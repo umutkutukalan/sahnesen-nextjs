@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  overscroll-behavior-y: contain;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Poppins", sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Fonts */
+.font-quicksand {
+  font-family: "Quicksand", sans-serif;
+}
+
+.font-shadowsIntoLightTwo {
+  font-family: "Shadows Into Light Two", cursive;
+}
+
+/* Layout helpers */
+.page-padding {
+  @apply p-4 md:px-10 md:py-6;
+}
+
+.page {
+  @apply w-full md:text-base text-xs;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+/* Navbar */
+.navbar {
+  @apply fixed w-full z-[100];
+  @apply flex items-center justify-between h-[64px];
+  @apply md:text-lg text-xs;
+  @apply transition-transform duration-300 ease-in-out;
+}
+
+.navbar-logo {
+  @apply list-none select-none cursor-pointer;
+}
+
+.navbar-links {
+  @apply flex items-center md:space-x-4 space-x-2;
+}
+
+/* Loading */
+.loading-screen {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 120px);
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.app-container {
+  padding-top: 64px;
+}
+
+/* Backgrounds */
+.music-bg {
+  background: linear-gradient(to bottom, #121212);
+}
+
+.bg-musicAboutPage {
+  background: linear-gradient(to right, #1a1a1a, #323232, #797979);
+  box-shadow: 0 80px 30px 5px rgba(50, 50, 50, 0.1);
+}
+
+.bg-musicDetail {
+  background: linear-gradient(to right bottom, #121212);
+}
+
+.bg-home {
+  background: linear-gradient(to right, #ffffff, #cde6b7);
+}
+
+/* Scrollbars */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #474747 #000000;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: #18181b;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4f46e5;
+  border-radius: 8px;
+}
+
+/* Hide scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -1,7 +1,6 @@
 "use client"; // client component olması lazım
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 // import { useUser } from "@/context/UserContext";
 
@@ -10,7 +9,6 @@ import LoginPage from "./login/page";
 
 const Home = () => {
   // const { user } = useUser();
-  const router = useRouter();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleClick = () => {

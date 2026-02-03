@@ -1,11 +1,17 @@
-// import { createBlog } from "../../utils";
+"use client";
 import LoginTable from "@/components/login/LoginTable";
 import RegisterTable from "@/components/login/RegisterTable";
+import { loginpageimg } from "@/utils";
+import Image from "next/image";
 import { useState } from "react";
 import { FaFireFlameCurved } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 
-const LoginPage = ({ setShowLoginModal }) => {
+export interface LoginPageProps {
+  setShowLoginModal: (value: boolean) => void;
+}
+
+const LoginPage = ({ setShowLoginModal }: LoginPageProps) => {
   const [sign, setSign] = useState(true);
   const [register, setRegister] = useState(false);
 
@@ -29,7 +35,7 @@ const LoginPage = ({ setShowLoginModal }) => {
       <div className="flex-1 w-full h-full py-10 flex flex-col justify-between items-center">
         <div className="flex items-center gap-1">
           <FaFireFlameCurved />
-          <h1 className="text-center">kızılelma</h1>
+          <h1 className="text-center">sahnesen</h1>
         </div>
         <div className="flex flex-col w-full justify-center items-center gap-2">
           <div className="flex flex-col items-center text-sm gap-2 w-100">
@@ -74,7 +80,11 @@ const LoginPage = ({ setShowLoginModal }) => {
         </div>
       </div>
       <div className="flex-1 w-full h-full">
-        {/* <img src={createBlog} alt="" className="w-full h-full object-cover" /> */}
+        <Image
+          src={loginpageimg}
+          alt=""
+          className="w-full h-full object-cover"
+        />
       </div>
     </div>
   );
