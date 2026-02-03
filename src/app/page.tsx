@@ -3,10 +3,10 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-// import LoginPage from "./login/login-page";
 // import { useUser } from "@/context/UserContext";
 
 import { ressam, runner, walker } from "../utils/";
+import LoginPage from "./login/page";
 
 const Home = () => {
   // const { user } = useUser();
@@ -31,7 +31,10 @@ const Home = () => {
             >
               Giriş Yap
             </button>
-            <button className="px-4 py-1 border rounded-md cursor-pointer">
+            <button
+              className="px-4 py-1 border rounded-md cursor-pointer"
+              onClick={() => setShowLoginModal(true)}
+            >
               Kaydol
             </button>
           </div>
@@ -101,11 +104,11 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {/* {showLoginModal && (
+      {showLoginModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-[9999]">
           <LoginPage setShowLoginModal={setShowLoginModal} />
         </div>
-      )} */}
+      )}
     </div>
   );
 };
