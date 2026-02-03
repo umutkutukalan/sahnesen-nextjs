@@ -1,6 +1,6 @@
 "use client";
 
-import { useRegister } from "@/hooks/useRegister";
+import { useRegister } from "@/hooks/login/useRegister";
 import Agreements from "./Agreements";
 import GoogleLogin from "./GoogleLogin";
 
