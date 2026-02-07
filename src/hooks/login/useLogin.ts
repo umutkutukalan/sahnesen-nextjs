@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useUser } from "../../context/UserContext";
-import { LoginService } from "@/services/login/loginService";
+import { LoginService } from "@/services/client/login/login.service";
 
 export const useLogin = () => {
   const [mail, setMail] = useState("");

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
-import {
-  RegisterData,
-  RegisterService,
-} from "@/services/login/registerService";
+import { RegisterData, RegisterService } from "@/services/client/login/register.service";
+
 
 export const useRegister = () => {
   const [name, setName] = useState("");
