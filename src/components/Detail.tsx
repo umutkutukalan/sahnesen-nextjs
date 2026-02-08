@@ -1,9 +1,16 @@
-import React from 'react'
+import { Project } from "@/services/server/project.service";
 
-const Detail = () => {
-  return (
-    <div>Detail</div>
-  )
+interface DetailProps {
+  project: Project;
 }
 
-export default Detail
+const Detail = ({ project }: DetailProps) => {
+  return (
+    <div>
+      <h1>{project.title}</h1>
+      {/* içerik */}
+    </div>
+  );
+};
+
+export default Detail;

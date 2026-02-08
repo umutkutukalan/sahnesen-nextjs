@@ -69,14 +69,7 @@ const Projects = ({
             <ProjectCard key={project.id} project={project} />
           ))}
 
-          {hasMore && (
-            <div
-              ref={loadMoreRef}
-              className="h-32 w-full bg-red-500 opacity-30"
-            >
-              LOAD MORE SENTINEL
-            </div>
-          )}
+          {hasMore && <div ref={loadMoreRef}></div>}
 
           {/* LOAD MORE */}
           {isLoadingMore && (
