@@ -1,4 +1,4 @@
-import Detail from "@/components/Detail";
+import Detail from "@/components/detail/Detail";
 import { getProjectBySlug } from "@/services/server/project.service";
 
 export interface ProjectDetailProps {

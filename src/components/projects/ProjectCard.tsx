@@ -122,7 +122,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                 project,
                 router,
                 author?.username,
-                project.title,
+                project.slug,
               )
             }
             className="text-gray-600 hover:text-gray-900 transition"

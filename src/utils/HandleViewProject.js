@@ -1,9 +1,9 @@
 import { generateSlug } from "./GenerateSlug";
 
-export const handleViewProject = (project, router, username, title) => {
+export const handleViewProject = (project, router, username, slug) => {
   const usernameSlug = generateSlug(username);
-  const projectSlug = generateSlug(title);
-  router.push(`/projeler/@${usernameSlug}/${projectSlug}`);
+  const projectSlug = slug;
+  router.push(`/projeler/${usernameSlug}/${projectSlug}`);
 };
 
 

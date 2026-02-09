@@ -17,6 +17,7 @@ import NavLinks from "./NavbarLinks";
 import { getProfileAccountWithUser } from "@/constants/index";
 import Link from "next/link";
 import LoginPage from "@/pages/LoginPage";
+import { usePathname } from "next/navigation";
 
 const Navbar = ({ transparent }: { transparent: boolean }) => {
   const { user, setUser } = useUser(); // setToken kaldırıldı
@@ -86,8 +87,10 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
     }
   };
 
-  const isHome = location.pathname === "/";
-  const isProfilePage = location.pathname.startsWith("/profil");
+  const pathname = usePathname();
+
+  const isHome = pathname === "/";
+  const isProfilePage = pathname.startsWith("/profil");
 
   return (
     <>
