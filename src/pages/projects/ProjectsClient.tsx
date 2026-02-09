@@ -5,6 +5,7 @@ import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
 import Projects from "./Projects";
 import { Project } from "@/services/server/project.service";
+import Navbar from "@/components/navbar/Navbar";
 
 interface Props {
   initialProjects: Project[];
@@ -29,10 +30,13 @@ export default function ProjectsClient({
   if (!user) return <Home />;
 
   return (
-    <Projects
-      initialProjects={initialProjects}
-      initialPage={initialPage}
-      totalPages={totalPages}
-    />
+    <>
+      <Navbar transparent={false} />
+      <Projects
+        initialProjects={initialProjects}
+        initialPage={initialPage}
+        totalPages={totalPages}
+      />
+    </>
   );
 }

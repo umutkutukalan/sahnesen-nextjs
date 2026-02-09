@@ -1,14 +1,16 @@
 "use client";
-import { useNavigate } from "react-router-dom";
-import { useToProfile } from "../../hooks/useToProfile";
+// import { useToProfile } from "../../hooks/useToProfile";
 import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { FaStar, FaStarHalf } from "react-icons/fa";
 import { handleViewBlog } from "../../utils/HandleViewBlog";
 
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 const PopularBlogs = ({ blogs }) => {
   const { formatRelativeTime } = useRelativeTime();
-  const navigate = useNavigate();
-  const { ToProfile } = useToProfile();
+  const router = useRouter();
+  // const { ToProfile } = useToProfile();
   console.log(blogs);
   const topBlogs = blogs.slice(0, 4);
   return (
@@ -27,18 +29,19 @@ const PopularBlogs = ({ blogs }) => {
           <li key={blog.id} className="flex flex-col gap-3 text-xs">
             <div className="flex items-center gap-2">
               <div
-                className="w-7 h-7 bg-gray-300 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 cursor-pointer"
-                onClick={() => ToProfile(blog?.user, blog?.user?.username)}
+                className="relative w-7 h-7 bg-gray-300 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 cursor-pointer"
+                // onClick={() => ToProfile(blog?.user, blog?.user?.username)}
               >
-                <img
+                <Image
                   src={blog.user.profileImg}
                   alt={blog.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               <span
                 className="cursor-pointer hover:underline"
-                onClick={() => ToProfile(blog?.user, blog?.user?.username)}
+                // onClick={() => ToProfile(blog?.user, blog?.user?.username)}
               >
                 {blog.user.name} {blog.user.surname}
               </span>
@@ -46,7 +49,7 @@ const PopularBlogs = ({ blogs }) => {
             <div
               className="flex flex-col gap-1 cursor-pointer"
               onClick={() =>
-                handleViewBlog(blog, navigate, blog?.user.name, blog?.title)
+                handleViewBlog(blog, router, blog?.user.name, blog?.title)
               }
             >
               <span

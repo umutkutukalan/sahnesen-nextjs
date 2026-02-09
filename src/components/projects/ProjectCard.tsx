@@ -13,8 +13,13 @@ import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { handleViewProject } from "../../utils/HandleViewProject";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
+import { Project } from "@/services/server/project.service";
 
-const ProjectCard = ({ project }) => {
+interface ProjectCardProps {
+  project: Project;
+}
+
+const ProjectCard = ({ project }: ProjectCardProps) => {
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
   const { hasUserLiked, liked } = useHasUserLiked();
@@ -25,7 +30,7 @@ const ProjectCard = ({ project }) => {
     getLikeCount(project.id, "project");
   }, [project?.id]);
 
-  const author = project.postCreateUser ?? project.user;
+  const author = project.user;
 
   return (
     <div className="w-full sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">

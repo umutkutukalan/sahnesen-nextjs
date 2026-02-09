@@ -5,3 +5,5 @@ export const handleViewProject = (project, router, username, title) => {
   const projectSlug = generateSlug(title);
   router.push(`/projeler/@${usernameSlug}/${projectSlug}`);
 };
+
+
