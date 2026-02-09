@@ -121,7 +121,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
             {user && user.role === "ADMIN" && (
               <div className="border-r pr-5">
                 <NavLinks
-                  href="/admin/NGZiMjE4MGYtZTBk/kutukalan-admin-access/olustur"
+                  href="/olustur"
                   logo={<FaFilePen />}
                 />
               </div>
