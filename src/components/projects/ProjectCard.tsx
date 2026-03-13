@@ -125,7 +125,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                 project.slug,
               )
             }
-            className="text-gray-600 hover:text-gray-900 transition"
+            className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
           >
             Okumaya Devam Et
           </button>
