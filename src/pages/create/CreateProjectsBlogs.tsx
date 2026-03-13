@@ -223,7 +223,7 @@ const CreateProjectsBlogs = ({ resourceType }) => {
   };
 
   return (
-    <div className={`page pt-5`}>
+    <div className={`page pt-20`}>
       <div className="page-padding flex justify-center">
         <div
           className={`h-[calc(100vh-64px)] w-full overflow-y-auto flex items-center justify-center`}

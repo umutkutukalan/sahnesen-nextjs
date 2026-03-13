@@ -86,7 +86,7 @@ const Detail = ({ project, blog }: DetailProps) => {
   }
 
   return (
-    <div className="page pt-5">
+    <div className="page pt-25">
       <div
         className={`page-padding flex gap-5 relative ${
           !isCommentsOpen && "items-center justify-center"

@@ -58,7 +58,7 @@ const Blogs = ({
   }, [user, getUserLikedProjects]);
 
   return (
-    <div className="page">
+    <div className="page pt-16">
       <div className="flex w-full">
         {/* SOL ANA AKIŞ */}
         <div className="w-full lg:w-5/7 flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-5">

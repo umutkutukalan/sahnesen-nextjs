@@ -12,7 +12,7 @@ export const CreateIntro = ({ setResourceType }: CreateIntroProps) => {
   const selectedType = currentResourceType || "projects";
 
   return (
-    <div className={`page h-[calc(100vh-64px)]`}>
+    <div className={`page h-[100vh]`}>
       <div className="flex h-full">
         <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
         <div
