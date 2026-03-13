@@ -1,4 +1,4 @@
-// app/projeler/layout.tsx
+// app/bloglar/layout.tsx
 
 import Navbar from "@/components/navbar/Navbar";
 
