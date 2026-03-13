@@ -3,7 +3,7 @@
 import Navbar from "@/components/navbar/Navbar";
 
 
-export default function ProjectsLayout({
+export default function BlogsLayout({
   children,
 }: {
   children: React.ReactNode;

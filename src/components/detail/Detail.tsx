@@ -16,14 +16,18 @@ import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import Image from "next/image";
 import { Blog } from "@/services/server/blog.service";
 
-interface DetailProps {
-  project?: Project;
-  blog?: Blog;
-}
+const SAMPLE_COMMENT_CREATED_AT = new Date(
+  Date.now() - 2 * 60 * 60 * 1000,
+).toISOString();
 
-const Detail = ({ project }: DetailProps) => {
-  const postId = project?.id;
-  const [type, setType] = useState(project ? "project" : "blog");
+type DetailProps =
+  | { project: Project; blog?: never }
+  | { blog: Blog; project?: never };
+
+const Detail = ({ project, blog }: DetailProps) => {
+  const detailData = project ?? blog;
+  const postId = detailData.id;
+  const type = project ? "project" : "blog";
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   // const { ToProfile } = useToProfile();
   const { formatRelativeTime } = useRelativeTime();
@@ -34,7 +38,7 @@ const Detail = ({ project }: DetailProps) => {
   const { likeCount, getLikeCount } = useGetLikeCount();
   const [likeCountLocal, setLikeCountLocal] = useState(likeCount);
 
-  const user = project?.user;
+  const user = detailData.user;
 
   const toggleComments = () => {
     setIsCommentsOpen(!isCommentsOpen);
@@ -49,7 +53,7 @@ const Detail = ({ project }: DetailProps) => {
       avatarColor: "from-blue-500 to-purple-500",
       comment:
         "Çok güzel anlatmışsın! Bu konuyu araştırıyordum tam zamanında geldi 🚀",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 saat önce
+      createdAt: SAMPLE_COMMENT_CREATED_AT, // 2 saat önce
     },
   ];
 
@@ -63,7 +67,7 @@ const Detail = ({ project }: DetailProps) => {
   useEffect(() => {
     hasUserLiked(postId, type);
     getLikeCount(postId, type);
-  }, [postId, type]);
+  }, [postId, type, hasUserLiked, getLikeCount]);
 
   const checkedLikeBtn = () => {
     if (likedLocal) {
@@ -131,11 +135,11 @@ const Detail = ({ project }: DetailProps) => {
               </div>
             </div>
             <div className="flex flex-col gap-3 border-b py-4 border-gray-200">
-              <h1 className="text-4xl font-bold">{project?.title}</h1>
+              <h1 className="text-4xl font-bold">{detailData.title}</h1>
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
                 <p>10 min read</p>
                 <span>•</span>
-                <p>{formatRelativeTime(project?.createdAt)} </p>
+                <p>{formatRelativeTime(detailData.createdAt)} </p>
               </div>
             </div>
             <div className="h-full w-full flex items-center py-2 justify-between border-b border-gray-200">
@@ -168,7 +172,7 @@ const Detail = ({ project }: DetailProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {project?.content.map((item, index) => {
+            {detailData.content.map((item, index) => {
               if (item.type === "paragraph") {
                 return (
                   <p key={index} className="text-gray-700 text-lg mb-5">

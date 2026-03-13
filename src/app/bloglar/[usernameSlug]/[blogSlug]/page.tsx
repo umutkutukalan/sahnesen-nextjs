@@ -1,17 +1,19 @@
 import Detail from "@/components/detail/Detail";
 import { getBlogBySlug } from "@/services/server/blog.service";
 
-export interface BlogDetailProps {
-  params: {
+interface PageProps {
+  params: Promise<{
     usernameSlug: string;
     blogSlug: string;
-  };
+  }>;
 }
-const BlogDetail = async ({ params }: BlogDetailProps) => {
-  const blog = await getBlogBySlug(
-    params.usernameSlug,
-    params.blogSlug,
-  );
+
+export default async function Page({ params }: PageProps) {
+  const { usernameSlug, blogSlug } = await params;
+
+  console.log("Fetching blog with:", { usernameSlug, blogSlug });
+
+  const blog = await getBlogBySlug(usernameSlug, blogSlug);
 
   if (!blog) {
     return (
@@ -21,9 +23,5 @@ const BlogDetail = async ({ params }: BlogDetailProps) => {
     );
   }
 
-  console.log("Fetched blog detail bree:", blog);
-
   return <Detail blog={blog} />;
-};
-
-export default BlogDetail;
+}
