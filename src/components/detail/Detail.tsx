@@ -14,9 +14,11 @@ import { useUnlikedPost } from "@/hooks/like/useUnlikedPost";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import Image from "next/image";
+import { Blog } from "@/services/server/blog.service";
 
 interface DetailProps {
-  project: Project;
+  project?: Project;
+  blog?: Blog;
 }
 
 const Detail = ({ project }: DetailProps) => {
@@ -32,7 +34,7 @@ const Detail = ({ project }: DetailProps) => {
   const { likeCount, getLikeCount } = useGetLikeCount();
   const [likeCountLocal, setLikeCountLocal] = useState(likeCount);
 
-  const user = project.user;
+  const user = project?.user;
 
   const toggleComments = () => {
     setIsCommentsOpen(!isCommentsOpen);
@@ -129,11 +131,11 @@ const Detail = ({ project }: DetailProps) => {
               </div>
             </div>
             <div className="flex flex-col gap-3 border-b py-4 border-gray-200">
-              <h1 className="text-4xl font-bold">{project.title}</h1>
+              <h1 className="text-4xl font-bold">{project?.title}</h1>
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
                 <p>10 min read</p>
                 <span>•</span>
-                <p>{formatRelativeTime(project.createdAt)} </p>
+                <p>{formatRelativeTime(project?.createdAt)} </p>
               </div>
             </div>
             <div className="h-full w-full flex items-center py-2 justify-between border-b border-gray-200">
@@ -166,7 +168,7 @@ const Detail = ({ project }: DetailProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {project.content.map((item, index) => {
+            {project?.content.map((item, index) => {
               if (item.type === "paragraph") {
                 return (
                   <p key={index} className="text-gray-700 text-lg mb-5">
