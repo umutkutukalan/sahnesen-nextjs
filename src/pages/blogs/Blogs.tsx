@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import PageAbout from "@/components/PageAbout";
-import ProjectCard from "@/components/projects/ProjectCard";
 
 import Notebook from "@/components/PageStickyExtra/Notebook";
 import LikedPost from "@/components/PageStickyExtra/LikedPost";
@@ -17,8 +16,9 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { Blog } from "@/services/server/blog.service";
 import { useGetBlogs } from "@/hooks/blogs/useGetBlogs";
+import BlogCard from "@/components/blogs/BlogCard";
 
-interface ProjectsProps {
+interface BlogsProps {
   initialBlogs: Blog[];
   initialPage: number;
   totalPages: number;
@@ -28,7 +28,7 @@ const Blogs = ({
   initialBlogs,
   initialPage,
   totalPages,
-}: ProjectsProps) => {
+}: BlogsProps) => {
   const { user } = useUser();
 
   console.log("Blogs component rendered with:", {
@@ -62,11 +62,11 @@ const Blogs = ({
       <div className="flex w-full">
         {/* SOL ANA AKIŞ */}
         <div className="w-full lg:w-5/7 flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-5">
-          <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" />
+          <PageAbout pageTitle={{ text: "Bloglar" }} contentType="Blogs" />
 
           {/* PROJE LİSTESİ */}
           {blogs.map((blog) => (
-            <ProjectCard key={blog.id} project={blog} />
+            <BlogCard key={blog.id} blog={blog} />
           ))}
 
           {hasMore && <div ref={loadMoreRef}></div>}
