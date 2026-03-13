@@ -71,10 +71,10 @@ const LoginPage = ({ setShowLoginModal }: LoginPageProps) => {
           }}
         >
           <p>
-            <button className="text-blue-500">kutukalan</button> , fikirlerini
+            <button className="text-blue-500">sahnesen</button> , fikirlerini
             paylaşan, sesini duyuran, çizgilerle düş kuranların dijital durağı.
             Giriş yaparak yazılım projelerini inceleyebilir, blogları
-            okuyabilir, müzikleri dinleyebilir, çizerlerin kitaplarında
+            okuyabilir, çizerlerin kitaplarında
             kaybolabilirsin.
           </p>
         </div>

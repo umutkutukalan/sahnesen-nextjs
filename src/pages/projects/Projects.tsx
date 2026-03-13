@@ -97,19 +97,24 @@ const Projects = ({
         </div>
 
         {/* SAĞ STICKY SIDEBAR */}
-        <aside className="hidden lg:flex lg:w-2/7 flex-col gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
+        <aside className="hidden lg:flex lg:w-2/7 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
           {/* Popular: infinite listeye bağlı olmasın */}
           <PopularProjects projects={projects.slice(0, 4)} />
 
-          {user && (
-            <>
+          {user ? (
+            <div className="flex flex-col gap-4">
               <Notebook />
               <LikedPost type="projects" />
               <BookMark />
-            </>
+              <StickySiteRules user={user} />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <StickySiteRules user={user} />
+            </div>
           )}
 
-          <StickySiteRules user={user} />
+
         </aside>
       </div>
 
