@@ -1,7 +1,7 @@
 import BlogsClient from "@/pages/blogs/BlogsClient";
 import { getBlogsServer } from "@/services/server/blog.service";
 
-export default async function ProjectsPage() {
+export default async function BlogsPage() {
   const data = await getBlogsServer(0, 5); // İlk sayfa projelerini sunucu tarafında al
   console.log("Server side fetched blogs:", data);
 
