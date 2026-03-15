@@ -3,5 +3,7 @@ import runner from "../../public/images/runner.jpeg";
 import walker from "../../public/images/walker.jpeg";
 
 import loginpageimg from "../../public/images/loginpageimg.jpeg";
+import loginpageimg from "../../public/images/profileborder.webp";
 
-export { ressam, runner, walker, loginpageimg };
+
+export { ressam, runner, walker, loginpageimg, profileborder };
