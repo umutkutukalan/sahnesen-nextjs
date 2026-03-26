@@ -19,7 +19,7 @@ const FollowersListItem = ({ follower, currentUserId, setFollowersList }) => {
           ToProfile(follower?.follower, follower?.follower?.username);
           setFollowersList(false);
         }}
-        className="w-10 h-10 border border-gray-300 rounded-full overflow-hidden flex items-end justify-center cursor-pointer flex-shrink-0"
+        className="w-10 h-10 border border-gray-300 rounded-full overflow-hidden flex items-end justify-center cursor-pointer flex-shrink-0 relative"
       >
         {follower.follower.profileImg ? (
           <Image
@@ -27,6 +27,7 @@ const FollowersListItem = ({ follower, currentUserId, setFollowersList }) => {
             alt=""
             fill
             unoptimized
+            className="object-cover"
           />
         ) : (
           <FiUser className="text-3xl text-gray-500" />

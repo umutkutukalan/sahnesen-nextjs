@@ -6,13 +6,14 @@ import { CiHeart } from "react-icons/ci";
 import { IoMdHeart } from "react-icons/io";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { handleViewBlog } from "@/utils/HandleViewBlog";
 import { Blog } from "@/services/server/blog.service";
+import { useToProfile } from "@/utils/useToProfile";
+import { useRouter } from "next/navigation";
 
 interface BlogCardProps {
     blog: Blog;
@@ -21,6 +22,7 @@ interface BlogCardProps {
 const BlogCard = ({ blog }: BlogCardProps) => {
     const { formatRelativeTime } = useRelativeTime();
     const router = useRouter();
+    const { ToProfile } = useToProfile();
     const { hasUserLiked, liked } = useHasUserLiked();
     const { likeCount, getLikeCount } = useGetLikeCount();
 
@@ -30,6 +32,8 @@ const BlogCard = ({ blog }: BlogCardProps) => {
     }, [blog?.id]);
 
     const author = blog.user;
+
+    console.log("BlogCard create user:", blog.postCreateUser);
 
     return (
         <div className="w-full sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
@@ -58,7 +62,15 @@ const BlogCard = ({ blog }: BlogCardProps) => {
             {/* RIGHT CONTENT */}
             <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 py-5">
                 {/* AUTHOR */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => {
+                        if (blog?.user) {
+                            ToProfile(blog?.user, blog.user?.username);
+                        } else {
+                            ToProfile(blog?.user, blog.user?.username);
+                        }
+                    }}
+                >
                     <div className="relative w-6 h-6 rounded-full overflow-hidden border">
                         {author?.profileImg ? (
                             <Image

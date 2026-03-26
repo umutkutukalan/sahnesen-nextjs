@@ -1,5 +1,6 @@
+import { useRouter } from "next/navigation";
 import { generateSlug } from "../utils/GenerateSlug";
-import { useRouter } from "next/router";
+
 
 export const useToProfile = () => {
   const router = useRouter();
@@ -7,7 +8,7 @@ export const useToProfile = () => {
     const usernameSlug = generateSlug(toUsername);
     const id = toUser?.id;
     const username = toUser?.username;
-    router.push(`/profil/${usernameSlug}`);
+    router.push(`/profile/${usernameSlug}`);
   };
   return { ToProfile };
 };

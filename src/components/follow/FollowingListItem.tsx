@@ -26,7 +26,9 @@ const FollowingItem = ({ following, currentUserId, setFollowingList }) => {
                     <Image
                         src={getOptimizedImageUrl(following.following.profileImg)}
                         alt=""
-                        className="w-full h-full object-cover"
+                        fill
+                        unoptimized
+                        className="object-cover"
                     />
                 ) : (
                     <FiUser className="text-3xl text-gray-500" />
