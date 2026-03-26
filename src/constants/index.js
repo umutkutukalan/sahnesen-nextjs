@@ -101,8 +101,7 @@ export const getProfileAccountWithUser = (user) => {
     } else if (item.dynamic && item.title === "Hesap Bilgileri") {
       return {
         ...item,
-        href: `/profil/@${usernameSlug}`,
-        state: { user },
+        href: `/profile/${user?.username}`,
       };
     } else if (item.dynamic && item.title === "Bloglarım" && user?.name) {
       return {

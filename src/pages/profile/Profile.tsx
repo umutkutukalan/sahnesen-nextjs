@@ -21,27 +21,33 @@ import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils"; // Özel karakterleri kaldırmak için yardımcı fonksiyon
 import Image from "next/image";
 import { profileborder } from "@/utils";
+import { useFollow } from "@/hooks/follow/useFollow";
+import ProfileUserProjects from "./ProfileUserProject";
+import { useGetUser } from "@/hooks/user/useGetUser";
 
-const Profile = () => {
+const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     const { user } = useUser();
     const router = useRouter();
     const currentUserId = user?.id; // Giriş yapan kullanıcının ID'si
+
     const [activeTab, setActiveTab] = useState("projeler"); // Tab state'i
     const [followingList, setFollowingList] = useState(false);
     const [followersList, setFollowersList] = useState(false);
 
+    // username varsa getUser'da username ile bulacağız
+    const { getUser, profileUser, isLoading } = useGetUser();
+
     // Eğer URL'de id varsa onu kullan, yoksa username kullan, hiçbiri yoksa giriş yapan kullanıcının profilini göster
 
-    {/*
-    const targetUserId = id || (username ? null : currentUserId); // id varsa id kullan, 
-    */}
+    console.log("ProfileUser in Profile component:", profileUser);
 
+    const targetUserId = profileUser?.id ?? (usernameSlug ? null : currentUserId);
 
-    // username varsa getUser'da username ile bulacağız
+    // kendi profili mi kontrolü — artık id state'i yok, username ile karşılaştır
+    const isOwnProfile = usernameSlug === user?.username;
 
-    const { getUser, profileUser, isLoading } = useGetUser();
-    const { publicSocialAccounts } = useGetPublicSocialAccount(targetUserId);
-    console.log("Public Social Accounts:", publicSocialAccounts);
+    // const { publicSocialAccounts } = useGetPublicSocialAccount(targetUserId);
+    // console.log("Public Social Accounts:", publicSocialAccounts);
 
     const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
 
@@ -52,10 +58,10 @@ const Profile = () => {
     const followers = getFollowers(targetUserId);
 
     useEffect(() => {
-        if (targetUserId) {
-            getUser(targetUserId);
+        if (usernameSlug) {
+            getUser(usernameSlug); // hook'un username desteklediğini varsayarak
         }
-    }, [targetUserId, getUser]);
+    }, [usernameSlug]);
 
     useEffect(() => {
         if (targetUserId) {
@@ -72,7 +78,7 @@ const Profile = () => {
     console.log(followings);
     console.log("Followers", followers);
 
-    if (isLoading) {
+    if (isLoading || !user) {
         return <LoadingScreen />;
     }
 
@@ -82,23 +88,29 @@ const Profile = () => {
                 <div className="w-full">
                     {/* Profil resmi ve bilgileri */}
                     <div className="w-full h-70 bg-gray-700 relative z-10">
-                        <div className="w-full h-full overflow-hidden">
+                        <div className="w-full h-full overflow-hidden relative">
                             <div className="absolute inset-0"></div>
-                            <Image
-                                src={
-                                    getOptimizedImageUrl(profileUser?.profileBorder) ||
-                                    profileborder
-                                }
-                                alt=""
-                                className="w-full h-full object-cover"
-                            />
+                            <div>
+                                <Image
+                                    src={
+                                        getOptimizedImageUrl(profileUser?.profileBorder) ||
+                                        profileborder
+                                    }
+                                    fill
+                                    unoptimized
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
                         </div>
                         <div className="absolute h-35 w-35 rounded-full overflow-hidden bg-gray-200 -bottom-15 right-15 shadow-lg z-20 flex items-center justify-center">
                             {profileUser?.profileImg ? (
                                 <Image
                                     src={getOptimizedImageUrl(profileUser.profileImg)}
                                     alt=""
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                                    fill
+                                    unoptimized
+                                    className="hover:scale-105 transition-transform duration-200"
                                     style={{
                                         imageRendering: "auto",
                                     }}
@@ -115,8 +127,8 @@ const Profile = () => {
                                 <button
                                     onClick={() => setActiveTab("projeler")}
                                     className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "projeler"
-                                            ? "border-blue-500 text-blue-600"
-                                            : "border-transparent text-gray-500 hover:text-gray-700"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
                                         }`}
                                 >
                                     Projeler
@@ -124,8 +136,8 @@ const Profile = () => {
                                 <button
                                     onClick={() => setActiveTab("bloglar")}
                                     className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "bloglar"
-                                            ? "border-blue-500 text-blue-600"
-                                            : "border-transparent text-gray-500 hover:text-gray-700"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
                                         }`}
                                 >
                                     Bloglar
@@ -133,8 +145,8 @@ const Profile = () => {
                                 <button
                                     onClick={() => setActiveTab("kitaplık")}
                                     className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "kitaplık"
-                                            ? "border-blue-500 text-blue-600"
-                                            : "border-transparent text-gray-500 hover:text-gray-700"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
                                         }`}
                                 >
                                     Kitaplık
@@ -146,9 +158,9 @@ const Profile = () => {
                                 {activeTab === "projeler" && (
                                     <ProfileUserProjects targetUserId={targetUserId} />
                                 )}
-                                {activeTab === "bloglar" && (
+                                {/* {activeTab === "bloglar" && (
                                     <ProfileUserBlogs targetUserId={targetUserId} />
-                                )}
+                                )} */}
                             </div>
                         </div>
                         {/* Kullanıcı adı ve takip butonu */}
@@ -171,7 +183,7 @@ const Profile = () => {
                                 </div>
                                 <div className="flex items-center gap-4 mt-2">
                                     {/* Kendi profilinde düzenle butonu, başkasının profilinde takip butonu */}
-                                    {!id || String(targetUserId) === String(currentUserId) ? (
+                                    {isOwnProfile ? (
                                         // Kendi profili - Düzenle butonu
                                         <button
                                             onClick={() => router.push("/me/settings")}
@@ -186,8 +198,8 @@ const Profile = () => {
                                             onClick={toggleFollow}
                                             disabled={isLoading}
                                             className={`px-3 py-1 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${isFollowing
-                                                    ? "bg-blue-50 text-blue-700 border-blue-200"
-                                                    : "bg-white text-green-700 border-gray-300"
+                                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                                : "bg-white text-green-700 border-gray-300"
                                                 }`}
                                         >
                                             {isLoading ? (
@@ -260,7 +272,7 @@ const Profile = () => {
                                         <span> Biyografi alanı doldurulmadı. </span>
                                     </div>
                                 )}
-                                {publicSocialAccounts.length > 0 && (
+                                {/* {publicSocialAccounts.length > 0 && (
                                     <div className="mt-5 flex flex-col gap-1">
                                         <h3 className="text-gray-600 text-xs">Bağlantılar</h3>
                                         {publicSocialAccounts.map((account) => (
@@ -302,14 +314,14 @@ const Profile = () => {
                                             </ul>
                                         ))}
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             {/* Takipçi ve takip eden listeleri */}
-            <div className="mt-6">
+            {/* <div className="mt-6">
                 {followingList && (
                     <FollowingList
                         followings={followings}
@@ -326,7 +338,7 @@ const Profile = () => {
                         setFollowersList={setFollowersList}
                     />
                 )}
-            </div>
+            </div> */}
         </div>
     );
 };
