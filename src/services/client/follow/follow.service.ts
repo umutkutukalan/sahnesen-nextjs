@@ -28,7 +28,7 @@ export const followService = {
     return response.json();
   },
 
-  getFollowCounts: async (userId: number) => {
+  getFollowCounts: async (userId: string | number) => {
     const response = await fetch(`${BASE_URL}/follows/count/${userId}`);
     return response.json();
   },
@@ -40,12 +40,12 @@ export const followService = {
     return response.json();
   },
 
-  getFollowing: async (userId: number) => {
+  getFollowing: async (userId: string | number) => {
     const response = await fetch(`${BASE_URL}/follows/following/${userId}`);
     return response.json();
   },
 
-  getFollowers: async (userId: number) => {
+  getFollowers: async (userId: string | number) => {
     const response = await fetch(`${BASE_URL}/follows/followers/${userId}`);
     return response.json();
   },

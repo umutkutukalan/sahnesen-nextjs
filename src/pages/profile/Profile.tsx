@@ -13,7 +13,6 @@ import {
     AiFillYoutube,
 } from "react-icons/ai";
 import { useUser } from "@/context/UserContext";
-import { followService } from "@/services/client/follow/follow.service";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useRouter } from "next/navigation";
 import { CiSettings } from "react-icons/ci";
@@ -21,9 +20,13 @@ import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils"; // Özel karakterleri kaldırmak için yardımcı fonksiyon
 import Image from "next/image";
 import { profileborder } from "@/utils";
-import { useFollow } from "@/hooks/follow/useFollow";
 import ProfileUserProjects from "./ProfileUserProject";
 import { useGetUser } from "@/hooks/user/useGetUser";
+import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
+import { useGetFollowers } from "@/hooks/follow/useGetFollowers";
+import { useFollow } from "@/hooks/follow/useFollow";
+import FollowersList from "@/components/follow/FollowersList";
+import FollowingList from "@/components/follow/FollowingList";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     const { user } = useUser();
@@ -50,12 +53,8 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     // console.log("Public Social Accounts:", publicSocialAccounts);
 
     const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
-
-    const getFollowing = followService.getFollowing;
-    const getFollowers = followService.getFollowers;
-
-    const followings = getFollowing(targetUserId);
-    const followers = getFollowers(targetUserId);
+    const { getFollowing, followings } = useGetFollowing();
+    const { getFollowers, followers } = useGetFollowers();
 
     useEffect(() => {
         if (usernameSlug) {
@@ -321,7 +320,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 </div>
             </div>
             {/* Takipçi ve takip eden listeleri */}
-            {/* <div className="mt-6">
+            <div className="mt-6">
                 {followingList && (
                     <FollowingList
                         followings={followings}
@@ -338,7 +337,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                         setFollowersList={setFollowersList}
                     />
                 )}
-            </div> */}
+            </div>
         </div>
     );
 };
