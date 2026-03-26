@@ -8,7 +8,7 @@ export const useGetFollowing = () => {
   const getFollowing = useCallback(async (targetUserId: string | number) => {
     try {
       const response = await followService.getFollowing(targetUserId);
-      setFollowing(response.data || []);
+      setFollowing(response || []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching following data:", error);

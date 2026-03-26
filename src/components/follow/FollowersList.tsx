@@ -2,6 +2,7 @@ import { IoClose } from "react-icons/io5";
 import FollowersListItem from "./FollowersListItem";
 
 const FollowersList = ({ followers, currentUserId, onClose, setFollowersList }) => {
+    console.log("FollowersList followers:", followers);
     return (
         <div
             className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-xs z-100"

@@ -20,7 +20,7 @@ const FollowingItem = ({ following, currentUserId, setFollowingList }) => {
                     ToProfile(following?.following, following?.following?.username);
                     setFollowingList(false);
                 }}
-                className="w-10 h-10 border border-gray-300 rounded-full overflow-hidden flex items-end justify-center cursor-pointer flex-shrink-0"
+                className="w-10 h-10 border border-gray-300 rounded-full overflow-hidden flex items-end justify-center cursor-pointer flex-shrink-0 relative"
             >
                 {following.following.profileImg ? (
                     <Image
@@ -39,7 +39,10 @@ const FollowingItem = ({ following, currentUserId, setFollowingList }) => {
                     <p className="text-gray-500" style={{ fontSize: "0.650rem" }}>
                         @{following.following.username}
                     </p>
-                    <span className="text-sm cursor-pointer" onClick={() => ToProfile()}>
+                    <span className="text-sm cursor-pointer" onClick={() => {
+                        ToProfile(following?.following, following?.following?.username);
+                        setFollowingList(false);
+                    }}>
                         {following.following.name} {following.following.surname}
                     </span>
                 </div>

@@ -38,7 +38,10 @@ const FollowersListItem = ({ follower, currentUserId, setFollowersList }) => {
           <p className="text-gray-500" style={{ fontSize: "0.650rem" }}>
             @{follower.follower.username}
           </p>
-          <span className="text-sm cursor-pointer" onClick={() => ToProfile()}>
+          <span className="text-sm cursor-pointer" onClick={() => {
+            ToProfile(follower?.follower, follower?.follower?.username);
+            setFollowersList(false);
+          }}>
             {follower.follower.name} {follower.follower.surname}
           </span>
         </div>
@@ -47,11 +50,10 @@ const FollowersListItem = ({ follower, currentUserId, setFollowersList }) => {
           <button
             onClick={toggleFollow}
             disabled={isLoading}
-            className={`px-3 py-1 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${
-              isFollowing
+            className={`px-3 py-1 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${isFollowing
                 ? "bg-blue-50 text-blue-700 border-blue-200"
                 : "bg-white text-green-700 border-gray-300"
-            }`}
+              }`}
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

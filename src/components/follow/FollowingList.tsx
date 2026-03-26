@@ -3,6 +3,9 @@ import FollowingItem from "./FollowingListItem";
 
 
 const FollowingList = ({ followings, currentUserId, onClose, setFollowingList }) => {
+
+  console.log("FollowingList followings:", followings);
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-xs z-100"
