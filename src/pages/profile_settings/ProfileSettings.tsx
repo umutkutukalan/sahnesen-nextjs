@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { profileSettingsOptions } from "../../constants";
 import { useUser } from "../../context/UserContext";
-import SocialAccounts from "../../components/ProfileSettings/SocialAccounts";
 import ProfileDetails from "@/components/profile_settings/ProfileDetails";
+import SocialAccounts from "@/components/profile_settings/SocialAccounts";
 
 const ProfileSettings = () => {
   const { user } = useUser();

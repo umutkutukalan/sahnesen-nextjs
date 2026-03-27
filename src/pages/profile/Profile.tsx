@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
@@ -27,6 +27,7 @@ import { useGetFollowers } from "@/hooks/follow/useGetFollowers";
 import { useFollow } from "@/hooks/follow/useFollow";
 import FollowersList from "@/components/follow/FollowersList";
 import FollowingList from "@/components/follow/FollowingList";
+import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     const { user } = useUser();
@@ -44,13 +45,12 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
 
     console.log("ProfileUser in Profile component:", profileUser);
 
-    const targetUserId = profileUser?.id ?? (usernameSlug ? null : currentUserId);
-
+    const targetUserId = profileUser?.id;
     // kendi profili mi kontrolü — artık id state'i yok, username ile karşılaştır
     const isOwnProfile = usernameSlug === user?.username;
 
-    // const { publicSocialAccounts } = useGetPublicSocialAccount(targetUserId);
-    // console.log("Public Social Accounts:", publicSocialAccounts);
+    const { getPublicSocialAccounts, publicSocialAccounts } = useSocialAccount(targetUserId);
+
 
     const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
     const { getFollowing, followings } = useGetFollowing();
@@ -74,8 +74,15 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
         }
     }, [targetUserId, getFollowers]);
 
-    console.log(followings);
-    console.log("Followers", followers);
+    useEffect(() => {
+        if (targetUserId) {
+            console.log("Fetching social accounts for ID:", targetUserId);
+            getPublicSocialAccounts(21);
+        }
+    }, [targetUserId]);
+    console.log("Social Accounts:", publicSocialAccounts);
+    console.log("Followings:", followings);
+    console.log("Followers:", followers);
 
     if (isLoading || !user) {
         return <LoadingScreen />;
@@ -271,7 +278,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                         <span> Biyografi alanı doldurulmadı. </span>
                                     </div>
                                 )}
-                                {/* {publicSocialAccounts.length > 0 && (
+                                {publicSocialAccounts.length > 0 && (
                                     <div className="mt-5 flex flex-col gap-1">
                                         <h3 className="text-gray-600 text-xs">Bağlantılar</h3>
                                         {publicSocialAccounts.map((account) => (
@@ -313,7 +320,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                             </ul>
                                         ))}
                                     </div>
-                                )} */}
+                                )}
                             </div>
                         </div>
                     </div>

@@ -24,6 +24,8 @@ export const useSocialAccount = (userId?: number | string) => {
         try {
             setIsLoading(true);
             const data = await socialAccountService.getPublicSocialAccounts(uid);
+            console.log("UID:", uid);
+            console.log("Fetched public social accounts:", data);
             setPublicSocialAccounts(data || []);
         } catch (err) {
             console.error("Error fetching public social accounts:", err);
