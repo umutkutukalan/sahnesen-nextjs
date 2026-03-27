@@ -185,7 +185,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                     {isOwnProfile ? (
                                         // Kendi profili - Düzenle butonu
                                         <button
-                                            onClick={() => router.push("/me/settings")}
+                                            onClick={() => router.push("/profile/me/settings")}
                                             className="px-3 py-1 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-200"
                                         >
                                             <CiSettings className="text-sm" />
