@@ -8,11 +8,15 @@ import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 
 const SocialAccounts = ({ user }) => {
   const { getSocialAccounts, socialAccounts, isLoading } = useSocialAccount();
+  
   useEffect(() => {
-    getSocialAccounts(user.id);
-  }, []);
+    if (user?.id) {
+      getSocialAccounts(user.id);
+    }
+  }, [user?.id, getSocialAccounts]);
+  
   console.log("SocialAccounts component - user:", socialAccounts);
-
+  
   return (
     <div className="min-h-screen">
       <ProfileBorderImage user={user} />

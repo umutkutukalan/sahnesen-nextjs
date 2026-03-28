@@ -24,6 +24,7 @@ export const getUserProjectsService = async (
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/projects?userId=${userId}&page=${page}&size=${size}&sort=createdAt,desc`,
       {
+        credentials: "include",
         cache: "no-store",
       },
     );
