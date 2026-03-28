@@ -11,7 +11,7 @@ const ProfileSettings = () => {
   const [settingsTitle, setSettingsTitle] = useState("Hesap Bilgileri");
   return (
     <div className="page">
-      <div className="w-full flex">
+      <div className="w-full h-full flex">
         <div
           className="w-1/5 flex h-full flex-col gap-5 p-5 border-r border-gray-200"
           style={{ position: "sticky", top: "64px" }}

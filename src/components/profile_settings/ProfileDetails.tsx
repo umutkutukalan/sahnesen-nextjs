@@ -1,19 +1,19 @@
 import { FiUser } from "react-icons/fi";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
-import Account from "../../components/ProfileSettingsItems/Account";
 import { RiImageEditLine } from "react-icons/ri";
 import { useState, useRef } from "react";
 import { useUser } from "../../context/UserContext";
-import { updateUserService } from "../../services/ProfileServices/updateUserService";
+// import { updateUserService } from "../../services/ProfileServices/updateUserService";
 import {
     compressProfileBorder,
     compressProfileImage,
-} from "../../utils/imageCompression";
-import { getOptimizedImageUrl } from "../../utils/imageUtils";
-import EmailField from "../ProfileSettingsItems/EmailField";
-import DeactivateAccount from "../ProfileSettingsItems/DeactivateAccount";
-import DeleteAccount from "../ProfileSettingsItems/DeleteAccount";
+} from "../../utils/ImageCompression";
 import Image from "next/image";
+import EmailField from "../profile_settings_item/EmailField";
+import Account from "../profile_settings_item/Account";
+import { getOptimizedImageUrl } from "@/utils/ImageUtils";
+import DeleteAccount from "../profile_settings_item/DeleteAccount";
+import DeactivateAccount from "../profile_settings_item/DeactivateAccount";
 
 const ProfileDetails = ({ user }) => {
     const { setUser } = useUser(); // UserContext'ten setUser fonksiyonunu al
@@ -35,29 +35,30 @@ const ProfileDetails = ({ user }) => {
     };
 
     // Resim kaydetme fonksiyonu
-    const handleSaveImage = async () => {
-        try {
-            const formData = {};
-            if (compressedProfileImageData) {
-                formData.profileImg = compressedProfileImageData;
-            } else if (compressedProfileBorderData) {
-                formData.profileBorder = compressedProfileBorderData;
-            }
 
-            const updatedUser = await updateUserService(formData);
-            setUser(updatedUser); // UserContext'i güncelle
+    // const handleSaveImage = async () => {
+    //     try {
+    //         const formData = {};
+    //         if (compressedProfileImageData) {
+    //             formData.profileImg = compressedProfileImageData;
+    //         } else if (compressedProfileBorderData) {
+    //             formData.profileBorder = compressedProfileBorderData;
+    //         }
 
-            setPreviewProfileImage(null);
-            setCompressedProfileImageData(null);
-            setPreviewProfileBorder(null);
-            setCompressedProfileBorderData(null);
+    //         const updatedUser = await updateUserService(formData);
+    //         setUser(updatedUser); // UserContext'i güncelle
 
-            alert("Güncellemeler başarıyla kaydedildi !");
-        } catch (error) {
-            console.error("Resim güncellenirken hata:", error);
-            alert("Resim güncellenirken bir hata oluştu.");
-        }
-    };
+    //         setPreviewProfileImage(null);
+    //         setCompressedProfileImageData(null);
+    //         setPreviewProfileBorder(null);
+    //         setCompressedProfileBorderData(null);
+
+    //         alert("Güncellemeler başarıyla kaydedildi !");
+    //     } catch (error) {
+    //         console.error("Resim güncellenirken hata:", error);
+    //         alert("Resim güncellenirken bir hata oluştu.");
+    //     }
+    // };
 
     // File input change handler
     const handleProfileImageChange = async (event) => {
@@ -111,7 +112,7 @@ const ProfileDetails = ({ user }) => {
                     {/* Profil resmi ve bilgileri */}
                     <div className="w-full h-70 bg-gray-700 relative z-10">
                         <div
-                            className="w-full h-full overflow-hidden group cursor-pointer"
+                            className="w-full h-full overflow-hidden group cursor-pointer relative"
                             onClick={handleProfileBorderSelect}
                         >
                             {/* Gizli file input */}
@@ -128,26 +129,31 @@ const ProfileDetails = ({ user }) => {
                             <div className="absolute inset-0 flex items-center justify-center transition-all">
                                 <RiImageEditLine className="text-4xl text-white transition-colors duration-100 hidden group-hover:block transition-all drop-shadow-lg" />
                             </div>
+
                             {previewProfileBorder ? (
-                                <Image
-                                    src={getOptimizedImageUrl(previewProfileBorder)}
-                                    alt=""
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                    style={{
-                                        imageRendering: "auto",
-                                        WebkitImageRendering: "auto",
-                                    }}
-                                />
+                                <div className="w-full h-full transition-transform duration-200 group-hover:scale-105">
+                                    <Image
+                                        src={getOptimizedImageUrl(previewProfileBorder)}
+                                        alt=""
+                                        fill
+                                        className="object-cover"
+                                        style={{
+                                            imageRendering: "auto",
+                                        }}
+                                    />
+                                </div>
                             ) : user?.profileBorder ? (
-                                <Image
-                                    src={getOptimizedImageUrl(user.profileBorder)} // Artık direkt base64 string
-                                    alt=""
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                    style={{
-                                        imageRendering: "auto",
-                                        WebkitImageRendering: "auto",
-                                    }}
-                                />
+                                <div className="w-full h-full transition-transform duration-200 group-hover:scale-105">
+                                    <Image
+                                        src={getOptimizedImageUrl(user.profileBorder)} // Artık direkt base64 string
+                                        alt=""
+                                        fill
+                                        className="object-cover"
+                                        style={{
+                                            imageRendering: "auto",
+                                        }}
+                                    />
+                                </div>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <RiImageEditLine className="text-4xl text-gray-500" />
@@ -168,24 +174,25 @@ const ProfileDetails = ({ user }) => {
                             />
 
                             {/* Resim önizlemesi - eğer yeni resim seçildiyse onu göster, yoksa mevcut resmi göster */}
+
                             {previewProfileImage ? (
                                 <Image
                                     src={getOptimizedImageUrl(previewProfileImage)}
                                     alt=""
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                                    fill
+                                    className="hover:scale-105 transition-transform duration-200"
                                     style={{
                                         imageRendering: "auto",
-                                        WebkitImageRendering: "auto",
                                     }}
                                 />
                             ) : user?.profileImg ? (
                                 <Image
                                     src={getOptimizedImageUrl(user.profileImg)} // Artık direkt base64 string
                                     alt=""
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                                    fill
+                                    className="object-cover hover:scale-105 transition-transform duration-200"
                                     style={{
                                         imageRendering: "auto",
-                                        WebkitImageRendering: "auto",
                                     }}
                                 />
                             ) : (

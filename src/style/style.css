@@ -1,0 +1,112 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Shadows+Into+Light+Two&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overscroll-behavior-y: contain; /* ekstra kaymaları engeller */
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #fff;
+  color: black;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+.font-quicksand {
+  font-family: 'Quicksand', sans-serif;
+}
+.font-shadowsIntoLightTwo {
+  font-family: 'Shadows Into Light Two', cursive;
+}
+
+.page-padding {
+  @apply p-4 md:px-10 md:py-6;
+}
+
+.page {
+  @apply w-full md:text-base text-xs;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.navbar {
+  @apply fixed w-full z-100;
+  @apply flex items-center justify-between h-[64px];
+  @apply md:text-lg text-xs;
+  @apply transition-transform duration-300 ease-in-out; /* Animasyon 
+  ekleme */
+}
+
+.navbar-logo {
+  @apply list-none select-none cursor-pointer;
+}
+
+.navbar-links {
+  @apply flex md:space-x-4 space-x-2 flex items-center;
+}
+
+.loading-screen {
+  position: fixed;
+  top: 64px; /* Navbar yüksekliği kadar */
+  left: 0;
+  width: 100%;
+  height: calc(100% - 120px); /* Navbar yüksekliği kadar */
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.app-container {
+  padding-top: 64px; /* Navbar yüksekliği kadar */
+}
+.music-bg {
+  background: linear-gradient(to bottom, #121212);
+}
+.bg-musicAboutPage {
+  background: linear-gradient(to right, #1a1a1a, #323232, #797979);
+  /* box-shadow: 10px 10px 10px 10px rgba(#797979, #797979, #797979, 0.5); */
+  box-shadow: 0 80px 30px 5px rgba(323232, 323232, 323232, 0.1);
+}
+.bg-musicDetail {
+  background: linear-gradient(to right bottom, #121212);
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #474747 #000000; /* thumb ve track rengi */
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: #18181b; /* track */
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4f46e5; /* thumb */
+  border-radius: 8px;
+}
+
+/* Scrollbar'ı tamamen gizlemek için */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.bg-home {
+  background: linear-gradient(to right, #ffffff, #cde6b7);
+}

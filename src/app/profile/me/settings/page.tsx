@@ -2,6 +2,7 @@
 
 import SocialAccounts from "@/components/profile_settings/SocialAccounts";
 import { useUser } from "@/context/UserContext"; // Path'i kendi klasör yapına göre düzenle
+import ProfileSettings from "@/pages/profile_settings/ProfileSettings";
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -29,6 +30,6 @@ export default function SettingsPage() {
     if (!user) return null;
 
     return (
-        <SocialAccounts user={user} />
+        <ProfileSettings />
     );
 }

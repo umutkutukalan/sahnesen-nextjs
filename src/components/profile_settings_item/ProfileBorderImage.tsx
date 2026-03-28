@@ -13,7 +13,7 @@ const ProfileBorderImage = ({ user }) => {
             src={getOptimizedImageUrl(user.profileBorder)} // Artık direkt base64 string
             alt=""
             fill
-            className="hover:scale-105 transition-transform duration-200 relative"
+            className="hover:scale-105 transition-transform duration-200 object-cover"
             style={{
               imageRendering: "auto",
             }}
@@ -25,13 +25,13 @@ const ProfileBorderImage = ({ user }) => {
                 src={profileborder}
                 alt=""
                 fill
-                className="hover:scale-105 transition-transform duration-200 brightness-45"
+                className="hover:scale-105 transition-transform duration-200 brightness-45 object-cover"
                 style={{
                   imageRendering: "auto",
                 }}
               />
             </div>
-            <RiImageEditLine className="text-4xl text-gray-300 z-10" />
+            <RiImageEditLine className="text-4xl text-gray-400 z-10" />
           </div>
         )}
       </div>
@@ -41,7 +41,7 @@ const ProfileBorderImage = ({ user }) => {
             src={getOptimizedImageUrl(user.profileImg)} // Artık direkt base64 string
             alt=""
             fill
-            className="hover:scale-105 transition-transform duration-200"
+            className="hover:scale-105 transition-transform duration-200 object-cover"
             style={{
               imageRendering: "auto",
             }}
