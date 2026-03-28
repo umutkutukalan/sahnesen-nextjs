@@ -8,6 +8,7 @@ import { useUser } from "../../context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useGetUserProjects } from "@/hooks/projects/useGetUserProjects";
 import Image from "next/image";
+import { undrawaddfiles } from "@/utils";
 
 const ProfileUserProjects = ({ targetUserId }: { targetUserId: string | number }) => {
     const { user } = useUser();
@@ -65,9 +66,9 @@ const ProfileUserProjects = ({ targetUserId }: { targetUserId: string | number }
                 ))
             ) : targetUserId === currentUserId ? (
                 <button className="col-span-full h-30 px-10 text-black border-2 border-gray-100 rounded-2xl flex items-center gap-8 group hover:shadow-md transition-shadow cursor-pointer">
-                    {/* <div className="relative">
+                    <div className="relative">
                         <Image src={undrawaddfiles} alt="" width={100} />
-                    </div> */}
+                    </div>
                     <div className="w-full flex flex-col text-left">
                         <p className="text-xl">İlk projenizi tanıtın!</p>
                         <p className="text-xs opacity-50">
