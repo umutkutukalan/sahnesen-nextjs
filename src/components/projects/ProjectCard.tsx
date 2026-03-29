@@ -14,6 +14,7 @@ import { handleViewProject } from "../../utils/HandleViewProject";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { Project } from "@/services/server/project.service";
+import { useToProfile } from "@/utils/useToProfile";
 
 interface ProjectCardProps {
   project: Project;
@@ -22,6 +23,7 @@ interface ProjectCardProps {
 const ProjectCard = ({ project }: ProjectCardProps) => {
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
+  const { ToProfile } = useToProfile();
   const { hasUserLiked, liked } = useHasUserLiked();
   const { likeCount, getLikeCount } = useGetLikeCount();
 
@@ -59,8 +61,16 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       {/* RIGHT CONTENT */}
       <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 py-5">
         {/* AUTHOR */}
-        <div className="flex items-center gap-2">
-          <div className="relative w-6 h-6 rounded-full overflow-hidden shadow-lg shadow-black/20">
+        <div className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            if (project?.user) {
+              ToProfile(project?.user, project.user?.username);
+            } else {
+              ToProfile(project?.user, project.user?.username);
+            }
+          }}
+        >
+          <div className="relative w-8 h-8 rounded-full overflow-hidden shadow-lg shadow-black/20">
             {author?.profileImg ? (
               <Image
                 src={author.profileImg}
@@ -74,14 +84,21 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             )}
           </div>
 
-          <div className="flex items-center gap-1 text-xs text-gray-600 truncate">
-            <span className="truncate">
-              {author?.name || author?.email} {author?.surname}
-            </span>
-            <TbRosetteDiscountCheckFilled
-              className="text-blue-500 shrink-0"
-              title="Onaylı Yazar"
-            />
+          <div className="truncate">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1 text-xs text-gray-600">
+                <span className="truncate">
+                  {author?.name || author?.email} {author?.surname}
+                </span>
+                <TbRosetteDiscountCheckFilled
+                  className="text-blue-500 shrink-0"
+                  title="Onaylı Yazar"
+                />
+              </div>
+              <span className="truncate text-[8px] text-gray-400">
+                @{author?.username}
+              </span>
+            </div>
           </div>
         </div>
 

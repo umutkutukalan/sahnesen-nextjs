@@ -160,7 +160,7 @@ const ProfileDetails = ({ user }) => {
                             )}
                         </div>
                         <div
-                            className="absolute h-30 w-30 rounded-full overflow-hidden bg-gray-200 -bottom-10 left-20 shadow-lg z-20 flex items-center justify-center group transition-all cursor-pointer"
+                            className="absolute h-30 w-30 rounded-full overflow-hidden bg-gray-200 -bottom-10 left-20 z-20 flex items-center justify-center group shadow-lg shadow-black/20 transition-all cursor-pointer"
                             onClick={handleProfileImageSelect}
                         >
                             {/* Gizli file input */}
@@ -179,7 +179,7 @@ const ProfileDetails = ({ user }) => {
                                     src={getOptimizedImageUrl(previewProfileImage)}
                                     alt=""
                                     fill
-                                    className="hover:scale-105 transition-transform duration-200"
+                                    className="hover:scale-105 transition-transform duration-200 object-cover"
                                     style={{
                                         imageRendering: "auto",
                                     }}

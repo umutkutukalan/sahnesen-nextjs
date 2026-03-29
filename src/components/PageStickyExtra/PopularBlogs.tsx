@@ -30,7 +30,7 @@ const PopularBlogs = ({ blogs }) => {
             <div className="flex items-center gap-2">
               <div
                 className="relative w-7 h-7 bg-gray-300 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 cursor-pointer"
-                // onClick={() => ToProfile(blog?.user, blog?.user?.username)}
+              // onClick={() => ToProfile(blog?.user, blog?.user?.username)}
               >
                 <Image
                   src={blog.user.profileImg}
@@ -41,7 +41,7 @@ const PopularBlogs = ({ blogs }) => {
               </div>
               <span
                 className="cursor-pointer hover:underline"
-                // onClick={() => ToProfile(blog?.user, blog?.user?.username)}
+              // onClick={() => ToProfile(blog?.user, blog?.user?.username)}
               >
                 {blog.user.name} {blog.user.surname}
               </span>
@@ -49,7 +49,7 @@ const PopularBlogs = ({ blogs }) => {
             <div
               className="flex flex-col gap-1 cursor-pointer"
               onClick={() =>
-                handleViewBlog(blog, router, blog?.user.name, blog?.title)
+                handleViewBlog(blog, router, blog?.user.username, blog?.slug)
               }
             >
               <span

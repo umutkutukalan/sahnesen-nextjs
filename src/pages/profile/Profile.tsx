@@ -109,14 +109,14 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                 />
                             </div>
                         </div>
-                        <div className="absolute h-35 w-35 rounded-full overflow-hidden bg-gray-200 -bottom-15 right-15 shadow-lg z-20 flex items-center justify-center">
+                        <div className="absolute h-35 w-35 rounded-full overflow-hidden bg-gray-200 -bottom-15 right-15 z-20 flex items-center justify-center shadow-lg shadow-black/20">
                             {profileUser?.profileImg ? (
                                 <Image
                                     src={getOptimizedImageUrl(profileUser.profileImg)}
                                     alt=""
                                     fill
                                     unoptimized
-                                    className="hover:scale-105 transition-transform duration-200"
+                                    className="hover:scale-105 transition-transform duration-200 object-cover"
                                     style={{
                                         imageRendering: "auto",
                                     }}

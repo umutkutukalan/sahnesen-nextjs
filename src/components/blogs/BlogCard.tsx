@@ -71,7 +71,7 @@ const BlogCard = ({ blog }: BlogCardProps) => {
                         }
                     }}
                 >
-                    <div className="relative w-6 h-6 rounded-full overflow-hidden shadow-lg shadow-black/20">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden shadow-lg shadow-black/20">
                         {author?.profileImg ? (
                             <Image
                                 src={author.profileImg}
@@ -85,14 +85,21 @@ const BlogCard = ({ blog }: BlogCardProps) => {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-1 text-xs text-gray-600 truncate">
-                        <span className="truncate">
-                            {author?.name || author?.email} {author?.surname}
-                        </span>
-                        <TbRosetteDiscountCheckFilled
-                            className="text-blue-500 shrink-0"
-                            title="Onaylı Yazar"
-                        />
+                    <div className="truncate">
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-1 text-xs text-gray-600">
+                                <span className="truncate">
+                                    {author?.name || author?.email} {author?.surname}
+                                </span>
+                                <TbRosetteDiscountCheckFilled
+                                    className="text-blue-500 shrink-0"
+                                    title="Onaylı Yazar"
+                                />
+                            </div>
+                            <span className="truncate text-[8px] text-gray-400">
+                                @{author?.username}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
