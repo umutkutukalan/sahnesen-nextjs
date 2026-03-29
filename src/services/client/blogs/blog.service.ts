@@ -28,7 +28,7 @@ export const getUserBlogsService = async (
         cache: "no-store",
       },
     );
-    return response;
+    return response.json();
   } catch (error) {
     console.error("Kullanıcı blogları çekilirken hata:", error);
     throw error;

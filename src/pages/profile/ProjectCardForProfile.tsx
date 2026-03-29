@@ -4,11 +4,13 @@ import { useAuth } from "../../context/UserContext";
 import { LuImages } from "react-icons/lu";
 import { handleViewProject } from "../../utils/HandleViewProject";
 import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const ProjectCardForProfile = ({ project, onDelete }) => {
   const { user } = useAuth();
   const { formatRelativeTime } = useRelativeTime();
-  const navigate = useNavigate();
+  const route = useRouter();
   const { deleteProject } = useDeleteProject();
   const [showConfirm, setShowConfirm] = useState(false);
   // console.log("Project User:", project.user); // Debug için kaldırıldı
@@ -48,15 +50,16 @@ const ProjectCardForProfile = ({ project, onDelete }) => {
     <div className="w-full h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-2 px-5">
       <div className="w-1/6 h-full rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
         <div
-          className={`w-full h-35 bg-white rounded-lg overflow-hidden flex items-center justify-center ${
+          className={`w-full h-35 bg-white rounded-lg overflow-hidden flex items-center justify-center relative ${
             project.image ? "" : "border border-gray-100 shadow-sm"
           }`}
         >
           {project.image ? (
-            <img
+            <Image
               src={project.image}
               alt="image"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <LuImages className="text-5xl text-gray-300" />
@@ -90,7 +93,7 @@ const ProjectCardForProfile = ({ project, onDelete }) => {
               onClick={() =>
                 handleViewProject(
                   project,
-                  navigate,
+                  route,
                   project?.user?.name,
                   project?.title
                 )

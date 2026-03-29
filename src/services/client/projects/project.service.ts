@@ -28,7 +28,7 @@ export const getUserProjectsService = async (
         cache: "no-store",
       },
     );
-    return response;
+    return response.json();
   } catch (error) {
     console.error("Kullanıcı projeleri çekilirken hata:", error);
     throw error;
