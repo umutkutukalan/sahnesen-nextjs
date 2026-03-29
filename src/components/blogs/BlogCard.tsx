@@ -71,7 +71,7 @@ const BlogCard = ({ blog }: BlogCardProps) => {
                         }
                     }}
                 >
-                    <div className="relative w-6 h-6 rounded-full overflow-hidden border">
+                    <div className="relative w-6 h-6 rounded-full overflow-hidden shadow-lg shadow-black/20">
                         {author?.profileImg ? (
                             <Image
                                 src={author.profileImg}

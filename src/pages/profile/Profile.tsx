@@ -93,7 +93,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div className="w-full">
                 <div className="w-full">
                     {/* Profil resmi ve bilgileri */}
-                    <div className="w-full h-70 bg-gray-700 relative z-10">
+                    <div className="w-full h-100 bg-gray-700 relative z-10">
                         <div className="w-full h-full overflow-hidden relative">
                             <div className="absolute inset-0"></div>
                             <div>

@@ -37,9 +37,8 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       {/* LEFT IMAGE */}
       <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg overflow-hidden flex-shrink-0 sm:flex items-center justify-center">
         <div
-          className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${
-            project.image ? "" : "border border-gray-100 shadow-sm"
-          }`}
+          className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${project.image ? "" : "border border-gray-100 shadow-sm"
+            }`}
         >
           {project.image ? (
             <Image
@@ -61,7 +60,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 py-5">
         {/* AUTHOR */}
         <div className="flex items-center gap-2">
-          <div className="relative w-6 h-6 rounded-full overflow-hidden border">
+          <div className="relative w-6 h-6 rounded-full overflow-hidden shadow-lg shadow-black/20">
             {author?.profileImg ? (
               <Image
                 src={author.profileImg}
