@@ -12,7 +12,7 @@ import BookMark from "@/components/PageStickyExtra/BookMark";
 import StickySiteRules from "@/components/PageStickyExtra/StickySiteRules";
 import PopularProjects from "@/components/PageStickyExtra/PopularProjects";
 
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/UserContext";
 import { useGetProjects } from "@/hooks/projects/useGetProjects";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
@@ -29,7 +29,7 @@ const Projects = ({
   initialPage,
   totalPages,
 }: ProjectsProps) => {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   console.log("Projects component rendered with:", {
     initialProjectsLength: initialProjects.length,

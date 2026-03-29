@@ -7,7 +7,7 @@ import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
 import { IoSettingsOutline } from "react-icons/io5";
 import axios from "axios";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
 // import NotificationsForUser from "./Notifications/NotificationsForUser";
@@ -20,7 +20,7 @@ import LoginPage from "@/pages/LoginPage";
 import { usePathname } from "next/navigation";
 
 const Navbar = ({ transparent }: { transparent: boolean }) => {
-  const { user, setUser } = useUser(); // setToken kaldırıldı
+  const { user, setUser } = useAuth(); // setToken kaldırıldı
   // const { unreadCount } = useNotification();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);

@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { useState } from "react";
-// import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/UserContext";
 
 import { ressam, runner, walker } from "../utils/";
 import LoginPage from "./LoginPage";
 
 const Home = () => {
-  // const { user } = useUser();
+  const { user } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleClick = () => {

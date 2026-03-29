@@ -1,14 +1,13 @@
 "use client";
 
-import SocialAccounts from "@/components/profile_settings/SocialAccounts";
-import { useUser } from "@/context/UserContext"; // Path'i kendi klasör yapına göre düzenle
+import { useAuth } from "@/context/UserContext"; // Path'i kendi klasör yapına göre düzenle
 import ProfileSettings from "@/pages/profile_settings/ProfileSettings";
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function SettingsPage() {
-    const { user, loading } = useUser();
+    const { user, loading } = useAuth();
     const router = useRouter();
 
     // Eğer kullanıcı giriş yapmamışsa ve yükleme bittiyse login'e yönlendir

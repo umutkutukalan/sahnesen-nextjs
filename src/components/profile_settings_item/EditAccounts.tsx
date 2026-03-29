@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { IoClose } from "react-icons/io5";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 
 const EditAccounts = ({ editSettings, setEditSettings, account, onUpdate }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [hasChanges, setHasChanges] = useState(false);
   const [deleteCheck, setDeleteCheck] = useState(false);
   const [updateAccountData, setUpdateAccountData] = useState({

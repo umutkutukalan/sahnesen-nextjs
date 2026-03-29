@@ -1,10 +1,10 @@
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { MdCheck } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { useFollow } from "@/hooks/follow/useFollow";
 
 const FollowButton = ({ userId, className = "" }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { isFollowing, followCounts, isLoading, toggleFollow, canFollow } =
     useFollow(userId);
 

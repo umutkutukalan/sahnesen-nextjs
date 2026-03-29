@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/UserContext";
 import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
 import Projects from "./Projects";
@@ -24,7 +24,7 @@ export default function ProjectsClient({
     totalPages,
   });
 
-  const { user, loading } = useUser();
+  const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
   if (!user) return <Home />;

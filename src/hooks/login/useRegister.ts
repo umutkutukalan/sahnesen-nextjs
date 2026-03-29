@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/UserContext";
 import { RegisterData, RegisterService } from "@/services/client/login/register.service";
 
 
@@ -8,7 +8,7 @@ export const useRegister = () => {
   const [surname, setSurname] = useState("");
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useUser();
+  const { setUser } = useAuth();
 
   const data: RegisterData = {
     name,

@@ -1,10 +1,10 @@
 import { IoIosArrowForward } from "react-icons/io";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 
 const EmailField = () => {
-  const { user, setUser } = useUser(); // setUser'ı d import et
+  const { user, setUser } = useAuth(); // setUser'ı d import et
   const [editProfile, setEditProfile] = useState(false);
   const [hasChanges, setHasChanges] = useState(false); // Değişiklik kontrolü için
 

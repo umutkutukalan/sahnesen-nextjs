@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
@@ -12,7 +12,7 @@ import {
     AiFillTwitterSquare,
     AiFillYoutube,
 } from "react-icons/ai";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useRouter } from "next/navigation";
 import { CiSettings } from "react-icons/ci";
@@ -30,7 +30,7 @@ import FollowingList from "@/components/follow/FollowingList";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
-    const { user } = useUser();
+    const { user } = useAuth();
     const router = useRouter();
     const currentUserId = user?.id; // Giriş yapan kullanıcının ID'si
 

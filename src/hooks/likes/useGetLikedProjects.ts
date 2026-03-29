@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { getUserProjectsLikes } from "@/services/client/projects/likes_project.service";
 import { Project } from "@/services/server/project.service";
 
 export const useGetUserLikedProjects = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const userId = user?.id;
   const [likedProjects, setLikedProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);

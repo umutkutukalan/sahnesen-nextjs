@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { LoginService } from "@/services/client/login/login.service";
 
 export const useLogin = () => {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useUser(); // setToken'ı kaldırdık
+  const { setUser } = useAuth(); // setToken'ı kaldırdık
 
   const data = {
     mail,

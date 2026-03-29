@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 
 const YourLinksAccount = ({ onUpdate }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { createSocialAccount, isLoading, error } = useSocialAccount();
   const [editSettings, setEditSettings] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);

@@ -1,20 +1,20 @@
 "use client";
 import { IoMdHeartEmpty } from "react-icons/io";
-import { useUser } from "../../context/UserContext";
+import { useAuth  } from "../../context/UserContext";
 import { useRouter } from "next/navigation";
 import { generateSlug } from "../../utils/GenerateSlug";
 
 const LikedPost = ({ type }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
   const handleViewLikedProjects = () => {
     if (user) {
       const username = user?.username;
       const usernameSlug = generateSlug(username);
       if (type === "projects") {
-        router(`/liked-projects/@${usernameSlug}`);
+        router.push(`/liked-projects/@${usernameSlug}`);
       } else if (type === "blogs") {
-        router(`/liked-blogs/@${usernameSlug}`);
+        router.push(`/liked-blogs/@${usernameSlug}`);
       }
     }
   };

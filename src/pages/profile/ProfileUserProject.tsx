@@ -4,14 +4,14 @@ import { useEffect } from "react";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import ProjectCardForProfile from "./ProjectCardForProfile";
 // import { undrawaddfiles } from "../../utils";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useGetUserProjects } from "@/hooks/projects/useGetUserProjects";
 import Image from "next/image";
 import { undrawaddfiles } from "@/utils";
 
 const ProfileUserProjects = ({ targetUserId }: { targetUserId: string | number }) => {
-    const { user } = useUser();
+    const { user } = useAuth();
     const currentUserId = user?.id;
     console.log("targetUserId:", targetUserId);
     console.log("currentUserId:", currentUserId);

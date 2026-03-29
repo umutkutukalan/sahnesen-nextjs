@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { followService } from "@/services/client/follow/follow.service";
 
 export const useFollow = (targetUserId: number) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followCounts, setFollowCounts] = useState({
     followingCount: 0,

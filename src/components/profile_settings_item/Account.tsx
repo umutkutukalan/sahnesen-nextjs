@@ -1,18 +1,18 @@
 import { IoIosArrowForward } from "react-icons/io";
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
-import { useUser } from "../../context/UserContext";
-import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
+import { useUser } from "@/hooks/user/useUser";
+import { useAuth } from "@/context/UserContext";
 
 const Account = () => {
-  const { user, setUser } = useUser(); // setUser'ı da import et
+  const { user, setUser } = useAuth(); // setUser'ı da import et
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
     bio: "",
   });
-  const { updateSocialAccount, isLoading, error } =
-    useSocialAccount();
+  const { updateUser, isLoading, error } =
+    useUser();
   const [editProfile, setEditProfile] = useState(false);
   const [hasChanges, setHasChanges] = useState(false); // Değişiklik kontrolü için
 
@@ -61,7 +61,7 @@ const Account = () => {
   // Kaydet işlemi
   const handleSave = async () => {
     try {
-      const updatedUser = await updateSocialAccount(user?.id, formData);
+      const updatedUser = await updateUser(formData);
 
       // UserContext'teki user bilgisini güncelle
       setUser(updatedUser);
@@ -200,11 +200,10 @@ const Account = () => {
               <button
                 onClick={handleSave}
                 disabled={!hasChanges || isLoading}
-                className={`rounded-md px-4 py-2 text-xs transition-colors ${
-                  hasChanges && !isLoading
-                    ? "bg-gray-500 hover:bg-gray-600 text-white cursor-pointer"
-                    : "bg-gray-100 text-gray-500 cursor-not-allowed"
-                }`}
+                className={`rounded-md px-4 py-2 text-xs transition-colors ${hasChanges && !isLoading
+                  ? "bg-gray-500 hover:bg-gray-600 text-white cursor-pointer"
+                  : "bg-gray-100 text-gray-500 cursor-not-allowed"
+                  }`}
               >
                 {isLoading ? "Kaydediliyor..." : "Kaydet"}
               </button>

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { profileSettingsOptions } from "../../constants";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import ProfileDetails from "@/components/profile_settings/ProfileDetails";
 import SocialAccounts from "@/components/profile_settings/SocialAccounts";
 
 const ProfileSettings = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [settingsTitle, setSettingsTitle] = useState("Hesap Bilgileri");
   return (
     <div className="page">

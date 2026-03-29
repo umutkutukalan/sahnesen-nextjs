@@ -2,8 +2,8 @@ import { FiUser } from "react-icons/fi";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { RiImageEditLine } from "react-icons/ri";
 import { useState, useRef } from "react";
-import { useUser } from "../../context/UserContext";
-// import { updateUserService } from "../../services/ProfileServices/updateUserService";
+import { useAuth } from "../../context/UserContext";
+import { updateUser } from "../../services/client/user/user.service";
 import {
     compressProfileBorder,
     compressProfileImage,
@@ -16,7 +16,7 @@ import DeleteAccount from "../profile_settings_item/DeleteAccount";
 import DeactivateAccount from "../profile_settings_item/DeactivateAccount";
 
 const ProfileDetails = ({ user }) => {
-    const { setUser } = useUser(); // UserContext'ten setUser fonksiyonunu al
+    const { setUser } = useAuth(); // UserContext'ten setUser fonksiyonunu al
     const [previewProfileImage, setPreviewProfileImage] = useState(null); // Preview URL
     const [previewProfileBorder, setPreviewProfileBorder] = useState(null); // Preview URL for border
     const [compressedProfileImageData, setCompressedProfileImageData] =
@@ -35,30 +35,29 @@ const ProfileDetails = ({ user }) => {
     };
 
     // Resim kaydetme fonksiyonu
+    const handleSaveImage = async () => {
+        try {
+            const formData = {};
+            if (compressedProfileImageData) {
+                formData.profileImg = compressedProfileImageData;
+            } else if (compressedProfileBorderData) {
+                formData.profileBorder = compressedProfileBorderData;
+            }
 
-    // const handleSaveImage = async () => {
-    //     try {
-    //         const formData = {};
-    //         if (compressedProfileImageData) {
-    //             formData.profileImg = compressedProfileImageData;
-    //         } else if (compressedProfileBorderData) {
-    //             formData.profileBorder = compressedProfileBorderData;
-    //         }
+            const updatedUser = await updateUser(formData);
+            setUser(updatedUser); // UserContext'i güncelle
 
-    //         const updatedUser = await updateUserService(formData);
-    //         setUser(updatedUser); // UserContext'i güncelle
+            setPreviewProfileImage(null);
+            setCompressedProfileImageData(null);
+            setPreviewProfileBorder(null);
+            setCompressedProfileBorderData(null);
 
-    //         setPreviewProfileImage(null);
-    //         setCompressedProfileImageData(null);
-    //         setPreviewProfileBorder(null);
-    //         setCompressedProfileBorderData(null);
-
-    //         alert("Güncellemeler başarıyla kaydedildi !");
-    //     } catch (error) {
-    //         console.error("Resim güncellenirken hata:", error);
-    //         alert("Resim güncellenirken bir hata oluştu.");
-    //     }
-    // };
+            alert("Güncellemeler başarıyla kaydedildi !");
+        } catch (error) {
+            console.error("Resim güncellenirken hata:", error);
+            alert("Resim güncellenirken bir hata oluştu.");
+        }
+    };
 
     // File input change handler
     const handleProfileImageChange = async (event) => {

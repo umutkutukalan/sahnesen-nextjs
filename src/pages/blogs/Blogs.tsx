@@ -11,7 +11,7 @@ import BookMark from "@/components/PageStickyExtra/BookMark";
 import StickySiteRules from "@/components/PageStickyExtra/StickySiteRules";
 import PopularProjects from "@/components/PageStickyExtra/PopularProjects";
 
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/UserContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { Blog } from "@/services/server/blog.service";
@@ -29,7 +29,7 @@ const Blogs = ({
   initialPage,
   totalPages,
 }: BlogsProps) => {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   console.log("Blogs component rendered with:", {
     initialBlogsLength: initialBlogs.length,

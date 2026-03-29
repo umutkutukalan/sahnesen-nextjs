@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { GoCheck, GoPlus } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 
 import { FaPencil } from "react-icons/fa6";
 import { IoIosMove } from "react-icons/io";
@@ -12,7 +12,7 @@ import { useCreateContent } from "@/hooks/create/useCreateProject";
 const CreateProjectsBlogs = ({ resourceType }) => {
   const titleRef = useRef(null);
   const [content, setContent] = useState([{ type: "paragraph", value: "" }]);
-  const { user } = useUser();
+  const { user } = useAuth();
   const [userId, setUserId] = useState(user?.id || null); // userId'yi UserContext'ten al
   const [focusedIndex, setFocusedIndex] = useState(null);
   const [menuOpenIndex, setMenuOpenIndex] = useState(null);

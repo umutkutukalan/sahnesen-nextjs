@@ -1,12 +1,12 @@
 import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { useState } from "react";
-import { useUser } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { LuImages } from "react-icons/lu";
 import { handleViewProject } from "../../utils/HandleViewProject";
 import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
 
 const ProjectCardForProfile = ({ project, onDelete }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { formatRelativeTime } = useRelativeTime();
   const navigate = useNavigate();
   const { deleteProject } = useDeleteProject();
