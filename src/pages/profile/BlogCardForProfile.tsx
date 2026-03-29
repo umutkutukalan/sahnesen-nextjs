@@ -14,6 +14,8 @@ const BlogCardForProfile = ({ blog, onDelete }) => {
   const { deleteBlog } = useDeleteBlog();
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const author = blog?.user;
+
   const handleDeleteClick = () => {
     if (!user) {
       alert("Bu işlem için giriş yapmalısınız!");
@@ -93,8 +95,8 @@ const BlogCardForProfile = ({ blog, onDelete }) => {
                 handleViewBlog(
                   blog,
                   route,
-                  blog?.user?.name,
-                  blog?.title
+                  author?.username,
+                  blog?.slug
                 )
               }
               className="cursor-pointer text-xs text-gray-500 hover:text-gray-700 transition-all"

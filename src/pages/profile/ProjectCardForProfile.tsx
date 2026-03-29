@@ -15,6 +15,8 @@ const ProjectCardForProfile = ({ project, onDelete }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   // console.log("Project User:", project.user); // Debug için kaldırıldı
 
+  const author = project.user;
+
   const handleDeleteClick = () => {
     if (!user) {
       alert("Bu işlem için giriş yapmalısınız!");
@@ -50,9 +52,8 @@ const ProjectCardForProfile = ({ project, onDelete }) => {
     <div className="w-full h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-2 px-5">
       <div className="w-1/6 h-full rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
         <div
-          className={`w-full h-35 bg-white rounded-lg overflow-hidden flex items-center justify-center relative ${
-            project.image ? "" : "border border-gray-100 shadow-sm"
-          }`}
+          className={`w-full h-35 bg-white rounded-lg overflow-hidden flex items-center justify-center relative ${project.image ? "" : "border border-gray-100 shadow-sm"
+            }`}
         >
           {project.image ? (
             <Image
@@ -94,8 +95,8 @@ const ProjectCardForProfile = ({ project, onDelete }) => {
                 handleViewProject(
                   project,
                   route,
-                  project?.user?.name,
-                  project?.title
+                  author?.username,
+                  project?.slug,
                 )
               }
               className="cursor-pointer text-xs text-gray-500 hover:text-gray-700 transition-all"
