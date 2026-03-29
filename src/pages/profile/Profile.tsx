@@ -51,7 +51,6 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
 
     const { getPublicSocialAccounts, publicSocialAccounts } = useSocialAccount(targetUserId);
 
-
     const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
     const { getFollowing, followings } = useGetFollowing();
     const { getFollowers, followers } = useGetFollowers();
@@ -77,7 +76,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     useEffect(() => {
         if (targetUserId) {
             console.log("Fetching social accounts for ID:", targetUserId);
-            getPublicSocialAccounts(21);
+            getPublicSocialAccounts(targetUserId);
         }
     }, [targetUserId]);
     console.log("Social Accounts:", publicSocialAccounts);
