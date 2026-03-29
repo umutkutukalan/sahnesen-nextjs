@@ -12,9 +12,9 @@ const LikedPost = ({ type }) => {
       const username = user?.username;
       const usernameSlug = generateSlug(username);
       if (type === "projects") {
-        router.push(`/liked-projects/@${usernameSlug}`);
+        router.push(`/me/lists/liked-projects`);
       } else if (type === "blogs") {
-        router.push(`/liked-blogs/@${usernameSlug}`);
+        router.push(`/me/lists/liked-blogs`);
       }
     }
   };

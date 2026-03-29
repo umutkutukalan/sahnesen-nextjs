@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 
-
-
 const StickySiteRules = ({ user }) => {
   const router = useRouter();
   const handleViewProjectsBlogs = (type) => {
