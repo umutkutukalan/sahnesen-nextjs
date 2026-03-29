@@ -5,5 +5,3 @@ export const handleViewBlog = (blog, router, username, title) => {
   const blogSlug = generateSlug(title);
   router.push(`/bloglar/${usernameSlug}/${blogSlug}`);
 };
-
-

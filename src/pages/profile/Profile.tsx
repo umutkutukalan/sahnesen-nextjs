@@ -28,6 +28,7 @@ import { useFollow } from "@/hooks/follow/useFollow";
 import FollowersList from "@/components/follow/FollowersList";
 import FollowingList from "@/components/follow/FollowingList";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
+import ProfileUserBlogs from "./ProfileUserBlogs";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     const { user } = useAuth();
@@ -163,9 +164,9 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                 {activeTab === "projeler" && (
                                     <ProfileUserProjects targetUserId={targetUserId} />
                                 )}
-                                {/* {activeTab === "bloglar" && (
+                                {activeTab === "bloglar" && (
                                     <ProfileUserBlogs targetUserId={targetUserId} />
-                                )} */}
+                                )}
                             </div>
                         </div>
                         {/* Kullanıcı adı ve takip butonu */}

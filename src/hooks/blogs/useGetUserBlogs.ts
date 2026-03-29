@@ -1,8 +1,8 @@
-import { getUserProjectsService } from "@/services/client/projects/project.service";
+import { getUserBlogsService } from "@/services/client/blogs/blog.service";
 import { useState, useCallback } from "react";
 
-export const useGetUserProjects = () => {
-  const [userProjects, setUserProjects] = useState([]);
+export const useGetUserBlogs = () => {
+  const [userBlogs, setUserBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -10,7 +10,7 @@ export const useGetUserProjects = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const getUserProjects = useCallback(
+  const getUserBlogs = useCallback(
     async (userId: string | number, page = 0, isLoadMore = false) => {
       try {
         if (isLoadMore) {
@@ -19,23 +19,23 @@ export const useGetUserProjects = () => {
           setIsLoading(true);
         }
 
-        const response = await getUserProjectsService(userId, page, 5);
+        const response = await getUserBlogsService(userId, page, 5);
 
         if (isLoadMore) {
-          // Spring Boot pagination: response.data.content içinde projeler var
-          const newProjects = response.content || response;
+          // Spring Boot pagination: response.data.content içinde bloglar var
+          const newBlogs = response.content || response;
 
-          setUserProjects((prev) => {
+          setUserBlogs((prev) => {
             // Duplicate kontrolü - id'ye göre filtreleme
-            const existingIds = new Set(prev.map((project) => project.id));
-            const uniqueNewProjects = newProjects.filter(
-              (project) => !existingIds.has(project.id)
+            const existingIds = new Set(prev.map((blog) => blog.id));
+            const uniqueNewBlogs = newBlogs.filter(
+              (blog) => !existingIds.has(blog.id)
             );
 
-            return [...prev, ...uniqueNewProjects];
+            return [...prev, ...uniqueNewBlogs];
           });
         } else {
-          setUserProjects(response.content || response);
+          setUserBlogs(response.content || response);
         }
 
         // Spring Boot pagination bilgilerini kullan
@@ -56,7 +56,7 @@ export const useGetUserProjects = () => {
         setIsLoading(false);
         setIsLoadingMore(false);
       } catch (error) {
-        console.error("Projeler çekilirken hata oluştu:", error);
+        console.error("Bloglar çekilirken hata oluştu:", error);
         setIsLoading(false);
         setIsLoadingMore(false);
       }
@@ -64,21 +64,21 @@ export const useGetUserProjects = () => {
     []
   );
 
-  const loadMoreUserProjects = useCallback(
+  const loadMoreUserBlogs = useCallback(
     (userId: string | number) => {
       if (!isLoadingMore && hasMore) {
-        getUserProjects(userId, currentPage + 1, true);
+        getUserBlogs(userId, currentPage + 1, true);
       }
     },
-    [currentPage, hasMore, isLoadingMore, getUserProjects]
+    [currentPage, hasMore, isLoadingMore, getUserBlogs]
   );
 
   return {
-    userProjects,
+    userBlogs,
     isLoading,
     error,
-    getUserProjects,
-    loadMoreUserProjects,
+    getUserBlogs,
+    loadMoreUserBlogs,
     isLoadingMore,
     hasMore,
     currentPage,
