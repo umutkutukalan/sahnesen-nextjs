@@ -164,9 +164,19 @@ body {
     pointer-events: none;
   }
 
-  /* Görsellerin Apple stili yumuşak köşeleri */
+  /* Varsayılan Görsel Stili (Yumuşak köşeler ve hafif gölge) */
   .tiptap img {
-    @apply rounded-2xl shadow-sm my-10 transition-transform duration-300;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    @apply rounded-lg my-10 transition-all duration-300 ease-out;
+    border: 1px solid #e5e7eb; /* Apple'ın hafif gri border'ı */
+    cursor: pointer;
+    box-shadow: 10px 10px 15px 0px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Görsel Seçildiğinde (Focus Olduğunda) Apple Stili Border */
+  .tiptap img.ProseMirror-selectednode {
+    /* Apple Blue renginde, belirgin ama zarif bir border */
+    @apply border-3 border-blue-600 scale-[1.04] transition-all duration-300 ease-out; /* Hafifçe büyüterek öne çıkarıyoruz */
+    box-shadow: 10px 10px 15px 0px rgba(0, 0, 0, 0.2);
+    outline: none; /* Varsayılan tarayıcı çerçevesini kapat */
   }
 }
