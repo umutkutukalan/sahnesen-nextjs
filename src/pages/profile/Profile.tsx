@@ -106,7 +106,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                     fill
                                     unoptimized
                                     alt=""
-                                    className="w-full h-full object-cover"
+                                    className="object-cover"
                                 />
                             </div>
                         </div>

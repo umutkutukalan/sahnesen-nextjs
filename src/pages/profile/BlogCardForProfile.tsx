@@ -101,7 +101,7 @@ const BlogCardForProfile = ({ blog, onDelete }) => {
               }
               className="cursor-pointer text-xs text-gray-500 hover:text-gray-700 transition-all"
             >
-              Projeyi İncele
+              Okumaya Devam Et
             </button>
           </div>
           {user &&
