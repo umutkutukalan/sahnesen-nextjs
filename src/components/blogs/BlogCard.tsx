@@ -4,7 +4,7 @@ import { FiUser } from "react-icons/fi";
 import { LuImages } from "react-icons/lu";
 import { CiHeart } from "react-icons/ci";
 import { IoMdHeart } from "react-icons/io";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { TbRosetteDiscountCheckFilled, TbRosetteFilled } from "react-icons/tb";
 import { useEffect } from "react";
 import Image from "next/image";
 import { useRelativeTime } from "../../hooks/useRelativeTime";
@@ -14,6 +14,7 @@ import { handleViewBlog } from "@/utils/HandleViewBlog";
 import { Blog } from "@/services/server/blog.service";
 import { useToProfile } from "@/utils/useToProfile";
 import { useRouter } from "next/navigation";
+import { IoBook } from "react-icons/io5";
 
 interface BlogCardProps {
     blog: Blog;
@@ -36,12 +37,16 @@ const BlogCard = ({ blog }: BlogCardProps) => {
     console.log("BlogCard create user:", blog.postCreateUser);
 
     return (
-        <div className="w-full sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
+        <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
             {/* LEFT IMAGE */}
-            <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg overflow-hidden flex-shrink-0 sm:flex items-center justify-center">
+            <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
                 <div
                     className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${blog.image ? "" : "border border-gray-100 shadow-sm"
-                        }`}
+                        }`
+                    }
+                    style={{
+                        boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.5)"
+                    }}
                 >
                     {blog.image ? (
                         <Image
@@ -60,9 +65,9 @@ const BlogCard = ({ blog }: BlogCardProps) => {
             </div>
 
             {/* RIGHT CONTENT */}
-            <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 py-5">
+            <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 lg:py-6 py-5">
                 {/* AUTHOR */}
-                <div className="flex items-center gap-2 cursor-pointer"
+                <div className="flex items-center gap-2 cursor-pointer w-max"
                     onClick={() => {
                         if (blog?.user) {
                             ToProfile(blog?.user, blog.user?.username);
@@ -87,14 +92,18 @@ const BlogCard = ({ blog }: BlogCardProps) => {
 
                     <div className="truncate">
                         <div className="flex flex-col">
-                            <div className="flex items-center gap-1 text-xs text-gray-600">
-                                <span className="truncate">
+                            <div className="flex items-center">
+                                <span className="truncate text-gray-600 text-xs">
                                     {author?.name || author?.email} {author?.surname}
                                 </span>
                                 <TbRosetteDiscountCheckFilled
-                                    className="text-blue-500 shrink-0"
+                                    className="text-blue-500 scale-90 ml-1 shrink-0"
                                     title="Onaylı Yazar"
                                 />
+                                {/* <div className="relative ml-1 flex items-center justify-center">
+                                    <TbRosetteFilled className="text-black scale-90 shrink-0 z-5"/>
+                                    <IoBook className="absolute z-10 scale-30 text-white"/>
+                                </div> */}
                             </div>
                             <span className="truncate text-[8px] text-gray-400">
                                 @{author?.username}

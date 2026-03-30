@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { TbRosetteDiscountCheckFilled, TbRosetteFilled } from "react-icons/tb";
 import {
     AiFillFacebook,
     AiFillGithub,
@@ -29,6 +29,7 @@ import FollowersList from "@/components/follow/FollowersList";
 import FollowingList from "@/components/follow/FollowingList";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 import ProfileUserBlogs from "./ProfileUserBlogs";
+import { IoBook } from "react-icons/io5";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     const { user } = useAuth();
@@ -186,6 +187,10 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                         className="text-blue-500 text-2xl"
                                         title="Onaylı Yazar"
                                     />
+                                    {/* <div className="relative ml-1 flex items-center justify-center">
+                                        <TbRosetteFilled className="text-black text-2xl shrink-0 z-5" />
+                                        <IoBook className="absolute z-10 text-[10px] text-white" />
+                                    </div> */}
                                 </div>
                                 <div className="flex items-center gap-4 mt-2">
                                     {/* Kendi profilinde düzenle butonu, başkasının profilinde takip butonu */}

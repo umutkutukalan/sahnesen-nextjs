@@ -35,12 +35,15 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
   const author = project.user;
 
   return (
-    <div className="w-full sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
+    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
       {/* LEFT IMAGE */}
-      <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg overflow-hidden flex-shrink-0 sm:flex items-center justify-center">
+      <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
           className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${project.image ? "" : "border border-gray-100 shadow-sm"
             }`}
+          style={{
+            boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.5)"
+          }}
         >
           {project.image ? (
             <Image
@@ -59,9 +62,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       </div>
 
       {/* RIGHT CONTENT */}
-      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 py-5">
+      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 lg:py-6 py-5">
         {/* AUTHOR */}
-        <div className="flex items-center gap-2 cursor-pointer"
+        <div className="flex items-center gap-2 cursor-pointer w-max"
           onClick={() => {
             if (project?.user) {
               ToProfile(project?.user, project.user?.username);
