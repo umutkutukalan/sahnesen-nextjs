@@ -167,7 +167,7 @@ body {
   /* Varsayılan Görsel Stili (Yumuşak köşeler ve hafif gölge) */
   .tiptap img {
     @apply rounded-lg my-10 transition-all duration-300 ease-out;
-    border: 1px solid #e5e7eb; /* Apple'ın hafif gri border'ı */
+    border: 1px transparent #000; /* Apple'ın hafif gri border'ı */
     cursor: pointer;
     box-shadow: 10px 10px 15px 0px rgba(0, 0, 0, 0.5);
   }

@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
-import { GoBold, GoItalic, GoPlus, GoQuote, GoTrash } from "react-icons/go";
+import { GoBold, GoItalic, GoPencil, GoPlus, GoQuote, GoTrash } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { useState } from 'react';
 
@@ -17,6 +17,10 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
 
     const [menuPosition, setMenuPosition] = useState<{ top: number, left: number, show: boolean }>({ top: 0, left: 0, show: false });
     const [bubbleMenu, setBubbleMenu] = useState<{ top: number, left: number, show: boolean }>({ top: 0, left: 0, show: false });
+
+    const [isAltModalOpen, setIsAltModalOpen] = useState(false);
+    const [editingImageAttrs, setEditingImageAttrs] = useState<{ src: string, alt: string } | null>(null);
+
 
     const editor = useEditor({
         extensions: [
@@ -107,7 +111,19 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                 return;
             }
         }
+
         setBubbleMenu(prev => ({ ...prev, show: false }));
+    };
+
+    const openAltModal = (editor: any) => {
+        const attrs = editor.getAttributes('image');
+        setEditingImageAttrs({ src: attrs.src, alt: attrs.alt || '' });
+        setIsAltModalOpen(true);
+    };
+
+    const saveAltText = (editor: any, newAlt: string) => {
+        editor.chain().focus().updateAttributes('image', { alt: newAlt }).run();
+        setIsAltModalOpen(false);
     };
 
     const handleImageUpload = () => {
@@ -152,37 +168,86 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                 </div>
             )}
 
-            {/* CUSTOM IMAGE BUBBLE MENU */}
-            {bubbleMenu.show && (
+            {/* CUSTOM IMAGE BUBBLE MENU - Artık sadece bir tetikleyici */}
+            {bubbleMenu.show && !isAltModalOpen && (
                 <div
-                    className="absolute z-[60] flex items-center gap-2 bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl rounded-xl p-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
-                    style={{ top: bubbleMenu.top, left: bubbleMenu.left }}
+                    className="absolute z-[60] flex items-center gap-1 bg-gray-800 backdrop-blur-md text-white border border-white/10 shadow-2xl rounded-sm py-2 px-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+                    style={{
+                        top: bubbleMenu.top - 5,
+                        left: bubbleMenu.left + 50,
+                    }} // Görselin ortasına doğru çektik
                 >
-                    <div className="flex items-center gap-2 px-2 border-r border-gray-100">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ALT</span>
-                        <input
-                            type="text"
-                            placeholder="SEO için açıklama yaz..."
-                            className="text-xs bg-transparent outline-none w-32 font-medium"
-                            value={editor.getAttributes('image').alt || ''}
-                            onKeyDown={(e) => {
-                                // Tuş basışlarının editöre gitmesini engelle (En kritik kısım!)
-                                e.stopPropagation();
-                            }}
-                            onChange={(e) => {
-                                const newAlt = e.target.value;
-                                // updateAttributes yaparken 'focus: false' diyerek odağın editöre kaymasını engelliyoruz
-                                editor.chain().updateAttributes('image', { alt: newAlt }).setMeta('addToHistory', false).run();
-                            }}
-                        />
-                    </div>
-
                     <button
-                        onClick={() => editor.chain().focus().deleteSelection().run()}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        onClick={() => openAltModal(editor)}
+                        className="w-full h-full flex items-center transition-colors text-xs cursor-pointer"
                     >
-                        <GoTrash size={18} />
+                        {editingImageAttrs?.alt ? editingImageAttrs.alt : 'Alt Metin Ekle'}
                     </button>
+                    {/* TOOLTIP ARROW */}
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-800 rotate-45 border-r border-b border-white/10 -z-10" />
+                </div>
+            )}
+
+            {/* --- APPLE STYLE ALT TEXT MODAL --- */}
+            {isAltModalOpen && editingImageAttrs && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/90 backdrop-blur-md animate-in fade-in duration-300">
+                    <div
+                        className="w-full max-w-2xl animate-in zoom-in-95 duration-300"
+                        onKeyDown={(e) => e.stopPropagation()} // Editörün tuşları dinlemesini engelle
+                    >
+                        <div className="flex flex-col items-center text-center gap-6">
+                            {/* Bilgi Metni */}
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-bold">Alternatif Açıklama</h3>
+                                <p className="text-black">
+                                    Görme engelli okuyucular için bu görselin kısa bir açıklamasını yazınız.
+                                </p>
+                            </div>
+
+                            {/* Ufak Önizleme */}
+                            <div className="relative max-w-xs h-64 aspect-video overflow-hidden">
+                                <img
+                                    src={editingImageAttrs.src}
+                                    alt="Önizleme"
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                            </div>
+
+                            {/* Input Alanı */}
+                            <div className="w-full flex flex-col gap-4">
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="Örn: Yağmurlu bir günde pencere kenarında duran sıcak bir kahve fincanı..."
+                                    className="w-full px-4 py-1 border-l border-gray-500 outline-none transition-all text-gray-800 bg-transparent"
+                                    value={editingImageAttrs.alt}
+                                    onChange={(e) => setEditingImageAttrs({ ...editingImageAttrs, alt: e.target.value })}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') saveAltText(editor, editingImageAttrs.alt);
+                                        if (e.key === 'Escape') setIsAltModalOpen(false);
+                                    }}
+                                />
+
+                                {/* Butonlar */}
+                                <div className="w-full flex items-center justify-center gap-3 pt-2 text-xs">
+                                    <button
+                                        onClick={() => saveAltText(editor, editingImageAttrs.alt)}
+                                        className="px-3 py-2 bg-transparent text-green-600 rounded-2xl border border-green-600 cursor-pointer"
+                                    >
+                                        Kaydet
+                                    </button>
+                                    <button
+                                        onClick={() => setIsAltModalOpen(false)}
+                                        className="px-3 py-2 bg-transparent text-gray-500 rounded-2xl border border-gray-500 cursor-pointer transition-colors"
+                                    >
+                                        Kapat
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
