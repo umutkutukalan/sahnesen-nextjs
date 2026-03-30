@@ -17,6 +17,7 @@ import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { Blog } from "@/services/server/blog.service";
 import { useGetBlogs } from "@/hooks/blogs/useGetBlogs";
 import BlogCard from "@/components/blogs/BlogCard";
+import PopularBlogs from "@/components/PageStickyExtra/PopularBlogs";
 
 interface BlogsProps {
   initialBlogs: Blog[];
@@ -99,7 +100,7 @@ const Blogs = ({
         {/* SAĞ STICKY SIDEBAR */}
         <aside className="hidden lg:flex lg:w-2/7 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
           {/* Popular: infinite listeye bağlı olmasın */}
-          <PopularProjects projects={blogs.slice(0, 4)} />
+          <PopularBlogs blogs={blogs.slice(0, 4)} />
 
           {user ? (
             <div className="flex flex-col gap-4">

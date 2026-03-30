@@ -127,7 +127,7 @@ const BlogCard = ({ blog }: BlogCardProps) => {
                 <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center gap-3">
                         <span>{formatRelativeTime(blog.createdAt)}</span>
-
+                        
                         <div className="hidden sm:flex items-center gap-1">
                             {liked ? (
                                 <IoMdHeart className="text-red-600 text-sm" />

@@ -10,6 +10,12 @@
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.17.13",
+    "@tiptap/extension-bubble-menu": "^3.21.0",
+    "@tiptap/extension-floating-menu": "^3.21.0",
+    "@tiptap/extension-image": "^3.21.0",
+    "@tiptap/extension-placeholder": "^3.21.0",
+    "@tiptap/react": "^3.21.0",
+    "@tiptap/starter-kit": "^3.21.0",
     "axios": "^1.13.4",
     "next": "16.1.6",
     "react": "19.2.3",
