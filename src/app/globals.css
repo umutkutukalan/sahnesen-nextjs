@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 * {
   box-sizing: border-box;
@@ -119,4 +120,53 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Tiptap Editor Custom Styles */
+@layer base {
+  /* Ana editör alanı ve tipografi ayarları */
+  .tiptap.prose {
+    /* Satır yüksekliğini Apple standartlarına (1.8) çekiyoruz */
+    line-height: 1.8;
+    /* Harf aralığını daha premium bir hava için hafifçe daraltıyoruz */
+    letter-spacing: -0.011em;
+    /* Editörün kenarlardan nefes alması için */
+    outline: none !important;
+  }
+
+  /* Paragraflar arası o istediğin ferah boşluk */
+  .tiptap.prose p {
+    margin-top: 1.5em; /* Biraz daha optimize ettik */
+    margin-bottom: 1.5em;
+    @apply text-zinc-800 antialiased; /* Kırmızı gitti, asil bir siyah geldi */
+  }
+
+  /* İlk paragrafın tepesindeki gereksiz boşluğu sıfırla */
+  .tiptap.prose p:first-child {
+    margin-top: 0;
+  }
+
+  /* Başlıkların Apple stili: Daha kalın ve belirgin boşluklar */
+  .tiptap.prose h1,
+  .tiptap.prose h2,
+  .tiptap.prose h3 {
+    @apply font-bold tracking-tight;
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+  }
+
+  /* Placeholder (Yol gösterici metin) stili */
+  .tiptap p.is-editor-empty:first-child::before {
+    @apply text-gray-300 font-normal;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  /* Görsellerin Apple stili yumuşak köşeleri */
+  .tiptap img {
+    @apply rounded-2xl shadow-sm my-10 transition-transform duration-300;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
 }

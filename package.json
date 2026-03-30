@@ -11,9 +11,12 @@
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.17.13",
     "@tiptap/extension-bubble-menu": "^3.21.0",
+    "@tiptap/extension-document": "^3.21.0",
     "@tiptap/extension-floating-menu": "^3.21.0",
     "@tiptap/extension-image": "^3.21.0",
+    "@tiptap/extension-paragraph": "^3.21.0",
     "@tiptap/extension-placeholder": "^3.21.0",
+    "@tiptap/extension-text": "^3.21.0",
     "@tiptap/react": "^3.21.0",
     "@tiptap/starter-kit": "^3.21.0",
     "axios": "^1.13.4",
@@ -21,12 +24,14 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-icons": "^5.5.0",
-    "react-toastify": "^11.0.5"
+    "react-toastify": "^11.0.5",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^20.19.37",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
