@@ -38,7 +38,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
         },
     });
 
-    // Medium Stili Menü Pozisyonunu Hesapla
+    // Menü Pozisyonunu Hesapla
     const updateMenuPosition = (editor: any) => {
         const { selection } = editor.state;
         const { $from } = selection;
@@ -75,11 +75,30 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
         setMenuPosition(prev => ({ ...prev, show: false }));
     };
 
+    const handleImageUpload = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+
+        input.onchange = async () => {
+            if (input.files?.length) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const url = e.target?.result as string;
+                    editor?.chain().focus().setImage({ src: url }).run();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    };
+
     if (!editor) return null;
 
     return (
         <div className="relative w-full">
-            {/* MEDIUM STYLE CUSTOM FLOATING MENU */}
             {menuPosition.show && (
                 <div
                     className="absolute z-50 flex items-center gap-2 transition-all duration-200 group"
@@ -90,10 +109,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                     </button>
 
                     <button
-                        onClick={() => {
-                            const url = window.prompt("Görsel Linki:");
-                            if (url) editor.chain().focus().setImage({ src: url }).run();
-                        }}
+                        onClick={handleImageUpload}
                         className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 opacity-0 group-hover:opacity-100 transition-all hover:bg-green-600 hover:text-white"
                     >
                         <MdOutlineAddPhotoAlternate size={18} />
@@ -108,7 +124,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                 <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded-full ${editor.isActive('bold') ? 'bg-black text-white' : ''}`}><GoBold /></button>
                 <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded-full ${editor.isActive('italic') ? 'bg-black text-white' : ''}`}><GoItalic /></button>
                 <div className="w-[1px] bg-gray-200 mx-1" />
-                <button onClick={() => {/* Image Upload Gelecek */ }} className="p-2 text-green-600"><MdOutlineAddPhotoAlternate size={20} /></button>
+                <button onClick={handleImageUpload} className="p-2 text-green-600"><MdOutlineAddPhotoAlternate size={20} /></button>
             </div>
         </div>
     );
