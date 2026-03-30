@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
-import { GoBold, GoItalic, GoPlus, GoQuote } from "react-icons/go";
+import { GoBold, GoItalic, GoPlus, GoQuote, GoTrash } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { useState } from 'react';
 
@@ -16,6 +16,7 @@ interface TiptapEditorProps {
 const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
 
     const [menuPosition, setMenuPosition] = useState<{ top: number, left: number, show: boolean }>({ top: 0, left: 0, show: false });
+    const [bubbleMenu, setBubbleMenu] = useState<{ top: number, left: number, show: boolean }>({ top: 0, left: 0, show: false });
 
     const editor = useEditor({
         extensions: [
@@ -30,6 +31,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
         },
         onSelectionUpdate: ({ editor }) => {
             updateMenuPosition(editor); // İmleç her hareket ettiğinde kontrol et
+            updateBubbleMenu(editor); // Seçim her değiştiğinde kontrol et
         },
         editorProps: {
             attributes: {
@@ -40,39 +42,72 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
 
     // Menü Pozisyonunu Hesapla
     const updateMenuPosition = (editor: any) => {
-        const { selection } = editor.state;
-        const { $from } = selection;
+        // DOM'un güncellenmesini bekle (Mikro-delay)
+        requestAnimationFrame(() => {
+            if (!editor || editor.isDestroyed) return;
 
-        // Satır boş mu? (Sadece boş satırda göster)
-        const isLineEmpty = $from.parent.content.size === 0;
+            const { selection } = editor.state;
+            const { $from } = selection;
 
-        if (isLineEmpty) {
-            // Tiptap'ın o anki aktif (odaklanmış) HTML elementini direkt bulalım
-            // EditorContent içindeki aktif satırı seçiyoruz
-            const activeNode = editor.view.domAtPos($from.pos).node;
-            let element = activeNode as HTMLElement;
+            // Satır boş mu? (Sadece boş satırda göster)
+            const isLineEmpty = $from.parent.content.size === 0;
 
-            // Eğer node bir text node ise parent elementine çık (genellikle <p>)
-            if (element.nodeType === 3) {
-                element = element.parentElement as HTMLElement;
+            if (isLineEmpty) {
+                // Tiptap'ın o anki aktif (odaklanmış) HTML elementini direkt bulalım
+                // EditorContent içindeki aktif satırı seçiyoruz
+                const activeNode = editor.view.domAtPos($from.pos).node;
+                let element = activeNode as HTMLElement;
+
+                // Eğer node bir text node ise parent elementine çık (genellikle <p>)
+                if (element.nodeType === 3) {
+                    element = element.parentElement as HTMLElement;
+                }
+
+                const editorElement = document.querySelector('.tiptap');
+
+                if (element && editorElement) {
+                    const rect = element.getBoundingClientRect();
+                    const editorRect = editorElement.getBoundingClientRect();
+
+                    // Pozisyonu tam satır hizasına getiriyoruz
+                    setMenuPosition({
+                        top: rect.top - editorRect.top,
+                        left: -50,
+                        show: true,
+                    });
+                    return;
+                }
             }
+            setMenuPosition(prev => ({ ...prev, show: false }));
+        });
+    };
 
+    const updateBubbleMenu = (editor: any) => {
+        // EĞER ODAK BİR INPUT İÇİNDEYSE HİÇBİR ŞEY YAPMA
+        if (document.activeElement?.tagName === 'INPUT') {
+            return;
+        }
+
+        const { selection } = editor.state;
+
+        // Eğer seçili olan şey bir "image" ise
+        if (editor.isActive('image')) {
+            const node = document.querySelector('.tiptap img.ProseMirror-selectednode');
             const editorElement = document.querySelector('.tiptap');
 
-            if (element && editorElement) {
-                const rect = element.getBoundingClientRect();
+            if (node && editorElement) {
+                const rect = node.getBoundingClientRect();
                 const editorRect = editorElement.getBoundingClientRect();
 
-                // Pozisyonu tam satır hizasına getiriyoruz
-                setMenuPosition({
-                    top: rect.top - editorRect.top,
-                    left: -50,
+                setBubbleMenu({
+                    top: rect.top - editorRect.top - 50, // Görselin 50px üstünde dursun
+                    left: (rect.left - editorRect.left) + (rect.width / 2) - 100, // Ortala (100 menü genişliğinin yarısı)
                     show: true,
                 });
                 return;
             }
         }
-        setMenuPosition(prev => ({ ...prev, show: false }));
+        setBubbleMenu(prev => ({ ...prev, show: false }));
     };
 
     const handleImageUpload = () => {
@@ -104,15 +139,49 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                     className="absolute z-50 flex items-center gap-2 transition-all duration-200 group"
                     style={{ top: menuPosition.top, left: menuPosition.left }}
                 >
-                    <button className="flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 bg-white text-gray-400 hover:text-black hover:border-black transition-all shadow-sm">
+                    <button className="flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 bg-white text-gray-400 hover:text-black hover:border-black transition-all shadow-sm cursor-pointer">
                         <GoPlus size={20} className="group-hover:rotate-90 transition-transform" />
                     </button>
 
                     <button
                         onClick={handleImageUpload}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 opacity-0 group-hover:opacity-100 transition-all hover:bg-green-600 hover:text-white"
+                        className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 opacity-0 group-hover:opacity-100 transition-all hover:bg-green-600 hover:text-white cursor-pointer"
                     >
                         <MdOutlineAddPhotoAlternate size={18} />
+                    </button>
+                </div>
+            )}
+
+            {/* CUSTOM IMAGE BUBBLE MENU */}
+            {bubbleMenu.show && (
+                <div
+                    className="absolute z-[60] flex items-center gap-2 bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl rounded-xl p-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+                    style={{ top: bubbleMenu.top, left: bubbleMenu.left }}
+                >
+                    <div className="flex items-center gap-2 px-2 border-r border-gray-100">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ALT</span>
+                        <input
+                            type="text"
+                            placeholder="SEO için açıklama yaz..."
+                            className="text-xs bg-transparent outline-none w-32 font-medium"
+                            value={editor.getAttributes('image').alt || ''}
+                            onKeyDown={(e) => {
+                                // Tuş basışlarının editöre gitmesini engelle (En kritik kısım!)
+                                e.stopPropagation();
+                            }}
+                            onChange={(e) => {
+                                const newAlt = e.target.value;
+                                // updateAttributes yaparken 'focus: false' diyerek odağın editöre kaymasını engelliyoruz
+                                editor.chain().updateAttributes('image', { alt: newAlt }).setMeta('addToHistory', false).run();
+                            }}
+                        />
+                    </div>
+
+                    <button
+                        onClick={() => editor.chain().focus().deleteSelection().run()}
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                        <GoTrash size={18} />
                     </button>
                 </div>
             )}
