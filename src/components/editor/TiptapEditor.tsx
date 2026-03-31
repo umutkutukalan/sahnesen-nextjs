@@ -170,29 +170,58 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                 </div>
             </FloatingMenu>
 
+            {/* Seçili Metin İçin Bubble Menu */}
             <BubbleMenu
                 editor={editor}
-                tippyOptions={{
-                    placement: 'top',          // Görselin üstünde çıksın
-                    offset: [0, 12],           // 12px boşluk
-                    animation: 'shift-away',   // Hafif animasyon
-                    duration: 150,
+                options={{
+                    placement: 'top', // Menü konumu
+                    offset: { mainAxis: 10, crossAxis: 0 },
+                    shift: false,
+                    flip: false,
                 }}
-                shouldShow={({ editor }) => {
-                    // Sadece image seçiliyken ve alt modal kapalıyken göster
-                    return editor.isActive('image') && !isAltModalOpen;
+                shouldShow={({ editor, state }) => {
+                    const { selection } = state;
+                    const { empty } = selection;
+
+                    // 1. Eğer görsel seçiliyse bu menü görünmesin (Görselin kendi menüsü var)
+                    if (editor.isActive('image')) return false;
+
+                    // 2. Sadece metin seçiliyse (boş değilse) göster
+                    return !empty;
                 }}
             >
-                {/* Senin orijinal bubble menu tasarımın — aynen korundu */}
-                <div className="flex items-center gap-1 bg-gray-800 backdrop-blur-md text-white border border-white/10 shadow-2xl rounded-sm py-2 px-3 animate-in fade-in duration-200">
+                <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 animate-in fade-in zoom-in-95 duration-200">
                     <button
-                        onClick={openAltModal}
-                        className="flex items-center transition-colors text-xs cursor-pointer hover:text-gray-300"
+                        onClick={() => editor.chain().focus().toggleBold().run()}
+                        className={`p-2 rounded hover:bg-white/10 transition-colors ${editor.isActive('bold') ? 'text-blue-400' : ''}`}
                     >
-                        {editor.getAttributes('image').alt || 'Alt Metin Ekle'}
+                        <GoBold size={18} />
                     </button>
-                    {/* Ok işareti — orijinalindeki gibi */}
-                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-800 rotate-45 border-r border-b border-white/10 -z-10" />
+                    <button
+                        onClick={() => editor.chain().focus().toggleItalic().run()}
+                        className={`p-2 rounded hover:bg-white/10 transition-colors ${editor.isActive('italic') ? 'text-blue-400' : ''}`}
+                    >
+                        <GoItalic size={18} />
+                    </button>
+
+                    <div className="w-[1px] h-4 bg-white/20 mx-1" />
+
+                    <button
+                        onClick={() => editor.chain().focus().toggleCode().run()}
+                        className={`p-2 rounded hover:bg-white/10 transition-colors ${editor.isActive('code') ? 'text-blue-400' : ''}`}
+                    >
+                        <GoCode size={18} />
+                    </button>
+
+                    <button
+                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                        className={`p-2 rounded hover:bg-white/10 transition-colors ${editor.isActive('blockquote') ? 'text-blue-400' : ''}`}
+                    >
+                        <GoQuote size={18} />
+                    </button>
+
+                    {/* Ok işareti tasarımı */}
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/90 rotate-45 -z-10" />
                 </div>
             </BubbleMenu>
 
@@ -276,33 +305,6 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
             )}
 
             <EditorContent editor={editor} />
-
-            {/* Floating Toolbar — değişmedi */}
-            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-4 py-2 flex gap-2">
-                <button
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={`p-2 rounded-full ${editor.isActive('bold') ? 'bg-black text-white' : ''}`}
-                >
-                    <GoBold />
-                </button>
-                <button
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={`p-2 rounded-full ${editor.isActive('italic') ? 'bg-black text-white' : ''}`}
-                >
-                    <GoItalic />
-                </button>
-                <div className="w-[1px] bg-gray-200 mx-1" />
-                <button onClick={handleImageUpload} className="p-2 text-green-600">
-                    <MdOutlineAddPhotoAlternate size={20} />
-                </button>
-                <button
-                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                    className={`p-2 rounded-full transition-colors ${editor.isActive('codeBlock') ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 text-gray-600'
-                        }`}
-                >
-                    <GoCode size={20} />
-                </button>
-            </div>
         </div>
     );
 

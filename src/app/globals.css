@@ -135,7 +135,7 @@ body {
   /* Ana editör alanı ve tipografi ayarları */
   .tiptap.prose {
     /* Satır yüksekliğini Apple standartlarına (1.8) çekiyoruz */
-    line-height: 1.8;
+    line-height: 1.6;
     /* Harf aralığını daha premium bir hava için hafifçe daraltıyoruz */
     letter-spacing: -0.011em;
     /* Editörün kenarlardan nefes alması için */
@@ -144,9 +144,9 @@ body {
 
   /* Paragraflar arası o istediğin ferah boşluk */
   .tiptap.prose p {
-    margin-top: 1.5em; /* Biraz daha optimize ettik */
-    margin-bottom: 1.5em;
     @apply text-zinc-800 antialiased text-[22px];
+    margin-top: 0.5em; /* Biraz daha optimize ettik */
+    margin-bottom: 0.5em;
   }
 
   /* İlk paragrafın tepesindeki gereksiz boşluğu sıfırla */
