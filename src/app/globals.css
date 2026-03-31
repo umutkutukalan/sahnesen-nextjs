@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -20,6 +21,13 @@ body {
   height: auto;
   min-height: 100%;
   width: 100vw;
+}
+
+.playfair-display-400 {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* Fonts */
@@ -138,7 +146,7 @@ body {
   .tiptap.prose p {
     margin-top: 1.5em; /* Biraz daha optimize ettik */
     margin-bottom: 1.5em;
-    @apply text-zinc-800 antialiased; /* Kırmızı gitti, asil bir siyah geldi */
+    @apply text-zinc-800 antialiased text-[22px];
   }
 
   /* İlk paragrafın tepesindeki gereksiz boşluğu sıfırla */
@@ -152,7 +160,7 @@ body {
   .tiptap.prose h3 {
     @apply font-bold tracking-tight;
     margin-top: 1.5em;
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
   }
 
   /* Placeholder (Yol gösterici metin) stili */
@@ -179,4 +187,61 @@ body {
     box-shadow: 10px 10px 15px 0px rgba(0, 0, 0, 0.2);
     outline: none; /* Varsayılan tarayıcı çerçevesini kapat */
   }
+}
+
+.tiptap pre {
+  @apply bg-[#f9f9f9] text-zinc-700 px-6 py-8 font-mono my-8 rounded-sm border border-gray-200 transition-all duration-300;
+}
+
+.tiptap.ProseMirror-focused pre:focus-within,
+.tiptap pre.ProseMirror-selectednode {
+  @apply border-gray-600 ring-1 ring-gray-400;
+}
+
+/* Kod bloğu içindeki select menüsü için özel stil */
+.code-block-lang-select {
+  @apply opacity-0 transition-opacity duration-200;
+}
+
+.tiptap pre:hover + div.code-block-lang-select,
+.tiptap pre:focus-within + div.code-block-lang-select,
+div.code-block-lang-select:hover {
+  @apply opacity-100;
+}
+
+.tiptap pre::before {
+  content: attr(data-language); /* Tiptap'ın eklediği dili buraya çeker */
+  @apply absolute top-3 right-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest opacity-50;
+}
+
+.tiptap pre code {
+  @apply bg-transparent p-0 text-inherit block;
+}
+.hljs-keyword {
+  color: #005cc5;
+  font-weight: 600;
+} /* Mavi (public, class) */
+.hljs-title {
+  color: #6f42c1;
+} /* Mor (Sahnesen) */
+.hljs-type {
+  color: #d73a49;
+} /* Kırmızımsı (String) */
+.hljs-string {
+  color: #22863a;
+} /* Yeşil ("Umut") */
+.hljs-comment {
+  color: #6a737d;
+  font-style: italic;
+} /* Gri (Yorumlar) */
+.hljs-attr {
+  color: #e36209;
+} /* Turuncu (Parametreler) */
+.hljs-number {
+  color: #005cc5;
+} /* Sayılar */
+
+.group\/editor:has(.floating-menu-container:hover) .is-empty::before {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }

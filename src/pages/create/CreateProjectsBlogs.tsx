@@ -32,9 +32,9 @@ const CreateProjectsBlog = () => {
         {/* Başlık: Sınırları olmayan, Apple minimalist girişi */}
         <textarea
           ref={titleRef}
-          placeholder="Baslık"
+          placeholder="Title"
           rows={1}
-          className="w-full text-5xl font-extrabold placeholder-gray-200 focus:outline-none resize-none mb-8"
+          className="w-full text-5xl font-semibold placeholder-gray-400 focus:outline-none resize-none playfair-display-400"
           onChange={(e) => {
             e.target.style.height = 'auto';
             e.target.style.height = e.target.scrollHeight + 'px';
