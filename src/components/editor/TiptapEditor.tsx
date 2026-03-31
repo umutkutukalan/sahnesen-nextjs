@@ -8,6 +8,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import { GoBold, GoCode, GoItalic, GoPencil, GoPlus, GoQuote, GoTrash } from "react-icons/go";
+import { HiOutlineSparkles } from "react-icons/hi2";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
@@ -39,6 +40,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
 
     const [isAltModalOpen, setIsAltModalOpen] = useState(false);
     const [editingImageAttrs, setEditingImageAttrs] = useState<{ src: string; alt: string } | null>(null);
+    const [isAiLoading, setIsAiLoading] = useState(false);
 
     const editor = useEditor({
         extensions: [
@@ -123,6 +125,36 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
         input.click();
     };
 
+    const handleAISpark = async () => {
+        if (!editor || isAiLoading) return;
+
+        // Son 1000 karakteri bağlam olarak gönderiyoruz
+        const context = editor.getText().slice(-1000);
+
+        if (!context.trim()) return;
+
+        setIsAiLoading(true);
+
+        try {
+            const response = await fetch('/api/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ context }),
+            });
+
+            const data = await response.json();
+
+            if (data.text) {
+                // Metni imlecin olduğu yere pürüzsüzce ekle
+                editor.chain().focus().insertContent(data.text).run();
+            }
+        } catch (error) {
+            console.error("AI Spark hatası:", error);
+        } finally {
+            setIsAiLoading(false);
+        }
+    };
+
     if (!editor) return null;
 
     return (
@@ -144,9 +176,8 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                     // 2. Ve bulunulan yer bir paragrafsa
                     // 3. Ve o paragraf boşsa göster
                     const isParagraph = $from.parent.type.name === 'paragraph';
-                    const isEmpty = $from.parent.content.size === 0;
 
-                    return (editor.isFocused || editor.isEmpty) && isParagraph && isEmpty;
+                    return (editor.isFocused || editor.isEmpty) && isParagraph;
                 }}
             >
                 <div className="floating-menu-container flex items-center gap-5 transition-all duration-200 group">
@@ -173,6 +204,22 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                             title="Ayraç"
                         >
                             <span className="font-bold text-lg leading-none">···</span>
+                        </button>
+                        <button
+                            onClick={handleAISpark}
+                            disabled={isAiLoading}
+                            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all cursor-pointer shadow-sm
+        ${isAiLoading
+                                    ? 'bg-purple-200 animate-pulse cursor-wait'
+                                    : 'bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white opacity-0 group-hover:opacity-100'
+                                }`}
+                            title="AI Spark"
+                        >
+                            {isAiLoading ? (
+                                <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <HiOutlineSparkles size={18} />
+                            )}
                         </button>
                     </div>
                 </div>

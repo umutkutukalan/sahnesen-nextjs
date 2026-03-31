@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
+    "@google/genai": "^1.47.0",
+    "@google/generative-ai": "^0.24.1",
     "@lottiefiles/dotlottie-react": "^0.17.13",
     "@tiptap/core": "^3.21.0",
     "@tiptap/extension-bubble-menu": "^3.21.0",
