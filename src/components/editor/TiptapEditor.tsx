@@ -181,7 +181,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                         onClick={() => openAltModal(editor)}
                         className="w-full h-full flex items-center transition-colors text-xs cursor-pointer"
                     >
-                        {editingImageAttrs?.alt ? editingImageAttrs.alt : 'Alt Metin Ekle'}
+                        {editor.getAttributes('image').alt || 'Alt Metin Ekle'}
                     </button>
                     {/* TOOLTIP ARROW */}
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-800 rotate-45 border-r border-b border-white/10 -z-10" />
@@ -220,7 +220,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                                     autoFocus
                                     type="text"
                                     placeholder="Örn: Yağmurlu bir günde pencere kenarında duran sıcak bir kahve fincanı..."
-                                    className="w-full px-4 py-1 border-l border-gray-500 outline-none transition-all text-gray-800 bg-transparent"
+                                    className="w-full px-4 py-1 border-l border-gray-500 outline-none transition-all text-gray-800 bg-transparent placeholder:italic"
                                     value={editingImageAttrs.alt}
                                     onChange={(e) => setEditingImageAttrs({ ...editingImageAttrs, alt: e.target.value })}
                                     onKeyDown={(e) => {
