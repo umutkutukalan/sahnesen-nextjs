@@ -132,7 +132,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                 editor={editor}
                 options={{
                     placement: 'left', // Menü konumu
-                    offset: { mainAxis: -70, crossAxis: 0 },
+                    offset: { mainAxis: -110, crossAxis: 0 },
                     shift: false,
                     flip: false,
                 }}
@@ -156,15 +156,23 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                     <div className="flex items-center gap-2 transition-all duration-200">
                         <button
                             onClick={handleImageUpload}
-                            className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 opacity-0 group-hover:opacity-100 transition-all hover:bg-green-600 hover:text-white cursor-pointer"
+                            className="flex items-center justify-center w-8 h-8 rounded-full text-green-600 opacity-0 border border-green-300 hover:border-green-500 group-hover:opacity-100 transition-all cursor-pointer"
                         >
                             <MdOutlineAddPhotoAlternate size={18} />
                         </button>
                         <button
                             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                            className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-600 hover:text-white cursor-pointer"
+                            className="flex items-center justify-center w-8 h-8 rounded-full text-blue-600 opacity-0 border
+                            border-blue-300 hover:border-blue-500 group-hover:opacity-100 transition-all cursor-pointer"
                         >
                             <GoCode size={18} />
+                        </button>
+                        <button
+                            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                            className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                            title="Ayraç"
+                        >
+                            <span className="font-bold text-lg leading-none">···</span>
                         </button>
                     </div>
                 </div>

@@ -245,3 +245,20 @@ div.code-block-lang-select:hover {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
+
+.tiptap hr {
+  border: none;
+  border-top: none;
+  cursor: pointer;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.tiptap hr::after {
+  content: "···"; /* Üç nokta veya tek nokta '·' */
+  @apply text-zinc-400 text-2xl tracking-[0.5em] font-bold;
+}
+
+.tiptap hr.ProseMirror-selectednode {
+  @apply ring-2 ring-blue-100 rounded-lg;
+}
