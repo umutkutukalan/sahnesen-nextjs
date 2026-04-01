@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview", // Senin bulduğun güncel model
-      contents: `${AI_CONFIG.SENTIMENT_ANALYSIS_PROMPT} ${context} `,
+      contents: `${AI_CONFIG.SPARK_SYSTEM_PROMPT} ${context} `,
       config: {
         thinkingConfig: {
           thinkingLevel: ThinkingLevel.LOW, // Hızlı yanıt için düşük düşünme seviyesi

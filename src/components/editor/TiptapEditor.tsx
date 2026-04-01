@@ -75,19 +75,16 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
         },
     });
 
+    // useEffect içindeki timer'ı biraz daha agresif ve net hale getirelim
     useEffect(() => {
         if (editor) {
-            // 100ms gecikme, DOM'un ve Tippy'nin (FloatingMenu) 
-            // tamamen hazır olduğundan emin olmamızı sağlar.
             const timer = setTimeout(() => {
-                if (editor.isEmpty) {
-                    editor.commands.focus('start');
+                // Editörü odakla
+                editor.commands.focus('start');
 
-                    // Burası kilit nokta: Editöre boş bir işlem (transaction) gönderiyoruz.
-                    // Bu, FloatingMenu'nün 'shouldShow' kontrolünü yeniden çalıştırır.
-                    editor.view.dispatch(editor.state.tr);
-                }
-            }, 100);
+                // Menüye "hey, buradayım ve boşum" sinyali gönder
+                editor.view.dispatch(editor.state.tr);
+            }, 200); // 100ms'den 200ms'e çektik
 
             return () => clearTimeout(timer);
         }
@@ -176,8 +173,9 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                     // 2. Ve bulunulan yer bir paragrafsa
                     // 3. Ve o paragraf boşsa göster
                     const isParagraph = $from.parent.type.name === 'paragraph';
+                    const isEmpty = $from.parent.content.size === 0;
 
-                    return (editor.isFocused || editor.isEmpty) && isParagraph;
+                    return (editor.isFocused || editor.isEmpty) && isParagraph && isEmpty;
                 }}
             >
                 <div className="floating-menu-container flex items-center gap-5 transition-all duration-200 group">
@@ -200,34 +198,56 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                         </button>
                         <button
                             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-                            className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                            className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all"
                             title="Ayraç"
                         >
                             <span className="font-bold text-lg leading-none">···</span>
-                        </button>
-                        <button
-                            onClick={handleAISpark}
-                            disabled={isAiLoading}
-                            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all cursor-pointer shadow-sm
-        ${isAiLoading
-                                    ? 'bg-purple-200 animate-pulse cursor-wait'
-                                    : 'bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white opacity-0 group-hover:opacity-100'
-                                }`}
-                            title="AI Spark"
-                        >
-                            {isAiLoading ? (
-                                <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <HiOutlineSparkles size={18} />
-                            )}
                         </button>
                     </div>
                 </div>
             </FloatingMenu>
 
-            {/* Seçili Metin İçin Bubble Menu */}
+            {/* AI Spark: Metin Sonunda Beliren Buton */}
             <BubbleMenu
                 editor={editor}
+                pluginKey="aiSparkMenu" // Diğer BubbleMenu ile çakışmaması için şart
+                shouldShow={({ editor, state }) => {
+                    const { selection } = state;
+                    const { $from, empty } = selection;
+
+                    // 1. Yazı varsa
+                    // 2. Seçili metin yoksa (sadece imleç varsa)
+                    // 3. Paragraf içindeysek
+                    const isParagraph = $from.parent.type.name === 'paragraph';
+                    const hasContent = $from.parent.content.size > 0;
+
+                    return empty && isParagraph && hasContent;
+                }}
+                options={{
+                    placement: 'right', // Metnin sağına yapış
+                    offset: { mainAxis: 20, crossAxis: 0 }, // Metinden biraz uzaklık
+                }}
+            >
+                <button
+                    onClick={handleAISpark}
+                    disabled={isAiLoading}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 shadow-sm cursor-pointer border
+            ${isAiLoading
+                            ? 'border-purple-300 hover:border-purple-500 animate-pulse'
+                            : 'border-purple-300 hover:border-purple-500 text-purple-600 scale-90 hover:scale-100'
+                        }`}
+                >
+                    {isAiLoading ? (
+                        <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <HiOutlineSparkles size={20} />
+                    )}
+                </button>
+            </BubbleMenu>
+
+            {/* Seçili Metin İçin Bubble Menu */}
+            <BubbleMenu
+                editor={editor} // Görsel seçiliyse bu menüyü devre dışı bırak
                 options={{
                     placement: 'top', // Menü konumu
                     offset: { mainAxis: 10, crossAxis: 0 },
@@ -239,7 +259,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                     const { empty } = selection;
 
                     // 1. Eğer görsel seçiliyse bu menü görünmesin (Görselin kendi menüsü var)
-                    if (editor.isActive('image')) return false;
+                    if (editor.isActive('image') || editor.isActive('horizontalRule')) return false;
 
                     // 2. Sadece metin seçiliyse (boş değilse) göster
                     return !empty;
