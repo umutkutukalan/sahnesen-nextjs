@@ -3,16 +3,16 @@
 
 import { useLogin } from "@/hooks/login/useLogin";
 
-const LoginTable = () => {
-  const { login, setMail, setPassword } = useLogin();
+const LoginTable = ( { onSuccess }: { onSuccess: () => void } ) => {
+  const { login, setIdentifier, setPassword } = useLogin(onSuccess);
   return (
     <div className="flex flex-col gap-5 w-full">
       <div className="flex flex-col gap-2 w-full">
         <input
           type="text"
           className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-black focus:outline-none focus:ring-0 focus:border-black transition-all duration-200 placeholder-gray-400"
-          placeholder="Email"
-          onChange={(e) => setMail(e.target.value)}
+          placeholder="Email veya Username"
+          onChange={(e) => setIdentifier(e.target.value)}
         />
         <input
           type="password"

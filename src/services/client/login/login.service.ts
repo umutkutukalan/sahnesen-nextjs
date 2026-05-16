@@ -1,13 +1,13 @@
 import api from "../config";
 
 export interface LoginData {
-  mail: string;
+  identifier: string; // Backend artık email veya username ile girişe izin veriyor
   password: string;
 }
 
 export const LoginService = async (data: LoginData) => {
   try {
-    const response = await api.post("/users/login", data, {
+    const response = await api.post("/api/auth/login", data, {
       withCredentials: true, // Cookie'leri otomatik handle et
     });
     return response;

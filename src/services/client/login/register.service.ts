@@ -3,13 +3,14 @@ import api from "../config";
 export interface RegisterData {
     name: string;
     surname: string;
-    mail: string;
+    email: string;
+    username: string;
     password: string;
 }
 
 export const RegisterService = async (data: RegisterData) => {
   try {
-    const response = await api.post("/users/register", data);
+    const response = await api.post("/api/auth/register", data);
     return response;
   } catch (error) {
     console.error("Kullanıcı kaydedilirken hata - service:", error);

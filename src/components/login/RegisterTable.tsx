@@ -4,8 +4,8 @@ import { useRegister } from "@/hooks/login/useRegister";
 import Agreements from "./Agreements";
 import GoogleLogin from "./GoogleLogin";
 
-const RegisterTable = () => {
-  const { register, setName, setSurname, setMail, setPassword } = useRegister();
+const RegisterTable = ( { onSuccess }: { onSuccess: () => void } ) => {
+  const { register, setName, setSurname, setMail, setPassword, setUsername } = useRegister(onSuccess);
 
   return (
     <div className="flex flex-col gap-5 w-full">
@@ -24,6 +24,12 @@ const RegisterTable = () => {
             onChange={(e) => setSurname(e.target.value)}
           />
         </div>
+        <input
+          type="text"
+          className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-black focus:outline-none focus:ring-0 focus:border-black transition-all duration-200 placeholder-gray-400"
+          placeholder="Kullanıcı Adı (@username)"
+          onChange={(e) => setUsername(e.target.value.toLowerCase().trim())} // Boşluksuz ve küçük harf zorunlu
+        />
         <input
           type="text"
           className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-black focus:outline-none focus:ring-0 focus:border-black transition-all duration-200 placeholder-gray-400"

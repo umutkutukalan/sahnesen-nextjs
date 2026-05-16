@@ -51,16 +51,15 @@ const LoginPage = ({ setShowLoginModal }: LoginPageProps) => {
                 Giris Yap
               </button>
               <button
-                className={`flex-1 px-8 py-2 rounded-sm cursor-pointer ${
-                  register ? "bg-white" : ""
-                }`}
+                className={`flex-1 px-8 py-2 rounded-sm cursor-pointer ${register ? "bg-white" : ""
+                  }`}
                 onClick={() => handleRegister()}
               >
                 Kaydol
               </button>
             </div>
-            {sign && <LoginTable />}
-            {register && <RegisterTable />}
+            {sign && <LoginTable onSuccess={() => setShowLoginModal(false)} />}
+            {register && <RegisterTable onSuccess={() => setShowLoginModal(false)} />}
           </div>
         </div>
         <div

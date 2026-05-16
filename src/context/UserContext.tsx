@@ -31,7 +31,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         console.log("UserContext: Fetching user from cookie...");
 
         // Cookie-based authentication
-        const response = await axios.get("http://localhost:8080/users/me", {
+        const response = await axios.get("http://localhost:8080/api/users/me", {
           withCredentials: true, // HttpOnly cookie gönder
         });
 

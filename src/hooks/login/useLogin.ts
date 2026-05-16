@@ -2,39 +2,37 @@ import { useState } from "react";
 import { useAuth } from "../../context/UserContext";
 import { LoginService } from "@/services/client/login/login.service";
 
-export const useLogin = () => {
-  const [mail, setMail] = useState("");
+export const useLogin = (onSuccess?: () => void) => {
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useAuth(); // setToken'ı kaldırdık
-
-  const data = {
-    mail,
-    password,
-  };
+  const { setUser } = useAuth(); 
 
   const login = async () => {
-    if (!mail || !password) {
-      alert("Email ve şifre boş olamaz!");
+    if (!identifier || !password) {
+      alert("Email veya username ve şifre boş olamaz!");
       return;
     }
+    
     try {
-      const response = await LoginService(data);
-      console.log("Kullanıcı giriş yaptı:", response.data);
-
-      // Backend HttpOnly cookie olarak token ayarlıyor
-      // Sadece user bilgisini UserContext'e kaydet
+      // Backend HttpOnly cookie bastığı için burası credentials: true/include ile gitmeli
+      const response = await LoginService({ identifier, password });
+      
+      /* Backend'den dönen user objesi artık yeni mimariyle uyumlu:
+        { id: 1, username: "kutukalan", name: "Umut", surname: "Kütükalan", profileImg: null ... }
+      */
       setUser(response.data.user);
+      
+      console.log("Giriş Başarılı! WebSocket bağlantıları başlatılıyor...");
 
-      console.log("Login başarılı - Cookie ile authentication aktif");
-
-      // Giriş başarılıysa sayfayı yenile
-      window.location.reload();
+      // Sert sayfa yenileme yerine modalı kapatacak callback'i tetikle
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
-      console.error("Kullanıcı girişi sırasında hata - hooks:", error);
-      console.log("Giriş verileri:", data);
-      alert("Giriş işlemi başarısız. Lütfen bilgilerinizi kontrol edin.");
+      console.error("Giriş hatası:", error);
+      alert("Giriş işlemi başarısız. Bilgilerinizi kontrol edin.");
     }
   };
 
-  return { login, setMail, setPassword, mail, password };
+  return { login, setIdentifier, setPassword, identifier, password };
 };
