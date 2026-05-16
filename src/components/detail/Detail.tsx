@@ -1,7 +1,7 @@
 "use client";
 
 import { useRelativeTime } from "@/hooks/useRelativeTime";
-import { Project } from "@/services/server/project.service";
+import { Project } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 import { BiCommentDetail } from "react-icons/bi";
 import LoadingScreen from "../LoadingScreen";

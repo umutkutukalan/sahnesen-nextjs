@@ -1,5 +1,5 @@
 import Detail from "@/components/detail/Detail";
-import { getProjectBySlug } from "@/services/server/project.service";
+import { getProjectBySlug } from "@/services/server/post.service";
 
 interface PageProps {
   params: Promise<{

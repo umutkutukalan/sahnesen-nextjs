@@ -1,5 +1,5 @@
 import { getProjectsClient } from "@/services/client/projects/project.service";
-import { Project } from "@/services/server/project.service";
+import { Project } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 
 export const useGetProjects = (

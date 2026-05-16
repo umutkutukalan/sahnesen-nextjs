@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "../../context/UserContext";
 import { getUserProjectsLikes } from "@/services/client/projects/likes_project.service";
-import { Project } from "@/services/server/project.service";
+import { Project } from "@/services/server/post.service";
 
 export const useGetUserLikedProjects = () => {
   const { user } = useAuth();

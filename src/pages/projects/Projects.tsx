@@ -16,7 +16,7 @@ import { useAuth } from "@/context/UserContext";
 import { useGetProjects } from "@/hooks/projects/useGetProjects";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
-import { Project } from "@/services/server/project.service";
+import { Project } from "@/services/server/post.service";
 
 interface ProjectsProps {
   initialProjects: Project[];

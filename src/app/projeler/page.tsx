@@ -1,5 +1,5 @@
 import ProjectsClient from "@/pages/projects/ProjectsClient";
-import { getProjectsServer } from "@/services/server/project.service";
+import { getProjectsServer } from "@/services/server/post.service";
 
 export default async function ProjectsPage() {
   const data = await getProjectsServer(0, 5); // İlk sayfa projelerini sunucu tarafında al

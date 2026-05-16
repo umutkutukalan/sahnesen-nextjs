@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/UserContext";
 import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
-import { Project } from "@/services/server/project.service";
+import { Project } from "@/services/server/post.service";
 import Navbar from "@/components/navbar/Navbar";
 import LikedProjects from "./LikedProjects";
 

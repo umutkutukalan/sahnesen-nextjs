@@ -4,11 +4,11 @@ import { useAuth } from "@/context/UserContext";
 import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
 import Projects from "./Projects";
-import { Project } from "@/services/server/project.service";
+import { PostResponse} from "@/services/server/post.service";
 import Navbar from "@/components/navbar/Navbar";
 
 interface Props {
-  initialProjects: Project[];
+  initialProjects: PostResponse[];
   initialPage: number;
   totalPages: number;
 }

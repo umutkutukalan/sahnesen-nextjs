@@ -13,7 +13,7 @@ import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { handleViewProject } from "../../utils/HandleViewProject";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
-import { Project } from "@/services/server/project.service";
+import { Project } from "@/services/server/post.service";
 import { useToProfile } from "@/utils/useToProfile";
 
 interface ProjectCardProps {
