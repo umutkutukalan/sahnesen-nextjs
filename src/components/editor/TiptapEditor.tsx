@@ -198,7 +198,7 @@ const TiptapEditor = ({ content, onUpdate }: TiptapEditorProps) => {
                         </button>
                         <button
                             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-                            className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all"
+                            className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                             title="Ayraç"
                         >
                             <span className="font-bold text-lg leading-none">···</span>

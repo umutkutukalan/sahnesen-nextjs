@@ -19,7 +19,7 @@ import { CiSettings } from "react-icons/ci";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils"; // Özel karakterleri kaldırmak için yardımcı fonksiyon
 import Image from "next/image";
-import { profileborder } from "@/utils";
+import { duck2, duck3, duck4, duck5, duck7, penguinandgirl, profileborder, pullshark, quickdraw, rabbit, yolo } from "@/utils";
 import ProfileUserProjects from "./ProfileUserProject";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
@@ -30,11 +30,26 @@ import FollowingList from "@/components/follow/FollowingList";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 import ProfileUserBlogs from "./ProfileUserBlogs";
 import { IoBook } from "react-icons/io5";
+import { MdOutlineWorkspacePremium } from "react-icons/md";
+import { TiLocationArrow } from "react-icons/ti";
+
+
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     const { user } = useAuth();
     const router = useRouter();
     const currentUserId = user?.id; // Giriş yapan kullanıcının ID'si
+
+    const rozets = [
+        // { id: 1, rozet: quickdraw, name: "Hızlı Çizer" },
+        // { id: 2, rozet: pullshark, name: "Pull Shark" },
+        // { id: 3, rozet: yolo, name: "YOLO" },
+        { id: 4, rozet: duck2, name: "Duck 2" },
+        { id: 5, rozet: duck3, name: "Duck 3" },
+        { id: 6, rozet: duck4, name: "Duck 4" },
+        { id: 7, rozet: duck5, name: "Duck 5" },
+        { id: 8, rozet: duck7, name: "Duck 7" },
+    ];
 
     const [activeTab, setActiveTab] = useState("projeler"); // Tab state'i
     const [followingList, setFollowingList] = useState(false);
@@ -94,7 +109,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div className="w-full">
                 <div className="w-full">
                     {/* Profil resmi ve bilgileri */}
-                    <div className="w-full h-100 bg-gray-700 relative z-10">
+                    <div className="w-full h-80 bg-gray-700 relative z-10">
                         <div className="w-full h-full overflow-hidden relative">
                             <div className="absolute inset-0"></div>
                             <div>
@@ -110,7 +125,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                 />
                             </div>
                         </div>
-                        <div className="absolute h-35 w-35 rounded-full overflow-hidden bg-gray-200 -bottom-15 right-15 z-20 flex items-center justify-center shadow-lg shadow-black/20">
+                        <div className="absolute h-35 w-35 rounded-full overflow-hidden bg-gray-200 -bottom-15 left-10 z-20 flex items-center justify-center shadow-lg shadow-black/20">
                             {profileUser?.profileImg ? (
                                 <Image
                                     src={getOptimizedImageUrl(profileUser.profileImg)}
@@ -128,69 +143,45 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                         </div>
                     </div>
                     <div className="mt-10 px-10 w-full flex gap-10">
-                        <div className="w-3/4">
-                            {/* Tab Navigation */}
-                            <div className="flex gap-8 border-b border-gray-200">
-                                <button
-                                    onClick={() => setActiveTab("projeler")}
-                                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "projeler"
-                                        ? "border-blue-500 text-blue-600"
-                                        : "border-transparent text-gray-500 hover:text-gray-700"
-                                        }`}
-                                >
-                                    Projeler
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("bloglar")}
-                                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "bloglar"
-                                        ? "border-blue-500 text-blue-600"
-                                        : "border-transparent text-gray-500 hover:text-gray-700"
-                                        }`}
-                                >
-                                    Bloglar
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("kitaplık")}
-                                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "kitaplık"
-                                        ? "border-blue-500 text-blue-600"
-                                        : "border-transparent text-gray-500 hover:text-gray-700"
-                                        }`}
-                                >
-                                    Kitaplık
-                                </button>
-                            </div>
-
-                            {/* Tab Content */}
-                            <div className="mt-6">
-                                {activeTab === "projeler" && (
-                                    <ProfileUserProjects targetUserId={targetUserId} />
-                                )}
-                                {activeTab === "bloglar" && (
-                                    <ProfileUserBlogs targetUserId={targetUserId} />
-                                )}
-                            </div>
-                        </div>
                         {/* Kullanıcı adı ve takip butonu */}
                         <div
-                            className="w-1/4 mt-5"
+                            className="w-1/4 mt-12"
                             style={{ position: "sticky", top: "64px" }}
                         >
                             <div className="flex flex-col">
-                                <h3 className="text-gray-500 text-xs">
-                                    @{profileUser?.username || "user"}
-                                </h3>
-                                <div className="flex items-center gap-1">
-                                    <h1 className="text-lg">
-                                        {profileUser?.name} {profileUser?.surname}
-                                    </h1>
-                                    <TbRosetteDiscountCheckFilled
-                                        className="text-blue-500 text-2xl"
-                                        title="Onaylı Yazar"
-                                    />
-                                    {/* <div className="relative ml-1 flex items-center justify-center">
-                                        <TbRosetteFilled className="text-black text-2xl shrink-0 z-5" />
-                                        <IoBook className="absolute z-10 text-[10px] text-white" />
-                                    </div> */}
+                                {rozets.length > 0 && (
+                                    <ul className="flex items-center gap-0.5 mb-2">
+                                        {rozets.map((rozet) => (
+                                            <li key={rozet?.id}>
+                                                <div className="relative">
+                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center border border-1 border-gray-600 overflow-hidden relative">
+                                                        <Image src={rozet?.rozet} alt={rozet?.name} fill className="object-cover" />
+                                                    </div>
+                                                    {rozet.id === 5 && (
+                                                        <div className="absolute -top-1 right-0 w-3 h-3 rounded-full bg-orange-500 text-[7px] flex items-center justify-center text-white">x2</div>
+                                                    )}
+                                                    {rozet.id === 4 && (
+                                                        <div className="absolute -top-1 right-0 w-3 h-3 rounded-full bg-black text-[7px] flex items-center justify-center text-white">x3</div>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                <div className="flex flex-col my-1">
+                                    <h3 className="text-gray-500 text-xs">
+                                        @{profileUser?.username || "user"}
+                                    </h3>
+                                    <div className="flex items-center gap-1">
+                                        <h1 className="text-xl font-semibold">
+                                            {profileUser?.name} {profileUser?.surname}
+                                        </h1>
+                                        <TbRosetteDiscountCheckFilled
+                                            className="text-blue-500 text-xl"
+                                            title="Onaylı Yazar"
+                                        />
+
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-4 mt-2">
                                     {/* Kendi profilinde düzenle butonu, başkasının profilinde takip butonu */}
@@ -251,19 +242,19 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div
-                  className="flex flex-col gap-1 mt-5 text-gray-600"
-                  style={{ fontSize: "0.7rem" }}
-                >
-                  <div className="flex items-center gap-1">
-                    <MdOutlineWorkspacePremium className="text-xl" />
-                    <span>Yazılım Mühendisi</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <TiLocationArrow className="text-xl" />
-                    <span>Eskişehir, Türkiye</span>
-                  </div>
-                </div> */}
+                                <div
+                                    className="flex flex-col gap-1 mt-5 text-gray-600"
+                                    style={{ fontSize: "0.7rem" }}
+                                >
+                                    <div className="flex items-center gap-1">
+                                        <MdOutlineWorkspacePremium className="text-xl" />
+                                        <span>Yazılım Mühendisi</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <TiLocationArrow className="text-xl" />
+                                        <span>Eskişehir, Türkiye</span>
+                                    </div>
+                                </div>
                                 {profileUser?.bio ? (
                                     <div
                                         className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
@@ -283,6 +274,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                         <span> Biyografi alanı doldurulmadı. </span>
                                     </div>
                                 )}
+
                                 {publicSocialAccounts.length > 0 && (
                                     <div className="mt-5 flex flex-col gap-1">
                                         <h3 className="text-gray-600 text-xs">Bağlantılar</h3>
@@ -325,6 +317,48 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                                             </ul>
                                         ))}
                                     </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="w-3/4">
+                            {/* Tab Navigation */}
+                            <div className="flex gap-8 border-b border-gray-200">
+                                <button
+                                    onClick={() => setActiveTab("projeler")}
+                                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "projeler"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
+                                        }`}
+                                >
+                                    Projeler
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("bloglar")}
+                                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "bloglar"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
+                                        }`}
+                                >
+                                    Bloglar
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("kitaplık")}
+                                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === "kitaplık"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
+                                        }`}
+                                >
+                                    Kitaplık
+                                </button>
+                            </div>
+
+                            {/* Tab Content */}
+                            <div className="mt-6">
+                                {activeTab === "projeler" && (
+                                    <ProfileUserProjects targetUserId={targetUserId} />
+                                )}
+                                {activeTab === "bloglar" && (
+                                    <ProfileUserBlogs targetUserId={targetUserId} />
                                 )}
                             </div>
                         </div>
