@@ -145,7 +145,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </div>
 
           <button
-            onClick={() => router.push(`/kesfet/${project.authorUsername}/${project.slug}`)} // Yeni şık rota mantığımız
+            onClick={() => router.push(`/${project.authorUsername}/${project.slug}`)} // Yeni şık rota mantığımız
             className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
           >
             Okumaya Devam Et
