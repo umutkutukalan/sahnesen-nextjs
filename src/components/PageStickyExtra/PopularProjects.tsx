@@ -7,95 +7,91 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useToProfile } from "@/utils/useToProfile";
+import { PostResponse } from "@/services/server/post.service";
+import { FiUser } from "react-icons/fi";
 // import { useToProfile } from "../../hooks/useToProfile";
 
-const PopularProjects = ({ projects }) => {
+interface PopularProjectsProps {
+  projects: PostResponse[]; // Tip dizisi güncellendi
+}
+
+const PopularProjects = ({ projects }: PopularProjectsProps) => {
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
   const { ToProfile } = useToProfile();
-  // const { ToProfile } = useToProfile();
-  console.log(projects);
+  
+  console.log("Popular projects data:", projects);
   const topProjects = projects.slice(0, 4);
 
   return (
     <div className="flex flex-col gap-4 mt-1">
-      <div
-        className="flex items-center gap-1"
-        style={{
-          fontSize: "0.8rem",
-        }}
-      >
+      <div className="flex items-center gap-1" style={{ fontSize: "0.8rem" }}>
         <FaStar className="flex-shrink-0 text-blue-600" />
-        <h3>Popüler Projeler</h3>
+        <h3>Popüler İçerikler</h3> {/* İsim genel akışa göre güncellendi */}
       </div>
+      
       <ul className="flex flex-col gap-5">
-        {topProjects.map((project) => (
-          <li key={project.id} className="flex flex-col gap-3 text-xs">
-            <div className="flex items-center gap-2 cursor-pointer"
-              onClick={() => {
-                if (project?.user) {
-                  ToProfile(project?.user, project.user?.username);
-                } else {
-                  ToProfile(project?.user, project.user?.username);
-                }
-              }}
-            >
-              <div
-                className="relative w-8 h-8 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 cursor-pointer shadow-lg shadow-black/20"
-              // onClick={() => ToProfile(project?.user, project?.user?.username)}
+        {topProjects.map((project) => {
+          // Yazar ismini güvenli bir şekilde birleştiriyoruz
+          const authorName = `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
+
+          return (
+            <li key={project.id} className="flex flex-col gap-3 text-xs">
+              
+              {/* AUTHOR HEADER */}
+              <div 
+                className="flex items-center gap-2 cursor-pointer w-max"
+                onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername
               >
-                <Image
-                  src={project.user.profileImg}
-                  alt={project.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="truncate">
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <span className="truncate">
-                      {project.user.name || project.user.email} {project.user.surname}
-                    </span>
-                    <TbRosetteDiscountCheckFilled
-                      className="text-blue-500 shrink-0"
-                      title="Onaylı Yazar"
+                <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 shadow-lg shadow-black/20">
+                  {project.authorProfileImg ? (
+                    <Image
+                      src={project.authorProfileImg}
+                      alt={project.title}
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
+                  ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                      <FiUser className="w-4 h-4 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="truncate">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{authorName || "Yazar"}</span>
+                      <TbRosetteDiscountCheckFilled className="text-blue-500 shrink-0" title="Onaylı Yazar" />
+                    </div>
+                    <span className="truncate text-[8px] text-gray-400">
+                      @{project.authorUsername}
+                    </span>
                   </div>
-                  <span className="truncate text-[8px] text-gray-400">
-                    @{project.user.username}
-                  </span>
                 </div>
               </div>
-            </div>
-            <div
-              className="flex flex-col gap-1 cursor-pointer"
-              onClick={() =>
-                handleViewProject(
-                  project,
-                  router,
-                  project?.user?.username,
-                  project?.slug,
-                )
-              }
-            >
-              <span
-                className="pr-10 line-clamp-2 font-semibold"
-                style={{
-                  fontSize: "0.8rem",
-                }}
+
+              {/* TITLE + TIME */}
+              <div
+                className="flex flex-col gap-1 cursor-pointer"
+                onClick={() => router.push(`/kesfet/${project.authorUsername}/${project.slug}`)} // Yeni şık rota mantığımız
               >
-                {project.title}
-              </span>
-              <div className="flex items-center">
-                <FaStarHalf className="flex-shrink-0 text-blue-600" />
-                <span className="text-gray-500">
-                  {formatRelativeTime(project.createdAt)}
+                <span
+                  className="pr-10 line-clamp-2 font-semibold hover:text-blue-600 transition-colors duration-200"
+                  style={{ fontSize: "0.8rem" }}
+                >
+                  {project.title}
                 </span>
+                <div className="flex items-center gap-1 text-gray-400">
+                  <FaStarHalf className="flex-shrink-0 text-blue-600 text-[10px]" />
+                  <span>{formatRelativeTime(project.createdAt)}</span>
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
+
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
