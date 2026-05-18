@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { useRelativeTime } from "../../hooks/useRelativeTime";
-import { handleViewProject } from "../../utils/HandleViewProject";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { useToProfile } from "@/utils/useToProfile";
@@ -32,50 +31,85 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     getLikeCount(project.id, "project");
   }, [project?.id]);
 
-  // TİPTAP METİN ÇIKARMA SİHİRBAZI (Helper Metot)
+  // 🔥 AKILLI TIPTAP METİN ÇIKARMA SİHİRBAZI
   const getFirstParagraphText = (contentStr: string): string => {
     try {
       if (!contentStr) return "";
-      
-      // 1. Aşama: Backend'den gelen String'i gerçek JSON nesnesine çeviriyoruz
       const parsed = JSON.parse(contentStr);
-      
-      // 2. Aşama: Tiptap hiyerarşisinde (doc -> content -> paragraph) geziyoruz
+
       if (parsed && parsed.content && Array.isArray(parsed.content)) {
-        // İlk paragraf düğümünü bul
-        const paragraphNode = parsed.content.find((node: any) => node.type === "paragraph");
-        
-        // Paragrafın içindeki text düğümlerini birleştir
-        if (paragraphNode && paragraphNode.content && Array.isArray(paragraphNode.content)) {
-          return paragraphNode.content
+        // Sadece paragraf değil, yazı içeren ilk anlamlı bloku buluyoruz (paragraf, heading, veya blockquote)
+        const textBearingNode = parsed.content.find(
+          (node: any) =>
+            (node.type === "paragraph" || node.type === "heading" || node.type === "blockquote") &&
+            node.content &&
+            node.content.length > 0
+        );
+
+        if (textBearingNode && textBearingNode.content && Array.isArray(textBearingNode.content)) {
+          return textBearingNode.content
             .map((textNode: any) => textNode.text || "")
             .join("");
         }
       }
       return "";
     } catch (e) {
-      console.error("Tiptap JSON parse hatası:", e);
+      console.error("Tiptap JSON parse hatası (Card):", e);
       return "";
     }
   };
+
+  // 🔥 TIPTAP İÇİNDEKİ İLK GÖRSELİ BULMA SİHİRBAZI
+  const getFirstImageSrc = (contentStr: string): string | null => {
+    try {
+      if (!contentStr) return null;
+      const parsed = JSON.parse(contentStr);
+
+      if (parsed && parsed.content && Array.isArray(parsed.content)) {
+        for (const node of parsed.content) {
+          // 1. İhtimal: Resim doğrudan ana blok olarak eklenmişse
+          if (node.type === "image" && node.attrs?.src) {
+            return node.attrs.src;
+          }
+
+          // 2. İhtimal: Resim bir paragrafın veya başka bir bloğun içine çocuk node olarak gömülmüşse
+          if (node.content && Array.isArray(node.content)) {
+            const inlineImage = node.content.find((child: any) => child.type === "image");
+            if (inlineImage && inlineImage.attrs?.src) {
+              return inlineImage.attrs.src;
+            }
+          }
+        }
+      }
+      return null;
+    } catch (e) {
+      console.error("Tiptap kapak resmi ayıklama hatası (Card):", e);
+      return null;
+    }
+  };
+
+  // Kullanımı tetikleyeceğimiz değişken: Öncelik coverImage, yoksa içerikteki ilk resim
+  const displayImage = project.coverImage || getFirstImageSrc(project.content);
+  const finalImageUrl = displayImage
+    ? (displayImage.startsWith("http") ? displayImage : `http://localhost:8080${displayImage}`)
+    : null;
 
   // Yeni backend mimarimizde yazarı doğrudan düzleştirilmiş (flat) olarak alıyoruz
   const authorName = `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
   return (
     <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
-      
+
       {/* LEFT IMAGE */}
       <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
-          className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${
-            project.coverImage ? "" : "border border-gray-100 shadow-sm" // image -> coverImage oldu
-          }`}
+          className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${finalImageUrl ? "" : "border border-gray-100 shadow-sm"
+            }`}
           style={{ boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.5)" }}
         >
-          {project.coverImage ? (
+          {finalImageUrl ? (
             <Image
-              src={project.coverImage}
+              src={finalImageUrl}
               alt={project.title}
               fill
               unoptimized
@@ -91,9 +125,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
       {/* RIGHT CONTENT */}
       <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 lg:py-6 py-5">
-        
+
         {/* AUTHOR */}
-        <div 
+        <div
           className="flex items-center gap-2 cursor-pointer w-max"
           onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
         >

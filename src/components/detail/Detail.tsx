@@ -1,14 +1,13 @@
 "use client";
 
 import { useRelativeTime } from "@/hooks/useRelativeTime";
-import { PostResponse } from "@/services/server/post.service"; // Yenilenen ortak tip
+import { PostResponse } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 import { BiCommentDetail } from "react-icons/bi";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser } from "react-icons/fi";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { IoIosMore, IoMdHeart } from "react-icons/io";
-// import FollowButton from "./FollowButton"; // Kullanmak istersen yazar ID'sine göre bağlarsın
 import { usePostLike } from "@/hooks/like/usePostLike";
 import { useUnlikedPost } from "@/hooks/like/useUnlikedPost";
 import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
@@ -34,7 +33,7 @@ const Detail = ({ post }: DetailProps) => {
   const [likeCountLocal, setLikeCountLocal] = useState(likeCount);
 
   // Like hook'una göndereceğimiz tip parametresini backend'den gelen postType ile senkronize ediyoruz
-  const type = post.postType.toLowerCase(); 
+  const type = post.postType.toLowerCase();
 
   const toggleComments = () => {
     setIsCommentsOpen(!isCommentsOpen);
@@ -76,42 +75,159 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
-  // 🔥 TIPTAP JSON STRING RENDER MOTORU
+  // 🔥 GELİŞMİŞ TIPTAP JSON STRING RENDER MOTORU
   const renderTiptapContent = (contentStr: string) => {
     try {
       if (!contentStr) return null;
       const parsed = JSON.parse(contentStr);
 
-      if (parsed && parsed.content && Array.isArray(parsed.content)) {
-        return parsed.content.map((node: any, index: number) => {
-          // 1. Paragraf Düğümü
-          if (node.type === "paragraph" && node.content) {
-            const text = node.content.map((t: any) => t.text || "").join("");
+      if (!parsed || !parsed.content || !Array.isArray(parsed.content)) return null;
+
+      // Inline text stillerini (Bold, Italic, Code) işleyen yardımcı fonksiyon
+      const renderTextNodes = (textNodes: any[]) => {
+        if (!textNodes || !Array.isArray(textNodes)) return "";
+
+        return textNodes.map((node: any, idx: number) => {
+          let element: React.ReactNode = node.text || "";
+
+          if (node.marks && Array.isArray(node.marks)) {
+            node.marks.forEach((mark: any) => {
+              if (mark.type === "bold") {
+                element = <strong key={idx} className="font-bold text-gray-900">{element}</strong>;
+              }
+              if (mark.type === "italic") {
+                element = <em key={idx} className="italic text-gray-800">{element}</em>;
+              }
+              if (mark.type === "code") {
+                element = (
+                  <code key={idx} className="bg-gray-100 text-red-600 px-1.5 py-0.5 rounded font-mono text-sm border border-gray-200">
+                    {element}
+                  </code>
+                );
+              }
+            });
+          }
+          return <span key={idx}>{element}</span>;
+        });
+      };
+
+      // Ana Tiptap Bloklarını Render Ediyoruz
+      return parsed.content.map((node: any, index: number) => {
+        switch (node.type) {
+          // 1. Paragraf
+          // 1. Paragraf (İçinde inline imaj barındırma ihtimaline karşı zırhlı)
+          case "paragraph":
+            if (node.content && Array.isArray(node.content)) {
+              // Eğer paragrafın içinde tipi "image" olan bir çocuk node varsa
+              const hasInlineImage = node.content.find((c: any) => c.type === "image");
+
+              if (hasInlineImage && hasInlineImage.attrs?.src) {
+                const imgUrl = hasInlineImage.attrs.src.startsWith('http')
+                  ? hasInlineImage.attrs.src
+                  : `http://localhost:8080${hasInlineImage.attrs.src}`;
+
+                return (
+                  <div className="my-8 flex flex-col gap-2 w-full" key={index}>
+                    <div className="w-full rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgUrl}
+                        alt={hasInlineImage.attrs.alt || "Sahnesen görseli"}
+                        className="w-full h-auto max-h-[600px] object-cover"
+                      />
+                    </div>
+                  </div>
+                );
+              }
+            }
+
+            // Normal paragraf metni basımı
             return (
-              <p key={index} className="text-gray-700 text-lg leading-relaxed mb-6">
-                {text}
+              <p key={index} className="text-gray-800 text-lg leading-relaxed mb-6 font-normal">
+                {node.content ? renderTextNodes(node.content) : <br />}
               </p>
             );
-          }
-          // 2. Görsel Düğümü (Tiptap formatına göre uyarlandı)
-          if (node.type === "image" && node.attrs?.src) {
+
+          // 2. Başlıklar (Heading)
+          case "heading":
+            const HeadingTag = `h${node.attrs?.level || 2}` as keyof JSX.IntrinsicElements;
+            const headingClasses: Record<number, string> = {
+              1: "text-4xl font-extrabold tracking-tight text-gray-950 mt-10 mb-4",
+              2: "text-2xl font-bold tracking-tight text-gray-900 mt-8 mb-4 border-b pb-2 border-gray-100",
+              3: "text-xl font-semibold tracking-tight text-gray-900 mt-6 mb-3",
+            };
             return (
-              <div className="relative w-full h-[400px] my-6 rounded-lg overflow-hidden shadow-md" key={index}>
-                <Image
-                  src={node.attrs.src}
-                  alt={node.attrs.alt || "İçerik görseli"}
-                  fill
-                  className="object-cover"
-                />
+              <HeadingTag key={index} className={headingClasses[node.attrs?.level || 2] || headingClasses[2]}>
+                {node.content ? node.content.map((t: any) => t.text || "").join("") : ""}
+              </HeadingTag>
+            );
+
+          // 3. Görsel Düğümü
+          case "image":
+            if (node.attrs?.src) {
+              // Eğer URL "http" ile başlamıyorsa, başına backend url'ini yapıştırıyoruz
+              const imageUrl = node.attrs.src.startsWith('http')
+                ? node.attrs.src
+                : `http://localhost:8080${node.attrs.src}`;
+
+              return (
+                <div className="my-8 flex flex-col gap-2 w-full" key={index}>
+                  <div className="w-full rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={imageUrl}
+                      alt={node.attrs.alt || "Sahnesen görseli"}
+                      className="w-full h-auto max-h-[600px] object-cover"
+                    />
+                  </div>
+                  {node.attrs.alt && (
+                    <span className="text-xs text-center italic text-gray-400 px-4">
+                      {node.attrs.alt}
+                    </span>
+                  )}
+                </div>
+              );
+            }
+            return null;
+
+          // 4. Alıntı (Blockquote)
+          case "blockquote":
+            return (
+              <blockquote key={index} className="border-l-4 border-blue-600 pl-4 italic text-gray-600 my-6 text-xl bg-gray-50 py-2 pr-2 rounded-r-lg">
+                {node.content ? renderTextNodes(node.content) : ""}
+              </blockquote>
+            );
+
+          // 5. Kod Bloğu (Code Block)
+          case "codeBlock":
+            const codeLang = node.attrs?.language || "auto";
+            return (
+              <div key={index} className="relative my-6 rounded-xl overflow-hidden bg-zinc-950 text-zinc-100 font-mono text-sm shadow-xl border border-zinc-800">
+                <div className="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800 text-[10px] text-zinc-400 select-none tracking-wider uppercase">
+                  <span>{codeLang}</span>
+                  <span className="lowercase text-zinc-500">sahnesen compiler</span>
+                </div>
+                <pre className="p-4 overflow-x-auto leading-relaxed whitespace-pre-wrap">
+                  <code>
+                    {node.content ? node.content.map((t: any) => t.text || "").join("") : ""}
+                  </code>
+                </pre>
               </div>
             );
-          }
-          return null;
-        });
-      }
+
+          // 6. Yatay Ayraç (Horizontal Rule / Üç Nokta Üç Çizgi)
+          case "horizontalRule":
+            return (
+              <hr key={index} className="my-10 border-t border-gray-200 w-full" />
+            );
+
+          default:
+            return null;
+        }
+      });
     } catch (e) {
       console.error("Tiptap parse hatası (Detail):", e);
-      return <p className="text-red-500">İçerik yüklenirken bir hata oluştu.</p>;
+      return <p className="text-red-500 text-sm">İçerik render edilirken bir mimari hata oluştu.</p>;
     }
   };
 
@@ -124,10 +240,10 @@ const Detail = ({ post }: DetailProps) => {
   return (
     <div className="page pt-25 bg-white text-black min-h-screen">
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
-        
+
         {/* ANA İÇERİK BLOĞU */}
         <div className="flex flex-col w-240 gap-10 transition-all duration-300 relative">
-          
+
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col">
             <div className="w-full flex items-center justify-between border-b pb-5 border-gray-200">
@@ -180,8 +296,8 @@ const Detail = ({ post }: DetailProps) => {
                 <span className="text-sm">
                   {likeCountLocal >= 1000
                     ? (likeCountLocal % 1000 === 0
-                        ? (likeCountLocal / 1000).toFixed(0)
-                        : Math.floor(likeCountLocal / 100) / 10) + "K"
+                      ? (likeCountLocal / 1000).toFixed(0)
+                      : Math.floor(likeCountLocal / 100) / 10) + "K"
                     : likeCountLocal}
                 </span>
               </div>
@@ -206,11 +322,10 @@ const Detail = ({ post }: DetailProps) => {
         {/* YORUMLAR TOGGLE BUTONU */}
         <button
           onClick={toggleComments}
-          className={`fixed bottom-6 right-6 flex items-center gap-2 rounded-full border shadow-md px-4 py-2.5 transition-all cursor-pointer ${
-            isCommentsOpen
-              ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-              : "text-gray-600 border-gray-200 hover:text-gray-800 hover:bg-gray-50 bg-white"
-          }`}
+          className={`fixed bottom-6 right-6 flex items-center gap-2 rounded-full border shadow-md px-4 py-2.5 transition-all cursor-pointer ${isCommentsOpen
+            ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+            : "text-gray-600 border-gray-200 hover:text-gray-800 hover:bg-gray-50 bg-white"
+            }`}
         >
           <BiCommentDetail className="text-base" />
           <span className="text-xs font-semibold">{sampleComments.length} Yorum</span>
