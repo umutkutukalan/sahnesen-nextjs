@@ -83,26 +83,43 @@ const Detail = ({ post }: DetailProps) => {
 
       if (!parsed || !parsed.content || !Array.isArray(parsed.content)) return null;
 
-      // Inline text stillerini (Bold, Italic, Code) işleyen yardımcı fonksiyon
+      // Inline text stillerini (Bold, Italic, Code, Link, Underline) eksiksiz işleyen zırhlı fonksiyon
       const renderTextNodes = (textNodes: any[]) => {
         if (!textNodes || !Array.isArray(textNodes)) return "";
 
         return textNodes.map((node: any, idx: number) => {
           let element: React.ReactNode = node.text || "";
 
+          // Eğer kelimenin stilleri (marks) varsa, her birini sırayla elementin etrafına sarıyoruz
           if (node.marks && Array.isArray(node.marks)) {
             node.marks.forEach((mark: any) => {
               if (mark.type === "bold") {
-                element = <strong key={idx} className="font-bold text-gray-900">{element}</strong>;
+                element = <strong key={idx} className="font-bold text-gray-950">{element}</strong>;
               }
               if (mark.type === "italic") {
                 element = <em key={idx} className="italic text-gray-800">{element}</em>;
               }
+              if (mark.type === "underline") {
+                element = <u key={idx} className="underline text-gray-900">{element}</u>;
+              }
               if (mark.type === "code") {
                 element = (
-                  <code key={idx} className="bg-gray-100 text-red-600 px-1.5 py-0.5 rounded font-mono text-sm border border-gray-200">
+                  <code key={idx} className="bg-gray-100 px-1.5 py-0.5 rounded-sm border border-gray-200 mx-0.5">
                     {element}
                   </code>
+                );
+              }
+              if (mark.type === "link" && mark.attrs?.href) {
+                element = (
+                  <a
+                    key={idx}
+                    href={mark.attrs.href}
+                    target={mark.attrs.target || "_blank"}
+                    rel={mark.attrs.rel || "noopener noreferrer"}
+                    className="hover:text-gray-600 underline transition-colors cursor-pointer"
+                  >
+                    {element}
+                  </a>
                 );
               }
             });
