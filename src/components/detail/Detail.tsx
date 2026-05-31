@@ -144,13 +144,13 @@ const Detail = ({ post }: DetailProps) => {
                   : `http://localhost:8080${hasInlineImage.attrs.src}`;
 
                 return (
-                  <div className="my-8 flex flex-col gap-2 w-full" key={index}>
-                    <div className="w-full rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm">
+                  <div className="flex flex-col gap-2 w-full" key={index}>
+                    <div className="w-full h-auto relative overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imgUrl}
                         alt={hasInlineImage.attrs.alt || "Sahnesen görseli"}
-                        className="w-full h-auto max-h-[600px] object-cover"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
@@ -189,7 +189,7 @@ const Detail = ({ post }: DetailProps) => {
 
               return (
                 <div className="my-8 flex flex-col gap-2 w-full" key={index}>
-                  <div className="w-full rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm">
+                  <div className="w-full rounded-xl overflow-hidden border border-gray-100 shadow-sm">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageUrl}
