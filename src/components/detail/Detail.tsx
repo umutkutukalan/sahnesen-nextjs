@@ -160,7 +160,7 @@ const Detail = ({ post }: DetailProps) => {
 
             // Normal paragraf metni basımı
             return (
-              <p key={index} className="text-gray-800 text-lg leading-relaxed mb-6 font-normal">
+              <p key={index} className="text-gray-800 text-base md:text-lg leading-relaxed mb-6 font-normal">
                 {node.content ? renderTextNodes(node.content) : <br />}
               </p>
             );
@@ -219,9 +219,9 @@ const Detail = ({ post }: DetailProps) => {
           case "codeBlock":
             const codeLang = node.attrs?.language || "auto";
             return (
-              <div key={index} className="border border-gray-300 rounded-lg px-5">
+              <div key={index}>
                 {/* whitespace-pre-wrap */}
-                <pre className="bg-white text-black overflow-x-auto leading-relaxed">
+                <pre className="bg-[#f9f9f9] border border-gray-300 p-8 text-xs md:text-md text-black overflow-x-auto leading-relaxed">
                   <code>
                     {node.content ? node.content.map((t: any) => t.text || "").join("") : ""}
                   </code>
@@ -256,7 +256,7 @@ const Detail = ({ post }: DetailProps) => {
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
 
         {/* ANA İÇERİK BLOĞU */}
-        <div className="flex flex-col w-240 gap-10 transition-all duration-300 relative px-15">
+        <div className="flex flex-col w-full md:w-240 gap-10 transition-all duration-300 relative px-2 sm:px-15">
 
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col">
@@ -286,7 +286,7 @@ const Detail = ({ post }: DetailProps) => {
             {/* BAŞLIK VE METADATA */}
             <div className="flex flex-col gap-3 border-b py-4 border-gray-200">
               <span className="text-xs font-bold text-blue-600 tracking-wider uppercase">{post.postType}</span>
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900">{post.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">{post.title}</h1>
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
                 <p>5 min read</p>
                 <span>•</span>
