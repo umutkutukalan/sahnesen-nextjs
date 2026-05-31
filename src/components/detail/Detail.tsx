@@ -220,7 +220,8 @@ const Detail = ({ post }: DetailProps) => {
             const codeLang = node.attrs?.language || "auto";
             return (
               <div key={index} className="border border-gray-300 rounded-lg px-5">
-                <pre className="bg-white text-black overflow-x-auto leading-relaxed whitespace-pre-wrap">
+                {/* whitespace-pre-wrap */}
+                <pre className="bg-white text-black overflow-x-auto leading-relaxed">
                   <code>
                     {node.content ? node.content.map((t: any) => t.text || "").join("") : ""}
                   </code>
@@ -255,7 +256,7 @@ const Detail = ({ post }: DetailProps) => {
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
 
         {/* ANA İÇERİK BLOĞU */}
-        <div className="flex flex-col w-240 gap-10 transition-all duration-300 relative">
+        <div className="flex flex-col w-240 gap-10 transition-all duration-300 relative px-15">
 
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col">
