@@ -202,12 +202,8 @@ const Detail = ({ post }: DetailProps) => {
           case "codeBlock":
             const codeLang = node.attrs?.language || "auto";
             return (
-              <div key={index} className="relative my-6 rounded-xl overflow-hidden bg-zinc-950 text-zinc-100 font-mono text-sm shadow-xl border border-zinc-800">
-                <div className="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800 text-[10px] text-zinc-400 select-none tracking-wider uppercase">
-                  <span>{codeLang}</span>
-                  <span className="lowercase text-zinc-500">sahnesen compiler</span>
-                </div>
-                <pre className="p-4 overflow-x-auto leading-relaxed whitespace-pre-wrap">
+              <div key={index} className="border border-gray-300 rounded-lg px-5">
+                <pre className="bg-white text-black overflow-x-auto leading-relaxed whitespace-pre-wrap">
                   <code>
                     {node.content ? node.content.map((t: any) => t.text || "").join("") : ""}
                   </code>
