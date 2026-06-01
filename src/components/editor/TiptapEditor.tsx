@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import { GoBold, GoCode, GoItalic, GoPlus, GoQuote } from "react-icons/go";
-import { MdOutlineAddPhotoAlternate } from "react-icons/md";
+import { MdOutlineAddPhotoAlternate, MdOutlineAspectRatio } from "react-icons/md";
 import { useEffect, useState, useRef } from 'react';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { createLowlight, common } from 'lowlight';
@@ -31,6 +31,51 @@ lowlight.register('csharp', csharp);
 lowlight.register('cpp', cpp);
 lowlight.register('sql', sql);
 
+// 🔥 MİMARİ ADIM: Altyazıyı Image Node'unun İçine (Figure/Figcaption) Gömerek Genişletilmiş Image Tanımı
+const CustomImage = Image.extend({
+    addAttributes() {
+        return {
+            ...this.parent?.(),
+            width: {
+                default: '100%',
+                renderHTML: attributes => {
+                    if (!attributes.width) return { style: 'width: 100%' };
+                    return { style: `width: ${attributes.width};` };
+                },
+            },
+            height: {
+                default: 'auto',
+                renderHTML: attributes => {
+                    if (!attributes.height) return { style: 'height: auto' };
+                    return { style: `height: ${attributes.height};` };
+                },
+            },
+        };
+    },
+    // Editörün HTML'i render etme mantığını tamamen eziyoruz
+    renderHTML({ HTMLAttributes }) {
+        const { alt, width, height, ...restAttributes } = HTMLAttributes;
+
+        return [
+            'figure',
+            {
+                class: 'custom-tiptap-figure mx-auto my-6 block transition-all duration-300',
+                style: `width: ${width || '100%'};`
+            },
+            [
+                'img',
+                {
+                    ...restAttributes,
+                    alt,
+                    class: 'w-full h-auto max-h-[600px] object-cover rounded-xl border border-gray-100 shadow-sm'
+                }
+            ],
+            // Eğer alt metni (altyazı) varsa figure içinde figcaption olarak basıyoruz
+            alt ? ['figcaption', { class: 'text-center text-xs text-gray-400 italic mt-2 font-sans select-none' }, alt] : ['span']
+        ];
+    },
+});
+
 interface TiptapEditorProps {
     content?: any;
     onUpdate: (json: any) => void;
@@ -52,44 +97,38 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     const [isAltModalOpen, setIsAltModalOpen] = useState(false);
     const [editingImageAttrs, setEditingImageAttrs] = useState<{ src: string; alt: string } | null>(null);
 
-    // Üst component'ten gelen içeriğin sadece İLK SEFERE MAHSUS yüklenmesini sağlamak için ref
     const isContentInitialized = useRef(false);
 
     const extractUrl = (backendResult: any): string => {
         if (!backendResult) return "";
-
         let url = "";
         if (typeof backendResult === 'string') url = backendResult;
         else if (backendResult.url) url = backendResult.url;
         else if (backendResult.data?.url) url = backendResult.data.url;
 
-        // Relative path geliyorsa backend base URL'ini ekle
         if (url && url.startsWith('/')) {
             url = `http://localhost:8080${url}`;
         }
-
         return url;
     };
 
     const editor = useEditor({
         extensions: [
             StarterKit.configure({ codeBlock: false }),
-            Image.configure({
+            CustomImage.configure({
                 inline: false,
                 allowBase64: true,
-                HTMLAttributes: {
-                    class: 'w-full h-auto max-h-[600px] object-cover rounded-xl my-6 border border-gray-100 shadow-sm',
-                },
+                // Sınıfları renderHTML içinde özelleştirdiğimiz için burayı sade bırakıyoruz
             }),
             Placeholder.configure({ placeholder: 'Hikayeni sahnele...' }),
             CodeBlockLowlight.configure({ lowlight }),
-            Focus.configure({ className: 'is-focused bg-blue-50/20 rounded-xl transition-all ring-2 ring-blue-500/20', mode: 'all' }),
+            // Focus class'ı artık img yerine direkt dışarıdaki figure elementine vuracak
+            Focus.configure({ className: 'is-focused ring-2 ring-blue-500/30 bg-blue-50/10 p-2 rounded-xl transition-all', mode: 'all' }),
         ],
         autofocus: false,
         content: content || '',
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
-            // Editör içi değişiklikleri yukarı fırlatıyoruz
             onUpdateRef.current(editor.getJSON());
         },
         editorProps: {
@@ -104,13 +143,11 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                         }
 
                         const localBlobUrl = URL.createObjectURL(file);
-                        // Editöre geçici blob resmi ekle
-                        view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl })));
+                        view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto' })));
 
                         uploadImageToBackend(file, postIdRef.current).then((res) => {
                             const finalUrl = extractUrl(res);
                             if (finalUrl) {
-                                // Blob'u döküman yapısını bozmadan kalıcı URL ile değiştir
                                 const { state } = view;
                                 const tr = state.tr;
                                 let changed = false;
@@ -145,7 +182,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                                 }
 
                                 const localBlobUrl = URL.createObjectURL(file);
-                                view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl })));
+                                view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto' })));
 
                                 uploadImageToBackend(file, postIdRef.current).then((res) => {
                                     const finalUrl = extractUrl(res);
@@ -179,11 +216,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         },
     });
 
-    // Kalan tek yönlü veri akışı senkronizasyonu (Görselin kaybolmasını önleyen kritik nokta)
     useEffect(() => {
         if (editor && content && !isContentInitialized.current) {
             editor.commands.setContent(content);
-            isContentInitialized.current = true; // İçerik tek sefer yüklendi, artık re-render'lar içeriği ezemez.
+            isContentInitialized.current = true;
 
             setTimeout(() => {
                 editor.commands.focus('start');
@@ -204,6 +240,12 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         setIsAltModalOpen(false);
     };
 
+    // 🔥 YENİ: Görsel boyutunu güncelleyen yardımcı fonksiyon
+    const setImageSize = (sizePercentage: string) => {
+        if (!editor) return;
+        editor.chain().focus().updateAttributes('image', { width: sizePercentage, height: 'auto' }).run();
+    };
+
     const handleImageUpload = () => {
         if (!postIdRef.current) {
             alert("Görsel yüklemeden önce lütfen bir başlık yazın ve taslağın oluşmasını bekleyin.");
@@ -220,15 +262,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             const file = input.files[0];
             const localBlobUrl = URL.createObjectURL(file);
 
-            // 1. Blob'u ekle ama onUpdate'i tetikleme
             editor.view.dispatch(
                 editor.view.state.tr.replaceSelectionWith(
-                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl })
+                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto' })
                 )
             );
 
             try {
-                const uploadResult = await uploadImageToBackend(file, postIdRef.current!); // ✅ res → uploadResult
+                const uploadResult = await uploadImageToBackend(file, postIdRef.current!);
                 const finalUrl = extractUrl(uploadResult);
 
                 if (!finalUrl) {
@@ -236,7 +277,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                     return;
                 }
 
-                // 2. Blob'u finalUrl ile değiştir
                 const currentState = editor.view.state;
                 const tr = currentState.tr;
                 let changed = false;
@@ -251,7 +291,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
                 if (changed) {
                     editor.view.dispatch(tr);
-                    // Sadece burada onUpdate çağır — tek seferlik
                     onUpdateRef.current(editor.view.state.doc.toJSON());
                 }
 
@@ -264,8 +303,28 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
     if (!editor) return null;
 
+    // Şu an seçili olan resmin genişlik değerini BubbleMenu'de "aktif" göstermek için alıyoruz
+    const currentWidth = editor.getAttributes('image').width || '100%';
+
     return (
         <div className="relative w-full group/editor playfair-display-400">
+            {/* Canlı Altyazı (Caption) için Global CSS Injection */}
+            <style jsx global>{`
+                .tiptap img + ::after {
+                     display: none !important; /* Tiptap default glitch'leri önleme */
+                }
+                /* Editör içinde resmin arkasından gelen bir alt bilgi div'i simülasyonu */
+                .image-caption-preview {
+                    text-align: center;
+                    font-size: 13px;
+                    color: #9ca3af;
+                    font-style: italic;
+                    margin-top: -18px;
+                    margin-bottom: 24px;
+                    font-family: sans-serif;
+                }
+            `}</style>
+
             <FloatingMenu
                 editor={editor}
                 options={{ placement: 'left', offset: { mainAxis: -110, crossAxis: 0 }, shift: false, flip: false }}
@@ -293,11 +352,37 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 </div>
             </FloatingMenu>
 
+            {/* 🔥 YENİLENEN BUBBLE MENU: Boyut Seçenekleri ve Alt Metin Butonu */}
             <BubbleMenu editor={editor} pluginKey="imageFeaturesMenu" shouldShow={({ editor }) => editor.isActive('image')} options={{ placement: 'top', offset: { mainAxis: 12, crossAxis: 0 } }}>
-                <div className="flex items-center gap-1 bg-black text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 text-xs font-sans">
-                    <button type="button" onClick={openAltModal} className="flex items-center gap-1 px-2.5 py-1.5 hover:bg-white/10 rounded transition-all text-blue-400 font-medium">
-                        <span>Alt Metin (Özellik) Ekle</span>
+                <div className="flex items-center gap-1.5 bg-black text-white border border-white/10 shadow-xl rounded-xl py-1.5 px-2 text-xs font-sans select-none">
+                    <button type="button" onClick={openAltModal} className="flex items-center gap-1 px-2.5 py-1.5 hover:bg-white/10 rounded-lg transition-all text-blue-400 font-medium border-r border-white/10 pr-3">
+                        <span>Alt Yazı Değiştir</span>
                     </button>
+
+                    {/* Üç Boyut Seçeneği */}
+                    <div className="flex items-center gap-1 pl-1">
+                        <button
+                            type="button"
+                            onClick={() => setImageSize('50%')}
+                            className={`px-2 py-1 rounded-md transition-all ${currentWidth === '50%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
+                        >
+                            Small
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setImageSize('75%')}
+                            className={`px-2 py-1 rounded-md transition-all ${currentWidth === '75%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
+                        >
+                            Medium
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setImageSize('100%')}
+                            className={`px-2 py-1 rounded-md transition-all ${currentWidth === '100%' || currentWidth === null ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
+                        >
+                            Full
+                        </button>
+                    </div>
                 </div>
             </BubbleMenu>
 
@@ -335,12 +420,12 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             {isAltModalOpen && editingImageAttrs && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/90 backdrop-blur-md font-sans">
                     <div className="w-full max-w-2xl text-center flex flex-col items-center gap-6">
-                        <h3 className="text-2xl font-bold">Alternatif Açıklama (Alt Tag)</h3>
-                        <img src={editingImageAttrs.src} alt="Önizleme" className="max-w-xs h-64 object-cover rounded-md shadow-lg" />
+                        <h3 className="text-2xl font-bold">Resim Alt Yazısı / Açıklaması</h3>
+                        <img src={editingImageAttrs.src} alt="Önizleme" className="max-w-xs h-64 object-cover rounded-md shadow-lg" style={{ width: currentWidth }} />
                         <input
                             autoFocus
                             type="text"
-                            placeholder="Bu görsel neyi anlatıyor? (SEO ve Erişilebilirlik için)"
+                            placeholder="Görselin altına şık bir açıklama yazın..."
                             className="w-full px-4 py-2 border-b border-gray-400 outline-none bg-transparent text-center text-lg"
                             value={editingImageAttrs.alt}
                             onChange={(e) => setEditingImageAttrs({ ...editingImageAttrs, alt: e.target.value })}
@@ -355,6 +440,13 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             )}
 
             <EditorContent editor={editor} />
+
+            {/* 🔥 YENİ: Editör içinde canlı altyazı önizlemesi */}
+            {editor.isActive('image') && editor.getAttributes('image').alt && (
+                <div className="image-caption-preview" style={{ width: currentWidth, marginLeft: 'auto', marginRight: 'auto' }}>
+                    {editor.getAttributes('image').alt}
+                </div>
+            )}
         </div>
     );
 };
