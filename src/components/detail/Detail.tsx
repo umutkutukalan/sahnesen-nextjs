@@ -14,12 +14,33 @@ import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import Image from "next/image";
 
+// Syntax Highlighting için Gerekli Yapılar
+import { createLowlight, common } from 'lowlight';
+import java from 'highlight.js/lib/languages/java';
+import javascript from 'highlight.js/lib/languages/javascript';
+import css from 'highlight.js/lib/languages/css';
+import python from 'highlight.js/lib/languages/python';
+import csharp from 'highlight.js/lib/languages/csharp';
+import cpp from 'highlight.js/lib/languages/cpp';
+import sql from 'highlight.js/lib/languages/sql';
+
+const lowlight = createLowlight(common);
+lowlight.register('java', java);
+lowlight.register('javascript', javascript);
+lowlight.register('js', javascript);
+lowlight.register('ts', javascript);
+lowlight.register('css', css);
+lowlight.register('python', python);
+lowlight.register('csharp', csharp);
+lowlight.register('cpp', cpp);
+lowlight.register('sql', sql);
+
 const SAMPLE_COMMENT_CREATED_AT = new Date(
   Date.now() - 2 * 60 * 60 * 1000,
 ).toISOString();
 
 interface DetailProps {
-  post: PostResponse; // Artık projenin veya blogun ayrımı yok, sadece tek bir zırhlı post var!
+  post: PostResponse;
 }
 
 const Detail = ({ post }: DetailProps) => {
@@ -32,7 +53,6 @@ const Detail = ({ post }: DetailProps) => {
   const { likeCount, getLikeCount } = useGetLikeCount();
   const [likeCountLocal, setLikeCountLocal] = useState(likeCount);
 
-  // Like hook'una göndereceğimiz tip parametresini backend'den gelen postType ile senkronize ediyoruz
   const type = post.postType.toLowerCase();
 
   const toggleComments = () => {
@@ -75,6 +95,25 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
+  // Lowlight AST (Abstract Syntax Tree) yapısını React elementlerine dönüştüren zırhlı render fonksiyonu
+  const renderLowlightNodes = (nodes: any[], keyPrefix = "hl"): React.ReactNode[] => {
+    return nodes.map((node, i) => {
+      const key = `${keyPrefix}-${i}`;
+      if (node.type === 'text') {
+        return node.value;
+      }
+      if (node.type === 'element') {
+        const className = node.properties?.className?.join(' ') || '';
+        return (
+          <span key={key} className={className}>
+            {renderLowlightNodes(node.children, key)}
+          </span>
+        );
+      }
+      return null;
+    });
+  };
+
   // 🔥 GELİŞMİŞ TIPTAP JSON STRING RENDER MOTORU
   const renderTiptapContent = (contentStr: string) => {
     try {
@@ -83,14 +122,12 @@ const Detail = ({ post }: DetailProps) => {
 
       if (!parsed || !parsed.content || !Array.isArray(parsed.content)) return null;
 
-      // Inline text stillerini (Bold, Italic, Code, Link, Underline) eksiksiz işleyen zırhlı fonksiyon
       const renderTextNodes = (textNodes: any[]) => {
         if (!textNodes || !Array.isArray(textNodes)) return "";
 
         return textNodes.map((node: any, idx: number) => {
           let element: React.ReactNode = node.text || "";
 
-          // Eğer kelimenin stilleri (marks) varsa, her birini sırayla elementin etrafına sarıyoruz
           if (node.marks && Array.isArray(node.marks)) {
             node.marks.forEach((mark: any) => {
               if (mark.type === "bold") {
@@ -104,7 +141,7 @@ const Detail = ({ post }: DetailProps) => {
               }
               if (mark.type === "code") {
                 element = (
-                  <code key={idx} className="bg-gray-200 px-1.5 py-0.5 rounded-sm font-normal mx-0.5">
+                  <code key={idx} className="bg-gray-100 px-1.5 py-0.5 rounded-md text-sm font-mono text-[#bf2356] font-normal mx-0.5">
                     {element}
                   </code>
                 );
@@ -128,14 +165,10 @@ const Detail = ({ post }: DetailProps) => {
         });
       };
 
-      // Ana Tiptap Bloklarını Render Ediyoruz
       return parsed.content.map((node: any, index: number) => {
         switch (node.type) {
-          // 1. Paragraf
-          // 1. Paragraf (İçinde inline imaj barındırma ihtimaline karşı zırhlı)
           case "paragraph":
             if (node.content && Array.isArray(node.content)) {
-              // Eğer paragrafın içinde tipi "image" olan bir çocuk node varsa
               const hasInlineImage = node.content.find((c: any) => c.type === "image");
 
               if (hasInlineImage && hasInlineImage.attrs?.src) {
@@ -146,7 +179,6 @@ const Detail = ({ post }: DetailProps) => {
                 return (
                   <div className="flex flex-col gap-2 w-full" key={index}>
                     <div className="w-full h-auto relative overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imgUrl}
                         alt={hasInlineImage.attrs.alt || "Sahnesen görseli"}
@@ -158,14 +190,12 @@ const Detail = ({ post }: DetailProps) => {
               }
             }
 
-            // Normal paragraf metni basımı
             return (
               <p key={index} className="text-gray-800 text-base md:text-lg leading-relaxed mb-5 md:mb-10 font-normal">
                 {node.content ? renderTextNodes(node.content) : <br />}
               </p>
             );
 
-          // 2. Başlıklar (Heading)
           case "heading":
             const HeadingTag = `h${node.attrs?.level || 2}` as keyof JSX.IntrinsicElements;
             const headingClasses: Record<number, string> = {
@@ -179,10 +209,8 @@ const Detail = ({ post }: DetailProps) => {
               </HeadingTag>
             );
 
-          // 3. Görsel Düğümü
           case "image":
             if (node.attrs?.src) {
-              // Eğer URL "http" ile başlamıyorsa, başına backend url'ini yapıştırıyoruz
               const imageUrl = node.attrs.src.startsWith('http')
                 ? node.attrs.src
                 : `http://localhost:8080${node.attrs.src}`;
@@ -190,7 +218,6 @@ const Detail = ({ post }: DetailProps) => {
               return (
                 <div className="my-8 flex flex-col gap-2 w-full" key={index}>
                   <div className="w-full rounded-xl overflow-hidden border border-gray-100 shadow-sm">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageUrl}
                       alt={node.attrs.alt || "Sahnesen görseli"}
@@ -207,7 +234,6 @@ const Detail = ({ post }: DetailProps) => {
             }
             return null;
 
-          // 4. Alıntı (Blockquote)
           case "blockquote":
             return (
               <blockquote key={index} className="border-l-4 border-blue-600 pl-4 italic text-gray-600 my-6 text-xl bg-gray-50 py-2 pr-2 rounded-r-lg">
@@ -215,21 +241,35 @@ const Detail = ({ post }: DetailProps) => {
               </blockquote>
             );
 
-          // 5. Kod Bloğu (Code Block)
+          // 5. Apple Tarzı Renklendirilmiş Kod Bloğu (Code Block)
           case "codeBlock":
             const codeLang = node.attrs?.language || "auto";
+            const rawContent = node.content ? node.content.map((t: any) => t.text || "").join("") : "";
+
+            let highlightedAst;
+            try {
+              if (codeLang && codeLang !== 'auto' && lowlight.registered(codeLang)) {
+                highlightedAst = lowlight.highlight(codeLang, rawContent);
+              } else {
+                highlightedAst = lowlight.highlightAuto(rawContent);
+              }
+            } catch (err) {
+              console.error("Highlighting hatası:", err);
+            }
+
             return (
-              <div key={index}>
-                {/* whitespace-pre-wrap */}
-                <pre className="bg-[#f9f9f9] border border-gray-300 p-8 text-xs md:text-md text-black overflow-x-auto leading-relaxed">
+              <div key={index} className="w-full">
+                {/* Kod Alanı */}
+                <pre className="apple-code-theme p-8 text-sm md:text-[14px] font-mono overflow-x-auto leading-relaxed text-black bg-[#f9f9f9] e">
                   <code>
-                    {node.content ? node.content.map((t: any) => t.text || "").join("") : ""}
+                    {highlightedAst
+                      ? renderLowlightNodes(highlightedAst.children)
+                      : rawContent}
                   </code>
                 </pre>
               </div>
             );
 
-          // 6. Yatay Ayraç (Horizontal Rule / Üç Nokta Üç Çizgi)
           case "horizontalRule":
             return (
               <div key={index} className="w-full flex items-center justify-center my-10 select-none" aria-hidden="true">
@@ -257,11 +297,23 @@ const Detail = ({ post }: DetailProps) => {
 
   return (
     <div className="page pt-25 bg-white text-black min-h-screen">
+      {/* Apple Renklendirme CSS injection alanı */}
+      <style jsx global>{`
+        .apple-code-theme .hljs-keyword { color: #9b2385; font-weight: 600; }
+        .apple-code-theme .hljs-title, 
+        .apple-code-theme .hljs-title.class_, 
+        .apple-code-theme .hljs-title.function_ { color: #1c00cf; }
+        .apple-code-theme .hljs-string { color: #c41a16; }
+        .apple-code-theme .hljs-comment { color: #007400; font-style: italic; }
+        .apple-code-theme .hljs-number { color: #1c00cf; }
+        .apple-code-theme .hljs-meta { color: #643820; font-weight: 500; }
+        .apple-code-theme .hljs-params { color: #5c6166; }
+        .apple-code-theme .hljs-attr { color: #836c28; }
+        .apple-code-theme .hljs-built_in { color: #5c3b92; }
+      `}</style>
+
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
-
-        {/* ANA İÇERİK BLOĞU */}
         <div className="flex flex-col w-full lg:w-240 gap-10 transition-all duration-300 relative px-2 md:px-15">
-
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col">
             <div className="w-full flex items-center justify-between border-b pb-5 border-gray-200">
@@ -334,7 +386,6 @@ const Detail = ({ post }: DetailProps) => {
           <div className="prose max-w-none antialiased">
             {renderTiptapContent(post.content)}
           </div>
-
         </div>
 
         {/* YORUMLAR TOGGLE BUTONU */}
@@ -348,7 +399,6 @@ const Detail = ({ post }: DetailProps) => {
           <BiCommentDetail className="text-base" />
           <span className="text-xs font-semibold">{sampleComments.length} Yorum</span>
         </button>
-
       </div>
     </div>
   );
