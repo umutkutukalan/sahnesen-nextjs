@@ -104,7 +104,7 @@ const Detail = ({ post }: DetailProps) => {
               }
               if (mark.type === "code") {
                 element = (
-                  <code key={idx} className="bg-gray-100 px-1.5 py-0.5 rounded-sm border border-gray-200 mx-0.5">
+                  <code key={idx} className="bg-gray-200 px-1.5 py-0.5 rounded-sm font-normal mx-0.5">
                     {element}
                   </code>
                 );
@@ -232,7 +232,11 @@ const Detail = ({ post }: DetailProps) => {
           // 6. Yatay Ayraç (Horizontal Rule / Üç Nokta Üç Çizgi)
           case "horizontalRule":
             return (
-              <hr key={index} className="my-10 border-t border-gray-200 w-full" />
+              <div key={index} className="w-full flex items-center justify-center my-10 select-none" aria-hidden="true">
+                <span className="text-zinc-400 text-2xl tracking-[0.6em] font-medium pl-[0.6em]">
+                  ···
+                </span>
+              </div>
             );
 
           default:
