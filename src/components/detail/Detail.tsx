@@ -160,7 +160,7 @@ const Detail = ({ post }: DetailProps) => {
 
             // Normal paragraf metni basımı
             return (
-              <p key={index} className="text-gray-800 text-base md:text-lg leading-relaxed mb-6 font-normal">
+              <p key={index} className="text-gray-800 text-base md:text-lg leading-relaxed mb-5 md:mb-10 font-normal">
                 {node.content ? renderTextNodes(node.content) : <br />}
               </p>
             );
@@ -256,7 +256,7 @@ const Detail = ({ post }: DetailProps) => {
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
 
         {/* ANA İÇERİK BLOĞU */}
-        <div className="flex flex-col w-full md:w-240 gap-10 transition-all duration-300 relative px-2 sm:px-15">
+        <div className="flex flex-col w-full lg:w-240 gap-10 transition-all duration-300 relative px-2 md:px-15">
 
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col">
