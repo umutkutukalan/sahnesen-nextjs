@@ -1,15 +1,14 @@
 "use client";
 import { useEditor, EditorContent } from '@tiptap/react';
-import { FloatingMenu } from '@tiptap/react/menus'
+import { FloatingMenu } from '@tiptap/react/menus';
 import Focus from '@tiptap/extension-focus';
-import { BubbleMenu } from '@tiptap/react/menus'
+import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import { GoBold, GoCode, GoItalic, GoPlus, GoQuote } from "react-icons/go";
-import { HiOutlineSparkles } from "react-icons/hi2";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { createLowlight, common } from 'lowlight';
 import java from 'highlight.js/lib/languages/java';
@@ -35,33 +34,63 @@ lowlight.register('sql', sql);
 interface TiptapEditorProps {
     content?: any;
     onUpdate: (json: any) => void;
-    postId: number | null; // Artık dışarıdan o anki postun id'sini alıyoruz
+    postId: number | null;
 }
 
 const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
+    const postIdRef = useRef<number | null>(postId);
+    useEffect(() => {
+        postIdRef.current = postId;
+    }, [postId]);
+
+    const onUpdateRef = useRef(onUpdate);
+    useEffect(() => {
+        onUpdateRef.current = onUpdate;
+    }, [onUpdate]);
+
     const [isAltModalOpen, setIsAltModalOpen] = useState(false);
     const [editingImageAttrs, setEditingImageAttrs] = useState<{ src: string; alt: string } | null>(null);
-    const [isAiLoading, setIsAiLoading] = useState(false);
+
+    // Üst component'ten gelen içeriğin sadece İLK SEFERE MAHSUS yüklenmesini sağlamak için ref
+    const isContentInitialized = useRef(false);
+
+    const extractUrl = (backendResult: any): string => {
+        if (!backendResult) return "";
+
+        let url = "";
+        if (typeof backendResult === 'string') url = backendResult;
+        else if (backendResult.url) url = backendResult.url;
+        else if (backendResult.data?.url) url = backendResult.data.url;
+
+        // Relative path geliyorsa backend base URL'ini ekle
+        if (url && url.startsWith('/')) {
+            url = `http://localhost:8080${url}`;
+        }
+
+        return url;
+    };
 
     const editor = useEditor({
         extensions: [
             StarterKit.configure({ codeBlock: false }),
-            Image.configure({ inline: true, allowBase64: false }), // 🔥 Base64 engeli tam gaz aktif
+            Image.configure({
+                inline: false,
+                allowBase64: true,
+                HTMLAttributes: {
+                    class: 'w-full h-auto max-h-[600px] object-cover rounded-xl my-6 border border-gray-100 shadow-sm',
+                },
+            }),
             Placeholder.configure({ placeholder: 'Hikayeni sahnele...' }),
             CodeBlockLowlight.configure({ lowlight }),
-            Focus.configure({ className: 'is-focused', mode: 'all' }),
+            Focus.configure({ className: 'is-focused bg-blue-50/20 rounded-xl transition-all ring-2 ring-blue-500/20', mode: 'all' }),
         ],
-        autofocus: 'start',
+        autofocus: false,
         content: content || '',
         immediatelyRender: false,
-        onCreate({ editor }) {
-            setTimeout(() => {
-                editor.commands.focus('start');
-            }, 10);
-        },
         onUpdate: ({ editor }) => {
-            onUpdate(editor.getJSON());
+            // Editör içi değişiklikleri yukarı fırlatıyoruz
+            onUpdateRef.current(editor.getJSON());
         },
         editorProps: {
             handleDrop: function (view, event, slice, moved) {
@@ -69,21 +98,36 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                     const file = event.dataTransfer.files[0];
 
                     if (/image\//.test(file.type)) {
-                        // Eğer henüz post oluşturulmadıysa resmi yükletme, uyar
-                        if (!postId) {
+                        if (!postIdRef.current) {
                             alert("Resim eklemeden önce lütfen şık bir başlık yazıp taslak oluşturulmasını bekleyin.");
                             return true;
                         }
 
-                        uploadImageToBackend(file, postId).then((url) => {
-                            if (url) {
-                                const { schema } = view.state;
-                                const node = schema.nodes.image.create({ src: url });
-                                const transaction = view.state.tr.replaceSelectionWith(node);
-                                view.dispatch(transaction);
+                        const localBlobUrl = URL.createObjectURL(file);
+                        // Editöre geçici blob resmi ekle
+                        view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl })));
+
+                        uploadImageToBackend(file, postIdRef.current).then((res) => {
+                            const finalUrl = extractUrl(res);
+                            if (finalUrl) {
+                                // Blob'u döküman yapısını bozmadan kalıcı URL ile değiştir
+                                const { state } = view;
+                                const tr = state.tr;
+                                let changed = false;
+                                state.doc.descendants((node, pos) => {
+                                    if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
+                                        tr.setNodeAttribute(pos, 'src', finalUrl);
+                                        changed = true;
+                                    }
+                                    return true;
+                                });
+                                if (changed) {
+                                    view.dispatch(tr);
+                                    onUpdateRef.current(view.state.doc.toJSON());
+                                }
                             }
-                        });
-                        return true; 
+                        }).catch(err => console.error("Görsel backend'e gönderilemedi:", err));
+                        return true;
                     }
                 }
                 return false;
@@ -95,18 +139,33 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                         if (items[i].type.indexOf("image") === 0) {
                             const file = items[i].getAsFile();
                             if (file) {
-                                if (!postId) {
+                                if (!postIdRef.current) {
                                     alert("Resim yapıştırmadan önce lütfen bir başlık yazın.");
                                     return true;
                                 }
-                                uploadImageToBackend(file, postId).then((url) => {
-                                    if (url) {
-                                        const { schema } = view.state;
-                                        const node = schema.nodes.image.create({ src: url });
-                                        const transaction = view.state.tr.replaceSelectionWith(node);
-                                        view.dispatch(transaction);
+
+                                const localBlobUrl = URL.createObjectURL(file);
+                                view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl })));
+
+                                uploadImageToBackend(file, postIdRef.current).then((res) => {
+                                    const finalUrl = extractUrl(res);
+                                    if (finalUrl) {
+                                        const { state } = view;
+                                        const tr = state.tr;
+                                        let changed = false;
+                                        state.doc.descendants((node, pos) => {
+                                            if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
+                                                tr.setNodeAttribute(pos, 'src', finalUrl);
+                                                changed = true;
+                                            }
+                                            return true;
+                                        });
+                                        if (changed) {
+                                            view.dispatch(tr);
+                                            onUpdateRef.current(view.state.doc.toJSON());
+                                        }
                                     }
-                                });
+                                }).catch(err => console.error("Görsel yapıştırma backend hatası:", err));
                                 return true;
                             }
                         }
@@ -117,25 +176,20 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             attributes: {
                 class: 'tiptap prose prose-lg max-w-none focus:outline-none min-h-[500px]',
             },
-            handleDOMEvents: {
-                focus: (view) => {
-                    view.dom.classList.add('is-focused');
-                    return false;
-                },
-            },
         },
     });
 
+    // Kalan tek yönlü veri akışı senkronizasyonu (Görselin kaybolmasını önleyen kritik nokta)
     useEffect(() => {
-        if (editor) {
-            const timer = setTimeout(() => {
-                editor.commands.focus('start');
-                editor.view.dispatch(editor.state.tr);
-            }, 200);
+        if (editor && content && !isContentInitialized.current) {
+            editor.commands.setContent(content);
+            isContentInitialized.current = true; // İçerik tek sefer yüklendi, artık re-render'lar içeriği ezemez.
 
-            return () => clearTimeout(timer);
+            setTimeout(() => {
+                editor.commands.focus('start');
+            }, 200);
         }
-    }, [editor]);
+    }, [editor, content]);
 
     const openAltModal = () => {
         if (!editor) return;
@@ -150,9 +204,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         setIsAltModalOpen(false);
     };
 
-    // ARTIK BUTONLA DOSYA SEÇİLDİĞİNDE DE BASE64 DEĞİL, BACKEND'E MULTIPART ATILIYOR!
     const handleImageUpload = () => {
-        if (!postId) {
+        if (!postIdRef.current) {
             alert("Görsel yüklemeden önce lütfen bir başlık yazın ve taslağın oluşmasını bekleyin.");
             return;
         }
@@ -162,63 +215,64 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         input.accept = 'image/*';
 
         input.onchange = async () => {
-            if (input.files?.length) {
-                const file = input.files[0];
-                
-                // Doğrudan bizim zırhlı servisimize fırlatıyoruz
-                const uploadedUrl = await uploadImageToBackend(file, postId);
-                if (uploadedUrl) {
-                    editor?.chain().focus().setImage({ src: uploadedUrl }).run();
-                } else {
-                    alert("Görsel yüklenirken bir hata oluştu.");
+            if (!input.files?.length || !editor) return;
+
+            const file = input.files[0];
+            const localBlobUrl = URL.createObjectURL(file);
+
+            // 1. Blob'u ekle ama onUpdate'i tetikleme
+            editor.view.dispatch(
+                editor.view.state.tr.replaceSelectionWith(
+                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl })
+                )
+            );
+
+            try {
+                const uploadResult = await uploadImageToBackend(file, postIdRef.current!); // ✅ res → uploadResult
+                const finalUrl = extractUrl(uploadResult);
+
+                if (!finalUrl) {
+                    alert("Görsel yüklenirken bir hata oluştu veya geçersiz URL döndü.");
+                    return;
                 }
+
+                // 2. Blob'u finalUrl ile değiştir
+                const currentState = editor.view.state;
+                const tr = currentState.tr;
+                let changed = false;
+
+                currentState.doc.descendants((node, pos) => {
+                    if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
+                        tr.setNodeAttribute(pos, 'src', finalUrl);
+                        changed = true;
+                    }
+                    return true;
+                });
+
+                if (changed) {
+                    editor.view.dispatch(tr);
+                    // Sadece burada onUpdate çağır — tek seferlik
+                    onUpdateRef.current(editor.view.state.doc.toJSON());
+                }
+
+            } catch (err) {
+                console.error("Görsel seçim yükleme hatası:", err);
             }
         };
         input.click();
-    };
-
-    const handleAISpark = async () => {
-        if (!editor || isAiLoading) return;
-        const context = editor.getText().slice(-1000);
-        if (!context.trim()) return;
-
-        setIsAiLoading(true);
-        try {
-            const response = await fetch('/api/ai/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ context }),
-            });
-            const data = await response.json();
-            if (data.text) {
-                editor.chain().focus().insertContent(data.text).run();
-            }
-        } catch (error) {
-            console.error("AI Spark hatası:", error);
-        } finally {
-            setIsAiLoading(false);
-        }
     };
 
     if (!editor) return null;
 
     return (
         <div className="relative w-full group/editor playfair-display-400">
-            {/* FLOATING, BUBBLE MENULERİN VE DİĞER JSX BİLEŞENLERİN TAMAMI DEĞİŞMEDEN AYNEN KALIYOR */}
             <FloatingMenu
                 editor={editor}
-                options={{
-                    placement: 'left',
-                    offset: { mainAxis: -110, crossAxis: 0 },
-                    shift: false,
-                    flip: false,
-                }}
+                options={{ placement: 'left', offset: { mainAxis: -110, crossAxis: 0 }, shift: false, flip: false }}
                 shouldShow={({ state }) => {
                     const { selection } = state;
                     const { $from } = selection;
-                    const isParagraph = $from.parent.type.name === 'paragraph';
-                    const isEmpty = $from.parent.content.size === 0;
-                    return (editor.isFocused || editor.isEmpty) && isParagraph && isEmpty;
+                    return (editor.isFocused || editor.isEmpty) && $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0;
                 }}
             >
                 <div className="floating-menu-container flex items-center gap-5 transition-all duration-200 group">
@@ -226,77 +280,34 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                         <GoPlus size={20} className="group-hover:rotate-90 transition-transform" />
                     </button>
                     <div className="flex items-center gap-2 transition-all duration-200">
-                        <button
-                            onClick={handleImageUpload}
-                            className="flex items-center justify-center w-8 h-8 rounded-full text-green-600 opacity-0 border border-green-300 hover:border-green-500 group-hover:opacity-100 transition-all cursor-pointer"
-                        >
+                        <button onClick={handleImageUpload} className="flex items-center justify-center w-8 h-8 rounded-full text-green-600 opacity-0 border border-green-300 hover:border-green-500 group-hover:opacity-100 transition-all cursor-pointer">
                             <MdOutlineAddPhotoAlternate size={18} />
                         </button>
-                        <button
-                            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                            className="flex items-center justify-center w-8 h-8 rounded-full text-blue-600 opacity-0 border border-blue-300 hover:border-blue-500 group-hover:opacity-100 transition-all cursor-pointer"
-                        >
+                        <button onClick={() => editor.chain().focus().toggleCodeBlock().run()} className="flex items-center justify-center w-8 h-8 rounded-full text-blue-600 opacity-0 border border-blue-300 hover:border-blue-500 group-hover:opacity-100 transition-all cursor-pointer">
                             <GoCode size={18} />
                         </button>
-                        <button
-                            onClick={() => editor.chain().focus().setHorizontalRule().run()}
-                            className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                            title="Ayraç"
-                        >
+                        <button onClick={() => editor.chain().focus().setHorizontalRule().run()} className="flex items-center justify-center w-8 h-8 rounded-full text-gray-600 border border-gray-300 hover:border-gray-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
                             <span className="font-bold text-lg leading-none">···</span>
                         </button>
                     </div>
                 </div>
             </FloatingMenu>
 
-            <BubbleMenu
-                editor={editor}
-                pluginKey="aiSparkMenu"
-                shouldShow={({ state }) => {
-                    const { selection } = state;
-                    const { $from, empty } = selection;
-                    const isParagraph = $from.parent.type.name === 'paragraph';
-                    const hasContent = $from.parent.content.size > 0;
-                    return empty && isParagraph && hasContent;
-                }}
-                options={{
-                    placement: 'right',
-                    offset: { mainAxis: 20, crossAxis: 0 },
-                }}
-            >
-                <button
-                    onClick={handleAISpark}
-                    disabled={isAiLoading}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 shadow-sm cursor-pointer border ${isAiLoading ? 'border-purple-300 animate-pulse' : 'border-purple-300 text-purple-600 scale-90 hover:scale-100'}`}
-                >
-                    {isAiLoading ? (
-                        <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                        <HiOutlineSparkles size={20} />
-                    )}
-                </button>
+            <BubbleMenu editor={editor} pluginKey="imageFeaturesMenu" shouldShow={({ editor }) => editor.isActive('image')} options={{ placement: 'top', offset: { mainAxis: 12, crossAxis: 0 } }}>
+                <div className="flex items-center gap-1 bg-black text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 text-xs font-sans">
+                    <button type="button" onClick={openAltModal} className="flex items-center gap-1 px-2.5 py-1.5 hover:bg-white/10 rounded transition-all text-blue-400 font-medium">
+                        <span>Alt Metin (Özellik) Ekle</span>
+                    </button>
+                </div>
             </BubbleMenu>
 
-            <BubbleMenu
-                editor={editor}
-                options={{
-                    placement: 'top',
-                    offset: { mainAxis: 10, crossAxis: 0 },
-                    shift: false,
-                    flip: false,
-                }}
-                shouldShow={({ editor, state }) => {
-                    const { selection } = state;
-                    return !selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule');
-                }}
-            >
-                <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 animate-in fade-in zoom-in-95 duration-200">
+            <BubbleMenu editor={editor} pluginKey="textFormattingMenu" options={{ placement: 'top', offset: { mainAxis: 10, crossAxis: 0 } }} shouldShow={({ editor, state }) => !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule')}>
+                <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2">
                     <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'text-blue-400' : ''}`}><GoBold size={18} /></button>
                     <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'text-blue-400' : ''}`}><GoItalic size={18} /></button>
                     <div className="w-[1px] h-4 bg-white/20 mx-1" />
                     <button onClick={() => editor.chain().focus().toggleCode().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('code') ? 'text-blue-400' : ''}`}><GoCode size={18} /></button>
                     <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'text-blue-400' : ''}`}><GoQuote size={18} /></button>
-                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/90 rotate-45 -z-10" />
                 </div>
             </BubbleMenu>
 
@@ -322,21 +333,22 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             )}
 
             {isAltModalOpen && editingImageAttrs && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/90 backdrop-blur-md">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/90 backdrop-blur-md font-sans">
                     <div className="w-full max-w-2xl text-center flex flex-col items-center gap-6">
-                        <h3 className="text-2xl font-bold">Alternatif Açıklama</h3>
-                        <img src={editingImageAttrs.src} alt="Önizleme" className="max-w-xs h-64 object-cover rounded-md" />
+                        <h3 className="text-2xl font-bold">Alternatif Açıklama (Alt Tag)</h3>
+                        <img src={editingImageAttrs.src} alt="Önizleme" className="max-w-xs h-64 object-cover rounded-md shadow-lg" />
                         <input
                             autoFocus
                             type="text"
-                            className="w-full px-4 py-1 border-l border-gray-500 outline-none bg-transparent"
+                            placeholder="Bu görsel neyi anlatıyor? (SEO ve Erişilebilirlik için)"
+                            className="w-full px-4 py-2 border-b border-gray-400 outline-none bg-transparent text-center text-lg"
                             value={editingImageAttrs.alt}
                             onChange={(e) => setEditingImageAttrs({ ...editingImageAttrs, alt: e.target.value })}
                             onKeyDown={(e) => { if (e.key === 'Enter') saveAltText(editingImageAttrs.alt); }}
                         />
                         <div className="flex gap-3">
-                            <button onClick={() => saveAltText(editingImageAttrs.alt)} className="px-3 py-2 text-green-600 border border-green-600 rounded-2xl">Kaydet</button>
-                            <button onClick={() => setIsAltModalOpen(false)} className="px-3 py-2 text-gray-500 border border-gray-500 rounded-2xl">Kapat</button>
+                            <button onClick={() => saveAltText(editingImageAttrs.alt)} className="px-5 py-2 text-green-600 border border-green-600 rounded-full hover:bg-green-50 transition-all cursor-pointer">Kaydet</button>
+                            <button onClick={() => setIsAltModalOpen(false)} className="px-5 py-2 text-gray-500 border border-gray-500 rounded-full hover:bg-gray-50 transition-all cursor-pointer">Kapat</button>
                         </div>
                     </div>
                 </div>
