@@ -215,21 +215,32 @@ const Detail = ({ post }: DetailProps) => {
                 ? node.attrs.src
                 : `http://localhost:8080${node.attrs.src}`;
 
-              const width = node.attrs.width || '100%';   // "50%", "75%", "100%"
+              const width = node.attrs.width || '100%';
               const height = node.attrs.height || 'auto';
 
-              // Alt tag'den #small/#medium/#full etiketini temizle
               const rawAlt = node.attrs.alt || '';
               const cleanAlt = rawAlt.replace(/#(small|medium|full)/gi, '').trim();
 
+              const isFull = width === '100%';
+
               return (
-                <div className="my-8 flex flex-col items-center gap-2 w-full" key={index}>
-                  <div style={{ width }} className="rounded-xl overflow-hidden border border-gray-100 shadow-sm transition-all">
+                <div
+                  key={index}
+                  className={`my-8 flex flex-col items-center gap-2 ${isFull
+                    ? 'w-screen relative left-1/2 -translate-x-1/2' // container dışına taş
+                    : 'w-full'
+                    }`}
+                >
+                  <div
+                    style={isFull ? {} : { width }}
+                    className={`overflow-hidden border border-gray-100 shadow-sm transition-all ${isFull ? 'w-full rounded-none' : 'rounded-xl'
+                      }`}
+                  >
                     <img
                       src={imageUrl}
                       alt={cleanAlt || "Sahnesen görseli"}
-                      style={{ width: '100%', height }}
-                      className="object-cover"
+                      style={{ width: '100%', height: isFull ? undefined : height }}
+                      className={`object-cover ${isFull ? 'max-h-[520px] w-full' : ''}`}
                     />
                   </div>
                   {cleanAlt && (
