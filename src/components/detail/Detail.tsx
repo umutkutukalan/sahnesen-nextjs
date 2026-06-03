@@ -215,18 +215,26 @@ const Detail = ({ post }: DetailProps) => {
                 ? node.attrs.src
                 : `http://localhost:8080${node.attrs.src}`;
 
+              const width = node.attrs.width || '100%';   // "50%", "75%", "100%"
+              const height = node.attrs.height || 'auto';
+
+              // Alt tag'den #small/#medium/#full etiketini temizle
+              const rawAlt = node.attrs.alt || '';
+              const cleanAlt = rawAlt.replace(/#(small|medium|full)/gi, '').trim();
+
               return (
-                <div className="my-8 flex flex-col gap-2 w-full" key={index}>
-                  <div className="w-full rounded-xl overflow-hidden border border-gray-100 shadow-sm">
+                <div className="my-8 flex flex-col items-center gap-2 w-full" key={index}>
+                  <div style={{ width }} className="rounded-xl overflow-hidden border border-gray-100 shadow-sm transition-all">
                     <img
                       src={imageUrl}
-                      alt={node.attrs.alt || "Sahnesen görseli"}
-                      className="w-full h-auto max-h-[600px] object-cover"
+                      alt={cleanAlt || "Sahnesen görseli"}
+                      style={{ width: '100%', height }}
+                      className="object-cover"
                     />
                   </div>
-                  {node.attrs.alt && (
+                  {cleanAlt && (
                     <span className="text-xs text-center italic text-gray-400 px-4">
-                      {node.attrs.alt}
+                      {cleanAlt}
                     </span>
                   )}
                 </div>
