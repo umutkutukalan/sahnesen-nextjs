@@ -223,6 +223,8 @@ const Detail = ({ post }: DetailProps) => {
               const width = node.attrs.width || '100%';
               // Eğer genişlik '100%' ise tam ekran (isFull) modundadır
               const isFull = width === '100%';
+              const isMedium = width === '75%';
+              const isSmall = width === '50%';
 
               const rawAlt = node.attrs.alt || '';
               const cleanAlt = rawAlt.replace(/#(small|medium|full)/gi, '').trim();
@@ -232,20 +234,21 @@ const Detail = ({ post }: DetailProps) => {
                   key={index}
                   className={`my-8 flex flex-col items-center ${isFull
                     ? 'w-screen relative left-1/2 -translate-x-1/2'
-                    : 'w-full'
+                    : isMedium
+                      ? 'relative left-1/2 -translate-x-1/2 w-[120%]'  // 👈 içerikten taşar
+                      : 'w-full'  // small: içerik genişliğinde
                     }`}
                 >
                   <div
-                    style={isFull ? {} : { width: width }}
-                    className={`not-prose overflow-hidden transition-all bg-red-200 duration-300 ${isFull ? 'w-full h-[520px]' : 'rounded-xl'
-                      }`}
+                    style={isFull || isMedium ? {} : { width: "100%" }}
+                    className={`not-prose overflow-hidden transition-all duration-300 w-full h-auto`}
                   >
                     <Image
                       src={imageUrl}
                       alt={cleanAlt || "Sahnesen görseli"}
                       width={0}
                       height={0}
-                      sizes={isFull ? "100vw" : "(max-w-3xl) 100vw, 75vw"}
+                      sizes={isFull ? "100vw" : isMedium ? "120vw" : "100vw"}
                       priority={index < 2}
                       unoptimized
                       className={`w-full block ${isFull ? 'h-full object-cover' : 'h-auto object-contain'
@@ -344,7 +347,7 @@ const Detail = ({ post }: DetailProps) => {
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
         <div className="flex flex-col w-full lg:w-240 gap-10 transition-all duration-300 relative px-2 md:px-15">
           {/* YAZAR ÜST BARI */}
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full">
             <div className="w-full flex items-center justify-between border-b pb-5 border-gray-200">
               <div className="w-full flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -410,7 +413,7 @@ const Detail = ({ post }: DetailProps) => {
               </div>
             </div>
 
-            
+
           </div>
 
           {/* REAL TIPTAP İÇERİK ALANI */}
