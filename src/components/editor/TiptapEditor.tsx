@@ -64,7 +64,7 @@ const CustomImage = Image.extend({
         return [
             'figure',
             {
-                class: 'custom-tiptap-figure mx-auto my-6 block transition-all duration-300',
+                class: 'custom-tiptap-figure mx-auto my-6 block transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-400 focus-within:ring-offset-2 flex items-center justify-center',
                 style: `width: ${width || '100%'};`
             },
             [
@@ -72,7 +72,7 @@ const CustomImage = Image.extend({
                 {
                     ...restAttributes,
                     alt,
-                    class: 'w-full h-auto max-h-[600px] object-cover rounded-xl border border-gray-100 shadow-sm'
+                    class: 'h-auto max-h-[600px] object-cover rounded-xl shadow-sm'
                 }
             ],
             // Eğer alt metni (altyazı) varsa figure içinde figcaption olarak basıyoruz
@@ -137,7 +137,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             Placeholder.configure({ placeholder: 'Hikayeni sahnele...' }),
             CodeBlockLowlight.configure({ lowlight }),
             // Focus class'ı artık img yerine direkt dışarıdaki figure elementine vuracak
-            Focus.configure({ className: 'is-focused ring-2 ring-blue-500/30 bg-blue-50/10 p-2 rounded-xl transition-all', mode: 'all' }),
+            Focus.configure({ className: 'is-focused transition-all', mode: 'all' }),
         ],
         autofocus: false,
         content: content || '',
