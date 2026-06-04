@@ -50,6 +50,11 @@ const CustomImage = Image.extend({
                     return { style: `height: ${attributes.height};` };
                 },
             },
+            aspectRatio: {
+                default: null,
+                renderHTML: () => ({}), // Html'e yazılması gerekmez, sadece iç mantık için kullanacağız
+            }
+
         };
     },
     // Editörün HTML'i render etme mantığını tamamen eziyoruz
@@ -112,6 +117,15 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return url;
     };
 
+    const getImageRatio = (src: string): Promise<number> => {
+        return new Promise((resolve) => {
+            const img = new window.Image();
+            img.onload = () => resolve(img.naturalWidth / img.naturalHeight);
+            img.onerror = () => resolve(1); // hata olursa 1 (kare kabul et)
+            img.src = src;
+        });
+    };
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({ codeBlock: false }),
@@ -143,27 +157,34 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                         }
 
                         const localBlobUrl = URL.createObjectURL(file);
-                        view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto' })));
 
-                        uploadImageToBackend(file, postIdRef.current).then((res) => {
+                        // 🔥 Önce placeholder olarak ekle, ratio hesaplanınca güncelle
+                        view.dispatch(view.state.tr.replaceSelectionWith(
+                            view.state.schema.nodes.image.create({
+                                src: localBlobUrl, width: '100%', height: 'auto', aspectRatio: null
+                            })
+                        ));
+                        Promise.all([
+                            getImageRatio(localBlobUrl),
+                            uploadImageToBackend(file, postIdRef.current)
+                        ]).then(([ratio, res]) => {
                             const finalUrl = extractUrl(res);
-                            if (finalUrl) {
-                                const { state } = view;
-                                const tr = state.tr;
-                                let changed = false;
-                                state.doc.descendants((node, pos) => {
-                                    if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
-                                        tr.setNodeAttribute(pos, 'src', finalUrl);
-                                        changed = true;
-                                    }
-                                    return true;
-                                });
-                                if (changed) {
-                                    view.dispatch(tr);
-                                    onUpdateRef.current(view.state.doc.toJSON());
+                            const { state } = view;
+                            const tr = state.tr;
+                            let changed = false;
+                            state.doc.descendants((node, pos) => {
+                                if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
+                                    if (finalUrl) tr.setNodeAttribute(pos, 'src', finalUrl);
+                                    tr.setNodeAttribute(pos, 'aspectRatio', ratio); // 👈
+                                    changed = true;
                                 }
+                                return true;
+                            });
+                            if (changed) {
+                                view.dispatch(tr);
+                                onUpdateRef.current(view.state.doc.toJSON());
                             }
-                        }).catch(err => console.error("Görsel backend'e gönderilemedi:", err));
+                        }).catch(err => console.error("Drop hatası:", err));
                         return true;
                     }
                 }
@@ -182,9 +203,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                                 }
 
                                 const localBlobUrl = URL.createObjectURL(file);
-                                view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto' })));
 
-                                uploadImageToBackend(file, postIdRef.current).then((res) => {
+
+                                view.dispatch(view.state.tr.replaceSelectionWith(view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto', aspectRatio: null })));
+
+                                Promise.all([
+                                    getImageRatio(localBlobUrl),
+                                    uploadImageToBackend(file, postIdRef.current)
+                                ]).then(([ratio, res]) => {
                                     const finalUrl = extractUrl(res);
                                     if (finalUrl) {
                                         const { state } = view;
@@ -194,6 +220,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                                             if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
                                                 tr.setNodeAttribute(pos, 'src', finalUrl);
                                                 changed = true;
+                                                tr.setNodeAttribute(pos, 'aspectRatio', ratio); // 👈 Yapıştırılan görselin oranını da güncelle
                                             }
                                             return true;
                                         });
@@ -246,6 +273,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         editor.chain().focus().updateAttributes('image', { width: sizePercentage, height: 'auto' }).run();
     };
 
+
     const handleImageUpload = () => {
         if (!postIdRef.current) {
             alert("Görsel yüklemeden önce lütfen bir başlık yazın ve taslağın oluşmasını bekleyin.");
@@ -262,9 +290,11 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             const file = input.files[0];
             const localBlobUrl = URL.createObjectURL(file);
 
+            const ratio = await getImageRatio(localBlobUrl);
+
             editor.view.dispatch(
                 editor.view.state.tr.replaceSelectionWith(
-                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto' })
+                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto', aspectRatio: ratio })
                 )
             );
 
@@ -305,6 +335,13 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
     // Şu an seçili olan resmin genişlik değerini BubbleMenu'de "aktif" göstermek için alıyoruz
     const currentWidth = editor.getAttributes('image').width || '100%';
+
+    const aspectRatio = editor.getAttributes('image').aspectRatio;
+    const ratioKnown = aspectRatio !== null && aspectRatio !== undefined;
+
+    const canBeFull = ratioKnown ? aspectRatio >= 1.2 : true;      // bilindiği gibi genişse tam genişlik opsiyonu sun, oran bilinmiyorsa varsayılan olarak sun (kullanıcı deneyimi için)
+    const canBeMedium = ratioKnown ? aspectRatio >= 0.85 : true;   // bilindiği gibi çok kare değilse orta boyut opsiyonu sun, oran bilinmiyorsa varsayılan olarak sun (kullanıcı deneyimi için)
+
 
     return (
         <div className="relative w-full group/editor playfair-display-400">
@@ -371,14 +408,20 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                         <button
                             type="button"
                             onClick={() => setImageSize('75%')}
-                            className={`px-2 py-1 rounded-md transition-all ${currentWidth === '75%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
+                            disabled={!canBeMedium}
+                            className={`px-2 py-1 rounded-md transition-all 
+                                ${!canBeMedium ? 'opacity-30 cursor-not-allowed' : ''}
+                                ${currentWidth === '75%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
                         >
                             Medium
                         </button>
                         <button
                             type="button"
                             onClick={() => setImageSize('100%')}
-                            className={`px-2 py-1 rounded-md transition-all ${currentWidth === '100%' || currentWidth === null ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
+                            disabled={!canBeFull}
+                            className={`px-2 py-1 rounded-md transition-all
+                                ${!canBeFull ? 'opacity-30 cursor-not-allowed' : ''}
+                                ${currentWidth === '100%' || currentWidth === null ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
                         >
                             Full
                         </button>
