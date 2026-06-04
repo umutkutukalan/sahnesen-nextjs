@@ -227,24 +227,24 @@ const Detail = ({ post }: DetailProps) => {
                 <div
                   key={index}
                   className={`my-8 flex flex-col items-center gap-2 ${isFull
-                    ? 'w-screen relative left-1/2 -translate-x-1/2' // container dışına taş
-                    : 'w-full'
+                      ? 'w-screen relative left-1/2 -translate-x-1/2' // Container dışına taşan tam ekran mod
+                      : 'w-full'
                     }`}
                 >
                   <div
-                    style={isFull ? {} : { width }}
-                    className={`overflow-hidden border border-gray-100 shadow-sm transition-all ${isFull ? 'w-full rounded-none' : 'rounded-xl'
+                    style={isFull ? {} : { width: width || '100%' }}
+                    className={`overflow-hidden bg-red-200 transition-all flex items-center justify-center ${isFull ? 'w-full h-auto rounded-none' : 'h-auto rounded-xl'
                       }`}
                   >
                     <img
                       src={imageUrl}
                       alt={cleanAlt || "Sahnesen görseli"}
-                      style={{ width: '100%', height: isFull ? undefined : height }}
-                      className={`object-cover ${isFull ? 'max-h-[520px] w-full' : ''}`}
+                      className="w-full h-auto block"
                     />
                   </div>
+
                   {cleanAlt && (
-                    <span className="text-xs text-center italic text-gray-400 px-4">
+                    <span className="text-xs text-center italic text-gray-400 px-4 font-sans block">
                       {cleanAlt}
                     </span>
                   )}
