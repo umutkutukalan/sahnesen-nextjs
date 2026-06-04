@@ -179,10 +179,15 @@ const Detail = ({ post }: DetailProps) => {
                 return (
                   <div className="flex flex-col gap-2 w-full" key={index}>
                     <div className="w-full h-auto relative overflow-hidden">
-                      <img
+                      <Image
                         src={imgUrl}
                         alt={hasInlineImage.attrs.alt || "Sahnesen görseli"}
-                        className="w-full h-full object-cover"
+                        width={0}
+                        height={0}
+                        sizes="(max-width: 768px) 100vw, 75vw"
+                        priority
+                        unoptimized
+                        className="w-full h-auto object-contain rounded-lg"
                       />
                     </div>
                   </div>
@@ -216,35 +221,40 @@ const Detail = ({ post }: DetailProps) => {
                 : `http://localhost:8080${node.attrs.src}`;
 
               const width = node.attrs.width || '100%';
-              const height = node.attrs.height || 'auto';
+              // Eğer genişlik '100%' ise tam ekran (isFull) modundadır
+              const isFull = width === '100%';
 
               const rawAlt = node.attrs.alt || '';
               const cleanAlt = rawAlt.replace(/#(small|medium|full)/gi, '').trim();
 
-              const isFull = width === '100%';
-
               return (
                 <div
                   key={index}
-                  className={`my-8 flex flex-col items-center gap-2 ${isFull
-                      ? 'w-screen relative left-1/2 -translate-x-1/2' // Container dışına taşan tam ekran mod
-                      : 'w-full'
+                  className={`my-8 flex flex-col items-center ${isFull
+                    ? 'w-screen relative left-1/2 -translate-x-1/2'
+                    : 'w-full'
                     }`}
                 >
                   <div
-                    style={isFull ? {} : { width: width || '100%' }}
-                    className={`overflow-hidden bg-red-200 transition-all flex items-center justify-center ${isFull ? 'w-full h-auto rounded-none' : 'h-auto rounded-xl'
+                    style={isFull ? {} : { width: width }}
+                    className={`not-prose overflow-hidden transition-all bg-red-200 duration-300 ${isFull ? 'w-full h-[520px]' : 'rounded-xl'
                       }`}
                   >
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={cleanAlt || "Sahnesen görseli"}
-                      className="w-full h-auto block"
+                      width={0}
+                      height={0}
+                      sizes={isFull ? "100vw" : "(max-w-3xl) 100vw, 75vw"}
+                      priority={index < 2}
+                      unoptimized
+                      className={`w-full block ${isFull ? 'h-full object-cover' : 'h-auto object-contain'
+                        }`}
                     />
                   </div>
 
                   {cleanAlt && (
-                    <span className="text-xs text-center italic text-gray-400 px-4 font-sans block">
+                    <span className="text-xs text-center italic text-gray-400 px-4 mt-3 font-sans block w-full">
                       {cleanAlt}
                     </span>
                   )}
@@ -399,6 +409,8 @@ const Detail = ({ post }: DetailProps) => {
                 <IoIosMore className="text-2xl cursor-pointer text-gray-400 hover:text-gray-700" />
               </div>
             </div>
+
+            
           </div>
 
           {/* REAL TIPTAP İÇERİK ALANI */}
