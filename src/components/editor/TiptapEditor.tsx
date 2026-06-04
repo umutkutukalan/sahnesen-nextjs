@@ -37,10 +37,10 @@ const CustomImage = Image.extend({
         return {
             ...this.parent?.(),
             width: {
-                default: '100%',
+                default: null,
                 renderHTML: attributes => {
-                    if (!attributes.width) return { style: 'width: 100%' };
-                    return { style: `width: ${attributes.width};` };
+                    const w = attributes.width || '100%';
+                    return { style: `width: ${w};` };
                 },
             },
             height: {
@@ -169,13 +169,18 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                             uploadImageToBackend(file, postIdRef.current)
                         ]).then(([ratio, res]) => {
                             const finalUrl = extractUrl(res);
+                            const defaultWidth = ratio < 0.85 ? '50%'
+                                : ratio < 1.2 ? '75%'
+                                    : '100%';
+
                             const { state } = view;
                             const tr = state.tr;
                             let changed = false;
                             state.doc.descendants((node, pos) => {
                                 if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
                                     if (finalUrl) tr.setNodeAttribute(pos, 'src', finalUrl);
-                                    tr.setNodeAttribute(pos, 'aspectRatio', ratio); // 👈
+                                    tr.setNodeAttribute(pos, 'aspectRatio', ratio);
+                                    tr.setNodeAttribute(pos, 'width', defaultWidth);
                                     changed = true;
                                 }
                                 return true;
@@ -212,6 +217,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                                     uploadImageToBackend(file, postIdRef.current)
                                 ]).then(([ratio, res]) => {
                                     const finalUrl = extractUrl(res);
+                                    const defaultWidth = ratio < 0.85 ? '50%'
+                                        : ratio < 1.2 ? '75%'
+                                            : '100%';
                                     if (finalUrl) {
                                         const { state } = view;
                                         const tr = state.tr;
@@ -220,7 +228,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                                             if (node.type.name === 'image' && node.attrs.src === localBlobUrl) {
                                                 tr.setNodeAttribute(pos, 'src', finalUrl);
                                                 changed = true;
-                                                tr.setNodeAttribute(pos, 'aspectRatio', ratio); // 👈 Yapıştırılan görselin oranını da güncelle
+                                                tr.setNodeAttribute(pos, 'aspectRatio', ratio);
+                                                tr.setNodeAttribute(pos, 'width', defaultWidth);
                                             }
                                             return true;
                                         });
@@ -292,9 +301,13 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             const ratio = await getImageRatio(localBlobUrl);
 
+            const defaultWidth = ratio < 0.85 ? '50%'
+                : ratio < 1.2 ? '75%'
+                    : '100%';
+
             editor.view.dispatch(
                 editor.view.state.tr.replaceSelectionWith(
-                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl, width: '100%', height: 'auto', aspectRatio: ratio })
+                    editor.view.state.schema.nodes.image.create({ src: localBlobUrl, width: defaultWidth, height: 'auto', aspectRatio: ratio })
                 )
             );
 
