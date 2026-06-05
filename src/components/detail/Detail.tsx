@@ -268,8 +268,17 @@ const Detail = ({ post }: DetailProps) => {
 
           case "blockquote":
             return (
-              <blockquote key={index} className="border-l-4 border-blue-600 pl-4 italic text-gray-600 my-6 text-xl bg-gray-50 py-2 pr-2 rounded-r-lg">
-                {node.content ? renderTextNodes(node.content) : ""}
+              <blockquote key={index} className="border-l-4 border-gray-200 pl-6 my-8">
+                {node.content?.map((child: any, i: number) => {
+                  if (child.type === 'paragraph') {
+                    return (
+                      <p key={i} className="italic text-zinc-800 antialiased text-base md:text-[22px] leading-relaxed ">
+                        {child.content ? renderTextNodes(child.content) : ''}
+                      </p>
+                    );
+                  }
+                  return null;
+                })}
               </blockquote>
             );
 
@@ -417,7 +426,7 @@ const Detail = ({ post }: DetailProps) => {
           </div>
 
           {/* REAL TIPTAP İÇERİK ALANI */}
-          <div className="prose max-w-none antialiased">
+          <div className="prose max-w-none antialiased playfair-display-400">
             {renderTiptapContent(post.content)}
           </div>
         </div>
