@@ -126,6 +126,11 @@ const Detail = ({ post }: DetailProps) => {
         if (!textNodes || !Array.isArray(textNodes)) return "";
 
         return textNodes.map((node: any, idx: number) => {
+
+          if (node.type === "hardBreak") {
+            return <br key={idx} />;
+          }
+
           let element: React.ReactNode = node.text || "";
 
           if (node.marks && Array.isArray(node.marks)) {
@@ -196,7 +201,7 @@ const Detail = ({ post }: DetailProps) => {
             }
 
             return (
-              <p key={index} className="text-gray-800 text-base md:text-lg leading-relaxed mb-5 md:mb-10 font-normal">
+              <p key={index} className="text-gray-800 text-xl md:text-2xl leading-relaxed mb-5 md:mb-10 font-normal">
                 {node.content ? renderTextNodes(node.content) : <br />}
               </p>
             );
