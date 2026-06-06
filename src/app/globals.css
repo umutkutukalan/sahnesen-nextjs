@@ -176,6 +176,53 @@ body {
 
   .tiptap figure {
     @apply relative select-none h-auto;
+    overflow: visible !important;
+  }
+
+  .tiptap figure .image-toolbar {
+    display: none;
+    position: absolute;
+    top: -42px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    border-radius: 10px;
+    padding: 4px 8px;
+    gap: 4px;
+    z-index: 50;
+    white-space: nowrap;
+    overflow: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .tiptap figure.ProseMirror-selectednode .image-toolbar {
+    display: flex;
+  }
+
+  .image-toolbar-btn {
+    color: #d1d5db;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: sans-serif;
+    transition: background 0.15s;
+  }
+
+  .image-toolbar-btn.disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .image-toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .image-toolbar-btn.active {
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
   }
 
   .tiptap figure div {

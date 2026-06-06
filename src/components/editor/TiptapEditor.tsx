@@ -57,15 +57,38 @@ const CustomImage = Image.extend({
     },
 
     addNodeView() {
-        return ({ node }) => {
+        return ({ node, getPos, editor }) => {
             const figure = document.createElement('figure');
             const div = document.createElement('div');
             const img = document.createElement('img');
             const figcaption = document.createElement('figcaption');
 
+            // Toolbar
+            const toolbar = document.createElement('div');
+            toolbar.className = 'image-toolbar';
+            toolbar.innerHTML = `
+            <button data-size="50%" class="image-toolbar-btn">Small</button>
+            <button data-size="75%" class="image-toolbar-btn">Medium</button>
+            <button data-size="100%" class="image-toolbar-btn">Full</button>
+        `;
+
+            toolbar.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const btn = (e.target as HTMLElement).closest('[data-size]');
+                if (btn) {
+                    const size = btn.getAttribute('data-size');
+                    const pos = typeof getPos === 'function' ? getPos() : null;
+                    if (pos !== null && size) {
+                        editor.chain().setNodeSelection(pos).updateAttributes('image', { width: size }).run();
+                    }
+                }
+            });
+
+
             div.className = 'h-full';
             figcaption.className = 'text-xs text-center italic text-gray-400 px-4 mt-3 font-sans block w-full select-none';
 
+            figure.appendChild(toolbar);
             figure.appendChild(div);
             div.appendChild(img);
             figure.appendChild(figcaption);
@@ -94,8 +117,43 @@ const CustomImage = Image.extend({
                         div.classList.add('w-full');
                     }
 
+                    // Aktif butonu güncelle
+                    toolbar.querySelectorAll('[data-size]').forEach(btn => {
+                        btn.classList.toggle('active', btn.getAttribute('data-size') === width);
+                    });
+
                     prevWidth = width;
                 }
+
+                // AspectRatio hesabı — her update'te kontrol et
+                const rawRatio = node.attrs.aspectRatio;
+                const aspectRatio = (rawRatio !== null && rawRatio !== undefined && rawRatio !== '')
+                    ? parseFloat(rawRatio)
+                    : null;
+                const ratioKnown = aspectRatio !== null && !isNaN(aspectRatio) && aspectRatio !== 0;
+
+                const canBeMedium = ratioKnown ? aspectRatio >= 0.85 : true;
+                const canBeFull = ratioKnown ? aspectRatio >= 1.2 : true;
+
+                // Butonları güncelle
+                toolbar.querySelectorAll<HTMLButtonElement>('[data-size]').forEach(btn => {
+                    const size = btn.getAttribute('data-size');
+
+                    // Aktif mi?
+                    btn.classList.toggle('active', size === width);
+
+                    // Disable kontrolü
+                    if (size === '75%' && !canBeMedium) {
+                        btn.disabled = true;
+                        btn.classList.add('disabled');
+                    } else if (size === '100%' && !canBeFull) {
+                        btn.disabled = true;
+                        btn.classList.add('disabled');
+                    } else {
+                        btn.disabled = false;
+                        btn.classList.remove('disabled');
+                    }
+                });
 
                 // src değiştiyse sadece src güncelle
                 if (src !== prevSrc) {
@@ -415,39 +473,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 </div>
             </FloatingMenu>
 
-            <BubbleMenu editor={editor} pluginKey="imageFeaturesMenu" shouldShow={({ editor }) => editor.isActive('image')} options={{ placement: 'top', offset: { mainAxis: 12, crossAxis: 0 } }}>
-                <div className="flex items-center gap-1.5 bg-black text-white border border-white/10 shadow-xl rounded-xl py-1.5 px-2 text-xs font-sans select-none">
-                    <button type="button" onClick={openAltModal} className="flex items-center gap-1 px-2.5 py-1.5 hover:bg-white/10 rounded-lg transition-all text-blue-400 font-medium border-r border-white/10 pr-3 cursor-pointer">
-                        <span>Alt Yazı Değiştir</span>
-                    </button>
-
-                    <div className="flex items-center gap-1 pl-1">
-                        <button
-                            type="button"
-                            onClick={() => setImageSize('50%')}
-                            className={`px-2 py-1 rounded-md transition-all cursor-pointer ${currentWidth === '50%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
-                        >
-                            Small
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setImageSize('75%')}
-                            disabled={!canBeMedium}
-                            className={`px-2 py-1 rounded-md transition-all ${!canBeMedium ? 'opacity-25 cursor-not-allowed text-gray-600' : 'cursor-pointer'} ${currentWidth === '75%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
-                        >
-                            Medium
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setImageSize('100%')}
-                            disabled={!canBeFull}
-                            className={`px-2 py-1 rounded-md transition-all ${!canBeFull ? 'opacity-25 cursor-not-allowed text-gray-600' : 'cursor-pointer'} ${currentWidth === '100%' ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-white/10 text-gray-300'}`}
-                        >
-                            Full
-                        </button>
-                    </div>
-                </div>
-            </BubbleMenu>
 
             <BubbleMenu editor={editor} pluginKey="textFormattingMenu" options={{ placement: 'top', offset: { mainAxis: 10, crossAxis: 0 } }} shouldShow={({ editor, state }) => !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule')}>
                 <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2">
