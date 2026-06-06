@@ -170,7 +170,7 @@ const CreateProjectsBlog = () => {
 
   return (
     <main className="min-h-screen bg-white pt-24 pb-18 text-black">
-      <div className="max-w-3xl mx-auto px-6">
+      <div className="w-full lg:w-190 mx-auto px-6">
 
         {/* TYPE SELECTOR */}
         <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-lg w-max text-xs font-medium">

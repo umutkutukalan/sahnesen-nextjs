@@ -172,20 +172,33 @@ body {
     pointer-events: none;
   }
 
-  /* Varsayılan Görsel Stili (Yumuşak köşeler ve hafif gölge) */
-  .tiptap img {
-    @apply rounded-lg my-10 transition-all duration-300 ease-out;
-    border: 1px transparent #000; /* Apple'ın hafif gri border'ı */
-    cursor: pointer;
-    box-shadow: 10px 10px 15px 0px rgba(0, 0, 0, 0.5);
+  /* figure.className = 'h-auto overflow-hidden flex items-center justify-center relative'; */
+
+  .tiptap figure {
+    @apply relative select-none h-auto;
   }
 
-  /* Görsel Seçildiğinde (Focus Olduğunda) Apple Stili Border */
-  .tiptap img.ProseMirror-selectednode {
-    /* Apple Blue renginde, belirgin ama zarif bir border */
-    @apply border-3 border-blue-600 scale-[1.04] transition-all duration-300 ease-out; /* Hafifçe büyüterek öne çıkarıyoruz */
-    box-shadow: 10px 10px 15px 0px rgba(0, 0, 0, 0.2);
-    outline: none; /* Varsayılan tarayıcı çerçevesini kapat */
+  .tiptap figure div {
+    @apply h-full w-full cursor-pointer;
+  }
+
+  .tiptap figure img {
+    @apply h-full w-full;
+  }
+
+  /* Hover: sadece img'e */
+  .tiptap figure img:hover {
+    box-shadow: 0 0 0 3px #34e79a;
+  }
+
+  /* Seçili: figure'a değil, div'e ver */
+  .tiptap figure.ProseMirror-selectednode > div {
+    box-shadow: 0 0 0 3px #000000;
+  }
+
+  /* Seçiliyken hover'ı ez */
+  .tiptap figure.ProseMirror-selectednode > div img:hover {
+    box-shadow: none;
   }
 }
 

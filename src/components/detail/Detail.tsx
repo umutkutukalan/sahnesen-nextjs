@@ -359,7 +359,7 @@ const Detail = ({ post }: DetailProps) => {
       `}</style>
 
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
-        <div className="flex flex-col w-full lg:w-240 gap-10 transition-all duration-300 relative px-2 md:px-15">
+        <div className="flex flex-col w-full lg:w-200 gap-10 transition-all duration-300 relative px-2 md:px-15">
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col w-full">
             <div className="w-full flex items-center justify-between border-b pb-5 border-gray-200">
