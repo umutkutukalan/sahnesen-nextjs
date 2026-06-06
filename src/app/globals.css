@@ -180,13 +180,12 @@ body {
   }
 
   .tiptap figure .image-toolbar {
+    @apply bg-gray-400 h-10;
     display: none;
     position: absolute;
-    top: -42px;
+    top: -50px;
     left: 50%;
     transform: translateX(-50%);
-    background: #000;
-    border-radius: 10px;
     padding: 4px 8px;
     gap: 4px;
     z-index: 50;
@@ -197,10 +196,12 @@ body {
 
   .tiptap figure.ProseMirror-selectednode .image-toolbar {
     display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .image-toolbar-btn {
-    color: #d1d5db;
+    @apply text-black;
     font-size: 12px;
     padding: 4px 8px;
     border-radius: 6px;
@@ -221,7 +222,6 @@ body {
 
   .image-toolbar-btn.active {
     background: #2563eb;
-    color: white;
     font-weight: 600;
   }
 
