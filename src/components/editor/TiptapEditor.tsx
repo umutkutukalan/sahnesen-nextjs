@@ -67,18 +67,21 @@ const CustomImage = Image.extend({
             const toolbar = document.createElement('div');
             toolbar.className = 'image-toolbar';
             toolbar.innerHTML = `
-                <div class="flex items-center justify-center gap-3">
-                    <div class="flex items-center gap-1">
-                        <button data-size="50%" class="image-toolbar-btn">Small</button>
-                        <button data-size="75%" class="image-toolbar-btn">Medium</button>
-                        <button data-size="100%" class="image-toolbar-btn">Full</button>
-                    </div>
-                    <div class="w-px h-4 bg-white/20"></div>
-                    <div>
-                        <button class="image-toolbar-btn image-toolbar-alt-btn">Alt Yazı</button>
-                    </div>
-                </div>
-        `;
+                <div class="flex items-center gap-3 size-buttons"></div>
+                <div class="w-px h-4 mx-1" style="background: rgba(255,255,255,0.2)"></div>
+                <button class="image-toolbar-btn image-toolbar-alt-btn">Alt Yazı</button>
+                 <div style="
+                    position: absolute;
+                    bottom: -7px;
+                    left: 55%;
+                    transform: translateX(-50%);
+                    width: 0;
+                    height: 0;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    border-top: 7px solid #1a1a1a;
+                "></div>
+`;
 
             toolbar.addEventListener('mousedown', (e) => {
                 e.preventDefault();
@@ -124,6 +127,35 @@ const CustomImage = Image.extend({
                 const src = node.attrs.src || '';
                 const alt = node.attrs.alt || '';
 
+                // AspectRatio hesabı
+                const rawRatio = node.attrs.aspectRatio;
+                const aspectRatio = (rawRatio !== null && rawRatio !== undefined && rawRatio !== '')
+                    ? parseFloat(rawRatio)
+                    : null;
+                const ratioKnown = aspectRatio !== null && !isNaN(aspectRatio) && aspectRatio !== 0;
+                const canBeMedium = ratioKnown ? aspectRatio >= 0.85 : true;
+                const canBeFull = ratioKnown ? aspectRatio >= 1.2 : true;
+
+                // Size butonlarını her seferinde sıfırdan oluştur
+                const sizeContainer = toolbar.querySelector('.size-buttons') as HTMLElement;
+                sizeContainer.innerHTML = '';
+
+                const sizes = [
+                    { value: '50%', label: 'Small', show: true },
+                    { value: '75%', label: 'Medium', show: canBeMedium },
+                    { value: '100%', label: 'Full', show: canBeFull },
+                ];
+
+                sizes.forEach(({ value, label, show }) => {
+                    if (!show) return;
+                    const btn = document.createElement('button');
+                    btn.setAttribute('data-size', value);
+                    btn.className = `image-toolbar-btn ${width === value ? 'active' : ''}`;
+                    btn.textContent = label;
+                    sizeContainer.appendChild(btn);
+                });
+
+                // div width güncelle
                 if (width !== prevWidth) {
                     div.classList.remove('w-screen', 'w-[120%]', 'w-full', 'relative', 'left-1/2', '-translate-x-1/2');
                     div.style.cssText = '';
@@ -138,48 +170,14 @@ const CustomImage = Image.extend({
                         div.classList.add('w-full');
                     }
 
-                    // Aktif butonu güncelle
-                    toolbar.querySelectorAll('[data-size]').forEach(btn => {
-                        btn.classList.toggle('active', btn.getAttribute('data-size') === width);
-                    });
-
                     prevWidth = width;
                 }
 
-                // AspectRatio hesabı — her update'te kontrol et
-                const rawRatio = node.attrs.aspectRatio;
-                const aspectRatio = (rawRatio !== null && rawRatio !== undefined && rawRatio !== '')
-                    ? parseFloat(rawRatio)
-                    : null;
-                const ratioKnown = aspectRatio !== null && !isNaN(aspectRatio) && aspectRatio !== 0;
-
-                const canBeMedium = ratioKnown ? aspectRatio >= 0.85 : true;
-                const canBeFull = ratioKnown ? aspectRatio >= 1.2 : true;
-
-                // Butonları güncelle
-                toolbar.querySelectorAll<HTMLButtonElement>('[data-size]').forEach(btn => {
-                    const size = btn.getAttribute('data-size');
-
-                    // Aktif mi?
-                    btn.classList.toggle('active', size === width);
-
-                    // Disable kontrolü
-                    if (size === '75%' && !canBeMedium) {
-                        btn.style.display = 'none';
-                    } else if (size === '100%' && !canBeFull) {
-                        btn.style.display = 'none';
-                    } else {
-                        btn.style.display = '';
-                    }
-                });
-
-                // src değiştiyse sadece src güncelle
                 if (src !== prevSrc) {
                     img.src = src;
                     prevSrc = src;
                 }
 
-                // alt değiştiyse sadece alt güncelle
                 if (alt !== prevAlt) {
                     img.alt = alt;
                     figcaption.textContent = alt;

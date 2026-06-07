@@ -180,18 +180,20 @@ body {
   }
 
   .tiptap figure .image-toolbar {
-    @apply w-50 h-10;
+    @apply flex items-center justify-center;
     visibility: hidden;
-    pointer-events: none; 
+    pointer-events: none;
     position: absolute;
-    top: -54px; /* ok için biraz daha yukarı */
+    top: -55px;
     left: 50%;
     transform: translateX(-50%) translateY(-4px);
     opacity: 0;
-    background: #686868;
-    border-radius: 12px;
-    padding: 6px 10px;
-    gap: 2px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    padding: 8px 12px;
+    gap: 8px;
+    width: fit-content; /* ← sabit genişlik yerine */
+    height: auto;
     z-index: 50;
     white-space: nowrap;
     overflow: visible !important;
@@ -205,14 +207,15 @@ body {
   .tiptap figure .image-toolbar::after {
     content: "";
     position: absolute;
-    bottom: -6px;
+    bottom: -7px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
-    border-top: 7px solid #cc0c0c;
+    border-top: 7px solid #ffffff; /* geçici beyaz */
+    z-index: 51;
   }
 
   /* Seçilince aşağıdan yukarı gelsin */
@@ -224,10 +227,6 @@ body {
     justify-content: center;
     transform: translateX(-50%) translateY(0px);
     opacity: 1;
-}
-
-  .tiptap figure.ProseMirror-selectednode .image-toolbar {
-    @apply flex items-center justify-center;
   }
 
   .image-toolbar-btn {
@@ -251,11 +250,6 @@ body {
   }
 
   /* Butonlar arası ince ayraç */
-  .image-toolbar-btn + .image-toolbar-btn {
-    border-left: 1px solid rgba(241, 241, 241, 0.1);
-    border-radius: 0;
-    padding-left: 12px;
-  }
 
   .image-toolbar-btn + .image-toolbar-btn.active,
   .image-toolbar-btn.active + .image-toolbar-btn {
