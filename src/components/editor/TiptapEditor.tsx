@@ -499,6 +499,18 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             <BubbleMenu editor={editor} pluginKey="textFormattingMenu" options={{ placement: 'top', offset: { mainAxis: 10, crossAxis: 0 } }} shouldShow={({ editor, state }) => !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule')}>
                 <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2">
+                    <button
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                        className={`p-2 rounded hover:bg-white/10 text-xs font-bold ${editor.isActive('heading', { level: 2 }) ? 'text-blue-400' : ''}`}
+                    >
+                        H2
+                    </button>
+                    <button
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                        className={`p-2 rounded hover:bg-white/10 text-xs font-bold ${editor.isActive('heading', { level: 3 }) ? 'text-blue-400' : ''}`}
+                    >
+                        H3
+                    </button>
                     <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'text-blue-400' : ''}`}><GoBold size={18} /></button>
                     <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'text-blue-400' : ''}`}><GoItalic size={18} /></button>
                     <div className="w-[1px] h-4 bg-white/20 mx-1" />
