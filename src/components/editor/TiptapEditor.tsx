@@ -8,6 +8,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import { GoBold, GoCode, GoItalic, GoPlus, GoQuote } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
+import { RxText } from "react-icons/rx";
 import { useEffect, useState, useRef } from 'react';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { createLowlight, common } from 'lowlight';
@@ -19,6 +20,9 @@ import csharp from 'highlight.js/lib/languages/csharp';
 import cpp from 'highlight.js/lib/languages/cpp';
 import sql from 'highlight.js/lib/languages/sql';
 import { uploadImageToBackend } from '@/utils/UploadImageToBackend';
+import { BiSolidQuoteAltLeft } from 'react-icons/bi';
+import { FaLink } from 'react-icons/fa6';
+import Link from '@tiptap/extension-link';
 
 const lowlight = createLowlight(common);
 lowlight.register('java', java);
@@ -217,6 +221,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     const [editingImageAttrs, setEditingImageAttrs] = useState<{ src: string; alt: string } | null>(null);
     const isContentInitialized = useRef(false);
 
+    const [isLinkInputOpen, setIsLinkInputOpen] = useState(false);
+    const [linkUrl, setLinkUrl] = useState('');
+
     const extractUrl = (backendResult: any): string => {
         if (!backendResult) return "";
         let url = "";
@@ -246,6 +253,12 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             Placeholder.configure({ placeholder: 'Hikayeni sahnele...' }),
             CodeBlockLowlight.configure({ lowlight }),
             Focus.configure({ className: 'is-focused transition-all', mode: 'all' }),
+            Link.configure(
+                {
+                    openOnClick: false,
+                    HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
+                }
+            ),
         ],
         autofocus: false,
         content: content || '',
@@ -372,6 +385,16 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return () => { editor.off('openAltModal' as any, handler); };
     }, [editor]);
 
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (!(e.target as HTMLElement).closest('.link-input-container')) {
+                setIsLinkInputOpen(false);
+            }
+        };
+        if (isLinkInputOpen) document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [isLinkInputOpen]);
+
     const saveAltText = (newAlt: string) => {
         if (!editor) return;
         editor.chain().focus().updateAttributes('image', { alt: newAlt }).run();
@@ -381,6 +404,12 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     const setImageSize = (sizePercentage: string) => {
         if (!editor) return;
         editor.chain().focus().updateAttributes('image', { width: sizePercentage, height: 'auto' }).run();
+    };
+
+    const normalizeUrl = (url: string): string => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        return `https://${url}`;
     };
 
     const handleImageUpload = () => {
@@ -499,35 +528,67 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             <BubbleMenu editor={editor} pluginKey="textFormattingMenu" options={{ placement: 'top', offset: { mainAxis: 10, crossAxis: 0 } }} shouldShow={({ editor, state }) => !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule')}>
                 <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2">
+                    <div className="flex items-center gap-1">
+                        <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'text-blue-400' : ''}`}><GoBold size={18} /></button>
+                        <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'text-blue-400' : ''}`}><GoItalic size={18} /></button>
+                        <button
+                            onClick={() => {
+                                if (editor.isActive('link')) {
+                                    editor.chain().focus().unsetLink().run();
+                                } else {
+                                    setLinkUrl('');
+                                    setIsLinkInputOpen(v => !v);
+                                }
+                            }}
+                            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('link') ? 'text-blue-400' : ''}`}
+                        >
+                            <FaLink />
+                        </button>
+
+                        {isLinkInputOpen && (
+                            <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 flex gap-2 z-50 min-w-64">
+                                <input
+                                    autoFocus
+                                    type="url"
+                                    placeholder="https://..."
+                                    value={linkUrl}
+                                    onChange={(e) => setLinkUrl(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            editor.chain().focus().setLink({ href: normalizeUrl(linkUrl) }).run();
+                                            setIsLinkInputOpen(false);
+                                        }
+                                        if (e.key === 'Escape') setIsLinkInputOpen(false);
+                                    }}
+                                    className="flex-1 text-black text-sm outline-none border-b border-gray-300 pb-1 font-sans"
+                                />
+                                <button
+                                    onClick={() => {
+                                        editor.chain().focus().setLink({ href: normalizeUrl(linkUrl) }).run();
+                                        setIsLinkInputOpen(false);
+                                    }}
+                                    className="text-xs text-blue-600 font-medium font-sans cursor-pointer"
+                                >
+                                    Ekle
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                    <div className="w-[1px] h-4 bg-white/20 mx-1" />
                     <button
                         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                         className={`p-2 rounded hover:bg-white/10 text-xs font-bold ${editor.isActive('heading', { level: 2 }) ? 'text-blue-400' : ''}`}
                     >
-                        H2
+                        <RxText className="text-xl font-extrabold" />
                     </button>
                     <button
                         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
                         className={`p-2 rounded hover:bg-white/10 text-xs font-bold ${editor.isActive('heading', { level: 3 }) ? 'text-blue-400' : ''}`}
                     >
-                        H3
+                        <RxText className="text-lg font-extrabold" />
                     </button>
-                    <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'text-blue-400' : ''}`}><GoBold size={18} /></button>
-                    <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'text-blue-400' : ''}`}><GoItalic size={18} /></button>
-                    <div className="w-[1px] h-4 bg-white/20 mx-1" />
                     <button onClick={() => editor.chain().focus().toggleCode().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('code') ? 'text-blue-400' : ''}`}><GoCode size={18} /></button>
-                    <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'text-blue-400' : ''}`}><GoQuote size={18} /></button>
-                    <button
-                        onClick={() => editor.chain().focus().toggleBulletList().run()}
-                        className={`p-2 rounded hover:bg-white/10 text-xs ${editor.isActive('bulletList') ? 'text-blue-400' : ''}`}
-                    >
-                        • List
-                    </button>
-                    <button
-                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                        className={`p-2 rounded hover:bg-white/10 text-xs ${editor.isActive('orderedList') ? 'text-blue-400' : ''}`}
-                    >
-                        1. List
-                    </button>
+                    <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'text-blue-400' : ''}`}><BiSolidQuoteAltLeft size={18} /></button>
                 </div>
             </BubbleMenu>
 

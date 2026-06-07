@@ -374,7 +374,7 @@ const Detail = ({ post }: DetailProps) => {
   const authorFullName = `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
 
   return (
-    <div className="page pt-25 bg-white text-black min-h-screen">
+    <div className="page pt-25 bg-private text-black min-h-screen">
       {/* Apple Renklendirme CSS injection alanı */}
       <style jsx global>{`
         .apple-code-theme .hljs-keyword { color: #9b2385; font-weight: 600; }

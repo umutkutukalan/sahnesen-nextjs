@@ -135,6 +135,10 @@ body {
   --tw-prose-counters: #000000;
 }
 
+.bg-private {
+  @apply bg-white;
+}
+
 /* Tiptap Editor Custom Styles */
 @layer base {
   /* Ana editör alanı ve tipografi ayarları */
