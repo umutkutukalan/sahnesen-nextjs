@@ -201,7 +201,7 @@ const Detail = ({ post }: DetailProps) => {
             }
 
             return (
-              <p key={index} className="text-gray-800 text-[18px] md:text-[20px] leading-relaxed mb-5 md:mb-10 font-normal"
+              <p key={index} className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed mb-5 md:mb-10 font-normal"
                 style={{ letterSpacing: "-0.003em", lineHeight: "32px", marginTop: "0.94em" }}
               >
                 {node.content ? renderTextNodes(node.content) : <br />}
@@ -212,7 +212,7 @@ const Detail = ({ post }: DetailProps) => {
             const HeadingTag = `h${node.attrs?.level || 2}` as keyof JSX.IntrinsicElements;
             const headingClasses: Record<number, string> = {
               1: "text-4xl font-extrabold tracking-tight text-gray-950 mt-10 mb-4",
-              2: "text-[22px] md:text-[26px] font-extrabold tracking-tight -mb-[0.28em] font-sans",
+              2: "text-[24px] md:text-[26px] font-extrabold tracking-tight -mb-[0.28em] font-sans",
               3: "text-xl font-semibold tracking-tight text-gray-900 mt-6 mb-3",
             };
             return (
@@ -273,13 +273,43 @@ const Detail = ({ post }: DetailProps) => {
             }
             return null;
 
+          case "bulletList":
+            return (
+              <ul key={index} className="list-disc pl-8 my-4 space-y-2">
+                {node.content?.map((item: any, i: number) => (
+                  <li key={i} className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed">
+                    {item.content?.map((child: any, j: number) => (
+                      child.type === 'paragraph'
+                        ? <span key={j}>{child.content ? renderTextNodes(child.content) : ''}</span>
+                        : null
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            );
+
+          case "orderedList":
+            return (
+              <ol key={index} className="list-decimal pl-8 my-4 space-y-2">
+                {node.content?.map((item: any, i: number) => (
+                  <li key={i} className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed">
+                    {item.content?.map((child: any, j: number) => (
+                      child.type === 'paragraph'
+                        ? <span key={j}>{child.content ? renderTextNodes(child.content) : ''}</span>
+                        : null
+                    ))}
+                  </li>
+                ))}
+              </ol>
+            );
+
           case "blockquote":
             return (
               <blockquote key={index} className="border-l-4 border-gray-200 pl-6 my-8">
                 {node.content?.map((child: any, i: number) => {
                   if (child.type === 'paragraph') {
                     return (
-                      <p key={i} className="italic text-zinc-800 antialiased text-base md:text-[20px] leading-relaxed ">
+                      <p key={i} className="italic text-zinc-800 antialiased text-[20px] md:text-[22px] leading-relaxed">
                         {child.content ? renderTextNodes(child.content) : ''}
                       </p>
                     );
@@ -361,7 +391,7 @@ const Detail = ({ post }: DetailProps) => {
       `}</style>
 
       <div className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}>
-        <div className="flex flex-col w-full lg:w-200 gap-10 transition-all duration-300 relative px-2 md:px-15">
+        <div className="flex flex-col w-full lg:w-[850px] gap-10 transition-all duration-300 relative px-2 md:px-15">
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col w-full">
             <div className="w-full flex items-center justify-between border-b pb-5 border-gray-200">
@@ -390,7 +420,9 @@ const Detail = ({ post }: DetailProps) => {
             {/* BAŞLIK VE METADATA */}
             <div className="flex flex-col gap-3 border-b py-4 border-gray-200">
               <span className="text-xs font-bold text-blue-600 tracking-wider uppercase">{post.postType}</span>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">{post.title}</h1>
+              <h1 className="text-[32px] md:text-[42px] font-extrabold tracking-tight text-gray-900 font-sans" style={{ lineHeight: '48px', letterSpacing: '-0.011em' }}>
+                {post.title}
+              </h1>
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
                 <p>5 min read</p>
                 <span>•</span>
