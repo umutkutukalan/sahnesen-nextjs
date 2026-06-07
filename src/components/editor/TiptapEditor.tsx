@@ -516,6 +516,18 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                     <div className="w-[1px] h-4 bg-white/20 mx-1" />
                     <button onClick={() => editor.chain().focus().toggleCode().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('code') ? 'text-blue-400' : ''}`}><GoCode size={18} /></button>
                     <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'text-blue-400' : ''}`}><GoQuote size={18} /></button>
+                    <button
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        className={`p-2 rounded hover:bg-white/10 text-xs ${editor.isActive('bulletList') ? 'text-blue-400' : ''}`}
+                    >
+                        • List
+                    </button>
+                    <button
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        className={`p-2 rounded hover:bg-white/10 text-xs ${editor.isActive('orderedList') ? 'text-blue-400' : ''}`}
+                    >
+                        1. List
+                    </button>
                 </div>
             </BubbleMenu>
 

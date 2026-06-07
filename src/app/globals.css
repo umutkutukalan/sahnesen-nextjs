@@ -130,6 +130,11 @@ body {
   display: none;
 }
 
+.tiptap.prose {
+  --tw-prose-bullets: #000000;
+  --tw-prose-counters: #000000;
+}
+
 /* Tiptap Editor Custom Styles */
 @layer base {
   /* Ana editör alanı ve tipografi ayarları */
@@ -158,7 +163,8 @@ body {
   .tiptap.prose h1,
   .tiptap.prose h2,
   .tiptap.prose h3 {
-    @apply font-bold tracking-tight;
+    @apply font-extrabold tracking-tight font-sans;
+    letter-spacing: -0.02em;
     margin-top: 1.5em;
     margin-bottom: 1.5em;
   }

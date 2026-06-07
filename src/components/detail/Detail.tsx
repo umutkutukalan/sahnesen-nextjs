@@ -275,7 +275,7 @@ const Detail = ({ post }: DetailProps) => {
 
           case "bulletList":
             return (
-              <ul key={index} className="list-disc pl-8 my-4 space-y-2">
+              <ul key={index} className="list-disc pl-8 my-4 space-y-2 marker:text-black">
                 {node.content?.map((item: any, i: number) => (
                   <li key={i} className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed">
                     {item.content?.map((child: any, j: number) => (
@@ -290,7 +290,7 @@ const Detail = ({ post }: DetailProps) => {
 
           case "orderedList":
             return (
-              <ol key={index} className="list-decimal pl-8 my-4 space-y-2">
+              <ol key={index} className="list-decimal pl-8 my-4 space-y-2 marker:text-black">
                 {node.content?.map((item: any, i: number) => (
                   <li key={i} className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed">
                     {item.content?.map((child: any, j: number) => (
