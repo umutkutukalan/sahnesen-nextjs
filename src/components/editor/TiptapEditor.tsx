@@ -165,14 +165,11 @@ const CustomImage = Image.extend({
 
                     // Disable kontrolü
                     if (size === '75%' && !canBeMedium) {
-                        btn.disabled = true;
-                        btn.classList.add('disabled');
+                        btn.style.display = 'none';
                     } else if (size === '100%' && !canBeFull) {
-                        btn.disabled = true;
-                        btn.classList.add('disabled');
+                        btn.style.display = 'none';
                     } else {
-                        btn.disabled = false;
-                        btn.classList.remove('disabled');
+                        btn.style.display = '';
                     }
                 });
 
