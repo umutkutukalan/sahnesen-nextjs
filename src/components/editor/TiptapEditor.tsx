@@ -67,20 +67,41 @@ const CustomImage = Image.extend({
             const toolbar = document.createElement('div');
             toolbar.className = 'image-toolbar';
             toolbar.innerHTML = `
-            <button data-size="50%" class="image-toolbar-btn">Small</button>
-            <button data-size="75%" class="image-toolbar-btn">Medium</button>
-            <button data-size="100%" class="image-toolbar-btn">Full</button>
+                <div class="flex items-center justify-center gap-3">
+                    <div class="flex items-center gap-1">
+                        <button data-size="50%" class="image-toolbar-btn">Small</button>
+                        <button data-size="75%" class="image-toolbar-btn">Medium</button>
+                        <button data-size="100%" class="image-toolbar-btn">Full</button>
+                    </div>
+                    <div class="w-px h-4 bg-white/20"></div>
+                    <div>
+                        <button class="image-toolbar-btn image-toolbar-alt-btn">Alt Yazı</button>
+                    </div>
+                </div>
         `;
 
             toolbar.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                const btn = (e.target as HTMLElement).closest('[data-size]');
-                if (btn) {
-                    const size = btn.getAttribute('data-size');
+                const sizeBtn = (e.target as HTMLElement).closest('[data-size]');
+                if (sizeBtn) {
+                    const size = sizeBtn.getAttribute('data-size');
                     const pos = typeof getPos === 'function' ? getPos() : null;
                     if (pos !== null && size) {
                         editor.chain().setNodeSelection(pos).updateAttributes('image', { width: size }).run();
                     }
+                    return;
+                }
+
+                const altBtn = (e.target as HTMLElement).closest('.image-toolbar-alt-btn');
+                if (altBtn) {
+                    // editor'daki openAltModal'ı tetikle
+                    // Bunun için editor üzerinden custom event fırlatabilirsin:
+                    const pos = typeof getPos === 'function' ? getPos() : null;
+                    if (pos !== null) {
+                        editor.chain().setNodeSelection(pos).run();
+                    }
+                    editor.emit('openAltModal' as any);
+                    return;
                 }
             });
 
@@ -348,6 +369,13 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         setEditingImageAttrs({ src: attrs.src, alt: attrs.alt || '' });
         setIsAltModalOpen(true);
     };
+
+    useEffect(() => {
+        if (!editor) return;
+        const handler = () => openAltModal();
+        editor.on('openAltModal' as any, handler);
+        return () => { editor.off('openAltModal' as any, handler); };
+    }, [editor]);
 
     const saveAltText = (newAlt: string) => {
         if (!editor) return;
