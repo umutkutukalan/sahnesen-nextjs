@@ -201,7 +201,9 @@ const Detail = ({ post }: DetailProps) => {
             }
 
             return (
-              <p key={index} className="text-gray-800 text-xl md:text-2xl leading-relaxed mb-5 md:mb-10 font-normal">
+              <p key={index} className="text-gray-800 text-[18px] md:text-[20px] leading-relaxed mb-5 md:mb-10 font-normal"
+                style={{ letterSpacing: "-0.003em", lineHeight: "32px", marginTop: "0.94em" }}
+              >
                 {node.content ? renderTextNodes(node.content) : <br />}
               </p>
             );
@@ -210,7 +212,7 @@ const Detail = ({ post }: DetailProps) => {
             const HeadingTag = `h${node.attrs?.level || 2}` as keyof JSX.IntrinsicElements;
             const headingClasses: Record<number, string> = {
               1: "text-4xl font-extrabold tracking-tight text-gray-950 mt-10 mb-4",
-              2: "text-2xl font-bold tracking-tight text-gray-900 mt-8 mb-4 border-b pb-2 border-gray-100",
+              2: "text-[22px] md:text-[26px] font-extrabold tracking-tight -mb-[0.28em] font-sans",
               3: "text-xl font-semibold tracking-tight text-gray-900 mt-6 mb-3",
             };
             return (
@@ -277,7 +279,7 @@ const Detail = ({ post }: DetailProps) => {
                 {node.content?.map((child: any, i: number) => {
                   if (child.type === 'paragraph') {
                     return (
-                      <p key={i} className="italic text-zinc-800 antialiased text-base md:text-[22px] leading-relaxed ">
+                      <p key={i} className="italic text-zinc-800 antialiased text-base md:text-[20px] leading-relaxed ">
                         {child.content ? renderTextNodes(child.content) : ''}
                       </p>
                     );
