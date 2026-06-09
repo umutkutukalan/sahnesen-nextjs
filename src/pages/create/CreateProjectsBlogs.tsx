@@ -16,23 +16,12 @@ const CreateProjectsBlog = () => {
   const router = useRouter();
   const [editorJSON, setEditorJSON] = useState<any>(null);
   const [postType, setPostType] = useState<'PROJECT' | 'BLOG'>('PROJECT');
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const [activePostId, setActivePostId] = useState<number | null>(null);
   const [isDraftCreating, setIsDraftCreating] = useState(false);
 
   const titleRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const activePostIdRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (imagePreview && imagePreview.startsWith('blob:')) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
 
   // Sadece başlık girildiğinde veya kapak eklendiğinde İLK taslağı (POST) oluşturur
   const ensureDraftExists = async () => {
@@ -99,32 +88,6 @@ const CreateProjectsBlog = () => {
     }
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const localUrl = URL.createObjectURL(file);
-    setImagePreview(localUrl);
-    setCoverImage(file);
-
-    const currentId = activePostIdRef.current || activePostId;
-    if (currentId) {
-      const formData = new FormData();
-      formData.append("coverImage", file);
-      try {
-        await axios.put(`http://localhost:8080/api/posts/me/${currentId}/cover`, formData, {
-          withCredentials: true,
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-      } catch (err) {
-        console.error("Kapak resmi yüklenirken hata:", err);
-      }
-    } else {
-      // Eğer henüz taslak yoksa ama kullanıcı kapak seçtiyse taslağı tetikle
-      setTimeout(() => ensureDraftExists(), 100);
-    }
-  };
-
   const handleSave = async () => {
     if (!titleRef.current?.value.trim()) {
       alert("Lütfen önce şık bir başlık girin!");
@@ -188,24 +151,6 @@ const CreateProjectsBlog = () => {
           >
             Blog Yazısı
           </button>
-        </div>
-
-        {/* KAPAK RESMİ */}
-        <div className="mb-8">
-          <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-          {imagePreview ? (
-            <div className="relative w-full h-64 rounded-xl overflow-hidden group shadow-md">
-              <img src={imagePreview} alt="Kapak" className="w-full h-full object-cover" />
-              <div onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-sm font-medium">
-                Görseli Değiştir
-              </div>
-            </div>
-          ) : (
-            <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-40 border border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-all text-xs">
-              <LuImagePlus size={24} />
-              <span>Kapak Görseli Ekle</span>
-            </button>
-          )}
         </div>
 
         {/* BAŞLIK INPUTU */}
