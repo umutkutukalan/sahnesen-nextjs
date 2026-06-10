@@ -1,10 +1,9 @@
 "use client";
 
 import dynamic from 'next/dynamic';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoCheck } from "react-icons/go";
-import { LuImagePlus } from "react-icons/lu";
 import axios from 'axios';
 
 const TiptapEditor = dynamic(() => import('@/components/editor/TiptapEditor'), {
@@ -12,93 +11,79 @@ const TiptapEditor = dynamic(() => import('@/components/editor/TiptapEditor'), {
   loading: () => <div className="h-64 bg-gray-50 animate-pulse rounded-xl" />
 });
 
+const extractTitle = (json: any): string => {
+  const first = json?.content?.[0];
+  if (first?.type === 'heading' && first?.attrs?.level === 1) {
+    return first.content?.map((n: any) => n.text || '').join('') || '';
+  }
+  return '';
+};
+
 const CreateProjectsBlog = () => {
   const router = useRouter();
+
   const [editorJSON, setEditorJSON] = useState<any>(null);
+  const editorJSONRef = useRef(editorJSON);
+  useEffect(() => { editorJSONRef.current = editorJSON; }, [editorJSON]);
+
   const [postType, setPostType] = useState<'PROJECT' | 'BLOG'>('PROJECT');
+  const postTypeRef = useRef(postType);
+  useEffect(() => { postTypeRef.current = postType; }, [postType]);
+
 
   const [activePostId, setActivePostId] = useState<number | null>(null);
-  const [isDraftCreating, setIsDraftCreating] = useState(false);
 
-  const titleRef = useRef<HTMLTextAreaElement>(null);
   const activePostIdRef = useRef<number | null>(null);
 
-  const extractTitle = (json: any): string => {
-    const first = json?.content?.[0];
-    if (first?.type === 'heading' && first?.attrs?.level === 1) {
-      return first.content?.map((n: any) => n.text || '').join('') || '';
-    }
-    return '';
-  };
 
-  // Sadece başlık girildiğinde veya kapak eklendiğinde İLK taslağı (POST) oluşturur
-  const ensureDraftExists = async (currentJson?: any) => {
-    if (activePostIdRef.current || activePostId || isDraftCreating) return;
-    const json = currentJson || editorJSON;
+  const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
+    if (activePostIdRef.current) return;
+    const json = currentJson || editorJSONRef.current;
     const currentTitle = extractTitle(json);
     if (!currentTitle || currentTitle.length < 3) return;
-
-    setIsDraftCreating(true);
     try {
-      const payload = {
-        postType: postType,
+      const response = await axios.post("http://localhost:8080/api/posts/me", {
+        postType: postTypeRef.current,
         title: currentTitle,
-        content: editorJSON || { type: "doc", content: [] },
-        coverImage: null,
+        content: json,
         isPublished: false
-      };
-
-      const response = await axios.post("http://localhost:8080/api/posts/me", payload, {
-        withCredentials: true,
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (response.data && response.data.id) {
-        const newId = response.data.id;
-        activePostIdRef.current = newId;
-        setActivePostId(newId);
-        console.log("Sahne Motoru: İlk taslak başarıyla ayrıldı. ID:", newId);
+      }, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+      if (response.data?.id) {
+        activePostIdRef.current = response.data.id;
+        setActivePostId(response.data.id);
       }
-    } catch (err) {
-      console.error("Taslak kaydı oluşturulurken kilitlenme yaşandı:", err);
-    } finally {
-      setIsDraftCreating(false);
-    }
-  };
+    } catch (err) { console.error(err); }
+  });
 
-  // 🔥 YENİ: Editör değiştikçe var olan taslağı sessizce güncelleyen (PUT) mekanizma
-  const autoSaveContent = async (currentJson: any) => {
-    const currentId = activePostIdRef.current;
-    if (!currentId) return; // Taslak yoksa asenkron istek atıp sistemi yorma
-
+  const autoSaveContentRef = useRef(async (currentJson: any) => {
+    if (!activePostIdRef.current) return;
     try {
-      await axios.put(`http://localhost:8080/api/posts/me/${currentId}`, {
-        postType: postType,
+      await axios.put(`http://localhost:8080/api/posts/me/${activePostIdRef.current}`, {
+        postType: postTypeRef.current,
         title: extractTitle(currentJson) || "Başlıksız Taslak",
         content: currentJson,
         isPublished: false
-      }, {
-        withCredentials: true,
-        headers: { 'Content-Type': 'application/json' }
-      });
-      console.log("Sahne Motoru: İçerik arka planda güncellendi (PUT).");
-    } catch (err) {
-      console.error("Otomatik kayıtta hata:", err);
-    }
-  };
+      }, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+    } catch (err) { console.error(err); }
+  });
+
+  // 🔥 RE-RENDER KİLİDİ: useCallback kullanarak fonksiyon referansını sabitliyoruz
+  const handleEditorUpdate = useCallback((json: any) => {
+    setEditorJSON(json);
+    ensureDraftExistsRef.current(json);
+    autoSaveContentRef.current(json);
+  }, []); // boş array — hiç yeniden oluşmaz
+
 
   const handleSave = async () => {
-    if (!titleRef.current?.value.trim()) {
-      alert("Lütfen önce şık bir başlık girin!");
-      return;
-    }
+
     const currentId = activePostIdRef.current || activePostId;
 
     try {
       const payload = {
-        postType: postType,
-        title: titleRef.current.value,
-        content: editorJSON,
+        postType: postTypeRef.current,
+        title: extractTitle(editorJSONRef.current) || "Başlıksız",
+        content: editorJSONRef.current,
         isPublished: true
       };
 
@@ -124,13 +109,6 @@ const CreateProjectsBlog = () => {
     }
   };
 
-  // 🔥 RE-RENDER KİLİDİ: useCallback kullanarak fonksiyon referansını sabitliyoruz
-  const handleEditorUpdate = useCallback((json: any) => {
-    setEditorJSON(json);
-    ensureDraftExists(json); // taslak tetikleme
-    autoSaveContent(json); // Her harfte veya resimde Create (POST) değil, sessizce PUT atıyoruz.
-  }, [postType]);
-
   return (
     <main className="min-h-screen bg-white pt-24 pb-18 text-black">
       <div className="w-full lg:w-190 mx-auto px-6">
@@ -154,29 +132,18 @@ const CreateProjectsBlog = () => {
         </div>
 
         {/* BAŞLIK INPUTU */}
-        <textarea
-          ref={titleRef}
-          placeholder="Başlık girin..."
-          rows={1}
-          className="w-full text-5xl font-semibold placeholder-gray-300 focus:outline-none resize-none mb-6 tracking-tight"
-          onBlur={ensureDraftExists} // 🔥 En güvenli yer: Kullanıcı başlıktan çıkınca ilk taslak oluşur.
-          onChange={(e) => {
-            e.target.style.height = 'auto';
-            e.target.style.height = e.target.scrollHeight + 'px';
-          }}
-        />
 
         {/* TIPTAP EDITOR */}
         <TiptapEditor
           onUpdate={handleEditorUpdate}
-          postId={activePostIdRef.current || activePostId}
+          postId={activePostId}
         />
 
         {/* DEBUG ALANI */}
         <div className="mt-20 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
           <p className="text-[10px] font-mono text-gray-400 mb-2 underline">MİMARİ KONTROL</p>
           <div className="text-[10px] text-gray-500 flex flex-col gap-1 font-mono">
-            <p><strong>Active Post ID (Taslak):</strong> {activePostIdRef.current || activePostId ? (activePostIdRef.current || activePostId) : "Henüz Oluşturulmadı"}</p>
+            <p><strong>Active Post ID (Taslak):</strong> {activePostId ?? "Henüz Oluşturulmadı"}</p>
             <p><strong>Tiptap Node Sayısı:</strong> {editorJSON?.content?.length || 0}</p>
           </div>
         </div>
