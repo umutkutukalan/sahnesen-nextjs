@@ -16,18 +16,26 @@ const CreateProjectsBlog = () => {
   const router = useRouter();
   const [editorJSON, setEditorJSON] = useState<any>(null);
   const [postType, setPostType] = useState<'PROJECT' | 'BLOG'>('PROJECT');
-  
+
   const [activePostId, setActivePostId] = useState<number | null>(null);
   const [isDraftCreating, setIsDraftCreating] = useState(false);
 
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const activePostIdRef = useRef<number | null>(null);
 
+  const extractTitle = (json: any): string => {
+    const first = json?.content?.[0];
+    if (first?.type === 'heading' && first?.attrs?.level === 1) {
+      return first.content?.map((n: any) => n.text || '').join('') || '';
+    }
+    return '';
+  };
+
   // Sadece başlık girildiğinde veya kapak eklendiğinde İLK taslağı (POST) oluşturur
-  const ensureDraftExists = async () => {
+  const ensureDraftExists = async (currentJson?: any) => {
     if (activePostIdRef.current || activePostId || isDraftCreating) return;
-    
-    const currentTitle = titleRef.current?.value.trim();
+    const json = currentJson || editorJSON;
+    const currentTitle = extractTitle(json);
     if (!currentTitle || currentTitle.length < 3) return;
 
     setIsDraftCreating(true);
@@ -37,7 +45,7 @@ const CreateProjectsBlog = () => {
         title: currentTitle,
         content: editorJSON || { type: "doc", content: [] },
         coverImage: null,
-        isPublished: false 
+        isPublished: false
       };
 
       const response = await axios.post("http://localhost:8080/api/posts/me", payload, {
@@ -50,15 +58,6 @@ const CreateProjectsBlog = () => {
         activePostIdRef.current = newId;
         setActivePostId(newId);
         console.log("Sahne Motoru: İlk taslak başarıyla ayrıldı. ID:", newId);
-
-        if (coverImage) {
-          const formData = new FormData();
-          formData.append("coverImage", coverImage);
-          await axios.put(`http://localhost:8080/api/posts/me/${newId}/cover`, formData, {
-            withCredentials: true,
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
-        }
       }
     } catch (err) {
       console.error("Taslak kaydı oluşturulurken kilitlenme yaşandı:", err);
@@ -75,7 +74,7 @@ const CreateProjectsBlog = () => {
     try {
       await axios.put(`http://localhost:8080/api/posts/me/${currentId}`, {
         postType: postType,
-        title: titleRef.current?.value || "Başlıksız Taslak",
+        title: extractTitle(currentJson) || "Başlıksız Taslak",
         content: currentJson,
         isPublished: false
       }, {
@@ -99,8 +98,8 @@ const CreateProjectsBlog = () => {
       const payload = {
         postType: postType,
         title: titleRef.current.value,
-        content: editorJSON, 
-        isPublished: true 
+        content: editorJSON,
+        isPublished: true
       };
 
       let response;
@@ -128,6 +127,7 @@ const CreateProjectsBlog = () => {
   // 🔥 RE-RENDER KİLİDİ: useCallback kullanarak fonksiyon referansını sabitliyoruz
   const handleEditorUpdate = useCallback((json: any) => {
     setEditorJSON(json);
+    ensureDraftExists(json); // taslak tetikleme
     autoSaveContent(json); // Her harfte veya resimde Create (POST) değil, sessizce PUT atıyoruz.
   }, [postType]);
 
@@ -167,9 +167,9 @@ const CreateProjectsBlog = () => {
         />
 
         {/* TIPTAP EDITOR */}
-        <TiptapEditor 
-          onUpdate={handleEditorUpdate} 
-          postId={activePostIdRef.current || activePostId} 
+        <TiptapEditor
+          onUpdate={handleEditorUpdate}
+          postId={activePostIdRef.current || activePostId}
         />
 
         {/* DEBUG ALANI */}

@@ -250,7 +250,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         extensions: [
             StarterKit.configure({ codeBlock: false }),
             CustomImage.configure({ inline: false, allowBase64: true }),
-            Placeholder.configure({ placeholder: 'Hikayeni sahnele...' }),
+            Placeholder.configure({
+                placeholder: ({ node }) => {
+                    if (node.type.name === 'heading' && node.attrs.level === 1) {
+                        return 'Başlık girin...';
+                    }
+                    return 'Hikayeni sahnele...';
+                },
+            }),
             CodeBlockLowlight.configure({ lowlight }),
             Focus.configure({ className: 'is-focused transition-all', mode: 'all' }),
             Link.configure(
@@ -261,7 +268,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             ),
         ],
         autofocus: false,
-        content: content || '',
+        content: content || {
+            type: 'doc',
+            content: [{ type: 'heading', attrs: { level: 1 }, content: [] }]
+        },
         immediatelyRender: false,
         onUpdate: ({ editor }) => { onUpdateRef.current(editor.getJSON()); },
         editorProps: {
