@@ -586,8 +586,19 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                     </div>
                     <div className="w-[1px] h-4 bg-white/20 mx-1" />
                     <button
-                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                        className={`p-2 rounded hover:bg-white/10 text-xs font-bold ${editor.isActive('heading', { level: 2 }) ? 'text-blue-400' : ''}`}
+                        onClick={() => {
+                            const hasH1 = editor.getJSON().content?.some(
+                                (node: any) => node.type === 'heading' && node.attrs?.level === 1
+                            );
+                            if (hasH1) {
+                                editor.chain().focus().toggleHeading({ level: 2 }).run();
+                            } else {
+                                editor.chain().focus().toggleHeading({ level: 1 }).run();
+                            }
+                        }}
+                        className={`p-2 rounded hover:bg-white/10 text-xs font-bold ${editor.isActive('heading', { level: 1 }) || editor.isActive('heading', { level: 2 })
+                            ? 'text-blue-400' : ''
+                            }`}
                     >
                         <RxText className="text-xl font-extrabold" />
                     </button>
