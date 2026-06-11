@@ -45,7 +45,7 @@ const CreateProjectsBlog = () => {
     const json = currentJson || editorJSONRef.current;
     const currentTitle = extractTitle(json);
     if (!currentTitle || currentTitle.length < 3) return;
-    
+
     setSaveStatus('SAVING');
     try {
       const response = await axios.post("http://localhost:8080/api/posts/me", {
@@ -59,26 +59,31 @@ const CreateProjectsBlog = () => {
         setActivePostId(response.data.id);
         setSaveStatus('SAVED');
       }
-    } catch (err) { 
-      console.error(err); 
+    } catch (err) {
+      console.error(err);
       setSaveStatus('ERROR');
     }
   });
 
-  // Otomatik Kaydedici
+  // Otomatik Kaydediciyi bu mantığa çekebilirsin
   const autoSaveContentRef = useRef(async (currentJson: any) => {
     if (!activePostIdRef.current) return;
+
+    // Eğer kullanıcı her şeyi sildiyse başlığı kurtaralım
+    const extracted = extractTitle(currentJson);
+    const finalTitle = extracted && extracted.length >= 3 ? extracted : "Başlıksız Taslak";
+
     try {
       await axios.put(`http://localhost:8080/api/posts/me/${activePostIdRef.current}`, {
         postType: postTypeRef.current,
-        title: extractTitle(currentJson) || "Başlıksız Taslak",
-        content: currentJson,
+        title: finalTitle,
+        content: currentJson, // Boş içerik (sadece boş bir node) gidebilir, sorun değil
         isPublished: false
       }, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
-      
+
       setSaveStatus('SAVED');
-    } catch (err) { 
-      console.error(err); 
+    } catch (err) {
+      console.error(err);
       setSaveStatus('ERROR');
     }
   });
@@ -92,7 +97,7 @@ const CreateProjectsBlog = () => {
     } else {
       setSaveStatus('SAVING');
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      
+
       // Süreyi 1500ms'e çekerek Tiptap'ın DOM'u rahatça işlemesine izin veriyoruz
       debounceTimerRef.current = setTimeout(() => {
         autoSaveContentRef.current(json);
