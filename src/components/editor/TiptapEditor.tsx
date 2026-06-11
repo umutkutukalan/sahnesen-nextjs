@@ -254,11 +254,17 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 includeChildren: true,
                 showOnlyCurrent: false, // Tüm boş bloklarda placeholder göster
                 showOnlyWhenEditable: true, // Sadece editör düzenleme modundayken (yazarken) çalışsın
-                placeholder: ({ node }) => {
+                placeholder: ({ node, editor }) => {
                     if (node.type.name === 'heading' && node.attrs.level === 1) {
                         return 'Başlık girin...';
                     }
-                    return 'Hikayeni sahnele...';
+                    else if (node.type.name === 'paragraph') {
+                        // Editörün hafızasındaki dökümanın 2. elementi (index 1) şu anki node ile aynı mı?
+                        if (editor.state.doc.firstChild === node || editor.state.doc.child(1) === node) {
+                            return 'İçeriğinizi yazmaya başlayın...';
+                        }
+                    }
+                    return '';
                 },
             }),
             CodeBlockLowlight.configure({ lowlight }),
