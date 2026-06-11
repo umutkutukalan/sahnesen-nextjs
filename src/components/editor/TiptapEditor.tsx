@@ -276,7 +276,46 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             content: [{ type: 'heading', attrs: { level: 1 }, content: [] }]
         },
         immediatelyRender: false,
-        onUpdate: ({ editor }) => { onUpdateRef.current(editor.getJSON()); },
+        onUpdate: ({ editor }) => {
+            const json = editor.getJSON();
+
+            let h1Count = 0;
+            let hasChanged = false;
+
+            // Mevcut imleç pozisyonunu hafızaya alıyoruz
+            const { selection } = editor.state;
+            const currentAnchor = selection.anchor;
+
+            // Arka planda değişiklikleri toplamak için bir transaction başlatıyoruz
+            const tr = editor.state.tr;
+
+            editor.state.doc.descendants((node, pos) => {
+                if (node.type.name === 'heading' && node.attrs.level === 1) {
+                    h1Count++;
+                    // Eğer bu, dökümandaki İKİNCİ veya daha sonraki bir H1 ise
+                    if (h1Count > 1) {
+                        // 🔥 ÇÖZÜM: setNodeSelection ile satırı seçmek yerine, 
+                        // doğrudan o pozisyondaki node'un niteliğini H2 yapıyoruz. İmleç bundan etkilenmez!
+                        tr.setNodeAttribute(pos, 'level', 2);
+                        hasChanged = true;
+                    }
+                }
+                return true;
+            });
+
+            if (hasChanged) {
+                // Geçmişi (Undo-Redo) bozmamak için addToHistory: false ile transaction'ı uyguluyoruz
+                tr.setMeta('addToHistory', false);
+                editor.view.dispatch(tr);
+
+                // İmleci kullanıcının kaldığı tam olarak aynı noktaya geri kilitliyoruz
+                editor.commands.setTextSelection(currentAnchor);
+
+                onUpdateRef.current(editor.getJSON());
+            } else {
+                onUpdateRef.current(json);
+            }
+        },
         editorProps: {
             handleDrop: function (view, event, slice, moved) {
                 if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
