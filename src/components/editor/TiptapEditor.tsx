@@ -251,6 +251,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             StarterKit.configure({ codeBlock: false }),
             CustomImage.configure({ inline: false, allowBase64: true }),
             Placeholder.configure({
+                includeChildren: true,
+                showOnlyCurrent: false, // Tüm boş bloklarda placeholder göster
+                showOnlyWhenEditable: true, // Sadece editör düzenleme modundayken (yazarken) çalışsın
                 placeholder: ({ node }) => {
                     if (node.type.name === 'heading' && node.attrs.level === 1) {
                         return 'Başlık girin...';
@@ -374,10 +377,30 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     });
 
     useEffect(() => {
-        if (editor && content && !isContentInitialized.current) {
-            editor.commands.setContent(content);
+        if (editor && !isContentInitialized.current) {
+            if (content && Object.keys(content).length > 0) {
+                // Eğer veritabanından dolu bir içerik geliyorsa onu yükle
+                editor.commands.setContent(content);
+            } else {
+                // 🔥 KRİTİK ADIM: Eğer gelen içerik boşsa, şablonu buraya zorunlu enjekte ediyoruz!
+                editor.commands.setContent({
+                    type: 'doc',
+                    content: [
+                        { type: 'heading', attrs: { level: 1 }, content: [] },
+                        { type: 'paragraph', content: [] }
+                    ]
+                });
+            }
+
             isContentInitialized.current = true;
-            setTimeout(() => { editor.commands.focus('start'); }, 200);
+
+            // 🔥 SİNSİ BUG ÇÖZÜMÜ: Sayfa yenilendiğinde ProseMirror'ın placeholder'ları 
+            // taraması için editörü görünmez bir anlığına start pozisyonuna odaklayıp bırakıyoruz.
+            setTimeout(() => {
+                if (!editor.isDestroyed) {
+                    editor.commands.focus('start');
+                }
+            }, 50);
         }
     }, [editor, content]);
 
