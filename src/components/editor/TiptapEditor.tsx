@@ -512,9 +512,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 editor={editor}
                 options={{ placement: 'left', offset: { mainAxis: -110, crossAxis: 0 }, shift: false, flip: false }}
                 shouldShow={({ state }) => {
+                    if (!editor || editor.isDestroyed) return false; // 🔥 GÜVENLİK KİLİDİ
                     const { selection } = state;
+                    if (!selection) return false; // 🔥 SEÇİM KONTROLÜ
+
                     const { $from } = selection;
-                    return (editor.isFocused || editor.isEmpty) && $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0;
+                    return (editor.isFocused || editor.isEmpty) &&
+                        $from.parent.type.name === 'paragraph' &&
+                        $from.parent.content.size === 0;
                 }}
             >
                 <div className="floating-menu-container flex items-center gap-5 transition-all duration-200 group">
@@ -536,7 +541,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             </FloatingMenu>
 
 
-            <BubbleMenu editor={editor} pluginKey="textFormattingMenu" options={{ placement: 'top', offset: { mainAxis: 10, crossAxis: 0 } }} shouldShow={({ editor, state }) => !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule')}>
+            <BubbleMenu editor={editor} pluginKey="textFormattingMenu" options={{ placement: 'top', offset: { mainAxis: 10, crossAxis: 0 } }} shouldShow={({ editor, state }) => {
+                if (!editor || editor.isDestroyed) return false; // 🔥 Güvenlik kilidi
+                return !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule');
+            }}>
                 <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2">
                     <div className="flex items-center gap-1">
                         <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'text-blue-400' : ''}`}><GoBold size={18} /></button>
