@@ -88,15 +88,20 @@ const EditorNavbar = ({ transparent }: { transparent: boolean }) => {
     return (
         <>
             <nav
-                className={`navbar md:py-4 p-10 ${transparent && isHome
+                className={`editor-navbar md:py-4 py-10 px-50 ${transparent && isHome
                     ? "bg-transparent text-black shadow-none static py-12 px-20"
                     : transparent && !isHome
                         ? "bg-transparent text-white shadow-none static py-12 px-20"
-                        : "text-black bg-white border-b border-gray-200 fixed top-0 left-0 w-full z-50"
+                        : "text-black bg-white fixed top-0 left-0 w-full z-50"
                     }`}
             >
                 <>
-                    <NavLinks href="/" logo="sahnesen" />
+                    <div className="flex items-top gap-2">
+                        <div className="text-2xl">
+                            <NavLinks href="/" logo="Sahnesen" />
+                        </div>
+                        <h3 className="text-sm font-light">Sahne</h3>
+                    </div>
                     <ul className="navbar-links">
                         {!user && (
                             <button
