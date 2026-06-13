@@ -30,6 +30,13 @@ body {
   font-style: normal;
 }
 
+.playfair-display-600 {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
 /* Fonts */
 .font-quicksand {
   font-family: "Quicksand", sans-serif;

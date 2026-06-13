@@ -17,10 +17,11 @@ import { AiOutlineCheckCircle, AiOutlineLoading3Quarters } from "react-icons/ai"
 interface EditorNavbarProps {
     transparent: boolean;
     contentStatus: string;
-    activePostId: string | null;
+    activePostId: number | null;
+    handleSave: () => void;
 }
 
-const EditorNavbar = ({ transparent, contentStatus, activePostId }: EditorNavbarProps) => {
+const EditorNavbar = ({ transparent, contentStatus, activePostId, handleSave }: EditorNavbarProps) => {
 
     const { user, setUser } = useAuth();
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -104,7 +105,7 @@ const EditorNavbar = ({ transparent, contentStatus, activePostId }: EditorNavbar
             >
                 <>
                     <div className="flex items-top gap-2">
-                        <div className="text-2xl">
+                        <div className="text-3xl playfair-display-600">
                             <NavLinks href="/" logo="Sahnesen" />
                         </div>
                         <div className="flex items-center gap-4 text-sm font-light">
@@ -113,7 +114,7 @@ const EditorNavbar = ({ transparent, contentStatus, activePostId }: EditorNavbar
                             <div className="transition-all duration-300">
                                 {contentStatus === 'SAVING' && (
                                     <span>
-                                        Saving
+                                        Saving...
                                     </span>
                                 )}
                                 {contentStatus === 'SAVED' && (
@@ -133,21 +134,25 @@ const EditorNavbar = ({ transparent, contentStatus, activePostId }: EditorNavbar
                             </div>
                         </div>
                     </div>
-                    <ul className="navbar-links">
-                        {!user && (
-                            <button
-                                className={`transition-all text-sm pl-2 text-xs cursor-pointer ${isProfilePage
-                                    ? "text-white hover:text-gray-100"
-                                    : "text-black hover:text-gray-600"
-                                    }`}
-                                onClick={() => setShowLoginModal(true)}
-                            >
-                                Giris Yap
-                            </button>
-                        )}
-                        {user && (
-                            <div className="flex items-center md:gap-4 gap-2 relative">
-                                {/* <div className="relative">
+                    <div className="flex items-center gap-2  overflow-hidden">
+                        <button className={`bg-green-800 text-xs text-white py-1 px-3 rounded-xl ${!activePostId ? 'opacity-50' : 'hover:bg-green-700 cursor-pointer'}`} disabled={!activePostId} onClick={handleSave}>
+                            Publish
+                        </button>
+                        <ul className="navbar-links">
+                            {!user && (
+                                <button
+                                    className={`transition-all text-sm pl-2 text-xs cursor-pointer ${isProfilePage
+                                        ? "text-white hover:text-gray-100"
+                                        : "text-black hover:text-gray-600"
+                                        }`}
+                                    onClick={() => setShowLoginModal(true)}
+                                >
+                                    Giris Yap
+                                </button>
+                            )}
+                            {user && (
+                                <div className="flex items-center md:gap-4 gap-2 relative">
+                                    {/* <div className="relative">
                   {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
                       {unreadCount}
@@ -166,80 +171,81 @@ const EditorNavbar = ({ transparent, contentStatus, activePostId }: EditorNavbar
                     />
                   )}
                 </div> */}
-                                <div
-                                    className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-gray-200  ${!user.profileImg && "border border-gray-300"
-                                        }`}
-                                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                                >
-                                    {user.profileImg ? (
-                                        <Image
-                                            src={user.profileImg}
-                                            alt="profile-img"
-                                            fill
-                                            className="object-cover"
-                                        />
+                                    <div
+                                        className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-gray-200  ${!user.profileImg && "border border-gray-300"
+                                            }`}
+                                        onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                    >
+                                        {user.profileImg ? (
+                                            <Image
+                                                src={user.profileImg}
+                                                alt="profile-img"
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <FaRegUser
+                                                className={`text-xl ${isProfilePage ? "text-white" : "text-gray-500"
+                                                    }`}
+                                            />
+                                        )}
+                                    </div>
+                                    {showProfileMenu && !isProfilePage ? (
+                                        <div className="absolute top-8 -right-2 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
+                                            {getProfileAccountWithUser(user).map((item) => (
+                                                <Link
+                                                    href={item.href}
+                                                    key={item.title}
+                                                    className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
+                                                    onClick={() => setShowProfileMenu(false)}
+                                                >
+                                                    <span className="text-lg">{renderIcon(item.icon)}</span>
+                                                    <p className="">{item.title}</p>
+                                                </Link>
+                                            ))}
+                                            <button
+                                                className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
+                                                onClick={handleLogout}
+                                            >
+                                                <CiLogout />
+                                                Çıkış Yap
+                                            </button>
+                                        </div>
                                     ) : (
-                                        <FaRegUser
-                                            className={`text-xl ${isProfilePage ? "text-white" : "text-gray-500"
-                                                }`}
-                                        />
+                                        showProfileMenu &&
+                                        isProfilePage && (
+                                            <>
+                                                {/* Üçgen pointer */}
+                                                <div className="absolute top-12 right-2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
+                                                <div className="absolute top-14 -right-5 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
+                                                    {getProfileAccountWithUser(user).map((item) => (
+                                                        <Link
+                                                            href={item.href}
+                                                            key={item.title}
+                                                            className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
+                                                            onClick={() => setShowProfileMenu(false)}
+                                                        >
+                                                            <span className="text-lg">
+                                                                {renderIcon(item.icon)}
+                                                            </span>
+                                                            <p className="">{item.title}</p>
+                                                        </Link>
+                                                    ))}
+                                                    <button
+                                                        className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
+                                                        onClick={handleLogout}
+                                                    >
+                                                        <CiLogout />
+                                                        Çıkış Yap
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )
                                     )}
                                 </div>
-                                {showProfileMenu && !isProfilePage ? (
-                                    <div className="absolute top-8 -right-2 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
-                                        {getProfileAccountWithUser(user).map((item) => (
-                                            <Link
-                                                href={item.href}
-                                                key={item.title}
-                                                className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
-                                                onClick={() => setShowProfileMenu(false)}
-                                            >
-                                                <span className="text-lg">{renderIcon(item.icon)}</span>
-                                                <p className="">{item.title}</p>
-                                            </Link>
-                                        ))}
-                                        <button
-                                            className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                                            onClick={handleLogout}
-                                        >
-                                            <CiLogout />
-                                            Çıkış Yap
-                                        </button>
-                                    </div>
-                                ) : (
-                                    showProfileMenu &&
-                                    isProfilePage && (
-                                        <>
-                                            {/* Üçgen pointer */}
-                                            <div className="absolute top-12 right-2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
-                                            <div className="absolute top-14 -right-5 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
-                                                {getProfileAccountWithUser(user).map((item) => (
-                                                    <Link
-                                                        href={item.href}
-                                                        key={item.title}
-                                                        className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
-                                                        onClick={() => setShowProfileMenu(false)}
-                                                    >
-                                                        <span className="text-lg">
-                                                            {renderIcon(item.icon)}
-                                                        </span>
-                                                        <p className="">{item.title}</p>
-                                                    </Link>
-                                                ))}
-                                                <button
-                                                    className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                                                    onClick={handleLogout}
-                                                >
-                                                    <CiLogout />
-                                                    Çıkış Yap
-                                                </button>
-                                            </div>
-                                        </>
-                                    )
-                                )}
-                            </div>
-                        )}
-                    </ul>
+                            )}
+                        </ul>
+                    </div>
                 </>
             </nav>
         </>

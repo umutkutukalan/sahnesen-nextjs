@@ -147,7 +147,7 @@ const CreateProjectsBlog = () => {
   return (
     <main className="min-h-screen bg-white pt-24 pb-18 text-black">
 
-      <EditorNavbar transparent={false} contentStatus={saveStatus} />
+      <EditorNavbar transparent={false} contentStatus={saveStatus} activePostId={activePostId} handleSave={handleSave} />
 
       <div className="w-full lg:w-190 mx-auto px-6">
 
