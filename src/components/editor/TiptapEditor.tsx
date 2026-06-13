@@ -6,7 +6,7 @@ import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
-import { GoBold, GoCode, GoItalic, GoPlus, GoQuote } from "react-icons/go";
+import { GoBold, GoCode, GoItalic, GoPlus } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { RxText } from "react-icons/rx";
 import { useEffect, useState, useRef } from 'react';
