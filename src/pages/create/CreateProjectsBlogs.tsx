@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { GoCheck } from "react-icons/go"; // GoCloudDownload yerine GoCheck kalsın veya alttaki importu kullanalım
 import { AiOutlineLoading3Quarters, AiOutlineCloudSync, AiOutlineCheckCircle } from "react-icons/ai"; // Güvenli ikon seti
 import axios from 'axios';
+import EditorNavbar from '@/components/navbar/editor-navbar/EditorNavbar';
 
 const TiptapEditor = dynamic(() => import('@/components/editor/TiptapEditor'), {
   ssr: false,
@@ -145,6 +146,9 @@ const CreateProjectsBlog = () => {
 
   return (
     <main className="min-h-screen bg-white pt-24 pb-18 text-black">
+
+      <EditorNavbar transparent={false} contentStatus={saveStatus} />
+
       <div className="w-full lg:w-190 mx-auto px-6">
 
         {/* ÜST BAR */}
@@ -164,30 +168,6 @@ const CreateProjectsBlog = () => {
             >
               Blog Yazısı
             </button>
-          </div>
-
-          {/* 🔥 GÜVENLİ VE ŞIK BULUT DURUMU */}
-          <div className="text-xs font-sans tracking-wide transition-all duration-300">
-            {saveStatus === 'SAVING' && (
-              <span className="text-gray-400 flex items-center gap-1.5 animate-pulse">
-                <AiOutlineLoading3Quarters className="animate-spin text-blue-500" size={12} />
-                Değişiklikler kaydediliyor...
-              </span>
-            )}
-            {saveStatus === 'SAVED' && (
-              <span className="text-emerald-500 flex items-center gap-1.5 font-medium">
-                <AiOutlineCheckCircle size={14} className="text-emerald-500" />
-                Buluta kaydedildi
-              </span>
-            )}
-            {saveStatus === 'ERROR' && (
-              <span className="text-rose-500 font-medium">
-                Otomatik kaydetme başarısız!
-              </span>
-            )}
-            {saveStatus === 'IDLE' && activePostId && (
-              <span className="text-gray-300">Değişiklik bekleniyor</span>
-            )}
           </div>
         </div>
 

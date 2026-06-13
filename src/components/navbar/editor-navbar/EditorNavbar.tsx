@@ -12,8 +12,15 @@ import { getProfileAccountWithUser } from "@/constants";
 import axios from "axios";
 import { FaRegUser } from "react-icons/fa6";
 import { CiLogout } from "react-icons/ci";
+import { AiOutlineCheckCircle, AiOutlineLoading3Quarters } from "react-icons/ai";
 
-const EditorNavbar = ({ transparent }: { transparent: boolean }) => {
+interface EditorNavbarProps {
+    transparent: boolean;
+    contentStatus: string;
+    activePostId: string | null;
+}
+
+const EditorNavbar = ({ transparent, contentStatus, activePostId }: EditorNavbarProps) => {
 
     const { user, setUser } = useAuth();
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -100,12 +107,36 @@ const EditorNavbar = ({ transparent }: { transparent: boolean }) => {
                         <div className="text-2xl">
                             <NavLinks href="/" logo="Sahnesen" />
                         </div>
-                        <h3 className="text-sm font-light">Sahne</h3>
+                        <div className="flex items-center gap-4 text-sm font-light">
+                            <h3>Sahne</h3>
+                            {/* 🔥 GÜVENLİ VE ŞIK BULUT DURUMU */}
+                            <div className="transition-all duration-300">
+                                {contentStatus === 'SAVING' && (
+                                    <span>
+                                        Saving
+                                    </span>
+                                )}
+                                {contentStatus === 'SAVED' && (
+                                    <span className="text-emerald-500 flex items-center gap-1.5 font-medium">
+                                        <AiOutlineCheckCircle size={14} className="text-emerald-500" />
+                                        Saved
+                                    </span>
+                                )}
+                                {contentStatus === 'ERROR' && (
+                                    <span className="text-rose-500 font-medium">
+                                        Save Failed
+                                    </span>
+                                )}
+                                {contentStatus === 'IDLE' && activePostId && (
+                                    <span className="text-gray-300">Değişiklik bekleniyor</span>
+                                )}
+                            </div>
+                        </div>
                     </div>
                     <ul className="navbar-links">
                         {!user && (
                             <button
-                                className={`border-l border-gray-300 transition-all text-sm pl-2 text-xs cursor-pointer ${isProfilePage
+                                className={`transition-all text-sm pl-2 text-xs cursor-pointer ${isProfilePage
                                     ? "text-white hover:text-gray-100"
                                     : "text-black hover:text-gray-600"
                                     }`}
@@ -115,7 +146,7 @@ const EditorNavbar = ({ transparent }: { transparent: boolean }) => {
                             </button>
                         )}
                         {user && (
-                            <div className="border-l pl-5 flex items-center md:gap-4 gap-2 relative">
+                            <div className="flex items-center md:gap-4 gap-2 relative">
                                 {/* <div className="relative">
                   {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
