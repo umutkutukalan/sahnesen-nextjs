@@ -105,6 +105,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
       >
         <>
           <NavLinks href="/" logo="sahnesen" />
+
           <div className="flex items-center gap-2 border-gray-200 border rounded-lg overflow-hidden lg:block hidden">
             <div className="relative rounded-2xl overflow-hidden">
               <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">

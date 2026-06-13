@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/components/navbar/Navbar";
+import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 import CreateProjectsBlogs from "@/pages/create/CreateProjectsBlogs";
 
 export default function CreatePage() {
@@ -9,7 +9,7 @@ export default function CreatePage() {
 
   return (
     <>
-      <Navbar transparent={false} />
+      <EditorNavbar transparent={false} />
       <CreateProjectsBlogs />;
     </>
   )
