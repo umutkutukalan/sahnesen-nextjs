@@ -613,7 +613,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 if (!editor || editor.isDestroyed) return false; // 🔥 Güvenlik kilidi
                 return !state.selection.empty && !editor.isActive('image') && !editor.isActive('horizontalRule');
             }}>
-                <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2">
+                <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 relative z-150">
                     <div className="flex items-center gap-1">
                         <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'text-blue-400' : ''}`}><GoBold size={18} /></button>
                         <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'text-blue-400' : ''}`}><GoItalic size={18} /></button>
