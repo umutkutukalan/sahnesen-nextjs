@@ -149,7 +149,7 @@ const CreateProjectsBlog = () => {
 
       <EditorNavbar transparent={false} contentStatus={saveStatus} activePostId={activePostId} handleSave={handleSave} />
 
-      <div className="w-full lg:w-190 mx-auto px-6">
+      <div className="w-full lg:w-180 mx-auto px-6">
 
         {/* ÜST BAR */}
         <div className="flex items-center justify-between mb-8 select-none">

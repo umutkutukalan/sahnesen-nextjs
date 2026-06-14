@@ -118,8 +118,7 @@ const EditorNavbar = ({ transparent, contentStatus, activePostId, handleSave }: 
                                     </span>
                                 )}
                                 {contentStatus === 'SAVED' && (
-                                    <span className="text-emerald-500 flex items-center gap-1.5 font-medium">
-                                        <AiOutlineCheckCircle size={14} className="text-emerald-500" />
+                                    <span className="text-green-800 flex items-center gap-1.5 font-medium">
                                         Saved
                                     </span>
                                 )}
