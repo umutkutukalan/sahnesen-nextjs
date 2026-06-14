@@ -145,14 +145,14 @@ const CreateProjectsBlog = () => {
   };
 
   return (
-    <main className="min-h-screen bg-white pt-24 pb-18 text-black">
+    <main className="h-[100vh-64px] bg-white text-black">
 
       <EditorNavbar transparent={false} contentStatus={saveStatus} activePostId={activePostId} handleSave={handleSave} />
 
       <div className="w-full lg:w-180 mx-auto px-6">
 
         {/* ÜST BAR */}
-        <div className="flex items-center justify-between mb-8 select-none">
+        {/* <div className="flex items-center justify-between mb-8 select-none">
           <div className="flex gap-2 bg-gray-100 p-1 rounded-lg w-max text-xs font-medium">
             <button
               type="button"
@@ -169,7 +169,7 @@ const CreateProjectsBlog = () => {
               Blog Yazısı
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* TIPTAP EDITOR */}
         <TiptapEditor
@@ -178,20 +178,16 @@ const CreateProjectsBlog = () => {
         />
 
         {/* DEBUG ALANI */}
-        <div className="mt-20 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+        {/* <div className="mt-20 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
           <p className="text-[10px] font-mono text-gray-400 mb-2 underline">MİMARİ KONTROL</p>
           <div className="text-[10px] text-gray-500 flex flex-col gap-1 font-mono">
             <p><strong>Active Post ID (Taslak):</strong> {activePostId ?? "Henüz Oluşturulmadı"}</p>
             <p><strong>Kaydetme Durumu:</strong> {saveStatus}</p>
             <p><strong>Tiptap Node Sayısı:</strong> {editorJSON?.content?.length || 0}</p>
           </div>
-        </div>
+        </div> */}
 
       </div>
-
-      <button onClick={handleSave} className="fixed bottom-10 right-10 w-16 h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-[60] cursor-pointer">
-        <GoCheck size={30} />
-      </button>
     </main>
   );
 };

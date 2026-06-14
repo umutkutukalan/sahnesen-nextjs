@@ -417,7 +417,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 }
                 return false;
             },
-            attributes: { class: 'tiptap prose prose-lg max-w-none focus:outline-none min-h-[500px]' },
+            attributes: { class: 'tiptap prose prose-lg max-w-none focus:outline-none h-full pt-24 mb-18' },
         },
     });
 
@@ -561,7 +561,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     const canBeFull = ratioKnown ? aspectRatio >= 1.2 : true;
 
     return (
-        <div className="relative w-full group/editor playfair-display-400">
+        <div className="relative w-full group/editor playfair-display-400 bg-white">
             <style jsx global>{`
                 .tiptap .ProseMirror { overflow-x: visible !important; }
                 .tiptap img + ::after { display: none !important; }
