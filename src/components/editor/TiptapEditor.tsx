@@ -261,7 +261,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                     else if (node.type.name === 'paragraph') {
                         // Editörün hafızasındaki dökümanın 2. elementi (index 1) şu anki node ile aynı mı?
                         if (editor.state.doc.firstChild === node || editor.state.doc.child(1) === node) {
-                            return 'Sahne sizin..';
+                            return 'Tell your story...';
                         }
                     }
                     return '';

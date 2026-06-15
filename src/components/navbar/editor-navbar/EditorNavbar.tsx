@@ -12,7 +12,6 @@ import { getProfileAccountWithUser } from "@/constants";
 import axios from "axios";
 import { FaRegUser } from "react-icons/fa6";
 import { CiLogout } from "react-icons/ci";
-import { AiOutlineCheckCircle, AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface EditorNavbarProps {
     transparent: boolean;
@@ -96,7 +95,7 @@ const EditorNavbar = ({ transparent, contentStatus, activePostId, handleSave }: 
     return (
         <>
             <nav
-                className={`editor-navbar md:py-4 py-10 px-50 ${transparent && isHome
+                className={`editor-navbar md:py-4 py-10 px-40 ${transparent && isHome
                     ? "bg-transparent text-black shadow-none static py-12 px-20"
                     : transparent && !isHome
                         ? "bg-transparent text-white shadow-none static py-12 px-20"
