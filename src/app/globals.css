@@ -345,6 +345,7 @@ body {
 
 .tiptap pre {
   @apply bg-[#f9f9f9] text-zinc-700 px-6 py-8 font-mono my-8 rounded-sm border border-gray-200 transition-all duration-300;
+  overflow-x: auto !important;
 }
 
 .tiptap.ProseMirror-focused pre:focus-within,
@@ -369,8 +370,13 @@ div.code-block-lang-select:hover {
 }
 
 .tiptap pre code {
-  @apply bg-transparent p-0 text-inherit block;
+  @apply bg-transparent p-0 text-inherit;
+  display: block !important;
+  white-space: pre !important;
+  width: fit-content;
+  min-width: 100%;
 }
+
 .hljs-keyword {
   color: #005cc5;
   font-weight: 600;
