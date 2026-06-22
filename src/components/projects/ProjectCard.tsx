@@ -39,9 +39,10 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
       if (parsed && parsed.content && Array.isArray(parsed.content)) {
         // Sadece paragraf değil, yazı içeren ilk anlamlı bloku buluyoruz (paragraf, heading, veya blockquote)
+
         const textBearingNode = parsed.content.find(
           (node: any) =>
-            (node.type === "paragraph" || node.type === "heading" || node.type === "blockquote") &&
+            (node.type === "paragraph" || node.type === "heading" && node.attrs?.level !== 1 || node.type === "blockquote") &&
             node.content &&
             node.content.length > 0
         );

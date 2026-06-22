@@ -209,7 +209,30 @@ const Detail = ({ post }: DetailProps) => {
             );
 
           case "heading":
-            const HeadingTag = `h${node.attrs?.level || 2}` as keyof JSX.IntrinsicElements;
+
+            const headingLevel = node.attrs?.level || 2;
+
+            if (headingLevel === 1) {
+              try {
+                // 1. Elindeki string'i güvenle objeye çeviriyoruz
+                const parsedContent = typeof contentStr === "string" ? JSON.parse(contentStr) : contentStr;
+
+                // 2. Obje içindeki düğümlerden ilk H1'in index'ini buluyoruz
+                const firstH1Index = parsedContent?.content?.findIndex(
+                  (n: any) => n.type === "heading" && n.attrs?.level === 1
+                );
+
+                // 3. Eğer şu an dönen element ilk H1 ise ekrana basma, es geç
+                if (index === firstH1Index) {
+                  return null;
+                }
+              } catch (err) {
+                console.error("JSON parse hatası:", err);
+              }
+            }
+
+
+            const HeadingTag = `h${headingLevel}` as keyof JSX.IntrinsicElements;
             const headingClasses: Record<number, string> = {
               1: "text-4xl font-extrabold tracking-tight text-gray-950 mt-10 mb-4",
               2: "text-[24px] md:text-[26px] font-extrabold tracking-tight -mb-[0.28em] font-sans",
