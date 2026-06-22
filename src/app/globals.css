@@ -401,16 +401,19 @@ div.code-block-lang-select:hover {
 }
 
 .tiptap hr {
-  border: none;
-  display: flex; /* İçeriği ortalamak için flex en iyisidir */
-  justify-content: center;
-  align-items: center;
-  margin: 3rem 0; /* Üstten ve alttan geniş boşluk asalet katar */
-  height: 24px; /* Tıklanabilir alan için bir yükseklik */
+  border: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 3.5rem 0 !important;
+  height: 24px !important;
+  background: transparent !important;
+  overflow: visible !important;
+  opacity: 1 !important;
 }
 
 .tiptap hr::after {
-  content: "···";
-  @apply text-zinc-400 text-2xl tracking-[0.5em] font-serif;
-  /* font-serif yaparak Playfair Display ile uyumlu hale getirdik */
+  @apply text-2xl tracking-[0.6em] font-medium;
+  content: "···" !important;
+  display: block !important;
 }
