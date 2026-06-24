@@ -182,6 +182,19 @@ body {
     margin-top: 0;
   }
 
+  /* Blockquote stilleri */
+  .tiptap.prose blockquote {
+    margin: 1.5em 0;
+    padding-left: 1.6em;
+    border-left: 3px solid #000000;
+  }
+
+  /* Blockquote içindeki paragraf tırnaklarını kaldır */
+  .prose blockquote p::before,
+  .prose blockquote p::after {
+    content: none !important;
+  }
+
   /* 1. Genel boşluk kontrolü ve placeholder içeriğinin basılması */
   /* Boş olan tüm elementlerin genel placeholder iskeleti */
   .tiptap .is-empty::before {
