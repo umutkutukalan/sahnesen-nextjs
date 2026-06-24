@@ -42,14 +42,27 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
         const textBearingNode = parsed.content.find(
           (node: any) =>
-            (node.type === "paragraph" || node.type === "heading" && node.attrs?.level !== 1 || node.type === "blockquote") &&
+            (node.type === "paragraph" ||
+              (node.type === "dropcap" && node.attrs?.letter) ||
+              (node.type === "heading" && node.attrs?.level !== 1) ||
+              node.type === "blockquote") &&
             node.content &&
-            node.content.length > 0
+            node.content.length > 0,
         );
 
-        if (textBearingNode && textBearingNode.content && Array.isArray(textBearingNode.content)) {
+        if (
+          (textBearingNode &&
+            textBearingNode.content &&
+            Array.isArray(textBearingNode.content)) ||
+          (textBearingNode.type === "dropcap" && textBearingNode.attrs?.letter)
+        ) {
           return textBearingNode.content
-            .map((textNode: any) => textNode.text || "")
+            .map((textNode: any) => {
+              if (textNode.type === "dropcap" && textNode.attrs?.letter) {
+                return textNode.attrs?.letter || "";
+              }
+              return textNode.text || "";
+            })
             .join("");
         }
       }
@@ -75,7 +88,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
           // 2. İhtimal: Resim bir paragrafın veya başka bir bloğun içine çocuk node olarak gömülmüşse
           if (node.content && Array.isArray(node.content)) {
-            const inlineImage = node.content.find((child: any) => child.type === "image");
+            const inlineImage = node.content.find(
+              (child: any) => child.type === "image",
+            );
             if (inlineImage && inlineImage.attrs?.src) {
               return inlineImage.attrs.src;
             }
@@ -92,20 +107,23 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
   // Kullanımı tetikleyeceğimiz değişken: Öncelik coverImage, yoksa içerikteki ilk resim
   const displayImage = project.coverImage || getFirstImageSrc(project.content);
   const finalImageUrl = displayImage
-    ? (displayImage.startsWith("http") ? displayImage : `http://localhost:8080${displayImage}`)
+    ? displayImage.startsWith("http")
+      ? displayImage
+      : `http://localhost:8080${displayImage}`
     : null;
 
   // Yeni backend mimarimizde yazarı doğrudan düzleştirilmiş (flat) olarak alıyoruz
-  const authorName = `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
+  const authorName =
+    `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
   return (
     <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
-
       {/* LEFT IMAGE */}
       <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
-          className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${finalImageUrl ? "" : "border border-gray-100 shadow-sm"
-            }`}
+          className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${
+            finalImageUrl ? "" : "border border-gray-100 shadow-sm"
+          }`}
           style={{ boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.5)" }}
         >
           {finalImageUrl ? (
@@ -126,7 +144,6 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
       {/* RIGHT CONTENT */}
       <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 lg:py-6 py-5">
-
         {/* AUTHOR */}
         <div
           className="flex items-center gap-2 cursor-pointer w-max"
@@ -150,9 +167,14 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             <div className="flex flex-col">
               <div className="flex items-center gap-1 text-xs text-gray-600">
                 <span className="truncate">{authorName || "Yazar"}</span>
-                <TbRosetteDiscountCheckFilled className="text-blue-500 shrink-0" title="Onaylı Yazar" />
+                <TbRosetteDiscountCheckFilled
+                  className="text-blue-500 shrink-0"
+                  title="Onaylı Yazar"
+                />
               </div>
-              <span className="truncate text-[8px] text-gray-400">@{project.authorUsername}</span>
+              <span className="truncate text-[8px] text-gray-400">
+                @{project.authorUsername}
+              </span>
             </div>
           </div>
         </div>
@@ -165,7 +187,8 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
           {/* Tiptap string'ini buraya besliyoruz */}
           <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-            {getFirstParagraphText(project.content) || "İçerik önizlemesi bulunamadı..."}
+            {getFirstParagraphText(project.content) ||
+              "İçerik önizlemesi bulunamadı..."}
           </p>
         </div>
 
@@ -174,19 +197,28 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           <div className="flex items-center gap-3">
             <span>{formatRelativeTime(project.createdAt)}</span>
             <div className="hidden sm:flex items-center gap-1">
-              {liked ? <IoMdHeart className="text-red-600 text-sm" /> : <CiHeart className="text-red-600 text-sm" />}
-              <span>{likeCount >= 1000 ? `${Math.floor(likeCount / 100) / 10}K` : likeCount}</span>
+              {liked ? (
+                <IoMdHeart className="text-red-600 text-sm" />
+              ) : (
+                <CiHeart className="text-red-600 text-sm" />
+              )}
+              <span>
+                {likeCount >= 1000
+                  ? `${Math.floor(likeCount / 100) / 10}K`
+                  : likeCount}
+              </span>
             </div>
           </div>
 
           <button
-            onClick={() => router.push(`/${project.authorUsername}/${project.slug}`)} // Yeni şık rota mantığımız
+            onClick={() =>
+              router.push(`/${project.authorUsername}/${project.slug}`)
+            } // Yeni şık rota mantığımız
             className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
           >
             Okumaya Devam Et
           </button>
         </div>
-
       </div>
     </div>
   );

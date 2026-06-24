@@ -135,6 +135,15 @@ const Detail = ({ post }: DetailProps) => {
             return <br key={idx} />;
           }
 
+          // Dropcap node'unu büyük baş harf olarak render et
+          if (node.type === "dropcap") {
+            return (
+              <span key={idx} className="dropcap-letter" aria-hidden="true">
+                {node.attrs?.letter || ""}
+              </span>
+            );
+          }
+
           let element: React.ReactNode = node.text || "";
 
           if (node.marks && Array.isArray(node.marks)) {
