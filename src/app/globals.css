@@ -195,6 +195,31 @@ body {
     content: none !important;
   }
 
+  /* Drop Cap (Büyük Baş Harf) Stilleri */
+  .dropcap-letter {
+    user-select: none !important;
+    pointer-events: none !important;
+    float: left;
+    font-size: 68px;
+    font-weight: 600;
+    line-height: 0.85;
+    margin-right: 0.1em;
+    margin-top: 0.12em;
+    text-transform: uppercase;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  }
+
+  /* Eğer paragrafta sadece dropcap harfi kalmışsa, normal boyutuna küçültüyoruz */
+  .empty-dropcap .dropcap-letter {
+    font-size: inherit !important;
+    float: none !important;
+    line-height: inherit !important;
+    margin: 0 !important;
+    font-weight: inherit !important;
+    text-transform: none !important;
+    font-family: inherit !important;
+  }
+
   /* 1. Genel boşluk kontrolü ve placeholder içeriğinin basılması */
   /* Boş olan tüm elementlerin genel placeholder iskeleti */
   .tiptap .is-empty::before {

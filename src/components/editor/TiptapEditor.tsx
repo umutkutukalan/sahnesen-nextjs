@@ -23,6 +23,7 @@ import { uploadImageToBackend } from "@/utils/UploadImageToBackend";
 import { BiSolidQuoteAltLeft } from "react-icons/bi";
 import { FaLink } from "react-icons/fa6";
 import Link from "@tiptap/extension-link";
+import Paragraph from "@tiptap/extension-paragraph";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -34,6 +35,67 @@ lowlight.register("python", python);
 lowlight.register("csharp", csharp);
 lowlight.register("cpp", cpp);
 lowlight.register("sql", sql);
+
+import { Node } from "@tiptap/core";
+import { LuLetterText } from "react-icons/lu";
+
+// 🔥 MİMARİ ADIM: Paragrafı genişleterek içeriğine göre sınıf kazandırıyoruz
+const CustomParagraph = Paragraph.extend({
+  renderHTML({ node, HTMLAttributes }) {
+    const firstChild = node.firstChild;
+    const isDropcap = firstChild && firstChild.type.name === "dropcap";
+    const hasText = node.textContent.length > (isDropcap ? 1 : 0);
+
+    const extraClass = isDropcap && !hasText ? "empty-dropcap" : "";
+
+    const mergedAttributes = {
+      ...HTMLAttributes,
+      class: [HTMLAttributes.class, extraClass].filter(Boolean).join(" "),
+    };
+
+    return ["p", mergedAttributes, 0];
+  },
+});
+
+// 🔥 MİMARİ ADIM: Dropcap Inline Atom Node Tanımı
+const Dropcap = Node.create({
+  name: "dropcap",
+  group: "inline",
+  inline: true,
+  selectable: true,
+  draggable: false,
+  atom: true,
+
+  addAttributes() {
+    return {
+      letter: {
+        default: "A",
+        parseHTML: (element) => element.textContent || "A",
+        renderHTML: (attributes) => ({}),
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'span[data-type="dropcap"]',
+      },
+    ];
+  },
+
+  renderHTML({ node }) {
+    return [
+      "span",
+      {
+        "data-type": "dropcap",
+        class: "dropcap-letter",
+        contenteditable: "false",
+      },
+      node.attrs.letter,
+    ];
+  },
+});
 
 // 🔥 MİMARİ ADIM: Sadece Temiz Veri Tutan ve Sınıf Hesaplamasını renderHTML'e Bırakan Genişletilmiş Image Tanımı
 const CustomImage = Image.extend({
@@ -230,6 +292,46 @@ const CustomImage = Image.extend({
   },
 });
 
+const toggleParagraphDropcap = (editor: any) => {
+  if (!editor) return;
+  const { state } = editor;
+  const { selection } = state;
+  const { $from } = selection;
+
+  // Paragrafta olup olmadığımızı kontrol et
+  if ($from.parent.type.name !== "paragraph") return;
+
+  const paragraphStart = $from.start();
+  const firstChild = $from.parent.firstChild;
+  const hasDropcap = firstChild && firstChild.type.name === "dropcap";
+
+  editor.commands.focus();
+
+  if (hasDropcap) {
+    // Dropcap'i kaldır ve harfi normal metin olarak geri ekle
+    const letter = firstChild.attrs.letter || "";
+    editor
+      .chain()
+      .deleteRange({ from: paragraphStart, to: paragraphStart + 1 })
+      .insertContentAt(paragraphStart, letter)
+      .run();
+  } else {
+    // İlk harfi bul ve dropcap yap
+    const textContent = $from.parent.textContent;
+    if (!textContent) return;
+
+    const firstChar = textContent.charAt(0);
+    editor
+      .chain()
+      .deleteRange({ from: paragraphStart, to: paragraphStart + 1 })
+      .insertContentAt(paragraphStart, {
+        type: "dropcap",
+        attrs: { letter: firstChar },
+      })
+      .run();
+  }
+};
+
 interface TiptapEditorProps {
   content?: any;
   onUpdate: (json: any) => void;
@@ -281,7 +383,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ codeBlock: false }),
+      StarterKit.configure({ codeBlock: false, paragraph: false }),
+      CustomParagraph,
+      Dropcap,
       CustomImage.configure({ inline: false, allowBase64: true }),
       Placeholder.configure({
         includeChildren: true,
@@ -843,6 +947,41 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           >
             <BiSolidQuoteAltLeft size={18} />
           </button>
+          {(() => {
+            if (!editor.isActive("paragraph")) return null;
+            try {
+              const { selection } = editor.state;
+              const { $from } = selection;
+              const pos = $from.start();
+              const domNode = editor.view.nodeDOM(
+                pos - 1,
+              ) as HTMLElement | null;
+              if (domNode) {
+                const computedStyle = window.getComputedStyle(domNode);
+                const lineHeight = parseFloat(computedStyle.lineHeight) || 24;
+                const height = domNode.clientHeight;
+                if (height < lineHeight * 2) return null;
+              } else {
+                const textLength = $from.parent.textContent.length;
+                if (textLength < 70) return null;
+              }
+            } catch {
+              return null;
+            }
+            const { selection } = editor.state;
+            const { $from } = selection;
+            const firstChild = $from.parent?.firstChild;
+            const isActive = firstChild && firstChild.type.name === "dropcap";
+            return (
+              <button
+                onClick={() => toggleParagraphDropcap(editor)}
+                className={`p-2 rounded cursor-pointer hover:bg-white/10 ${isActive ? "text-blue-400" : ""}`}
+                title="Büyük Baş Harf (Drop Cap)"
+              >
+                <LuLetterText />
+              </button>
+            );
+          })()}
         </div>
       </BubbleMenu>
 
