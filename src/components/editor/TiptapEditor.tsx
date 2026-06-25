@@ -2,7 +2,6 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import { FloatingMenu } from "@tiptap/react/menus";
 import Focus from "@tiptap/extension-focus";
-import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
@@ -339,6 +338,9 @@ interface TiptapEditorProps {
 }
 
 const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
+  const bubbleToolbarRef = useRef<HTMLDivElement | null>(null);
+  const linkInputRef = useRef<HTMLDivElement | null>(null);
+
   const postIdRef = useRef<number | null>(postId);
   useEffect(() => {
     postIdRef.current = postId;
@@ -640,16 +642,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     };
   }, [editor]);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest(".link-input-container")) {
-        setIsLinkInputOpen(false);
-      }
-    };
-    if (isLinkInputOpen) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [isLinkInputOpen]);
-
   const saveAltText = (newAlt: string) => {
     if (!editor) return;
     editor.chain().focus().updateAttributes("image", { alt: newAlt }).run();
@@ -734,6 +726,277 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     };
     input.click();
   };
+
+  useEffect(() => {
+    if (!editor) return;
+
+    // ── Toolbar DOM'u oluştur ──────────────────────────────────────
+    const toolbar = document.createElement("div");
+    toolbar.className = "bubble-menu";
+    toolbar.style.cssText = `
+    position: fixed;
+    z-index: 150;
+    top: 0; left: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px) translateX(-50%);
+    transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    will-change: transform, opacity;
+  `;
+
+    // ── Toolbar içeriği ───────────────────────────────────────────
+    toolbar.innerHTML = `
+    <div class="bm-btns">
+      <button data-action="bold"     class="bm-btn" title="Kalın">B</button>
+      <button data-action="italic"   class="bm-btn" title="İtalik">i</button>
+      <button data-action="link"     class="bm-btn" title="Link">         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+      <div class="bm-divider"></div>
+      <button data-action="heading"  class="bm-btn" title="Başlık">T</button>
+      <button data-action="heading3" class="bm-btn" title="Alt Başlık">T</button>
+      <div class="bm-divider"></div>
+      <button data-action="code"     class="bm-btn" title="Kod">         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
+      <button data-action="quote"    class="bm-btn" title="Alıntı">"</button>
+      <button data-action="dropcap" class="bm-btn bm-dropcap" title="Drop Cap" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="12" rx="1"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="14" y1="8" x2="21" y2="8"/><line x1="14" y1="13" x2="19" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="bm-link-input" style="display:none;align-items:center;gap:6px;padding:0 4px;">
+      <input type="url" placeholder="https://..." style="border:none;outline:none;background:transparent;color:#fff;font-size:13px;font-family:sans-serif;width:180px;border-bottom:1px solid rgba(255,255,255,0.3);padding-bottom:2px;" />
+      <button class="bm-link-confirm" style="font-size:12px;color:#60a5fa;cursor:pointer;background:none;border:none;font-family:sans-serif;padding:0;">Ekle</button>
+    </div>
+  `;
+
+    document.body.appendChild(toolbar);
+    bubbleToolbarRef.current = toolbar;
+
+    // ── Aktif buton state'ini güncelle ───────────────────────────
+    const syncActiveStates = () => {
+      const btns = toolbar.querySelectorAll<HTMLButtonElement>(".bm-btn");
+      btns.forEach((btn) => {
+        const action = btn.dataset.action;
+        let active = false;
+        if (action === "bold") active = editor.isActive("bold");
+        if (action === "italic") active = editor.isActive("italic");
+        if (action === "link") active = editor.isActive("link");
+        if (action === "heading")
+          active =
+            editor.isActive("heading", { level: 1 }) ||
+            editor.isActive("heading", { level: 2 });
+        if (action === "heading3")
+          active = editor.isActive("heading", { level: 3 });
+        if (action === "code") active = editor.isActive("code");
+        if (action === "quote") active = editor.isActive("blockquote");
+        if (action === "dropcap") {
+          const { $from } = editor.state.selection;
+          active = !!(
+            editor.isActive("paragraph") &&
+            $from.parent?.firstChild?.type.name === "dropcap"
+          );
+        }
+        btn.classList.toggle("active", active);
+      });
+
+      // Dropcap butonunu göster/gizle
+      const dropcapBtn = toolbar.querySelector<HTMLElement>(".bm-dropcap");
+      if (dropcapBtn && editor.isActive("paragraph")) {
+        try {
+          const { $from } = editor.state.selection;
+          const domNode = editor.view.nodeDOM(
+            $from.start() - 1,
+          ) as HTMLElement | null;
+          let showDropcap = false;
+          if (domNode) {
+            const lineH =
+              parseFloat(window.getComputedStyle(domNode).lineHeight) || 24;
+            showDropcap = domNode.clientHeight >= lineH * 2;
+          } else {
+            showDropcap = $from.parent.textContent.length >= 70;
+          }
+          dropcapBtn.style.display = showDropcap ? "" : "none";
+        } catch {
+          dropcapBtn.style.display = "none";
+        }
+      } else if (dropcapBtn) {
+        dropcapBtn.style.display = "none";
+      }
+    };
+
+    // ── Toolbar pozisyonunu hesapla ve göster/gizle ──────────────
+    let rafId = 0;
+    const updatePosition = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const { selection, doc } = editor.state;
+        const isImage = editor.isActive("image");
+        const isHRule = editor.isActive("horizontalRule");
+        const isEmpty = selection.empty;
+
+        const linkInputEl =
+          toolbar.querySelector<HTMLElement>(".bm-link-input");
+        const linkActive = linkInputEl?.style.display === "flex";
+
+        if (isEmpty || isImage || isHRule) {
+          // Link input açıksa kapat
+          if (linkInputEl) linkInputEl.style.display = "none";
+          const btnsEl = toolbar.querySelector<HTMLElement>(".bm-btns");
+          if (btnsEl) btnsEl.style.display = "flex";
+          toolbar.style.opacity = "0";
+          toolbar.style.pointerEvents = "none";
+          toolbar.style.transform = `translateY(6px) translateX(-50%)`;
+          return;
+        }
+
+        // Seçilen metnin koordinatını al
+        const { from, to } = selection;
+        const start = editor.view.coordsAtPos(from);
+        const end = editor.view.coordsAtPos(to);
+        const midX = (start.left + end.left) / 2;
+        const topY = Math.min(start.top, end.top);
+
+        toolbar.style.left = `${midX}px`;
+        toolbar.style.top = `${topY - 12}px`;
+        toolbar.style.transform = `translateY(-100%) translateX(-50%)`;
+        toolbar.style.opacity = "1";
+        toolbar.style.pointerEvents = "auto";
+
+        syncActiveStates();
+      });
+    };
+
+    // ── Editor transaction'larını dinle ──────────────────────────
+    editor.on("transaction", updatePosition);
+    editor.on("blur", () => {
+      // Link input açıksa blur'da kapanmasın
+      const linkInputEl = toolbar.querySelector<HTMLElement>(".bm-link-input");
+      if (linkInputEl?.style.display === "flex") return;
+      setTimeout(() => {
+        if (!editor.isFocused) {
+          toolbar.style.opacity = "0";
+          toolbar.style.pointerEvents = "none";
+        }
+      }, 150);
+    });
+
+    // ── Buton click handler'ları ──────────────────────────────────
+    const normalizeUrl = (url: string) => {
+      if (!url) return "";
+      return url.startsWith("http://") || url.startsWith("https://")
+        ? url
+        : `https://${url}`;
+    };
+
+    toolbar.addEventListener("mousedown", (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>(
+        "[data-action]",
+      );
+      if (!btn) return;
+      e.preventDefault();
+
+      const action = btn.dataset.action!;
+      const btnsEl = toolbar.querySelector<HTMLElement>(".bm-btns");
+      const linkInputEl = toolbar.querySelector<HTMLElement>(".bm-link-input");
+      const linkInput = toolbar.querySelector<HTMLInputElement>(
+        ".bm-link-input input",
+      );
+
+      if (action === "bold") {
+        editor.chain().focus().toggleBold().run();
+        return;
+      }
+      if (action === "italic") {
+        editor.chain().focus().toggleItalic().run();
+        return;
+      }
+      if (action === "code") {
+        editor.chain().focus().toggleCode().run();
+        return;
+      }
+      if (action === "quote") {
+        editor.chain().focus().toggleBlockquote().run();
+        return;
+      }
+      if (action === "dropcap") {
+        toggleParagraphDropcap(editor);
+        return;
+      }
+
+      if (action === "heading") {
+        const hasH1 = editor
+          .getJSON()
+          .content?.some(
+            (n: any) => n.type === "heading" && n.attrs?.level === 1,
+          );
+        if (hasH1) editor.chain().focus().toggleHeading({ level: 2 }).run();
+        else editor.chain().focus().toggleHeading({ level: 1 }).run();
+        return;
+      }
+
+      if (action === "heading3") {
+        editor.chain().focus().toggleHeading({ level: 3 }).run();
+        return;
+      }
+
+      if (action === "link") {
+        if (editor.isActive("link")) {
+          editor.chain().focus().unsetLink().run();
+          return;
+        }
+        // Link input'u aç
+        if (btnsEl && linkInputEl && linkInput) {
+          btnsEl.style.display = "none";
+          linkInputEl.style.display = "flex";
+          linkInput.value = "";
+          linkInput.focus();
+        }
+        return;
+      }
+    });
+
+    // Link input: Enter / Escape / Confirm butonu
+    const linkInput = toolbar.querySelector<HTMLInputElement>(
+      ".bm-link-input input",
+    );
+    const linkConfirm = toolbar.querySelector<HTMLElement>(".bm-link-confirm");
+    const btnsEl = toolbar.querySelector<HTMLElement>(".bm-btns");
+    const linkInputEl = toolbar.querySelector<HTMLElement>(".bm-link-input");
+
+    const confirmLink = () => {
+      const url = normalizeUrl(linkInput?.value || "");
+      if (url) editor.chain().focus().setLink({ href: url }).run();
+      if (btnsEl) btnsEl.style.display = "flex";
+      if (linkInputEl) linkInputEl.style.display = "none";
+    };
+
+    const cancelLink = () => {
+      editor.chain().focus().run();
+      if (btnsEl) btnsEl.style.display = "flex";
+      if (linkInputEl) linkInputEl.style.display = "none";
+    };
+
+    linkInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        confirmLink();
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        cancelLink();
+      }
+    });
+
+    linkConfirm?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      confirmLink();
+    });
+
+    // ── Cleanup ───────────────────────────────────────────────────
+    return () => {
+      cancelAnimationFrame(rafId);
+      editor.off("transaction", updatePosition);
+      toolbar.remove();
+      bubbleToolbarRef.current = null;
+    };
+  }, [editor]);
 
   if (!editor) return null;
 
@@ -824,166 +1087,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           </div>
         </div>
       </FloatingMenu>
-
-      <BubbleMenu
-        editor={editor}
-        pluginKey="textFormattingMenu"
-        options={{ placement: "top", offset: { mainAxis: 10, crossAxis: 0 } }}
-        shouldShow={({ editor, state }) => {
-          if (!editor || editor.isDestroyed) return false; // 🔥 Güvenlik kilidi
-          return (
-            !state.selection.empty &&
-            !editor.isActive("image") &&
-            !editor.isActive("horizontalRule")
-          );
-        }}
-      >
-        <div className="flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 relative z-150">
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              className={`p-2 rounded cursor-pointer hover:bg-white/10 ${editor.isActive("bold") ? "text-blue-400" : ""}`}
-            >
-              <GoBold size={18} />
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={`p-2 rounded cursor-pointer hover:bg-white/10 ${editor.isActive("italic") ? "text-blue-400" : ""}`}
-            >
-              <GoItalic size={18} />
-            </button>
-            <button
-              onClick={() => {
-                if (editor.isActive("link")) {
-                  editor.chain().focus().unsetLink().run();
-                } else {
-                  setLinkUrl("");
-                  setIsLinkInputOpen((v) => !v);
-                }
-              }}
-              className={`p-2 rounded cursor-pointer hover:bg-white/10 ${editor.isActive("link") ? "text-blue-400" : ""}`}
-            >
-              <FaLink />
-            </button>
-
-            {isLinkInputOpen && (
-              <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 flex gap-2 z-50 min-w-64">
-                <input
-                  autoFocus
-                  type="url"
-                  placeholder="https://..."
-                  value={linkUrl}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      editor
-                        .chain()
-                        .focus()
-                        .setLink({ href: normalizeUrl(linkUrl) })
-                        .run();
-                      setIsLinkInputOpen(false);
-                    }
-                    if (e.key === "Escape") setIsLinkInputOpen(false);
-                  }}
-                  className="flex-1 text-black text-sm outline-none border-b border-gray-300 pb-1 font-sans"
-                />
-                <button
-                  onClick={() => {
-                    editor
-                      .chain()
-                      .focus()
-                      .setLink({ href: normalizeUrl(linkUrl) })
-                      .run();
-                    setIsLinkInputOpen(false);
-                  }}
-                  className="text-xs text-blue-600 font-medium font-sans cursor-pointer"
-                >
-                  Ekle
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="w-[1px] h-4 bg-white/20 mx-1" />
-          <button
-            onClick={() => {
-              const hasH1 = editor
-                .getJSON()
-                .content?.some(
-                  (node: any) =>
-                    node.type === "heading" && node.attrs?.level === 1,
-                );
-              if (hasH1) {
-                editor.chain().focus().toggleHeading({ level: 2 }).run();
-              } else {
-                editor.chain().focus().toggleHeading({ level: 1 }).run();
-              }
-            }}
-            className={`p-2 rounded cursor-pointer hover:bg-white/10 text-xs font-bold ${
-              editor.isActive("heading", { level: 1 }) ||
-              editor.isActive("heading", { level: 2 })
-                ? "text-blue-400"
-                : ""
-            }`}
-          >
-            <RxText className="text-xl font-extrabold" />
-          </button>
-          <button
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 3 }).run()
-            }
-            className={`p-2 rounded cursor-pointer hover:bg-white/10 text-xs font-bold ${editor.isActive("heading", { level: 3 }) ? "text-blue-400" : ""}`}
-          >
-            <RxText className="text-lg font-extrabold" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            className={`p-2 rounded cursor-pointer hover:bg-white/10 ${editor.isActive("code") ? "text-blue-400" : ""}`}
-          >
-            <GoCode size={18} />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-2 rounded cursor-pointer hover:bg-white/10 ${editor.isActive("blockquote") ? "text-blue-400" : ""}`}
-          >
-            <BiSolidQuoteAltLeft size={18} />
-          </button>
-          {(() => {
-            if (!editor.isActive("paragraph")) return null;
-            try {
-              const { selection } = editor.state;
-              const { $from } = selection;
-              const pos = $from.start();
-              const domNode = editor.view.nodeDOM(
-                pos - 1,
-              ) as HTMLElement | null;
-              if (domNode) {
-                const computedStyle = window.getComputedStyle(domNode);
-                const lineHeight = parseFloat(computedStyle.lineHeight) || 24;
-                const height = domNode.clientHeight;
-                if (height < lineHeight * 2) return null;
-              } else {
-                const textLength = $from.parent.textContent.length;
-                if (textLength < 70) return null;
-              }
-            } catch {
-              return null;
-            }
-            const { selection } = editor.state;
-            const { $from } = selection;
-            const firstChild = $from.parent?.firstChild;
-            const isActive = firstChild && firstChild.type.name === "dropcap";
-            return (
-              <button
-                onClick={() => toggleParagraphDropcap(editor)}
-                className={`p-2 rounded cursor-pointer hover:bg-white/10 ${isActive ? "text-blue-400" : ""}`}
-                title="Büyük Baş Harf (Drop Cap)"
-              >
-                <LuLetterText />
-              </button>
-            );
-          })()}
-        </div>
-      </BubbleMenu>
 
       {editor.isActive("codeBlock") && (
         <div className="absolute right-2 top-2 z-[60] backdrop-blur-md p-1 flex gap-1">

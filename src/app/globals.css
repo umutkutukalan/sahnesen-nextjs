@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+Oriya:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lavishly+Yours&family=Noto+Serif+Oriya:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fleur+De+Leah&family=Lavishly+Yours&family=Noto+Serif+Oriya:wght@400..700&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -32,6 +35,29 @@ body {
 
 .playfair-display-600 {
   font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.noto-serif-oriya-600 {
+  font-family: "Noto Serif Oriya", serif;
+  font-weight: 600;
+}
+.noto-serif-oriya-400 {
+  font-family: "Noto Serif Oriya", serif;
+  font-weight: 600;
+}
+
+.lavishly-yours-400 {
+  font-family: "Lavishly Yours", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lavishly-yours-600 {
+  font-family: "Lavishly Yours", cursive;
   font-optical-sizing: auto;
   font-weight: 600;
   font-style: normal;
@@ -460,4 +486,82 @@ div.code-block-lang-select:hover {
   @apply text-2xl tracking-[0.6em] font-medium;
   content: "···" !important;
   display: block !important;
+}
+
+.bubble-menu {
+  @apply flex items-center gap-1 bg-black/90 backdrop-blur-md text-white border border-white/10 shadow-xl rounded-lg py-1 px-2 relative z-150;
+}
+
+.bm-btns {
+  @apply flex items-center;
+}
+
+.bm-btn {
+  @apply flex items-center justify-center text-xl;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  color: #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease;
+  font-family: sans-serif;
+  font-weight: 600;
+}
+
+.bm-btn[data-action="heading"],
+.bm-btn[data-action="heading3"] {
+  font-family: "Playfair Display", serif;
+}
+
+.bm-btn[data-action="heading"] {
+  @apply text-xl font-bold;
+}
+.bm-btn[data-action="heading3"] {
+  @apply text-base font-bold pt-0.75;
+}
+
+.bm-btn[data-action="bold"] {
+  @apply leading-none pt-1.5;
+  font-family: "Noto Serif Oriya", serif;
+}
+
+.bm-btn[data-action="italic"] {
+  @apply text-4xl pb-2;
+  font-family: "Lavishly Yours", cursive;
+}
+.bm-btn[data-action="quote"] {
+  @apply text-[50px] pt-6 pr-2.5;
+  font-family: "Fleur De Leah", cursive;
+}
+
+.bm-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.bm-btn.active {
+  color: #60a5fa;
+}
+
+.bm-text-lg {
+  font-size: 15px;
+  font-weight: 700;
+  width: auto;
+  padding: 0 6px;
+}
+.bm-text-sm {
+  font-size: 12px;
+  font-weight: 700;
+  width: auto;
+  padding: 0 6px;
+}
+
+.bm-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 2px;
 }
