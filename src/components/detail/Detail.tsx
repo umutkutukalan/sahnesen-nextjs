@@ -238,7 +238,7 @@ const Detail = ({ post }: DetailProps) => {
                 className={`text-gray-800 text-[20px] md:text-[22px] leading-relaxed mb-5 md:mb-10 font-normal ${isDropcap ? "dropcap" : ""}`}
                 style={{
                   letterSpacing: "-0.003em",
-                  lineHeight: "32px",
+                  lineHeight: "1.58",
                   marginTop: "0.94em",
                 }}
               >

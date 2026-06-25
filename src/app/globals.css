@@ -197,10 +197,10 @@ body {
 
   /* Drop Cap (Büyük Baş Harf) Stilleri */
   .dropcap-letter {
+    @apply text-[62px] md:text-[68px];
     user-select: none !important;
     pointer-events: none !important;
     float: left;
-    font-size: 68px;
     font-weight: 600;
     line-height: 0.85;
     margin-right: 0.1em;
