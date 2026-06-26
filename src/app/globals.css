@@ -241,6 +241,19 @@ body {
     display: inline-block !important; /* Tarayıcıya yan yana durmaları gerektiği baskısını yapar */
   }
 
+  .detail-inline-code {
+    @apply rounded-md font-bold;
+    font-size: 20px !important;
+  }
+  .detail-inline-code::before {
+    margin-right: 0.3rem !important;
+    color: #a60606 !important;
+  }
+  .detail-inline-code::after {
+    margin-left: 0.3rem !important;
+    color: #a60606 !important;
+  }
+
   /* Drop Cap (Büyük Baş Harf) Stilleri */
   .dropcap-letter {
     @apply text-[62px] md:text-[68px];

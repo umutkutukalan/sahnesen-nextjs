@@ -171,10 +171,7 @@ const Detail = ({ post }: DetailProps) => {
               }
               if (mark.type === "code") {
                 element = (
-                  <code
-                    key={idx}
-                    className="bg-gray-100 px-1.5 py-0.5 rounded-md text-sm font-mono text-[#bf2356] font-normal mx-0.5"
-                  >
+                  <code key={idx} className="detail-inline-code">
                     {element}
                   </code>
                 );
