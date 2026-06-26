@@ -771,19 +771,41 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
     // ── Aktif buton state'ini güncelle ───────────────────────────
     const syncActiveStates = () => {
+      const isHeading =
+        editor.isActive("heading", { level: 1 }) ||
+        editor.isActive("heading", { level: 2 }) ||
+        editor.isActive("heading", { level: 3 });
+
+      const isCodeOrQuote =
+        editor.isActive("code") || editor.isActive("blockquote");
+
       const btns = toolbar.querySelectorAll<HTMLButtonElement>(".bm-btn");
       btns.forEach((btn) => {
         const action = btn.dataset.action;
         let active = false;
-        if (action === "bold") active = editor.isActive("bold");
-        if (action === "italic") active = editor.isActive("italic");
-        if (action === "link") active = editor.isActive("link");
-        if (action === "heading")
+        let disabled = false;
+        if (action === "bold") {
+          active = editor.isActive("bold");
+          disabled = isHeading;
+        }
+        if (action === "italic") {
+          active = editor.isActive("italic");
+          disabled = isHeading;
+        }
+        if (action === "link") {
+          active = editor.isActive("link");
+          disabled = isHeading;
+        }
+        if (action === "heading") {
           active =
             editor.isActive("heading", { level: 1 }) ||
             editor.isActive("heading", { level: 2 });
-        if (action === "heading3")
+          disabled = isCodeOrQuote;
+        }
+        if (action === "heading3") {
           active = editor.isActive("heading", { level: 3 });
+          disabled = isCodeOrQuote;
+        }
         if (action === "code") active = editor.isActive("code");
         if (action === "quote") active = editor.isActive("blockquote");
         if (action === "dropcap") {
@@ -793,7 +815,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             $from.parent?.firstChild?.type.name === "dropcap"
           );
         }
-        btn.classList.toggle("active", active);
+        btn.classList.toggle("active", active && !disabled);
+        btn.classList.toggle("bm-disabled", disabled);
       });
 
       // Dropcap butonunu göster/gizle
@@ -890,6 +913,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         "[data-action]",
       );
       if (!btn) return;
+      if (btn.classList.contains("bm-disabled")) return;
+
       e.preventDefault();
 
       const action = btn.dataset.action!;
