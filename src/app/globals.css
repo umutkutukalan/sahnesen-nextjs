@@ -226,6 +226,21 @@ body {
     content: none !important;
   }
 
+  .tiptap.prose :not(pre) > code::before {
+    content: "`" !important;
+    margin-right: 0.3rem !important;
+    color: #a60606 !important;
+    display: inline-block !important; /* Tarayıcıya yan yana durmaları gerektiği baskısını yapar */
+  }
+
+  .tiptap.prose :not(pre) > code::after {
+    content: "`" !important;
+    visibility: visible !important;
+    margin-left: 0.3rem !important;
+    color: #a60606 !important;
+    display: inline-block !important; /* Tarayıcıya yan yana durmaları gerektiği baskısını yapar */
+  }
+
   /* Drop Cap (Büyük Baş Harf) Stilleri */
   .dropcap-letter {
     @apply text-[62px] md:text-[68px];
