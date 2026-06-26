@@ -908,19 +908,28 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return;
       }
       if (action === "code") {
+        if (editor.isActive("heading"))
+          editor.chain().focus().setParagraph().run();
         editor.chain().focus().toggleCode().run();
         return;
       }
       if (action === "quote") {
+        if (editor.isActive("heading"))
+          editor.chain().focus().setParagraph().run();
         editor.chain().focus().toggleBlockquote().run();
         return;
       }
       if (action === "dropcap") {
+        if (editor.isActive("heading"))
+          editor.chain().focus().setParagraph().run();
         toggleParagraphDropcap(editor);
         return;
       }
 
       if (action === "heading") {
+        if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
+        if (editor.isActive("blockquote"))
+          editor.chain().focus().toggleBlockquote().run();
         const hasH1 = editor
           .getJSON()
           .content?.some(
@@ -932,6 +941,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       }
 
       if (action === "heading3") {
+        if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
+        if (editor.isActive("blockquote"))
+          editor.chain().focus().toggleBlockquote().run();
         editor.chain().focus().toggleHeading({ level: 3 }).run();
         return;
       }
