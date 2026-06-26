@@ -397,7 +397,7 @@ const Detail = ({ post }: DetailProps) => {
             return (
               <blockquote
                 key={index}
-                className="border-l-4 border-gray-200 pl-6 my-8"
+                className="border-l-4 border-black pl-5 my-8"
               >
                 {node.content?.map((child: any, i: number) => {
                   if (child.type === "paragraph") {

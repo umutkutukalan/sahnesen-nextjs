@@ -210,9 +210,14 @@ body {
 
   /* Blockquote stilleri */
   .tiptap.prose blockquote {
-    margin: 1.5em 0;
-    padding-left: 1.6em;
-    border-left: 3px solid #000000;
+    margin: 1.5em 0 !important;
+    padding-left: 1em !important;
+
+    /* 🔥 ÇÖZÜM: Tailwind'in kullandığı renk değişkenini beyaz yapıyoruz */
+    --tw-prose-quote-borders: #000 !important;
+
+    /* Garanti olması açısından border'ın yönsel rengini de besleyelim */
+    border-inline-start-color: #000 !important;
   }
 
   /* Blockquote içindeki paragraf tırnaklarını kaldır */

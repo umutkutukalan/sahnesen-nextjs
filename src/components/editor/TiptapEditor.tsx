@@ -1160,19 +1160,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       )}
 
       <EditorContent editor={editor} />
-
-      {editor.isActive("image") && editor.getAttributes("image").alt && (
-        <div
-          className="image-caption-preview"
-          style={{
-            width: currentWidth,
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          {editor.getAttributes("image").alt}
-        </div>
-      )}
     </div>
   );
 };
