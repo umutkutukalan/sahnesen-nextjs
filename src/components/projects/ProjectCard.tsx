@@ -50,20 +50,25 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             node.content.length > 0,
         );
 
-        if (
-          (textBearingNode &&
-            textBearingNode.content &&
-            Array.isArray(textBearingNode.content)) ||
-          (textBearingNode.type === "dropcap" && textBearingNode.attrs?.letter)
-        ) {
-          return textBearingNode.content
-            .map((textNode: any) => {
-              if (textNode.type === "dropcap" && textNode.attrs?.letter) {
-                return textNode.attrs?.letter || "";
-              }
-              return textNode.text || "";
-            })
-            .join("");
+        if (textBearingNode) {
+          // 2. SİHİRLİ REKÜRSİF FONKSİYON: Node ne kadar derinde olursa olsun tüm metni kazır
+          const extractText = (node: any): string => {
+            // Eğer doğrudan text node ise metni dön
+            if (node.type === "text") {
+              return node.text || "";
+            }
+            // Eğer inline bir dropcap ise harfi dön
+            if (node.type === "dropcap" && node.attrs?.letter) {
+              return node.attrs.letter;
+            }
+            // Eğer alt node'ları (children) varsa, hepsini derinlemesine tara ve birleştir
+            if (node.content && Array.isArray(node.content)) {
+              return node.content.map(extractText).join("");
+            }
+            return "";
+          };
+
+          return extractText(textBearingNode);
         }
       }
       return "";
