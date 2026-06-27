@@ -747,16 +747,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     // ── Toolbar DOM'u oluştur ──────────────────────────────────────
     const toolbar = document.createElement("div");
     toolbar.className = "bubble-menu";
-    toolbar.style.cssText = `
-    position: fixed;
-    z-index: 150;
-    top: 0; left: 0;
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(6px) translateX(-50%);
-    transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-    will-change: transform, opacity;
-  `;
 
     // ── Toolbar içeriği ───────────────────────────────────────────
     toolbar.innerHTML = `
