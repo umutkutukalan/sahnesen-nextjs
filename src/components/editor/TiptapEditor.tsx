@@ -780,6 +780,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         editor.isActive("heading", { level: 2 }) ||
         editor.isActive("heading", { level: 3 });
 
+      const isCode = editor.isActive("code");
+
       const btns = toolbar.querySelectorAll<HTMLButtonElement>(".bm-btn");
       btns.forEach((btn) => {
         const action = btn.dataset.action;
@@ -787,15 +789,15 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         let disabled = false;
         if (action === "bold") {
           active = editor.isActive("bold");
-          disabled = isHeading;
+          disabled = isHeading || isCode;
         }
         if (action === "italic") {
           active = editor.isActive("italic");
-          disabled = isHeading;
+          disabled = isHeading || isCode;
         }
         if (action === "link") {
           active = editor.isActive("link");
-          disabled = isHeading;
+          disabled = isHeading || isCode;
         }
         if (action === "heading") {
           active =
