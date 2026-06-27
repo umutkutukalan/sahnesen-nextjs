@@ -830,6 +830,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
       // Dropcap butonunu göster/gizle
       const dropcapBtn = toolbar.querySelector<HTMLElement>(".bm-dropcap");
+      if (dropcapBtn && isHeading) {
+        dropcapBtn.style.display = "none";
+      }
       if (dropcapBtn && editor.isActive("paragraph")) {
         try {
           const { $from } = editor.state.selection;
@@ -961,9 +964,15 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       }
 
       if (action === "heading") {
+        const { $from } = editor.state.selection;
+        if ($from.parent.firstChild?.type.name === "dropcap") {
+          toggleParagraphDropcap(editor);
+        }
+
         if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
         if (editor.isActive("blockquote"))
           editor.chain().focus().toggleBlockquote().run();
+
         const hasH1 = editor
           .getJSON()
           .content?.some(
@@ -975,6 +984,11 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       }
 
       if (action === "heading3") {
+        const { $from } = editor.state.selection;
+        if ($from.parent.firstChild?.type.name === "dropcap") {
+          toggleParagraphDropcap(editor);
+        }
+
         if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
         if (editor.isActive("blockquote"))
           editor.chain().focus().toggleBlockquote().run();
