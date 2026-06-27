@@ -959,6 +959,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           toggleParagraphDropcap(editor);
         }
 
+        if (editor.isActive("bold")) editor.chain().focus().toggleBold().run();
+        if (editor.isActive("italic"))
+          editor.chain().focus().toggleItalic().run();
+
         if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
         if (editor.isActive("blockquote"))
           editor.chain().focus().toggleBlockquote().run();
@@ -978,6 +982,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         if ($from.parent.firstChild?.type.name === "dropcap") {
           toggleParagraphDropcap(editor);
         }
+
+        if (editor.isActive("bold")) editor.chain().focus().toggleBold().run();
+        if (editor.isActive("italic"))
+          editor.chain().focus().toggleItalic().run();
 
         if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
         if (editor.isActive("blockquote"))
