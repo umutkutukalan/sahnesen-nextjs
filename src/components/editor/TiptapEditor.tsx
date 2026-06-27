@@ -781,6 +781,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         editor.isActive("heading", { level: 3 });
 
       const isCode = editor.isActive("code");
+      const isBlockQuote = editor.isActive("blockquote");
 
       const btns = toolbar.querySelectorAll<HTMLButtonElement>(".bm-btn");
       btns.forEach((btn) => {
@@ -793,11 +794,11 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         }
         if (action === "italic") {
           active = editor.isActive("italic");
-          disabled = isHeading || isCode;
+          disabled = isHeading || isCode || isBlockQuote;
         }
         if (action === "link") {
           active = editor.isActive("link");
-          disabled = isHeading || isCode;
+          disabled = isHeading || isCode || isBlockQuote;
         }
         if (action === "heading") {
           active =
@@ -822,7 +823,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
       // Dropcap butonunu göster/gizle
       const dropcapBtn = toolbar.querySelector<HTMLElement>(".bm-dropcap");
-      if (dropcapBtn && isHeading) {
+      if (dropcapBtn && (isHeading || isBlockQuote)) {
         dropcapBtn.style.display = "none";
       }
       if (dropcapBtn && editor.isActive("paragraph")) {
@@ -943,12 +944,20 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return;
       }
       if (action === "quote") {
+        const { $from } = editor.state.selection;
+        if ($from.parent.firstChild?.type.name === "dropcap") {
+          toggleParagraphDropcap(editor);
+        }
+
         if (editor.isActive("heading"))
           editor.chain().focus().setParagraph().run();
         editor.chain().focus().toggleBlockquote().run();
         return;
       }
       if (action === "dropcap") {
+        if (editor.isActive("blockquote"))
+          editor.chain().focus().toggleBlockquote().run();
+
         if (editor.isActive("heading"))
           editor.chain().focus().setParagraph().run();
         toggleParagraphDropcap(editor);
