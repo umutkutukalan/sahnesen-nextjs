@@ -462,6 +462,20 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       }
     },
     editorProps: {
+      handleKeyDown(view, event) {
+        const mod = event.metaKey || event.ctrlKey;
+        if (mod && ["b", "i", "k"].includes(event.key)) {
+          const isHeading =
+            view.state.doc.resolve(view.state.selection.from).parent.type
+              .name === "heading";
+          if (isHeading) {
+            event.preventDefault();
+            return true;
+          }
+        }
+        return false;
+      },
+
       handleDrop: function (view, event, slice, moved) {
         if (
           !moved &&
