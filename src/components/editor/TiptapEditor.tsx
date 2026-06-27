@@ -776,9 +776,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         editor.isActive("heading", { level: 2 }) ||
         editor.isActive("heading", { level: 3 });
 
-      const isCodeOrQuote =
-        editor.isActive("code") || editor.isActive("blockquote");
-
       const btns = toolbar.querySelectorAll<HTMLButtonElement>(".bm-btn");
       btns.forEach((btn) => {
         const action = btn.dataset.action;
@@ -800,11 +797,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           active =
             editor.isActive("heading", { level: 1 }) ||
             editor.isActive("heading", { level: 2 });
-          disabled = isCodeOrQuote;
         }
         if (action === "heading3") {
           active = editor.isActive("heading", { level: 3 });
-          disabled = isCodeOrQuote;
         }
         if (action === "code") active = editor.isActive("code");
         if (action === "quote") active = editor.isActive("blockquote");
