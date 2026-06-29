@@ -415,6 +415,23 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         // KISAYOLLARI YENİDEN TANIMLAYIP AKIŞA BAĞLIYORUZ
         addKeyboardShortcuts() {
           return {
+            // Blockquote
+            "Mod-Shift-b": () => {
+              // Eğer zaten blockquote içindeyse kısayola basınca blockquote'tan çıksın (toggle)
+              // Ama çoklu seçimlerde sarmalların çakışmaması için önce güvenli limana alıyoruz
+              if (this.editor.isActive("blockquote")) {
+                return this.editor.chain().focus().toggleBlockquote().run();
+              }
+
+              // Eğer blockquote içinde DEĞİLSEK, önce inline başlık formatlarını temizleyip düzleştiriyoruz
+              return this.editor
+                .chain()
+                .focus()
+                .clearNodes() // Başlık yapısı veya çakışan düğümleri temizler
+                .toggleBlockquote()
+                .run();
+            },
+
             // Cmd+Alt+1 veya Ctrl+Alt+1 basıldığında:
             "Mod-Alt-1": () => {
               // Önce blockquote ve diğer tüm yapısal sarmalları temizle
@@ -459,6 +476,16 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 .clearNodes() // Önce sarmalı kır
                 .toggleHeading({ level: 3 })
                 .run();
+            },
+
+            // (> + Space mantığı) buraya konulabilir
+            // handleKeyDown yerine doğrudan eklentinin kendi kurallarına gömüyoruz
+
+            addInputRules() {
+              // Eğer girdileri tamamen özelleştirmek istersen burayı kullanabilirsin.
+              // Ancak üstte handleKeyDown ile yaptığımız spesifik "zaten blockquote içindeyse saf metin bas"
+              // mantığı klavye dinleyicisinde kalabilir ya da buradaki kurallar tamamen sıfırlanabilir.
+              return [];
             },
           };
         },
