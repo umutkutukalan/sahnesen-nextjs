@@ -291,7 +291,7 @@ const Detail = ({ post }: DetailProps) => {
             return (
               <p
                 key={index}
-                className={`text-gray-800 text-[20px] md:text-[22px] leading-relaxed mb-5 md:mb-10 font-normal ${isDropcap ? "dropcap" : ""}`}
+                className={`text-gray-800 text-[18px] md:text-[20px] leading-relaxed mb-5 md:mb-10 font-normal ${isDropcap ? "dropcap" : ""}`}
                 style={{
                   letterSpacing: "-0.003em",
                   lineHeight: "1.58",
@@ -412,7 +412,7 @@ const Detail = ({ post }: DetailProps) => {
                 {node.content?.map((item: any, i: number) => (
                   <li
                     key={i}
-                    className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed"
+                    className="text-gray-800 text-[18px] md:text-[20px] leading-relaxed"
                   >
                     {item.content?.map((child: any, j: number) =>
                       child.type === "paragraph" ? (
@@ -435,7 +435,7 @@ const Detail = ({ post }: DetailProps) => {
                 {node.content?.map((item: any, i: number) => (
                   <li
                     key={i}
-                    className="text-gray-800 text-[20px] md:text-[22px] leading-relaxed"
+                    className="text-gray-800 text-[18px] md:text-[20px] leading-relaxed"
                   >
                     {item.content?.map((child: any, j: number) =>
                       child.type === "paragraph" ? (
@@ -460,7 +460,7 @@ const Detail = ({ post }: DetailProps) => {
                     return (
                       <p
                         key={i}
-                        className="italic text-zinc-800 antialiased text-[20px] md:text-[22px] leading-relaxed"
+                        className="italic text-zinc-800 antialiased text-[18px] md:text-[20px] leading-relaxed"
                       >
                         {child.content ? renderTextNodes(child.content) : ""}
                       </p>

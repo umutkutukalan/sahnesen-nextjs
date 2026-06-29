@@ -242,8 +242,7 @@ body {
   }
 
   .detail-inline-code {
-    @apply rounded-md font-bold;
-    font-size: 20px !important;
+    @apply rounded-md font-bold text-[18px] md:text-[20px];
   }
   .detail-inline-code::before {
     margin-right: 0.3rem !important;
