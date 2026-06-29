@@ -193,7 +193,7 @@ body {
 
   /* Paragraflar arası o istediğin ferah boşluk */
   .tiptap.prose p {
-    @apply text-zinc-800 antialiased text-[22px];
+    @apply text-zinc-800 antialiased text-[18px] md:text-[20px];
     margin-top: 0 !important;
     margin-bottom: 1.2em !important;
     line-height: 1.58 !important;
@@ -320,6 +320,14 @@ body {
     letter-spacing: -0.02em;
     margin-top: 1.5em;
     margin-bottom: 10px !important;
+  }
+
+  .tiptap.prose h2 {
+    @apply !text-[24px] md:!text-[28px];
+  }
+
+  .tiptap.prose h3 {
+    @apply !text-[20px] md:!text-[22px];
   }
 
   /* Placeholder (Yol gösterici metin) stili */
