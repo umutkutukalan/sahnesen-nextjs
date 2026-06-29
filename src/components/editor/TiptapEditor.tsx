@@ -5,9 +5,8 @@ import Focus from "@tiptap/extension-focus";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
-import { GoBold, GoCode, GoItalic, GoPlus } from "react-icons/go";
+import { GoCode, GoPlus } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import { RxText } from "react-icons/rx";
 import { useEffect, useState, useRef } from "react";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { createLowlight, common } from "lowlight";
@@ -19,10 +18,9 @@ import csharp from "highlight.js/lib/languages/csharp";
 import cpp from "highlight.js/lib/languages/cpp";
 import sql from "highlight.js/lib/languages/sql";
 import { uploadImageToBackend } from "@/utils/UploadImageToBackend";
-import { BiSolidQuoteAltLeft } from "react-icons/bi";
-import { FaLink } from "react-icons/fa6";
 import Link from "@tiptap/extension-link";
 import Paragraph from "@tiptap/extension-paragraph";
+import Heading from "@tiptap/extension-heading";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -36,7 +34,6 @@ lowlight.register("cpp", cpp);
 lowlight.register("sql", sql);
 
 import { Node } from "@tiptap/core";
-import { LuLetterText } from "react-icons/lu";
 
 // 🔥 MİMARİ ADIM: Paragrafı genişleterek içeriğine göre sınıf kazandırıyoruz
 const CustomParagraph = Paragraph.extend({
@@ -413,6 +410,58 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: { rel: "noopener noreferrer", target: "_blank" },
+      }),
+      Heading.extend({
+        // KISAYOLLARI YENİDEN TANIMLAYIP AKIŞA BAĞLIYORUZ
+        addKeyboardShortcuts() {
+          return {
+            // Cmd+Alt+1 veya Ctrl+Alt+1 basıldığında:
+            "Mod-Alt-1": () => {
+              // Önce blockquote ve diğer tüm yapısal sarmalları temizle
+              this.editor.chain().focus().clearNodes().run();
+
+              // Özel H1/H2 mantığını buraya da kuruyoruz
+              const hasH1 = this.editor
+                .getJSON()
+                .content?.some(
+                  (n: any) => n.type === "heading" && n.attrs?.level === 1,
+                );
+
+              if (hasH1) {
+                return this.editor
+                  .chain()
+                  .focus()
+                  .toggleHeading({ level: 2 })
+                  .run();
+              }
+              return this.editor
+                .chain()
+                .focus()
+                .toggleHeading({ level: 1 })
+                .run();
+            },
+
+            // Cmd+Alt+2 veya Ctrl+Alt+2 basıldığında:
+            "Mod-Alt-2": () => {
+              return this.editor
+                .chain()
+                .focus()
+                .clearNodes() // Önce sarmalı kır
+                .toggleHeading({ level: 2 })
+                .run();
+            },
+
+            // Cmd+Alt+3 veya Ctrl+Alt+3 basıldığında:
+            "Mod-Alt-3": () => {
+              return this.editor
+                .chain()
+                .focus()
+                .clearNodes() // Önce sarmalı kır
+                .toggleHeading({ level: 3 })
+                .run();
+            },
+          };
+        },
       }),
     ],
     autofocus: false,
