@@ -809,7 +809,26 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           active = editor.isActive("heading", { level: 3 });
         }
         if (action === "code") active = editor.isActive("code");
-        if (action === "quote") active = editor.isActive("blockquote");
+
+        if (action === "quote") {
+          const { state } = editor;
+          const { from, to } = state.selection;
+
+          let totalBlocks = 0;
+          let quoteBlocks = 0;
+
+          state.doc.nodesBetween(from, to, (node) => {
+            if (node.isBlock && node.type.name !== "doc") {
+              totalBlocks++;
+              // 🔥 Burada da "blockquote" kontrolü yapıyoruz
+              if (node.type.name === "blockquote") quoteBlocks++;
+              return false;
+            }
+          });
+
+          active = totalBlocks > 0 && quoteBlocks === totalBlocks;
+        }
+
         if (action === "dropcap") {
           const { $from } = editor.state.selection;
           active = !!(
@@ -944,16 +963,59 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return;
       }
       if (action === "quote") {
-        const { $from } = editor.state.selection;
-        if ($from.parent.firstChild?.type.name === "dropcap") {
-          toggleParagraphDropcap(editor);
+        const { state } = editor;
+        const { selection } = state;
+        const { from, to } = selection;
+
+        let totalBlocks = 0;
+        let quoteBlocks = 0;
+
+        // 1. Seçim alanındaki blok tiplerini analiz et
+        state.doc.nodesBetween(from, to, (node) => {
+          if (node.isBlock && node.type.name !== "doc") {
+            totalBlocks++;
+            if (node.type.name === "blockquote") {
+              quoteBlocks++;
+            }
+            return false;
+          }
+        });
+
+        const allSelectedAreQuote =
+          totalBlocks > 0 && quoteBlocks === totalBlocks;
+
+        editor.chain().focus();
+
+        if (allSelectedAreQuote) {
+          // 💡 SENARYO A: Her yer zaten blockquote ise, hepsini düz paragrafa çek (Burada sorun yoktu)
+          editor.chain().focus().lift("blockquote").run();
+        } else {
+          // 💡 SENARYO B: Karmaşık seçim (İç içe geçmeyi ve bölünmeyi önleyen atomik çözüm)
+
+          // Adım 1: Önce dökümandaki heading, dropcap gibi yan özellikleri temizle
+          if (editor.isActive("heading")) {
+            editor.chain().focus().setParagraph().run();
+          }
+          const { $from } = editor.state.selection;
+          if ($from.parent.firstChild?.type.name === "dropcap") {
+            toggleParagraphDropcap(editor);
+          }
+
+          // Adım 2:
+          // Tiptap'ın default lift komutu çaresiz kaldığı için, seçili alandaki blockquote formatını
+          // peşinen tamamen söküp atmak için Tiptap'ın yerleşik 'clearNodes' komutunu çağırıyoruz.
+          // Bu komut, seçtiğin alandaki tüm yapısal sarmalları (iç içe ne varsa) tamamen yırtar
+          // ve her şeyi sıfır noktasına (düz paragraflara) eşitler!
+          editor.chain().focus().clearNodes().run();
+
+          // Adım 3: Şimdi elimizde hiçbir sarmalı kalmamış, tamamen düzleşmiş yan yana paragraflar var.
+          // Bunları tek bir çatı altında ve tek bir parça olarak blockquote içine alıyoruz.
+          editor.chain().focus().wrapIn("blockquote").run();
         }
 
-        if (editor.isActive("heading"))
-          editor.chain().focus().setParagraph().run();
-        editor.chain().focus().toggleBlockquote().run();
         return;
       }
+
       if (action === "dropcap") {
         if (editor.isActive("blockquote"))
           editor.chain().focus().toggleBlockquote().run();
