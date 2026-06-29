@@ -473,6 +473,41 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             return true;
           }
         }
+
+        if (editor && (event.key === " " || event.code === "Space")) {
+          const { state } = editor;
+          const { $from } = state.selection;
+
+          // 1. Zaten bir blockquote içinde miyiz kontrol et
+          const isAlreadyInBlockquote =
+            $from.node($from.depth - 1)?.type.name === "blockquote" ||
+            $from.parent.type.name === "blockquote" ||
+            editor.isActive("blockquote");
+
+          // 2. İmlecin solundaki metni kontrol et
+          const currentLineText = $from.parent.textContent;
+          const cursorPositionInLine = $from.parentOffset;
+
+          // İmleç tam olarak satır başındaki '>' işaretinin sağındaysa
+          const isRightAfterChevron =
+            currentLineText.substring(0, cursorPositionInLine).trim() === ">";
+
+          // 💡 KRİTİK AYRIM BURADA:
+          if (isAlreadyInBlockquote && isRightAfterChevron) {
+            // EĞER BLOCKQUOTE VARSA: Tiptap'ın otomatik makrosunu engelle
+            event.preventDefault();
+
+            // Normal yazım standartı: Araya sadece normal bir boşluk enjekte et
+            // Zaten satır başında '>' yazıyordu, yanına boşluk gelince saf metin olarak '> ' kalmış olacak
+            editor.chain().focus().insertContent(" ").run();
+
+            return true; // ProseMirror'a bu tuşu bizim tükettiğimizi bildir
+          }
+
+          // EĞER BLOCKQUOTE YOKSA: Kod bu if bloğuna hiç girmeyecek,
+          // Tiptap'ın kendi default mekanizması çalışıp pürüzsüzce blockquote'u oluşturacak.
+        }
+
         return false;
       },
 
