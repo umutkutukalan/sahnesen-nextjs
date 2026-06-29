@@ -478,27 +478,37 @@ const Detail = ({ post }: DetailProps) => {
               ? node.content.map((t: any) => t.text || "").join("")
               : "";
 
-            let highlightedAst;
+            let highlightedAst = null;
+
             try {
+              // Sadece içi gerçekten kod benzeri bir şeyse ve dil kayıtlıysa highlight et
               if (
                 codeLang &&
                 codeLang !== "auto" &&
                 lowlight.registered(codeLang)
               ) {
                 highlightedAst = lowlight.highlight(codeLang, rawContent);
-              } else {
+              } else if (rawContent.trim().length > 0) {
+                // Düz metin çıktısı değilse auto-highlight dene
                 highlightedAst = lowlight.highlightAuto(rawContent);
               }
             } catch (err) {
               console.error("Highlighting hatası:", err);
             }
 
+            // Güvenlik Kilidi: Eğer lowlight içi boş bir AST ürettiyse veya başarısız olduysa
+            // ya da gelen içerik düz bir çıktıysa (3\n3\n3 gibi), ham içeriğe geri dön
+            const hasValidAst =
+              highlightedAst &&
+              highlightedAst.children &&
+              highlightedAst.children.length > 0;
+
             return (
-              <div key={index} className="w-full">
-                {/* Kod Alanı */}
-                <pre className="apple-code-theme p-8 text-sm md:text-[14px] font-mono overflow-x-auto leading-relaxed text-black bg-[#f9f9f9] e">
+              <div key={index} className="w-full my-6">
+                {/* Kod Alanı - whitespace-pre-wrap ve break-words eklendi */}
+                <pre className="apple-code-theme p-6 text-sm md:text-[14px] font-mono overflow-x-auto leading-relaxed text-black bg-[#f5f5f7] rounded-lg whitespace-pre-wrap break-words">
                   <code>
-                    {highlightedAst
+                    {hasValidAst && highlightedAst
                       ? renderLowlightNodes(highlightedAst.children)
                       : rawContent}
                   </code>
