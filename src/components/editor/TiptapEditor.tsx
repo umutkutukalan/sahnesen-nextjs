@@ -1037,8 +1037,9 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           editor.chain().focus().toggleItalic().run();
 
         if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
-        if (editor.isActive("blockquote"))
-          editor.chain().focus().toggleBlockquote().run();
+
+        // Çoklu seçimde araya sıkışmış blockquote, list veya diğer yapısal düğümleri tamamen yırtıp dökümanı düzleştiriyoruz.
+        editor.chain().focus().clearNodes().run();
 
         const hasH1 = editor
           .getJSON()
@@ -1061,8 +1062,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           editor.chain().focus().toggleItalic().run();
 
         if (editor.isActive("code")) editor.chain().focus().toggleCode().run();
-        if (editor.isActive("blockquote"))
-          editor.chain().focus().toggleBlockquote().run();
+
+        // Blockquote sarmalları çoklu seçimde de tamamen eriyor
+        editor.chain().focus().clearNodes().run();
+
         editor.chain().focus().toggleHeading({ level: 3 }).run();
         return;
       }
