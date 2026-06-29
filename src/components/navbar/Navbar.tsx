@@ -121,10 +121,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
               <div className="border-r pr-5">
-                <NavLinks
-                  href="/olustur"
-                  logo={<FaFilePen />}
-                />
+                <NavLinks href="/olustur" logo={<FaFilePen />} />
               </div>
             )}
             <NavLinks href="/projeler" logo={<RiComputerFill />} />
