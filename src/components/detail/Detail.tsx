@@ -118,7 +118,7 @@ const Detail = ({ post }: DetailProps) => {
     });
   };
 
-  // 🔥 GELİŞMİŞ TIPTAP JSON STRING RENDER MOTORU
+  // GELİŞMİŞ TIPTAP JSON STRING RENDER MOTORU
   const renderTiptapContent = (contentStr: string) => {
     try {
       if (!contentStr) return null;
@@ -126,6 +126,52 @@ const Detail = ({ post }: DetailProps) => {
 
       if (!parsed || !parsed.content || !Array.isArray(parsed.content))
         return null;
+
+      let firstMeaningfulIndex = -1;
+
+      for (let i = 0; i < parsed.content.length; i++) {
+        const node = parsed.content[i];
+
+        // Eğer gelen eleman paragraf değilse direkt anlamlı içeriktir, index'i kilitle ve çık
+        if (node.type !== "paragraph") {
+          firstMeaningfulIndex = i;
+          break;
+        }
+
+        // 1. Durum: node.content hiç yoksa veya boş array ise
+        const isAbsolutelyEmpty =
+          !node.content ||
+          !Array.isArray(node.content) ||
+          node.content.length === 0;
+
+        // 2. Durum: Paragrafın içindeki tüm metin parçalarını toplayıp temizliyoruz
+        let totalTextContent = "";
+        if (node.content && Array.isArray(node.content)) {
+          node.content.forEach((child: any) => {
+            if (child.type === "text" && child.text) {
+              totalTextContent += child.text;
+            }
+          });
+        }
+
+        // Eğer içeride hiç 'text' düğümü yoksa veya olan tüm metinler tamamen boşluk karakteriyse ("   " gibi)
+        const isTextContentEmpty = totalTextContent.trim() === "";
+
+        // 💡 EĞER PARAGRAF YAPISAL OLARAK BOŞSA VEYA İÇİNDEKİ METİNLERİN TAMAMI BOŞLUKSA
+        if (isAbsolutelyEmpty || isTextContentEmpty) {
+          continue; // Boş satırdır, es geç!
+        }
+
+        // Yukarıdaki filtrelere takılmadıysa içinde gerçek, görünür bir metin veya görsel öğe vardır!
+        firstMeaningfulIndex = i;
+        break;
+      }
+
+      // Eğer dökümanın tamamı boş satırlardan oluşuyorsa hiçbir şey render etme
+      if (firstMeaningfulIndex === -1) return null;
+
+      // Döküman içeriğini sadece ilk anlamlı verinin başladığı yerden itibaren kesiyoruz
+      const cleanedContent = parsed.content.slice(firstMeaningfulIndex);
 
       const renderTextNodes = (textNodes: any[]) => {
         if (!textNodes || !Array.isArray(textNodes)) return "";
@@ -195,9 +241,22 @@ const Detail = ({ post }: DetailProps) => {
         });
       };
 
-      return parsed.content.map((node: any, index: number) => {
+      return cleanedContent.map((node: any, index: number) => {
         switch (node.type) {
           case "paragraph":
+            // İçeriği tamamen boş olan paragrafları render etme
+            if (!node.content || node.content.length === 0) return null;
+
+            const textContent = node.content
+              .filter((c: any) => c.type === "text")
+              .map((c: any) => c.text || "")
+              .join("");
+
+            const hasOnlyDropcap =
+              node.content.length === 1 && node.content[0].type === "dropcap";
+
+            if (textContent.trim() === "" && !hasOnlyDropcap) return null;
+
             if (node.content && Array.isArray(node.content)) {
               const hasInlineImage = node.content.find(
                 (c: any) => c.type === "image",
