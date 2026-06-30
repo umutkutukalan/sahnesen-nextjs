@@ -577,6 +577,11 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
               return true; // kısayolun "handle edildi" demesi şart
             },
 
+            // 4, 5, 6 seviyelerini kasıtlı olarak devre dışı bırak
+            "Mod-Alt-4": () => true,
+            "Mod-Alt-5": () => true,
+            "Mod-Alt-6": () => true,
+
             // (> + Space mantığı) buraya konulabilir
             // handleKeyDown yerine doğrudan eklentinin kendi kurallarına gömüyoruz
 
@@ -588,6 +593,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             },
           };
         },
+      }).configure({
+        levels: [1, 2, 3],
       }),
     ],
     autofocus: false,
