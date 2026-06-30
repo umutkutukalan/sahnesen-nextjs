@@ -331,7 +331,7 @@ const Detail = ({ post }: DetailProps) => {
               `h${headingLevel}` as keyof JSX.IntrinsicElements;
             const headingClasses: Record<number, string> = {
               1: "text-4xl font-extrabold tracking-tight text-gray-950 mt-10 mb-4",
-              2: "text-[24px] md:text-[28px] font-extrabold tracking-tight -mb-[0.28em] leading-[30px] font-sans",
+              2: "text-[24px] md:text-[28px] font-extrabold tracking-tight leading-[30px] font-sans",
               3: "text-[20px] md:text-[22px] font-extrabold tracking-tight -mb-[0.56em] leading-[30px] font-sans",
             };
             return (

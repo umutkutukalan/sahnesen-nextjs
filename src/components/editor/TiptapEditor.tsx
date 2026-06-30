@@ -852,6 +852,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
     input.click();
   };
 
+  // bubble-menu
   useEffect(() => {
     if (!editor) return;
 
@@ -953,29 +954,44 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
       // Dropcap butonunu göster/gizle
       const dropcapBtn = toolbar.querySelector<HTMLElement>(".bm-dropcap");
-      if (dropcapBtn && (isHeading || isBlockQuote)) {
-        dropcapBtn.style.display = "none";
-      }
-      if (dropcapBtn && editor.isActive("paragraph")) {
-        try {
-          const { $from } = editor.state.selection;
-          const domNode = editor.view.nodeDOM(
-            $from.start() - 1,
-          ) as HTMLElement | null;
-          let showDropcap = false;
-          if (domNode) {
-            const lineH =
-              parseFloat(window.getComputedStyle(domNode).lineHeight) || 24;
-            showDropcap = domNode.clientHeight >= lineH * 2;
-          } else {
-            showDropcap = $from.parent.textContent.length >= 70;
-          }
-          dropcapBtn.style.display = showDropcap ? "" : "none";
-        } catch {
+      if (dropcapBtn) {
+        // Eğer başlık veya alıntı içerisindeysek dropcap kesinlikle görünmemeli
+        if (isHeading || isBlockQuote) {
           dropcapBtn.style.display = "none";
         }
-      } else if (dropcapBtn) {
-        dropcapBtn.style.display = "none";
+        // Sadece temiz, düz bir paragraf içindeysek ölçüm yapalım
+        else if (editor.isActive("paragraph")) {
+          try {
+            const { $from } = editor.state.selection;
+
+            const domNode = editor.view.nodeDOM(
+              $from.before(),
+            ) as HTMLElement | null;
+
+            let showDropcap = false;
+
+            if (domNode && domNode.nodeType === Node.ELEMENT_NODE) {
+              const computedStyle = window.getComputedStyle(domNode);
+              const lineH = parseFloat(computedStyle.lineHeight) || 24;
+
+              // Paragrafın gerçek yüksekliği 2 satırdan fazla mı?
+              showDropcap = domNode.clientHeight >= lineH * 2;
+            } else {
+              // DOM'a ulaşılamazsa güvenli metin uzunluğu süzgeci (Fallback)
+              showDropcap = $from.parent.textContent.length >= 70;
+            }
+
+            dropcapBtn.style.display = showDropcap ? "" : "none";
+          } catch (err) {
+            console.warn("Dropcap görünüm hesabı esnasında hata:", err);
+            // Hata durumunda bile metin uzunluğu kurtarıcımız olsun, tamamen yok olmasın
+            const { $from } = editor.state.selection;
+            const showFallback = $from.parent?.textContent?.length >= 70;
+            dropcapBtn.style.display = showFallback ? "" : "none";
+          }
+        } else {
+          dropcapBtn.style.display = "none";
+        }
       }
     };
 
