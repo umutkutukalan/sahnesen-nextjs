@@ -535,6 +535,17 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 .run();
             },
 
+            "Mod-Shift-g": () => {
+              const { $from } = this.editor.state.selection;
+              const isDropcapActive = !!(
+                this.editor.isActive("paragraph") &&
+                $from.parent?.firstChild?.type.name === "dropcap"
+              );
+
+              toggleParagraphDropcap(this.editor); // var olan helper'ı çağır, toggle işini o yapsın
+              return true; // kısayolun "handle edildi" demesi şart
+            },
+
             // (> + Space mantığı) buraya konulabilir
             // handleKeyDown yerine doğrudan eklentinin kendi kurallarına gömüyoruz
 
