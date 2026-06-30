@@ -328,6 +328,31 @@ const toggleParagraphDropcap = (editor: any) => {
   }
 };
 
+// Component'in üst seviyesine, toggleParagraphDropcap'in yanına ekle:
+const isDropcapEligible = (editor: any): boolean => {
+  if (editor.isActive("heading") || editor.isActive("blockquote")) {
+    return false;
+  }
+  if (!editor.isActive("paragraph")) return false;
+
+  try {
+    const { $from } = editor.state.selection;
+    const domNode = editor.view.nodeDOM($from.before()) as HTMLElement | null;
+
+    if (domNode && domNode.nodeType === Node.ELEMENT_NODE) {
+      const computedStyle = window.getComputedStyle(domNode);
+      const lineH = parseFloat(computedStyle.lineHeight) || 24;
+      return domNode.clientHeight >= lineH * 2;
+    }
+
+    return ($from.parent.textContent?.length ?? 0) >= 70;
+  } catch (err) {
+    console.warn("Dropcap görünüm hesabı esnasında hata:", err);
+    const { $from } = editor.state.selection;
+    return ($from.parent?.textContent?.length ?? 0) >= 70;
+  }
+};
+
 interface TiptapEditorProps {
   content?: any;
   onUpdate: (json: any) => void;
@@ -541,6 +566,12 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 this.editor.isActive("paragraph") &&
                 $from.parent?.firstChild?.type.name === "dropcap"
               );
+
+              // Zaten aktifse her zaman kapatılabilsin (kullanıcı geri alabilmeli),
+              // ama henüz aktif değilse koşula uymalı
+              if (!isDropcapActive && !isDropcapEligible(this.editor)) {
+                return false; // koşul sağlanmıyor, kısayolu işleme
+              }
 
               toggleParagraphDropcap(this.editor); // var olan helper'ı çağır, toggle işini o yapsın
               return true; // kısayolun "handle edildi" demesi şart
@@ -1023,43 +1054,8 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       // Dropcap butonunu göster/gizle
       const dropcapBtn = toolbar.querySelector<HTMLElement>(".bm-dropcap");
       if (dropcapBtn) {
-        // Eğer başlık veya alıntı içerisindeysek dropcap kesinlikle görünmemeli
-        if (isHeading || isBlockQuote) {
-          dropcapBtn.style.display = "none";
-        }
-        // Sadece temiz, düz bir paragraf içindeysek ölçüm yapalım
-        else if (editor.isActive("paragraph")) {
-          try {
-            const { $from } = editor.state.selection;
-
-            const domNode = editor.view.nodeDOM(
-              $from.before(),
-            ) as HTMLElement | null;
-
-            let showDropcap = false;
-
-            if (domNode && domNode.nodeType === Node.ELEMENT_NODE) {
-              const computedStyle = window.getComputedStyle(domNode);
-              const lineH = parseFloat(computedStyle.lineHeight) || 24;
-
-              // Paragrafın gerçek yüksekliği 2 satırdan fazla mı?
-              showDropcap = domNode.clientHeight >= lineH * 2;
-            } else {
-              // DOM'a ulaşılamazsa güvenli metin uzunluğu süzgeci (Fallback)
-              showDropcap = $from.parent.textContent.length >= 70;
-            }
-
-            dropcapBtn.style.display = showDropcap ? "" : "none";
-          } catch (err) {
-            console.warn("Dropcap görünüm hesabı esnasında hata:", err);
-            // Hata durumunda bile metin uzunluğu kurtarıcımız olsun, tamamen yok olmasın
-            const { $from } = editor.state.selection;
-            const showFallback = $from.parent?.textContent?.length >= 70;
-            dropcapBtn.style.display = showFallback ? "" : "none";
-          }
-        } else {
-          dropcapBtn.style.display = "none";
-        }
+        const showDropcap = isDropcapEligible(editor);
+        dropcapBtn.style.display = showDropcap ? "" : "none";
       }
     };
 
