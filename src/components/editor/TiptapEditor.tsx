@@ -444,6 +444,17 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                   (n: any) => n.type === "heading" && n.attrs?.level === 1,
                 );
 
+              const { state } = this.editor;
+              const { $from } = state.selection;
+
+              // Eğer paragrafın başında dropcap varsa, önce onu normal harfe çevir
+              if (
+                $from.parent.type.name === "paragraph" &&
+                $from.parent.firstChild?.type.name === "dropcap"
+              ) {
+                toggleParagraphDropcap(this.editor); // dropcap'i kaldırıp harfi metne geri koyar
+              }
+
               if (hasH1) {
                 return this.editor
                   .chain()
