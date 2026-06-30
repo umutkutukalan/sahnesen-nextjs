@@ -193,19 +193,14 @@ body {
 
   /* Paragraflar arası o istediğin ferah boşluk */
   .tiptap.prose p {
-    @apply text-zinc-800 antialiased text-[18px] md:text-[20px];
-    margin-top: 0 !important;
-    margin-bottom: 1.2em !important;
+    @apply text-gray-800 antialiased text-[18px] md:text-[20px] leading-relaxed mb-5 md:mb-10;
+    letter-spacing: -0.003em !important;
+    margin-top: 0.94em !important;
     line-height: 1.58 !important;
   }
 
-  .tiptap.prose p:first-of-type {
+  .tiptap.prose h1 + p {
     margin-top: 0 !important;
-  }
-
-  /* İlk paragrafın tepesindeki gereksiz boşluğu sıfırla */
-  .tiptap.prose p:first-child {
-    margin-top: 0;
   }
 
   /* Blockquote stilleri */
@@ -316,10 +311,7 @@ body {
 
   .tiptap.prose h2,
   .tiptap.prose h3 {
-    @apply font-extrabold tracking-tight font-sans;
-    letter-spacing: -0.02em;
-    margin-top: 1.5em;
-    margin-bottom: 10px !important;
+    @apply !font-extrabold !tracking-tight !font-sans !leading-[30px];
   }
 
   .tiptap.prose h2 {
@@ -327,7 +319,7 @@ body {
   }
 
   .tiptap.prose h3 {
-    @apply !text-[20px] md:!text-[22px];
+    @apply !text-[20px] md:!text-[22px] !-mb-[0.56em];
   }
 
   /* Placeholder (Yol gösterici metin) stili */
