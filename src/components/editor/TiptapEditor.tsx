@@ -434,6 +434,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             // Cmd+Alt+1 veya Ctrl+Alt+1 basıldığında:
             "Mod-Alt-1": () => {
+              if (this.editor.isActive("heading", { level: 1 })) {
+                return this.editor
+                  .chain()
+                  .focus()
+                  .toggleHeading({ level: 1 })
+                  .run();
+              }
+
               // Önce blockquote ve diğer tüm yapısal sarmalları temizle
               this.editor.chain().focus().clearNodes().run();
 
@@ -471,6 +479,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             // Cmd+Alt+2 veya Ctrl+Alt+2 basıldığında:
             "Mod-Alt-2": () => {
+              if (this.editor.isActive("heading", { level: 2 })) {
+                return this.editor
+                  .chain()
+                  .focus()
+                  .toggleHeading({ level: 2 })
+                  .run();
+              }
+
               const { state } = this.editor;
               const { $from } = state.selection;
 
@@ -492,6 +508,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             // Cmd+Alt+3 veya Ctrl+Alt+3 basıldığında:
             "Mod-Alt-3": () => {
+              if (this.editor.isActive("heading", { level: 3 })) {
+                return this.editor
+                  .chain()
+                  .focus()
+                  .toggleHeading({ level: 3 })
+                  .run();
+              }
+
               const { state } = this.editor;
               const { $from } = state.selection;
 
