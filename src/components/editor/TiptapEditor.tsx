@@ -460,16 +460,38 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
 
             // Cmd+Alt+2 veya Ctrl+Alt+2 basıldığında:
             "Mod-Alt-2": () => {
+              const { state } = this.editor;
+              const { $from } = state.selection;
+
+              // Eğer paragrafın başında dropcap varsa, önce onu normal harfe çevir
+              if (
+                $from.parent.type.name === "paragraph" &&
+                $from.parent.firstChild?.type.name === "dropcap"
+              ) {
+                toggleParagraphDropcap(this.editor); // dropcap'i kaldırıp harfi metne geri koyar
+              }
+
               return this.editor
                 .chain()
                 .focus()
-                .clearNodes() // Önce sarmalı kır
+                .clearNodes()
                 .toggleHeading({ level: 2 })
                 .run();
             },
 
             // Cmd+Alt+3 veya Ctrl+Alt+3 basıldığında:
             "Mod-Alt-3": () => {
+              const { state } = this.editor;
+              const { $from } = state.selection;
+
+              // Eğer paragrafın başında dropcap varsa, önce onu normal harfe çevir
+              if (
+                $from.parent.type.name === "paragraph" &&
+                $from.parent.firstChild?.type.name === "dropcap"
+              ) {
+                toggleParagraphDropcap(this.editor); // dropcap'i kaldırıp harfi metne geri koyar
+              }
+
               return this.editor
                 .chain()
                 .focus()
