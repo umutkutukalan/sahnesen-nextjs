@@ -255,7 +255,7 @@ body {
 
   /* Drop Cap (Büyük Baş Harf) Stilleri */
   .dropcap-letter {
-    @apply text-[62px] md:text-[68px];
+    @apply text-[56px] md:text-[62px];
     user-select: none !important;
     pointer-events: none !important;
     float: left;
