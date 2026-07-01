@@ -442,18 +442,60 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           return {
             // Blockquote
             "Mod-Shift-b": () => {
-              // Eğer zaten blockquote içindeyse kısayola basınca blockquote'tan çıksın (toggle)
-              // Ama çoklu seçimlerde sarmalların çakışmaması için önce güvenli limana alıyoruz
-              if (this.editor.isActive("blockquote")) {
-                return this.editor.chain().focus().toggleBlockquote().run();
+              const { state } = this.editor;
+              const { selection } = state;
+              const { from, to } = selection;
+              const { $from } = selection;
+
+              state.doc.nodesBetween(from, to, (node, pos) => {
+                if (
+                  node.type.name === "paragraph" &&
+                  node.firstChild?.type.name === "dropcap"
+                ) {
+                  const letter = node.firstChild.attrs.letter || "";
+                  const paragraphStart = pos + 1;
+                  this.editor
+                    .chain()
+                    .deleteRange({
+                      from: paragraphStart,
+                      to: paragraphStart + 1,
+                    })
+                    .insertContentAt(paragraphStart, letter)
+                    .run();
+                }
+                return true;
+              });
+
+              const freshState = this.editor.state;
+              const freshFrom = freshState.selection.from;
+              const freshTo = freshState.selection.to;
+
+              // Seçimdeki blokları say — bubble menu ile aynı mantık
+              let totalBlocks = 0;
+              let quoteBlocks = 0;
+
+              freshState.doc.nodesBetween(freshFrom, freshTo, (node) => {
+                if (node.isBlock && node.type.name !== "doc") {
+                  totalBlocks++;
+                  if (node.type.name === "blockquote") quoteBlocks++;
+                  return false;
+                }
+              });
+
+              const allSelectedAreQuote =
+                totalBlocks > 0 && quoteBlocks === totalBlocks;
+
+              if (allSelectedAreQuote) {
+                // Hepsi zaten blockquote → çıkar
+                return this.editor.chain().focus().lift("blockquote").run();
               }
 
-              // Eğer blockquote içinde DEĞİLSEK, önce inline başlık formatlarını temizleyip düzleştiriyoruz
+              // Değilse → düzleştir ve sarmala
               return this.editor
                 .chain()
                 .focus()
-                .clearNodes() // Başlık yapısı veya çakışan düğümleri temizler
-                .toggleBlockquote()
+                .clearNodes()
+                .wrapIn("blockquote")
                 .run();
             },
 
@@ -1162,19 +1204,38 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       }
       if (action === "quote") {
         const { state } = editor;
-        const { selection } = state;
-        const { from, to } = selection;
+        const { from, to } = state.selection;
+
+        // 🔥 Seçimdeki TÜM paragraflarda dropcap varsa önce hepsini temizle
+        state.doc.nodesBetween(from, to, (node, pos) => {
+          if (
+            node.type.name === "paragraph" &&
+            node.firstChild?.type.name === "dropcap"
+          ) {
+            const letter = node.firstChild.attrs.letter || "";
+            const paragraphStart = pos + 1; // paragraph node'un içi
+
+            editor
+              .chain()
+              .deleteRange({ from: paragraphStart, to: paragraphStart + 1 })
+              .insertContentAt(paragraphStart, letter)
+              .run();
+          }
+          return true;
+        });
+
+        // Dropcap temizlendikten sonra güncel state'i al
+        const freshState = editor.state;
+        const freshFrom = freshState.selection.from;
+        const freshTo = freshState.selection.to;
 
         let totalBlocks = 0;
         let quoteBlocks = 0;
 
-        // 1. Seçim alanındaki blok tiplerini analiz et
-        state.doc.nodesBetween(from, to, (node) => {
+        freshState.doc.nodesBetween(freshFrom, freshTo, (node) => {
           if (node.isBlock && node.type.name !== "doc") {
             totalBlocks++;
-            if (node.type.name === "blockquote") {
-              quoteBlocks++;
-            }
+            if (node.type.name === "blockquote") quoteBlocks++;
             return false;
           }
         });
@@ -1182,33 +1243,10 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         const allSelectedAreQuote =
           totalBlocks > 0 && quoteBlocks === totalBlocks;
 
-        editor.chain().focus();
-
         if (allSelectedAreQuote) {
-          // 💡 SENARYO A: Her yer zaten blockquote ise, hepsini düz paragrafa çek (Burada sorun yoktu)
           editor.chain().focus().lift("blockquote").run();
         } else {
-          // 💡 SENARYO B: Karmaşık seçim (İç içe geçmeyi ve bölünmeyi önleyen atomik çözüm)
-
-          // Adım 1: Önce dökümandaki heading, dropcap gibi yan özellikleri temizle
-          if (editor.isActive("heading")) {
-            editor.chain().focus().setParagraph().run();
-          }
-          const { $from } = editor.state.selection;
-          if ($from.parent.firstChild?.type.name === "dropcap") {
-            toggleParagraphDropcap(editor);
-          }
-
-          // Adım 2:
-          // Tiptap'ın default lift komutu çaresiz kaldığı için, seçili alandaki blockquote formatını
-          // peşinen tamamen söküp atmak için Tiptap'ın yerleşik 'clearNodes' komutunu çağırıyoruz.
-          // Bu komut, seçtiğin alandaki tüm yapısal sarmalları (iç içe ne varsa) tamamen yırtar
-          // ve her şeyi sıfır noktasına (düz paragraflara) eşitler!
-          editor.chain().focus().clearNodes().run();
-
-          // Adım 3: Şimdi elimizde hiçbir sarmalı kalmamış, tamamen düzleşmiş yan yana paragraflar var.
-          // Bunları tek bir çatı altında ve tek bir parça olarak blockquote içine alıyoruz.
-          editor.chain().focus().wrapIn("blockquote").run();
+          editor.chain().focus().clearNodes().wrapIn("blockquote").run();
         }
 
         return;
