@@ -441,47 +441,15 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         addKeyboardShortcuts() {
           return {
             // Blockquote
-            "Mod-Shift-b": () => {
-              const { state } = this.editor;
-              const { from, to } = state.selection;
+            "Mod-Shift-9": () => {
+              // Adım 1: Önce blockquote durumunu MEVCUT state'den ölç
+              const initialState = this.editor.state;
+              const { from, to } = initialState.selection;
 
-              // Heading içindeyse önce düzleştir, sonra devam et
-              if (
-                this.editor.isActive("heading", { level: 1 }) ||
-                this.editor.isActive("heading", { level: 2 }) ||
-                this.editor.isActive("heading", { level: 3 })
-              ) {
-                this.editor.chain().focus().clearNodes().run();
-              }
-
-              state.doc.nodesBetween(from, to, (node, pos) => {
-                if (
-                  node.type.name === "paragraph" &&
-                  node.firstChild?.type.name === "dropcap"
-                ) {
-                  const letter = node.firstChild.attrs.letter || "";
-                  const paragraphStart = pos + 1;
-                  this.editor
-                    .chain()
-                    .deleteRange({
-                      from: paragraphStart,
-                      to: paragraphStart + 1,
-                    })
-                    .insertContentAt(paragraphStart, letter)
-                    .run();
-                }
-                return true;
-              });
-
-              const freshState = this.editor.state;
-              const freshFrom = freshState.selection.from;
-              const freshTo = freshState.selection.to;
-
-              // Seçimdeki blokları say — bubble menu ile aynı mantık
               let totalBlocks = 0;
               let quoteBlocks = 0;
 
-              freshState.doc.nodesBetween(freshFrom, freshTo, (node) => {
+              initialState.doc.nodesBetween(from, to, (node) => {
                 if (node.isBlock && node.type.name !== "doc") {
                   totalBlocks++;
                   if (node.type.name === "blockquote") quoteBlocks++;
@@ -492,10 +460,44 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
               const allSelectedAreQuote =
                 totalBlocks > 0 && quoteBlocks === totalBlocks;
 
+              // Adım 2: Hepsi blockquote ise direkt çık
               if (allSelectedAreQuote) {
-                // Hepsi zaten blockquote → çıkar
                 return this.editor.chain().focus().lift("blockquote").run();
               }
+
+              // Adım 3: Heading, dropcap vs. hepsini temizle
+              this.editor.chain().focus().clearNodes().run();
+
+              // Adım 4: clearNodes sonrası TAZE state'den dropcap tara
+              const afterClearState = this.editor.state;
+              const freshFrom = afterClearState.selection.from;
+              const freshTo = afterClearState.selection.to;
+
+              afterClearState.doc.nodesBetween(
+                freshFrom,
+                freshTo,
+                (node, pos) => {
+                  if (
+                    node.type.name === "paragraph" &&
+                    node.firstChild?.type.name === "dropcap"
+                  ) {
+                    const letter = node.firstChild.attrs.letter || "";
+                    const paragraphStart = pos + 1;
+                    this.editor
+                      .chain()
+                      .deleteRange({
+                        from: paragraphStart,
+                        to: paragraphStart + 1,
+                      })
+                      .insertContentAt(paragraphStart, letter)
+                      .run();
+                  }
+                  return true;
+                },
+              );
+
+              // Adım 5: Artık temiz paragrafları blockquote'a sarmala
+              return this.editor.chain().focus().wrapIn("blockquote").run();
             },
 
             // Cmd+Alt+1 veya Ctrl+Alt+1 basıldığında:
@@ -1202,36 +1204,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return;
       }
       if (action === "quote") {
-        const { state } = editor;
-        const { from, to } = state.selection;
-
-        // 🔥 Seçimdeki TÜM paragraflarda dropcap varsa önce hepsini temizle
-        state.doc.nodesBetween(from, to, (node, pos) => {
-          if (
-            node.type.name === "paragraph" &&
-            node.firstChild?.type.name === "dropcap"
-          ) {
-            const letter = node.firstChild.attrs.letter || "";
-            const paragraphStart = pos + 1; // paragraph node'un içi
-
-            editor
-              .chain()
-              .deleteRange({ from: paragraphStart, to: paragraphStart + 1 })
-              .insertContentAt(paragraphStart, letter)
-              .run();
-          }
-          return true;
-        });
-
-        // Dropcap temizlendikten sonra güncel state'i al
-        const freshState = editor.state;
-        const freshFrom = freshState.selection.from;
-        const freshTo = freshState.selection.to;
+        // Adım 1: Önce blockquote durumunu mevcut state'den ölç
+        const initialState = editor.state;
+        const { from, to } = initialState.selection;
 
         let totalBlocks = 0;
         let quoteBlocks = 0;
 
-        freshState.doc.nodesBetween(freshFrom, freshTo, (node) => {
+        initialState.doc.nodesBetween(from, to, (node) => {
           if (node.isBlock && node.type.name !== "doc") {
             totalBlocks++;
             if (node.type.name === "blockquote") quoteBlocks++;
@@ -1242,12 +1222,38 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         const allSelectedAreQuote =
           totalBlocks > 0 && quoteBlocks === totalBlocks;
 
+        // Adım 2: Hepsi blockquote ise direkt çık
         if (allSelectedAreQuote) {
           editor.chain().focus().lift("blockquote").run();
-        } else {
-          editor.chain().focus().clearNodes().wrapIn("blockquote").run();
+          return;
         }
 
+        // Adım 3: Heading, dropcap vs. hepsini temizle
+        editor.chain().focus().clearNodes().run();
+
+        // Adım 4: clearNodes sonrası taze state'den dropcap tara
+        const afterClearState = editor.state;
+        const freshFrom = afterClearState.selection.from;
+        const freshTo = afterClearState.selection.to;
+
+        afterClearState.doc.nodesBetween(freshFrom, freshTo, (node, pos) => {
+          if (
+            node.type.name === "paragraph" &&
+            node.firstChild?.type.name === "dropcap"
+          ) {
+            const letter = node.firstChild.attrs.letter || "";
+            const paragraphStart = pos + 1;
+            editor
+              .chain()
+              .deleteRange({ from: paragraphStart, to: paragraphStart + 1 })
+              .insertContentAt(paragraphStart, letter)
+              .run();
+          }
+          return true;
+        });
+
+        // Adım 5: Temiz paragrafları blockquote'a sarmala
+        editor.chain().focus().wrapIn("blockquote").run();
         return;
       }
 
