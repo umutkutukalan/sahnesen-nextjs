@@ -324,6 +324,7 @@ body {
   .tiptap.prose h1 + h2 {
     @apply !text-[20px] md:!text-[22px];
     margin-top: 10px !important;
+    margin-bottom: 22px !important;
     font-weight: 500 !important;
     color: #757575 !important;
   }

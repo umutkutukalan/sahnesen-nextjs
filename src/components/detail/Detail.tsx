@@ -118,6 +118,31 @@ const Detail = ({ post }: DetailProps) => {
     });
   };
 
+  const extractSubtitle = (contentStr: string): string | null => {
+    try {
+      const parsed = JSON.parse(contentStr);
+      const nodes = parsed?.content;
+      if (!nodes || !Array.isArray(nodes)) return null;
+
+      const h1Index = nodes.findIndex(
+        (n: any) => n.type === "heading" && n.attrs?.level === 1,
+      );
+
+      if (h1Index === -1) return null;
+
+      const next = nodes[h1Index + 1];
+      if (next?.type === "heading" && next.attrs?.level === 2) {
+        return next.content?.map((t: any) => t.text || "").join("") || null;
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const subtitle = extractSubtitle(post.content);
+
   // GELİŞMİŞ TIPTAP JSON STRING RENDER MOTORU
   const renderTiptapContent = (contentStr: string) => {
     try {
@@ -304,6 +329,26 @@ const Detail = ({ post }: DetailProps) => {
 
           case "heading":
             const headingLevel = node.attrs?.level || 2;
+
+            // İlk H1'i zaten atlıyorduk, şimdi hemen ardından gelen H2'yi de atla
+            if (headingLevel === 2) {
+              try {
+                const parsedContent =
+                  typeof contentStr === "string"
+                    ? JSON.parse(contentStr)
+                    : contentStr;
+
+                const h1Index = parsedContent?.content?.findIndex(
+                  (n: any) => n.type === "heading" && n.attrs?.level === 1,
+                );
+
+                // Bu node, h1'den hemen sonraki h2 mi?
+                const absoluteIndex = firstMeaningfulIndex + index;
+                if (h1Index !== -1 && absoluteIndex === h1Index + 1) {
+                  return null;
+                }
+              } catch {}
+            }
 
             if (headingLevel === 1) {
               try {
@@ -638,6 +683,11 @@ const Detail = ({ post }: DetailProps) => {
               >
                 {post.title}
               </h1>
+              {subtitle && (
+                <p className="text-[18px] md:text-[22px] text-gray-500 font-normal leading-snug tracking-tight">
+                  {subtitle}
+                </p>
+              )}
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
                 <p>5 min read</p>
                 <span>•</span>
