@@ -1435,7 +1435,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         }}
       >
         <div className="floating-menu-container flex items-center gap-5 transition-all duration-200 group">
-          <button className="flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 bg-white text-gray-400 hover:text-black hover:border-black transition-all shadow-sm cursor-pointer">
+          <button className="flex items-center justify-center w-8 h-8 rounded-full border border-black bg-white text-gray-700 transition-all cursor-pointer">
             <span className="group-hover:rotate-90 transition-transform">
               <GoPlus size={20} />
             </span>

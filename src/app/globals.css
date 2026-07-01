@@ -315,9 +315,81 @@ body {
     margin-bottom: 10px !important;
   }
 
+  /* h1 için position bağlamı */
+  .tiptap.prose h1:not(.is-empty),
+  .tiptap.prose h1 + h2 {
+    position: relative;
+  }
+
+  .tiptap.prose h1 + h2 {
+    @apply !text-[20px] md:!text-[22px];
+    margin-top: 10px !important;
+    font-weight: 500 !important;
+    color: #757575 !important;
+  }
+
+  /* Genel is-empty kuralını h1 için tamamen ezip solda konumlandır */
+  .tiptap.prose h1:not(.is-empty)::before {
+    content: "Title";
+    position: absolute;
+    right: calc(
+      100% + 18px
+    ); /* floating menu gibi solda, boşluk ayarlanabilir */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 50px !important;
+
+    /* Genel kuralın float/height/width'ini sıfırla */
+    float: none;
+    height: auto;
+    width: auto;
+    white-space: nowrap;
+
+    border-right: 1px solid #acacac !important;
+    padding-top: 10px !important;
+    padding-right: 20px !important;
+
+    font-family: "Playfair Display", serif !important;
+    font-size: 1.9rem !important;
+    font-weight: 400 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.5px;
+    color: #d1d5db !important;
+    pointer-events: none;
+  }
+
+  .tiptap.prose h2::before {
+    content: "Subtitle";
+    position: absolute;
+    right: calc(
+      100% + 18px
+    ); /* floating menu gibi solda, boşluk ayarlanabilir */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 50px !important;
+
+    /* Genel kuralın float/height/width'ini sıfırla */
+    float: none;
+    height: auto;
+    width: auto;
+    white-space: nowrap;
+
+    border-right: 1px solid #acacac !important;
+    padding-top: 15px !important;
+    padding-right: 20px !important;
+
+    font-family: "Playfair Display", serif !important;
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.5px;
+    color: #d1d5db !important;
+    pointer-events: none;
+  }
+
   .tiptap.prose h2,
   .tiptap.prose h3 {
-    @apply !font-extrabold !tracking-tight !font-sans !leading-[30px];
+    @apply !tracking-tight !font-sans !leading-[30px];
   }
 
   .tiptap.prose h2 {
