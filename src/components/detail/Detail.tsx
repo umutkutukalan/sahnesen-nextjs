@@ -267,6 +267,11 @@ const Detail = ({ post }: DetailProps) => {
       };
 
       return cleanedContent.map((node: any, index: number) => {
+        const prevNode = index > 0 ? cleanedContent[index - 1] : null;
+        const prevIsH2orH3 =
+          prevNode?.type === "heading" &&
+          (prevNode.attrs?.level === 2 || prevNode.attrs?.level === 3);
+
         switch (node.type) {
           case "paragraph":
             // İçeriği tamamen boş olan paragrafları render etme
@@ -316,11 +321,12 @@ const Detail = ({ post }: DetailProps) => {
             return (
               <p
                 key={index}
-                className={`text-gray-800 text-[18px] md:text-[20px] leading-relaxed mb-5 md:mb-10 font-normal ${isDropcap ? "dropcap" : ""}`}
+                className={`text-gray-800 text-[18px] md:text-[20px] leading-relaxed font-normal ${isDropcap ? "dropcap" : ""}`}
                 style={{
                   letterSpacing: "-0.003em",
                   lineHeight: "1.58",
-                  marginTop: "0.94em",
+                  marginTop: prevIsH2orH3 ? "6px" : "28px",
+                  marginBottom: "0px",
                 }}
               >
                 {node.content ? renderTextNodes(node.content) : <br />}
@@ -376,8 +382,8 @@ const Detail = ({ post }: DetailProps) => {
               `h${headingLevel}` as keyof JSX.IntrinsicElements;
             const headingClasses: Record<number, string> = {
               1: "text-4xl font-extrabold tracking-tight text-gray-950 mt-10 mb-4",
-              2: "text-[24px] md:text-[28px] font-extrabold tracking-tight leading-[30px] font-sans",
-              3: "text-[20px] md:text-[22px] font-extrabold tracking-tight -mb-[0.56em] leading-[30px] font-sans",
+              2: "text-[24px] md:text-[28px] font-extrabold tracking-tight leading-[30px] font-sans mb-0 mt-[53px]",
+              3: "text-[20px] md:text-[22px] font-extrabold tracking-tight leading-[30px] font-sans mb-0 mt-[30px]",
             };
             return (
               <HeadingTag
