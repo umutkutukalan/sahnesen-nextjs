@@ -443,9 +443,16 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             // Blockquote
             "Mod-Shift-b": () => {
               const { state } = this.editor;
-              const { selection } = state;
-              const { from, to } = selection;
-              const { $from } = selection;
+              const { from, to } = state.selection;
+
+              // Heading içindeyse önce düzleştir, sonra devam et
+              if (
+                this.editor.isActive("heading", { level: 1 }) ||
+                this.editor.isActive("heading", { level: 2 }) ||
+                this.editor.isActive("heading", { level: 3 })
+              ) {
+                this.editor.chain().focus().clearNodes().run();
+              }
 
               state.doc.nodesBetween(from, to, (node, pos) => {
                 if (
@@ -489,14 +496,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 // Hepsi zaten blockquote → çıkar
                 return this.editor.chain().focus().lift("blockquote").run();
               }
-
-              // Değilse → düzleştir ve sarmala
-              return this.editor
-                .chain()
-                .focus()
-                .clearNodes()
-                .wrapIn("blockquote")
-                .run();
             },
 
             // Cmd+Alt+1 veya Ctrl+Alt+1 basıldığında:
