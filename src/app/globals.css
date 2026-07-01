@@ -337,7 +337,7 @@ body {
     ); /* floating menu gibi solda, boşluk ayarlanabilir */
     top: 50%;
     transform: translateY(-50%);
-    height: 50px !important;
+    height: 100% !important;
 
     /* Genel kuralın float/height/width'ini sıfırla */
     float: none;
@@ -346,7 +346,7 @@ body {
     white-space: nowrap;
 
     border-right: 1px solid #acacac !important;
-    padding-top: 10px !important;
+    padding-top: 8px !important;
     padding-right: 20px !important;
 
     font-family: "Playfair Display", serif !important;
@@ -358,7 +358,7 @@ body {
     pointer-events: none;
   }
 
-  .tiptap.prose h2::before {
+  .tiptap.prose h1 + h2::before {
     content: "Subtitle";
     position: absolute;
     right: calc(
@@ -366,7 +366,7 @@ body {
     ); /* floating menu gibi solda, boşluk ayarlanabilir */
     top: 50%;
     transform: translateY(-50%);
-    height: 50px !important;
+    height: 100% !important;
 
     /* Genel kuralın float/height/width'ini sıfırla */
     float: none;
@@ -375,7 +375,7 @@ body {
     white-space: nowrap;
 
     border-right: 1px solid #acacac !important;
-    padding-top: 15px !important;
+    padding-top: 5px !important;
     padding-right: 20px !important;
 
     font-family: "Playfair Display", serif !important;
