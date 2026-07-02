@@ -430,7 +430,23 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
           return "";
         },
       }),
-      CodeBlockLowlight.configure({ lowlight }),
+      CodeBlockLowlight.extend({
+        addKeyboardShortcuts() {
+          return {
+            "Mod-Alt-c": () => {
+              if (this.editor.isActive("blockquote")) {
+                return this.editor
+                  .chain()
+                  .focus()
+                  .clearNodes()
+                  .toggleCodeBlock()
+                  .run();
+              }
+              return this.editor.chain().focus().toggleCodeBlock().run();
+            },
+          };
+        },
+      }).configure({ lowlight }),
       Focus.configure({ className: "is-focused transition-all", mode: "all" }),
       Link.configure({
         openOnClick: false,
@@ -697,6 +713,17 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             event.preventDefault();
             return true;
           }
+        }
+
+        // codeblock toggle
+        if (editor && mod && event.altKey && event.key === "c") {
+          event.preventDefault();
+          if (editor.isActive("blockquote")) {
+            editor.chain().focus().clearNodes().toggleCodeBlock().run();
+          } else {
+            editor.chain().focus().toggleCodeBlock().run();
+          }
+          return true;
         }
 
         if (editor && (event.key === " " || event.code === "Space")) {
@@ -1449,7 +1476,13 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
               <MdOutlineAddPhotoAlternate size={18} />
             </button>
             <button
-              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              onClick={() => {
+                if (editor.isActive("blockquote")) {
+                  editor.chain().focus().clearNodes().toggleCodeBlock().run;
+                } else {
+                  editor.chain().focus().toggleCodeBlock().run;
+                }
+              }}
               className="flex items-center justify-center w-8 h-8 rounded-full text-blue-600 opacity-0 border border-blue-300 hover:border-blue-500 group-hover:opacity-100 transition-all cursor-pointer"
             >
               <GoCode size={18} />
