@@ -1,43 +1,51 @@
 "use client";
 
-import dynamic from 'next/dynamic';
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import dynamic from "next/dynamic";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { GoCheck } from "react-icons/go"; // GoCloudDownload yerine GoCheck kalsın veya alttaki importu kullanalım
-import { AiOutlineLoading3Quarters, AiOutlineCloudSync, AiOutlineCheckCircle } from "react-icons/ai"; // Güvenli ikon seti
-import axios from 'axios';
-import EditorNavbar from '@/components/navbar/editor-navbar/EditorNavbar';
+import {
+  AiOutlineLoading3Quarters,
+  AiOutlineCloudSync,
+  AiOutlineCheckCircle,
+} from "react-icons/ai"; // Güvenli ikon seti
+import axios from "axios";
+import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 
-const TiptapEditor = dynamic(() => import('@/components/editor/TiptapEditor'), {
+const TiptapEditor = dynamic(() => import("@/components/editor/TiptapEditor"), {
   ssr: false,
-  loading: () => <div className="h-64 bg-gray-50 animate-pulse rounded-xl" />
+  loading: () => <div className="h-64 bg-gray-50 animate-pulse rounded-xl" />,
 });
 
 const extractTitle = (json: any): string => {
   const first = json?.content?.[0];
-  if (first?.type === 'heading' && first?.attrs?.level === 1) {
-    return first.content?.map((n: any) => n.text || '').join('') || '';
+  if (first?.type === "heading" && first?.attrs?.level === 1) {
+    return first.content?.map((n: any) => n.text || "").join("") || "";
   }
-  return '';
+  return "";
 };
 
-type SaveStatus = 'IDLE' | 'SAVING' | 'SAVED' | 'ERROR';
+type SaveStatus = "IDLE" | "SAVING" | "SAVED" | "ERROR";
 
 const CreateProjectsBlog = () => {
   const router = useRouter();
 
   const [editorJSON, setEditorJSON] = useState<any>(null);
   const editorJSONRef = useRef(editorJSON);
-  useEffect(() => { editorJSONRef.current = editorJSON; }, [editorJSON]);
+  useEffect(() => {
+    editorJSONRef.current = editorJSON;
+  }, [editorJSON]);
 
-  const [postType, setPostType] = useState<'PROJECT' | 'BLOG'>('PROJECT');
+  const [postType, setPostType] = useState<"PROJECT" | "BLOG">("PROJECT");
   const postTypeRef = useRef(postType);
-  useEffect(() => { postTypeRef.current = postType; }, [postType]);
+  useEffect(() => {
+    postTypeRef.current = postType;
+  }, [postType]);
 
   const [activePostId, setActivePostId] = useState<number | null>(null);
   const activePostIdRef = useRef<number | null>(null);
 
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('IDLE');
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Taslak Oluşturucu
@@ -47,22 +55,29 @@ const CreateProjectsBlog = () => {
     const currentTitle = extractTitle(json);
     if (!currentTitle || currentTitle.length < 3) return;
 
-    setSaveStatus('SAVING');
+    setSaveStatus("SAVING");
     try {
-      const response = await axios.post("http://localhost:8080/api/posts/me", {
-        postType: postTypeRef.current,
-        title: currentTitle,
-        content: json,
-        isPublished: false
-      }, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+      const response = await axios.post(
+        "http://localhost:8080/api/posts/me",
+        {
+          postType: postTypeRef.current,
+          title: currentTitle,
+          content: json,
+          isPublished: false,
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
       if (response.data?.id) {
         activePostIdRef.current = response.data.id;
         setActivePostId(response.data.id);
-        setSaveStatus('SAVED');
+        setSaveStatus("SAVED");
       }
     } catch (err) {
       console.error(err);
-      setSaveStatus('ERROR');
+      setSaveStatus("ERROR");
     }
   });
 
@@ -72,20 +87,28 @@ const CreateProjectsBlog = () => {
 
     // Eğer kullanıcı her şeyi sildiyse başlığı kurtaralım
     const extracted = extractTitle(currentJson);
-    const finalTitle = extracted && extracted.length >= 3 ? extracted : "Başlıksız Taslak";
+    const finalTitle =
+      extracted && extracted.length >= 3 ? extracted : "Başlıksız Taslak";
 
     try {
-      await axios.put(`http://localhost:8080/api/posts/me/${activePostIdRef.current}`, {
-        postType: postTypeRef.current,
-        title: finalTitle,
-        content: currentJson, // Boş içerik (sadece boş bir node) gidebilir, sorun değil
-        isPublished: false
-      }, { withCredentials: true, headers: { 'Content-Type': 'application/json' } });
+      await axios.put(
+        `http://localhost:8080/api/posts/me/${activePostIdRef.current}`,
+        {
+          postType: postTypeRef.current,
+          title: finalTitle,
+          content: currentJson, // Boş içerik (sadece boş bir node) gidebilir, sorun değil
+          isPublished: false,
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
-      setSaveStatus('SAVED');
+      setSaveStatus("SAVED");
     } catch (err) {
       console.error(err);
-      setSaveStatus('ERROR');
+      setSaveStatus("ERROR");
     }
   });
 
@@ -96,7 +119,7 @@ const CreateProjectsBlog = () => {
     if (!activePostIdRef.current) {
       ensureDraftExistsRef.current(json);
     } else {
-      setSaveStatus('SAVING');
+      setSaveStatus("SAVING");
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
       // Süreyi 1500ms'e çekerek Tiptap'ın DOM'u rahatça işlemesine izin veriyoruz
@@ -119,20 +142,28 @@ const CreateProjectsBlog = () => {
         postType: postTypeRef.current,
         title: extractTitle(editorJSONRef.current) || "Başlıksız",
         content: editorJSONRef.current,
-        isPublished: true
+        isPublished: true,
       };
 
       let response;
       if (currentId) {
-        response = await axios.put(`http://localhost:8080/api/posts/me/${currentId}`, payload, {
-          withCredentials: true,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        response = await axios.put(
+          `http://localhost:8080/api/posts/me/${currentId}`,
+          payload,
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
       } else {
-        response = await axios.post("http://localhost:8080/api/posts/me", payload, {
-          withCredentials: true,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        response = await axios.post(
+          "http://localhost:8080/api/posts/me",
+          payload,
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
       }
 
       if (response.status === 200 || response.status === 201) {
@@ -146,11 +177,14 @@ const CreateProjectsBlog = () => {
 
   return (
     <main className="h-[100vh-64px] bg-white text-black">
-
-      <EditorNavbar transparent={false} contentStatus={saveStatus} activePostId={activePostId} handleSave={handleSave} />
+      <EditorNavbar
+        transparent={false}
+        contentStatus={saveStatus}
+        activePostId={activePostId}
+        handleSave={handleSave}
+      />
 
       <div className="w-full lg:w-190 mx-auto px-6">
-
         {/* ÜST BAR */}
         {/* <div className="flex items-center justify-between mb-8 select-none">
           <div className="flex gap-2 bg-gray-100 p-1 rounded-lg w-max text-xs font-medium">
@@ -172,10 +206,8 @@ const CreateProjectsBlog = () => {
         </div> */}
 
         {/* TIPTAP EDITOR */}
-        <TiptapEditor
-          onUpdate={handleEditorUpdate}
-          postId={activePostId}
-        />
+
+        <TiptapEditor onUpdate={handleEditorUpdate} postId={activePostId} />
 
         {/* DEBUG ALANI */}
         {/* <div className="mt-20 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
@@ -186,7 +218,6 @@ const CreateProjectsBlog = () => {
             <p><strong>Tiptap Node Sayısı:</strong> {editorJSON?.content?.length || 0}</p>
           </div>
         </div> */}
-
       </div>
     </main>
   );

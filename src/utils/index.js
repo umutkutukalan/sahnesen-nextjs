@@ -20,6 +20,14 @@ import duck7 from "../../public/images/duck7.jpg";
 import penguinandgirl from "../../public/images/penguinandgirl.png";
 import rabbit from "../../public/images/rabbit.png";
 
+import cat1 from "../../public/images/cat_one.jpg";
+import cat2 from "../../public/images/cat_two.jpg";
+import cat3 from "../../public/images/cat_three.jpg";
+
+import tire from "../../public/images/tire.png";
+
+export { cat1, cat2, cat3, tire };
+
 export { ressam, runner, walker, loginpageimg, profileborder };
 export { undrawloveit, undrawaddfiles };
 export { quickdraw, pullshark, yolo };

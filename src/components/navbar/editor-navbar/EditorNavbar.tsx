@@ -99,7 +99,7 @@ const EditorNavbar = ({
   return (
     <>
       <nav
-        className={`editor-navbar py-4 lg:px-40 px-6 ${
+        className={`editor-navbar py-4 lg:px-40 px-6 z-50 ${
           transparent && isHome
             ? "bg-transparent text-black shadow-none static py-12 px-20"
             : transparent && !isHome
@@ -108,7 +108,7 @@ const EditorNavbar = ({
         }`}
       >
         <>
-          <div className="flex items-top gap-2">
+          <div className="flex items-top gap-2 text-black">
             <div className="text-3xl playfair-display-600">
               <NavLinks href="/" logo="Sahnesen" />
             </div>

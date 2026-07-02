@@ -1,3 +1,5 @@
+"use client";
+
 import { FaCheck } from "react-icons/fa";
 import { useState } from "react";
 import { MdNavigateNext } from "react-icons/md";
@@ -7,7 +9,9 @@ export interface CreateIntroProps {
 }
 
 export const CreateIntro = ({ setResourceType }: CreateIntroProps) => {
-  const [currentResourceType, setCurrentResourceType] = useState<"projects" | "blogs">("projects");
+  const [currentResourceType, setCurrentResourceType] = useState<
+    "projects" | "blogs"
+  >("projects");
 
   const selectedType = currentResourceType || "projects";
 
@@ -33,10 +37,11 @@ export const CreateIntro = ({ setResourceType }: CreateIntroProps) => {
                     <button
                       key={type}
                       onClick={() => setCurrentResourceType(type)}
-                      className={`w-full h-full p-5 rounded-xl cursor-pointer transition-all duration-500 shadow-md ${currentResourceType === type
-                        ? "bg-gray-300"
-                        : "bg-white text-gray-800"
-                        } focus:outline-none`}
+                      className={`w-full h-full p-5 rounded-xl cursor-pointer transition-all duration-500 shadow-md ${
+                        currentResourceType === type
+                          ? "bg-gray-300"
+                          : "bg-white text-gray-800"
+                      } focus:outline-none`}
                     >
                       {type === "projects" ? (
                         <SelectType
@@ -79,10 +84,11 @@ export const SelectType = ({ type, currentResourceType }) => {
       {type === "projects" && (
         <div className="flex items-center gap-5 text-left h-full">
           <div
-            className={`w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center ${currentResourceType === "projects"
-              ? "bg-green-800 transition-all duration-500 border-none"
-              : "transition-all duration-500"
-              }`}
+            className={`w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center ${
+              currentResourceType === "projects"
+                ? "bg-green-800 transition-all duration-500 border-none"
+                : "transition-all duration-500"
+            }`}
           >
             {currentResourceType === "projects" && (
               <FaCheck className="text-white text-2xl" />
@@ -101,10 +107,11 @@ export const SelectType = ({ type, currentResourceType }) => {
       {type === "blogs" && (
         <div className="flex items-center gap-5 text-left h-full">
           <div
-            className={`w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center ${currentResourceType === "blogs"
-              ? "bg-green-800 transition-all duration-500 border-none"
-              : "transition-all duration-500"
-              }`}
+            className={`w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center ${
+              currentResourceType === "blogs"
+                ? "bg-green-800 transition-all duration-500 border-none"
+                : "transition-all duration-500"
+            }`}
           >
             {currentResourceType === "blogs" && (
               <FaCheck className="text-white text-2xl" />
@@ -123,10 +130,11 @@ export const SelectType = ({ type, currentResourceType }) => {
       {type === "musics" && (
         <div className="flex items-center gap-5 text-left h-full">
           <div
-            className={`w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center ${currentResourceType === "musics"
-              ? "bg-green-800 transition-all duration-500 border-none"
-              : "transition-all duration-500"
-              }`}
+            className={`w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center ${
+              currentResourceType === "musics"
+                ? "bg-green-800 transition-all duration-500 border-none"
+                : "transition-all duration-500"
+            }`}
           >
             {currentResourceType === "musics" && (
               <FaCheck className="text-white text-2xl" />
@@ -144,7 +152,11 @@ export const SelectType = ({ type, currentResourceType }) => {
   );
 };
 
-export const MessageForType = ({ currentResourceType }: { currentResourceType: "projects" | "blogs" }) => {
+export const MessageForType = ({
+  currentResourceType,
+}: {
+  currentResourceType: "projects" | "blogs";
+}) => {
   return (
     <div className="text-center text-xl">
       {currentResourceType === "projects" && (
