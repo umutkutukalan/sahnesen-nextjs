@@ -33,7 +33,86 @@ lowlight.register("csharp", csharp);
 lowlight.register("cpp", cpp);
 lowlight.register("sql", sql);
 
-import { Node } from "@tiptap/core";
+import { Extension, Node } from "@tiptap/core";
+
+const EditorShortcuts = Extension.create({
+  name: "editorShortcuts",
+  addKeyboardShortcuts() {
+    return {
+      // Blockquote
+      "Mod-Shift-9": () => {
+        // Adım 1: Önce blockquote durumunu MEVCUT state'den ölç
+        const initialState = this.editor.state;
+        const { from, to } = initialState.selection;
+
+        let totalBlocks = 0;
+        let quoteBlocks = 0;
+
+        initialState.doc.nodesBetween(from, to, (node) => {
+          if (node.isBlock && node.type.name !== "doc") {
+            totalBlocks++;
+            if (node.type.name === "blockquote") quoteBlocks++;
+            return false;
+          }
+        });
+
+        const allSelectedAreQuote =
+          totalBlocks > 0 && quoteBlocks === totalBlocks;
+
+        // Adım 2: Hepsi blockquote ise direkt çık
+        if (allSelectedAreQuote) {
+          return this.editor.chain().focus().lift("blockquote").run();
+        }
+
+        // Adım 3: Heading, dropcap vs. hepsini temizle
+        this.editor.chain().focus().clearNodes().run();
+
+        // Adım 4: clearNodes sonrası TAZE state'den dropcap tara
+        const afterClearState = this.editor.state;
+        const freshFrom = afterClearState.selection.from;
+        const freshTo = afterClearState.selection.to;
+
+        afterClearState.doc.nodesBetween(freshFrom, freshTo, (node, pos) => {
+          if (
+            node.type.name === "paragraph" &&
+            node.firstChild?.type.name === "dropcap"
+          ) {
+            const letter = node.firstChild.attrs.letter || "";
+            const paragraphStart = pos + 1;
+            this.editor
+              .chain()
+              .deleteRange({
+                from: paragraphStart,
+                to: paragraphStart + 1,
+              })
+              .insertContentAt(paragraphStart, letter)
+              .run();
+          }
+          return true;
+        });
+
+        // Adım 5: Artık temiz paragrafları blockquote'a sarmala
+        return this.editor.chain().focus().wrapIn("blockquote").run();
+      },
+      "Mod-Shift-g": () => {
+        const { $from } = this.editor.state.selection;
+        const isDropcapActive = !!(
+          this.editor.isActive("paragraph") &&
+          $from.parent?.firstChild?.type.name === "dropcap"
+        );
+
+        // Zaten aktifse her zaman kapatılabilsin (kullanıcı geri alabilmeli),
+        // ama henüz aktif değilse koşula uymalı
+        if (!isDropcapActive && !isDropcapEligible(this.editor)) {
+          return false; // koşul sağlanmıyor, kısayolu işleme
+        }
+
+        toggleParagraphDropcap(this.editor); // var olan helper'ı çağır, toggle işini o yapsın
+        return true; // kısayolun "handle edildi" demesi şart
+      },
+    };
+  },
+});
 
 // 🔥 MİMARİ ADIM: Paragrafı genişleterek içeriğine göre sınıf kazandırıyoruz
 const CustomParagraph = Paragraph.extend({
@@ -408,6 +487,7 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false, paragraph: false }),
+      EditorShortcuts,
       CustomParagraph,
       Dropcap,
       CustomImage.configure({ inline: false, allowBase64: true }),
@@ -456,66 +536,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         // KISAYOLLARI YENİDEN TANIMLAYIP AKIŞA BAĞLIYORUZ
         addKeyboardShortcuts() {
           return {
-            // Blockquote
-            "Mod-Shift-9": () => {
-              // Adım 1: Önce blockquote durumunu MEVCUT state'den ölç
-              const initialState = this.editor.state;
-              const { from, to } = initialState.selection;
-
-              let totalBlocks = 0;
-              let quoteBlocks = 0;
-
-              initialState.doc.nodesBetween(from, to, (node) => {
-                if (node.isBlock && node.type.name !== "doc") {
-                  totalBlocks++;
-                  if (node.type.name === "blockquote") quoteBlocks++;
-                  return false;
-                }
-              });
-
-              const allSelectedAreQuote =
-                totalBlocks > 0 && quoteBlocks === totalBlocks;
-
-              // Adım 2: Hepsi blockquote ise direkt çık
-              if (allSelectedAreQuote) {
-                return this.editor.chain().focus().lift("blockquote").run();
-              }
-
-              // Adım 3: Heading, dropcap vs. hepsini temizle
-              this.editor.chain().focus().clearNodes().run();
-
-              // Adım 4: clearNodes sonrası TAZE state'den dropcap tara
-              const afterClearState = this.editor.state;
-              const freshFrom = afterClearState.selection.from;
-              const freshTo = afterClearState.selection.to;
-
-              afterClearState.doc.nodesBetween(
-                freshFrom,
-                freshTo,
-                (node, pos) => {
-                  if (
-                    node.type.name === "paragraph" &&
-                    node.firstChild?.type.name === "dropcap"
-                  ) {
-                    const letter = node.firstChild.attrs.letter || "";
-                    const paragraphStart = pos + 1;
-                    this.editor
-                      .chain()
-                      .deleteRange({
-                        from: paragraphStart,
-                        to: paragraphStart + 1,
-                      })
-                      .insertContentAt(paragraphStart, letter)
-                      .run();
-                  }
-                  return true;
-                },
-              );
-
-              // Adım 5: Artık temiz paragrafları blockquote'a sarmala
-              return this.editor.chain().focus().wrapIn("blockquote").run();
-            },
-
             // Cmd+Alt+1 veya Ctrl+Alt+1 basıldığında:
             "Mod-Alt-1": () => {
               if (this.editor.isActive("heading", { level: 1 })) {
@@ -619,23 +639,6 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
                 .run();
             },
 
-            "Mod-Shift-g": () => {
-              const { $from } = this.editor.state.selection;
-              const isDropcapActive = !!(
-                this.editor.isActive("paragraph") &&
-                $from.parent?.firstChild?.type.name === "dropcap"
-              );
-
-              // Zaten aktifse her zaman kapatılabilsin (kullanıcı geri alabilmeli),
-              // ama henüz aktif değilse koşula uymalı
-              if (!isDropcapActive && !isDropcapEligible(this.editor)) {
-                return false; // koşul sağlanmıyor, kısayolu işleme
-              }
-
-              toggleParagraphDropcap(this.editor); // var olan helper'ı çağır, toggle işini o yapsın
-              return true; // kısayolun "handle edildi" demesi şart
-            },
-
             // 4, 5, 6 seviyelerini kasıtlı olarak devre dışı bırak
             "Mod-Alt-4": () => true,
             "Mod-Alt-5": () => true,
@@ -644,12 +647,12 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
             // (> + Space mantığı) buraya konulabilir
             // handleKeyDown yerine doğrudan eklentinin kendi kurallarına gömüyoruz
 
-            addInputRules() {
-              // Eğer girdileri tamamen özelleştirmek istersen burayı kullanabilirsin.
-              // Ancak üstte handleKeyDown ile yaptığımız spesifik "zaten blockquote içindeyse saf metin bas"
-              // mantığı klavye dinleyicisinde kalabilir ya da buradaki kurallar tamamen sıfırlanabilir.
-              return [];
-            },
+            // addInputRules() {
+            //   Eğer girdileri tamamen özelleştirmek istersen burayı kullanabilirsin.
+            //   Ancak üstte handleKeyDown ile yaptığımız spesifik "zaten blockquote içindeyse saf metin bas"
+            //   mantığı klavye dinleyicisinde kalabilir ya da buradaki kurallar tamamen sıfırlanabilir.
+            // return [];
+            // },
           };
         },
       }).configure({
