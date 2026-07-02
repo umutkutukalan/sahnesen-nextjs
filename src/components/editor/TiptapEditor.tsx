@@ -1117,13 +1117,14 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         const { selection, doc } = editor.state;
         const isImage = editor.isActive("image");
         const isHRule = editor.isActive("horizontalRule");
+        const isCodeBlock = editor.isActive("codeBlock");
         const isEmpty = selection.empty;
 
         const linkInputEl =
           toolbar.querySelector<HTMLElement>(".bm-link-input");
         const linkActive = linkInputEl?.style.display === "flex";
 
-        if (isEmpty || isImage || isHRule) {
+        if (isEmpty || isImage || isHRule || isCodeBlock) {
           // Link input açıksa kapat
           if (linkInputEl) linkInputEl.style.display = "none";
           const btnsEl = toolbar.querySelector<HTMLElement>(".bm-btns");
