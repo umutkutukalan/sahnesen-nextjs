@@ -237,6 +237,20 @@ body {
     color: #242424 !important;
   }
 
+  .prose blockquote {
+    margin-left: -1.1em;
+    padding-left: 1em;
+    margin-top: 2.14em;
+    margin-bottom: -0.46em;
+    border-inline-start-color: #242424 !important;
+  }
+
+  .prose blockquote p {
+    @apply antialiased text-[18px] md:text-[20px] leading-relaxed;
+    line-height: 32px;
+    color: #242424;
+  }
+
   .tiptap.prose :not(pre) > code::before {
     content: "`" !important;
     margin-right: 0.3rem !important;

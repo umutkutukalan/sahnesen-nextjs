@@ -221,21 +221,21 @@ const Detail = ({ post }: DetailProps) => {
             node.marks.forEach((mark: any) => {
               if (mark.type === "bold") {
                 element = (
-                  <strong key={idx} className="font-bold text-gray-950">
+                  <strong key={idx} className="font-bold">
                     {element}
                   </strong>
                 );
               }
               if (mark.type === "italic") {
                 element = (
-                  <em key={idx} className="italic text-gray-800">
+                  <em key={idx} className="italic">
                     {element}
                   </em>
                 );
               }
               if (mark.type === "underline") {
                 element = (
-                  <u key={idx} className="underline text-gray-900">
+                  <u key={idx} className="underline">
                     {element}
                   </u>
                 );
@@ -503,17 +503,11 @@ const Detail = ({ post }: DetailProps) => {
 
           case "blockquote":
             return (
-              <blockquote
-                key={index}
-                className="border-l-4 border-black pl-5 my-8"
-              >
+              <blockquote key={index} className="blockquote">
                 {node.content?.map((child: any, i: number) => {
                   if (child.type === "paragraph") {
                     return (
-                      <p
-                        key={i}
-                        className="italic text-zinc-800 antialiased text-[18px] md:text-[20px] leading-relaxed"
-                      >
+                      <p key={i}>
                         {child.content ? renderTextNodes(child.content) : ""}
                       </p>
                     );
