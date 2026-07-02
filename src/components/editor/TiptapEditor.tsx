@@ -692,6 +692,43 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
         return true;
       });
 
+      // Dropcap kontrolü: tek satıra düşen paragraflardan dropcap'i kaldır
+      editor.state.doc.descendants((node, pos) => {
+        if (
+          node.type.name === "paragraph" &&
+          node.firstChild?.type.name === "dropcap"
+        ) {
+          const domNode = editor.view.nodeDOM(pos) as HTMLElement | null;
+          if (domNode && domNode.nodeType === Node.ELEMENT_NODE) {
+            const lineH =
+              parseFloat(window.getComputedStyle(domNode).lineHeight) || 24;
+            const isSingleLine = domNode.clientHeight < lineH * 2.5;
+
+            if (isSingleLine) {
+              const letter = node.firstChild.attrs.letter || "";
+              const paragraphStart = pos + 1;
+              const tr = editor.state.tr;
+              tr.delete(paragraphStart, paragraphStart + 1);
+              tr.insertText(letter, paragraphStart);
+              tr.setMeta("addToHistory", false);
+              editor.view.dispatch(tr);
+            }
+          } else {
+            // DOM'a ulaşılamazsa karakter sayısı fallback
+            if (node.textContent.length < 90) {
+              const letter = node.firstChild.attrs.letter || "";
+              const paragraphStart = pos + 1;
+              const tr = editor.state.tr;
+              tr.delete(paragraphStart, paragraphStart + 1);
+              tr.insertText(letter, paragraphStart);
+              tr.setMeta("addToHistory", false);
+              editor.view.dispatch(tr);
+            }
+          }
+        }
+        return true;
+      });
+
       if (hasChanged) {
         // Geçmişi (Undo-Redo) bozmamak için addToHistory: false ile transaction'ı uyguluyoruz
         tr.setMeta("addToHistory", false);
