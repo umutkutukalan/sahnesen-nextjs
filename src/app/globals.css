@@ -204,7 +204,10 @@ body {
     margin-top: 0 !important;
   }
 
-  .tiptap.prose h2 + p,
+  .tiptap.prose h2 + p {
+    margin-top: 12px !important;
+  }
+
   .tiptap.prose h3 + p {
     margin-top: 6px !important;
   }
@@ -419,6 +422,8 @@ body {
   .tiptap figure {
     @apply relative select-none h-auto;
     overflow: visible !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   .tiptap figure .image-toolbar {

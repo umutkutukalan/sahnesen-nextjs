@@ -268,9 +268,10 @@ const Detail = ({ post }: DetailProps) => {
 
       return cleanedContent.map((node: any, index: number) => {
         const prevNode = index > 0 ? cleanedContent[index - 1] : null;
-        const prevIsH2orH3 =
-          prevNode?.type === "heading" &&
-          (prevNode.attrs?.level === 2 || prevNode.attrs?.level === 3);
+        const prevIsH2 =
+          prevNode?.type === "heading" && prevNode.attrs?.level === 2;
+        const prevIsH3 =
+          prevNode?.type === "heading" && prevNode.attrs?.level === 3;
 
         switch (node.type) {
           case "paragraph":
@@ -325,7 +326,7 @@ const Detail = ({ post }: DetailProps) => {
                 style={{
                   letterSpacing: "-0.003em",
                   lineHeight: "1.58",
-                  marginTop: prevIsH2orH3 ? "6px" : "28px",
+                  marginTop: prevIsH2 ? "12px" : prevIsH3 ? "6px" : "28px",
                   marginBottom: "0px",
                 }}
               >
