@@ -421,14 +421,14 @@ const isDropcapEligible = (editor: any): boolean => {
     if (domNode && domNode.nodeType === Node.ELEMENT_NODE) {
       const computedStyle = window.getComputedStyle(domNode);
       const lineH = parseFloat(computedStyle.lineHeight) || 24;
-      return domNode.clientHeight >= lineH * 2;
+      return domNode.clientHeight >= lineH * 2.5; // onUpdate ile aynı eşik
     }
 
-    return ($from.parent.textContent?.length ?? 0) >= 70;
+    return ($from.parent.textContent?.length ?? 0) >= 95; // onUpdate ile aynı fallback
   } catch (err) {
     console.warn("Dropcap görünüm hesabı esnasında hata:", err);
     const { $from } = editor.state.selection;
-    return ($from.parent?.textContent?.length ?? 0) >= 70;
+    return ($from.parent?.textContent?.length ?? 0) >= 95;
   }
 };
 
