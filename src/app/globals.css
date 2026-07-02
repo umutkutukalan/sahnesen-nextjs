@@ -214,8 +214,11 @@ body {
 
   /* Blockquote stilleri */
   .tiptap.prose blockquote {
-    margin: 1.5em 0 !important;
+    margin-left: -1.1em !important;
     padding-left: 1em !important;
+
+    margin-top: 2.14em !important;
+    margin-bottom: -0.46em !important;
 
     /* 🔥 ÇÖZÜM: Tailwind'in kullandığı renk değişkenini beyaz yapıyoruz */
     --tw-prose-quote-borders: #000 !important;
@@ -228,6 +231,10 @@ body {
   .prose blockquote p::before,
   .prose blockquote p::after {
     content: none !important;
+  }
+
+  .tiptap.prose blockquote p {
+    color: #242424 !important;
   }
 
   .tiptap.prose :not(pre) > code::before {
