@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { IoIosArrowForward } from "react-icons/io";
 
 const cards = [
   {
@@ -15,7 +16,7 @@ const cards = [
     image: fineday,
     side: "left",
     bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
-    options: ["Yeni Monolog Yaz", "Monolog Arşivi", "Örneklere Göz At"],
+    options: ["Editöre Git"],
   },
   {
     id: "sahne",
@@ -25,7 +26,7 @@ const cards = [
     side: "right",
     route: "/olustur",
     bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
-    options: ["Sahne Oluştur", "Karakter Tasarla", "Şablonlar"],
+    options: ["Editöre Git"],
   },
   {
     id: "yanyana",
@@ -34,7 +35,7 @@ const cards = [
     image: card1,
     side: "left",
     bottomOffset: "-bottom-2 left-0 sm:-bottom-2 sm:left-0 w-60 h-60",
-    options: ["İkili Sahne Başlat", "Metin Karşılaştır"],
+    options: ["Editöre Git"],
   },
   {
     id: "tersyuz",
@@ -43,7 +44,7 @@ const cards = [
     image: camasir,
     side: "right",
     bottomOffset: "sm:-bottom-10 sm:-left-10 w-90 h-90",
-    options: ["Rolleri Değiş", "Tersyüz Hikayeleri"],
+    options: ["Editöre Git"],
   },
 ];
 
@@ -153,10 +154,7 @@ const CreateIntroTwo = () => {
                 style={{ zIndex: isSelected ? 50 : 1 }}
               >
                 {/* Süsleme Katmanı (Label & Tire) */}
-                <motion.div
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  animate={{ opacity: isSelected && isExpanded ? 0 : 1 }}
-                >
+                <motion.div className="absolute inset-0 w-full h-full pointer-events-none">
                   {/* Label */}
                   <div
                     className={`absolute w-1/2 h-8 border border-black flex items-center justify-center ${
@@ -165,12 +163,12 @@ const CreateIntroTwo = () => {
                         : "-right-18 bottom-14 rotate-90 bg-gray-600 text-white"
                     }`}
                   >
-                    <span className="text-sm font-bold">{card.label}</span>
+                    <span className="text-sm">{card.label}</span>
                   </div>
 
                   {/* Tire */}
                   <div
-                    className={`absolute z-50 h-30 w-30 sm:h-40 sm:w-40
+                    className={`absolute z-150 h-30 w-30 sm:h-40 sm:w-40
                       ${
                         card.side === "left"
                           ? "-left-14 -top-14 sm:-left-18 sm:-top-18 -rotate-30"
@@ -187,7 +185,7 @@ const CreateIntroTwo = () => {
                 </motion.div>
 
                 {/* 1. Maskelenmiş Gerçek Kutu (İçerik) - overflow-hidden BURADA kalıyor */}
-                <div className="relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto">
+                <div className="relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto z-100">
                   <div
                     className="w-full h-full"
                     style={{ background: card.bg }}
@@ -211,21 +209,21 @@ const CreateIntroTwo = () => {
                     variants={containerVariants}
                     initial="hidden"
                     animate="show"
-                    className="absolute top-full left-0 w-full flex flex-col items-center justify-center pt-4 gap-2 z-50 pointer-events-auto"
+                    className="absolute -bottom-15 right-0 flex flex-col items-end justify-center gap-2 pointer-events-auto"
                   >
                     {card.options?.map((option, idx) => (
                       <motion.button
                         key={idx}
                         variants={itemVariants}
-                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={(e) => {
-                          e.stopPropagation(); // Kartın geriye doğru kapanmasını önlemek için
-                          alert(`${option} seçildi!`);
+                          e.stopPropagation();
+                          router.push("/olustur");
                         }}
-                        className="w-full py-2 px-4 border-2 border-black bg-white text-black font-bold text-xs rounded-md shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-50 transition-colors"
+                        className="w-fit text-black flex items-center justify-end gap-1 transition-colors cursor-pointer"
                       >
-                        {option}
+                        <span>{option}</span>
+                        <IoIosArrowForward />
                       </motion.button>
                     ))}
                   </motion.div>
