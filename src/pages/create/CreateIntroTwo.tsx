@@ -4,7 +4,7 @@ import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 import { camasir, card1, fineday, sahne, tire } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 const cards = [
@@ -46,14 +46,31 @@ const cards = [
 const CreateIntroTwo = () => {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleClick = (card: (typeof cards)[0]) => {
-    if (selected) return;
+    // 1. Durum: Eğer zaten bu seçili karta tıklandıysa animasyonu GERİ AL (Kapat)
+    if (selected === card.id) {
+      setSelected(null);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current); // Sayfa geçişini iptal et
+        timeoutRef.current = null;
+      }
+      return;
+    }
+
+    // 2. Durum: Başka bir kart seçiliyken tıklamaları engelle
+    if (selected !== null) return;
+
+    // 3. Durum: İlk defa bir karta tıklanıyorsa ORTAYA TOPLA
     setSelected(card.id);
 
-    setTimeout(() => {
-      if (card.route) router.push(card.route);
-    }, 1000);
+    // Eğer kartın bir rotası varsa 1 saniye sonra oraya yönlendir
+    if (card.route) {
+      timeoutRef.current = setTimeout(() => {
+        router.push(card.route);
+      }, 1000);
+    }
   };
 
   return (
@@ -75,6 +92,16 @@ const CreateIntroTwo = () => {
               i % 2 === 0 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
             const offsetY =
               i < 2 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
+
+            const getDelay = () => {
+              if (selected !== null) {
+                //kartları ortaya toplarken
+                return isSelected ? 0.15 : i * 0.04;
+              } else {
+                //kartları geri açarken
+                return isSelected ? 0.15 : i * 0.05;
+              }
+            };
 
             return (
               <motion.div
@@ -104,7 +131,7 @@ const CreateIntroTwo = () => {
                 transition={{
                   duration: 0.5,
                   ease: [0.4, 0, 0.2, 1],
-                  delay: isSelected ? 0.1 : 0,
+                  delay: getDelay(),
                 }}
                 style={{ zIndex: isSelected ? 50 : 1 }}
               >
