@@ -22,7 +22,6 @@ const cards = [
     bg: "#faf8f5",
     image: sahne,
     side: "right",
-    route: "/olustur",
     bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
   },
   {
