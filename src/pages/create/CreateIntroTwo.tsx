@@ -48,6 +48,8 @@ const CreateIntroTwo = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const selectedCardData = cards.find((card) => card.id === selected);
+
   const handleClick = (card: (typeof cards)[0]) => {
     // 1. Durum: Eğer zaten bu seçili karta tıklandıysa animasyonu GERİ AL (Kapat)
     if (selected === card.id) {
@@ -81,7 +83,10 @@ const CreateIntroTwo = () => {
         activePostId={null}
         handleSave={() => {}}
       />
-      <div className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden">
+      <div
+        className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden group"
+        style={{ backgroundColor: selected ? selectedCardData?.bg : "#ffffff" }}
+      >
         <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-xl mx-auto">
           {cards.map((card, i) => {
             const isSelected = selected === card.id;
@@ -107,7 +112,7 @@ const CreateIntroTwo = () => {
               <motion.div
                 key={card.id}
                 // group sınıfını buraya ekledik ki ileride hover yapmak isterseniz tetiklensin
-                className="relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group"
+                className={`relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer ${selected ? `group:${card.bg}` : ""}`}
                 onClick={() => handleClick(card)}
                 animate={
                   isSelected
