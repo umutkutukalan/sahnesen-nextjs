@@ -10,22 +10,22 @@ import { IoIosArrowForward } from "react-icons/io";
 
 const cards = [
   {
-    id: "monolog",
-    label: "Monolog",
-    bg: "#f2c103",
-    image: fineday,
-    side: "left",
-    bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
-    options: ["Editöre Git"],
-  },
-  {
     id: "sahne",
     label: "Sahne",
     bg: "#faf8f5",
     image: sahne,
-    side: "right",
+    side: "left",
     route: "/olustur",
     bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
+    options: ["Editöre Git"],
+  },
+  {
+    id: "monolog",
+    label: "Monolog",
+    bg: "#f2c103",
+    image: fineday,
+    side: "right",
+    bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
     options: ["Editöre Git"],
   },
   {
@@ -157,10 +157,10 @@ const CreateIntroTwo = () => {
                 <motion.div className="absolute inset-0 w-full h-full pointer-events-none">
                   {/* Label */}
                   <div
-                    className={`absolute w-1/2 h-8 border border-black flex items-center justify-center ${
+                    className={`absolute w-1/2 h-8 flex items-center justify-center bg-gray-600 text-white ${
                       card.side === "left"
-                        ? "-left-18 bottom-14 -rotate-90 bg-gray-200 text-black"
-                        : "-right-18 bottom-14 rotate-90 bg-gray-600 text-white"
+                        ? "-left-18 bottom-14 -rotate-90"
+                        : "-right-18 bottom-14 rotate-90"
                     }`}
                   >
                     <span className="text-sm">{card.label}</span>
