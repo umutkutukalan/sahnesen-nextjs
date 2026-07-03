@@ -4,7 +4,7 @@ import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 import { camasir, card1, fineday, sahne, tire } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 
 const cards = [
@@ -15,6 +15,7 @@ const cards = [
     image: fineday,
     side: "left",
     bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
+    options: ["Yeni Monolog Yaz", "Monolog Arşivi", "Örneklere Göz At"],
   },
   {
     id: "sahne",
@@ -22,7 +23,9 @@ const cards = [
     bg: "#faf8f5",
     image: sahne,
     side: "right",
+    route: "/olustur",
     bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
+    options: ["Sahne Oluştur", "Karakter Tasarla", "Şablonlar"],
   },
   {
     id: "yanyana",
@@ -31,6 +34,7 @@ const cards = [
     image: card1,
     side: "left",
     bottomOffset: "-bottom-2 left-0 sm:-bottom-2 sm:left-0 w-60 h-60",
+    options: ["İkili Sahne Başlat", "Metin Karşılaştır"],
   },
   {
     id: "tersyuz",
@@ -39,39 +43,47 @@ const cards = [
     image: camasir,
     side: "right",
     bottomOffset: "sm:-bottom-10 sm:-left-10 w-90 h-90",
+    options: ["Rolleri Değiş", "Tersyüz Hikayeleri"],
   },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
+};
 
 const CreateIntroTwo = () => {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedCardData = cards.find((card) => card.id === selected);
 
   const handleClick = (card: (typeof cards)[0]) => {
-    // 1. Durum: Eğer zaten bu seçili karta tıklandıysa animasyonu GERİ AL (Kapat)
     if (selected === card.id) {
+      setIsExpanded(false);
       setSelected(null);
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current); // Sayfa geçişini iptal et
+        clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
       return;
     }
 
-    // 2. Durum: Başka bir kart seçiliyken tıklamaları engelle
     if (selected !== null) return;
-
-    // 3. Durum: İlk defa bir karta tıklanıyorsa ORTAYA TOPLA
     setSelected(card.id);
-
-    // Eğer kartın bir rotası varsa 1 saniye sonra oraya yönlendir
-    if (card.route) {
-      timeoutRef.current = setTimeout(() => {
-        router.push(card.route);
-      }, 1000);
-    }
   };
 
   return (
@@ -83,7 +95,7 @@ const CreateIntroTwo = () => {
         handleSave={() => {}}
       />
       <div
-        className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden group"
+        className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden transition-colors duration-500 ease-in-out"
         style={{ backgroundColor: selected ? selectedCardData?.bg : "#ffffff" }}
       >
         <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-xl mx-auto">
@@ -91,7 +103,6 @@ const CreateIntroTwo = () => {
             const isSelected = selected === card.id;
             const isOther = selected !== null && !isSelected;
 
-            // Ortaya toplanma offset'leri
             const offsetX =
               i % 2 === 0 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
             const offsetY =
@@ -99,19 +110,16 @@ const CreateIntroTwo = () => {
 
             const getDelay = () => {
               if (selected !== null) {
-                //kartları ortaya toplarken
                 return isSelected ? 0.15 : i * 0.04;
               } else {
-                //kartları geri açarken
-                return isSelected ? 0.15 : i * 0.05;
+                return isSelected ? 0 : 0.15 + i * 0.05;
               }
             };
 
             return (
               <motion.div
                 key={card.id}
-                // group sınıfını buraya ekledik ki ileride hover yapmak isterseniz tetiklensin
-                className={`relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer ${selected ? `group:${card.bg}` : ""}`}
+                className="relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group"
                 onClick={() => handleClick(card)}
                 animate={
                   isSelected
@@ -137,25 +145,30 @@ const CreateIntroTwo = () => {
                   ease: [0.4, 0, 0.2, 1],
                   delay: getDelay(),
                 }}
+                onAnimationComplete={() => {
+                  if (isSelected) {
+                    setIsExpanded(true);
+                  }
+                }}
                 style={{ zIndex: isSelected ? 50 : 1 }}
               >
-                {/* KARTIN ASIL GÖVDESİ VE TAŞAN UNSURLAR 
-                  Bu kapsayıcı tam olarak w-full h-full olduğu için ortalama 
-                  hesabını asla bozmaz, dışındaki süsler alanı genişletmez.
-                */}
-                <div className="absolute inset-0 w-full h-full pointer-events-none">
-                  {/* Label - Sadece görsel olarak dışarı itildi */}
+                {/* Süsleme Katmanı (Label & Tire) */}
+                <motion.div
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  animate={{ opacity: isSelected && isExpanded ? 0 : 1 }}
+                >
+                  {/* Label */}
                   <div
-                    className={`absolute w-1/2 h-8 border border-black flex items-center justify-center                      ${
+                    className={`absolute w-1/2 h-8 border border-black flex items-center justify-center ${
                       card.side === "left"
                         ? "-left-18 bottom-14 -rotate-90 bg-gray-200 text-black"
                         : "-right-18 bottom-14 rotate-90 bg-gray-600 text-white"
                     }`}
                   >
-                    <span className="text-sm">{card.label}</span>
+                    <span className="text-sm font-bold">{card.label}</span>
                   </div>
 
-                  {/* Tire - Sadece görsel olarak dışarı itildi */}
+                  {/* Tire */}
                   <div
                     className={`absolute z-50 h-30 w-30 sm:h-40 sm:w-40
                       ${
@@ -171,9 +184,9 @@ const CreateIntroTwo = () => {
                       className="object-contain"
                     />
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Maskelenmiş Gerçek Kutu (İçerik) */}
+                {/* 1. Maskelenmiş Gerçek Kutu (İçerik) - overflow-hidden BURADA kalıyor */}
                 <div className="relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto">
                   <div
                     className="w-full h-full"
@@ -188,6 +201,35 @@ const CreateIntroTwo = () => {
                     />
                   </div>
                 </div>
+
+                {/* 2. SİHİRLİ DOKUNUŞ: KARTIN DIŞINDA (ALTINDA) BELİREN SEÇENEKLER 
+                    overflow-hidden olan üstteki div'in dışına çıkarttık. 
+                    absolute top-full vererek kutunun alt hizasından dışarıya taşmasını sağladık.
+                */}
+                {isSelected && isExpanded && (
+                  <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                    className="absolute top-full left-0 w-full flex flex-col items-center justify-center pt-4 gap-2 z-50 pointer-events-auto"
+                  >
+                    {card.options?.map((option, idx) => (
+                      <motion.button
+                        key={idx}
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Kartın geriye doğru kapanmasını önlemek için
+                          alert(`${option} seçildi!`);
+                        }}
+                        className="w-full py-2 px-4 border-2 border-black bg-white text-black font-bold text-xs rounded-md shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-50 transition-colors"
+                      >
+                        {option}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
               </motion.div>
             );
           })}
