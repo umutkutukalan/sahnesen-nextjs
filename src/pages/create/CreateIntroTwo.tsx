@@ -1,10 +1,61 @@
 "use client";
 
 import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
-import { cat1, cat2, cat3, tire } from "@/utils";
+import { camasir, card1, fineday, sahne, tire } from "@/utils";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { motion } from "framer-motion";
+
+const cards = [
+  {
+    id: "monolog",
+    label: "Monolog",
+    bg: "#f2c103",
+    image: fineday,
+    side: "left",
+    bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
+  },
+  {
+    id: "sahne",
+    label: "Sahne",
+    bg: "#faf8f5",
+    image: sahne,
+    side: "right",
+    route: "/olustur",
+    bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
+  },
+  {
+    id: "yanyana",
+    label: "Yan Yana",
+    bg: "#fa9ec1",
+    image: card1,
+    side: "left",
+    bottomOffset: "-bottom-2 left-0 sm:-bottom-2 sm:left-0 w-60 h-60",
+  },
+  {
+    id: "tersyuz",
+    label: "Tersyüz",
+    bg: "#93c5fd",
+    image: camasir,
+    side: "right",
+    bottomOffset: "sm:-bottom-10 sm:-left-10 w-90 h-90",
+  },
+];
 
 const CreateIntroTwo = () => {
+  const router = useRouter();
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const handleClick = (card: (typeof cards)[0]) => {
+    if (selected) return;
+    setSelected(card.id);
+
+    setTimeout(() => {
+      if (card.route) router.push(card.route);
+    }, 1000);
+  };
+
   return (
     <>
       <EditorNavbar
@@ -13,49 +64,102 @@ const CreateIntroTwo = () => {
         activePostId={null}
         handleSave={() => {}}
       />
-      <div className="w-full h-[100vh] relative">
-        <div className="flex flex-wrap content-center justify-center gap-10 w-full h-full max-w-xl mx-auto">
-          {" "}
-          <div className="relative w-44 h-44 sm:w-60 sm:h-60">
-            <div className="absolute -left-14 -top-14 sm:-left-18 sm:-top-18 z-50 h-30 w-30 sm:h-40 sm:w-40 -rotate-30">
-              <Image src={tire} fill alt="Tire" className="object-contain" />
-            </div>
-            <div className="relative w-full h-full rounded-md border border-black overflow-hidden">
-              <div className="absolute w-full h-full">
-                <Image src={cat1} fill alt="Kedi" className="object-cover" />
-              </div>
-            </div>
-          </div>
-          <div className="relative w-44 h-44 sm:w-60 sm:h-60">
-            <div className="absolute -right-14 -top-14 sm:-right-18 sm:-top-18 z-50 h-30 w-30 sm:h-40 sm:w-40 rotate-30">
-              <Image src={tire} fill alt="Tire" className="object-contain" />
-            </div>
-            <div className="relative w-full h-full rounded-md border border-black overflow-hidden">
-              <div className="absolute w-full h-full">
-                <Image src={cat2} fill alt="Kedi" className="object-cover" />
-              </div>
-            </div>
-          </div>
-          <div className="relative w-44 h-44 sm:w-60 sm:h-60">
-            <div className="absolute -left-14 -top-14 sm:-left-18 sm:-top-18 z-50 h-30 w-30 sm:h-40 sm:w-40 -rotate-30">
-              <Image src={tire} fill alt="Tire" className="object-contain" />
-            </div>
-            <div className="relative w-full h-full rounded-md border border-black overflow-hidden">
-              <div className="absolute w-full h-full">
-                <Image src={cat3} fill alt="Kedi" className="object-cover" />
-              </div>
-            </div>
-          </div>
-          <div className="relative w-44 h-44 sm:w-60 sm:h-60">
-            <div className="absolute -right-14 -top-14 sm:-right-18 sm:-top-18 z-50 h-30 w-30 sm:h-40 sm:w-40 rotate-30">
-              <Image src={tire} fill alt="Tire" className="object-contain" />
-            </div>
-            <div className="relative w-full h-full rounded-md border border-black overflow-hidden">
-              <div className="absolute w-full h-full">
-                <Image src={cat1} fill alt="Kedi" className="object-cover" />
-              </div>
-            </div>
-          </div>
+      <div className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden">
+        <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-xl mx-auto">
+          {cards.map((card, i) => {
+            const isSelected = selected === card.id;
+            const isOther = selected !== null && !isSelected;
+
+            // Ortaya toplanma offset'leri
+            const offsetX =
+              i % 2 === 0 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
+            const offsetY =
+              i < 2 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
+
+            return (
+              <motion.div
+                key={card.id}
+                // group sınıfını buraya ekledik ki ileride hover yapmak isterseniz tetiklensin
+                className="relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group"
+                onClick={() => handleClick(card)}
+                animate={
+                  isSelected
+                    ? {
+                        x: offsetX,
+                        y: offsetY,
+                        scale: 1.1,
+                        zIndex: 50,
+                        opacity: 1,
+                      }
+                    : isOther
+                      ? {
+                          x: offsetX,
+                          y: offsetY,
+                          scale: 0.9,
+                          opacity: 0,
+                          zIndex: 1,
+                        }
+                      : { x: 0, y: 0, scale: 1, opacity: 1, zIndex: 1 }
+                }
+                transition={{
+                  duration: 0.5,
+                  ease: [0.4, 0, 0.2, 1],
+                  delay: isSelected ? 0.1 : 0,
+                }}
+                style={{ zIndex: isSelected ? 50 : 1 }}
+              >
+                {/* KARTIN ASIL GÖVDESİ VE TAŞAN UNSURLAR 
+                  Bu kapsayıcı tam olarak w-full h-full olduğu için ortalama 
+                  hesabını asla bozmaz, dışındaki süsler alanı genişletmez.
+                */}
+                <div className="absolute inset-0 w-full h-full pointer-events-none">
+                  {/* Label - Sadece görsel olarak dışarı itildi */}
+                  <div
+                    className={`absolute w-1/2 h-8 border border-black flex items-center justify-center                      ${
+                      card.side === "left"
+                        ? "-left-18 bottom-14 -rotate-90 bg-gray-200 text-black"
+                        : "-right-18 bottom-14 rotate-90 bg-gray-600 text-white"
+                    }`}
+                  >
+                    <span className="text-sm">{card.label}</span>
+                  </div>
+
+                  {/* Tire - Sadece görsel olarak dışarı itildi */}
+                  <div
+                    className={`absolute z-50 h-30 w-30 sm:h-40 sm:w-40
+                      ${
+                        card.side === "left"
+                          ? "-left-14 -top-14 sm:-left-18 sm:-top-18 -rotate-30"
+                          : "-right-14 -top-14 sm:-right-18 sm:-top-18 rotate-30"
+                      }`}
+                  >
+                    <Image
+                      src={tire}
+                      fill
+                      alt="Tire"
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+
+                {/* Maskelenmiş Gerçek Kutu (İçerik) */}
+                <div className="relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto">
+                  <div
+                    className="w-full h-full"
+                    style={{ background: card.bg }}
+                  />
+                  <div className={`absolute ${card.bottomOffset}`}>
+                    <Image
+                      src={card.image}
+                      fill
+                      alt={card.label}
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </>

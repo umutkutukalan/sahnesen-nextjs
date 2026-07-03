@@ -20,13 +20,14 @@ import duck7 from "../../public/images/duck7.jpg";
 import penguinandgirl from "../../public/images/penguinandgirl.png";
 import rabbit from "../../public/images/rabbit.png";
 
-import cat1 from "../../public/images/cat_one.jpg";
-import cat2 from "../../public/images/cat_two.jpg";
-import cat3 from "../../public/images/cat_three.jpg";
+import card1 from "../../public/images/card1.png";
+import camasir from "../../public/images/camasir.png";
+import fineday from "../../public/images/fineday.png";
+import sahne from "../../public/images/sahne.png";
 
 import tire from "../../public/images/tire.png";
 
-export { cat1, cat2, cat3, tire };
+export { tire, fineday, sahne, card1, camasir };
 
 export { ressam, runner, walker, loginpageimg, profileborder };
 export { undrawloveit, undrawaddfiles };
