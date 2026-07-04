@@ -18,6 +18,7 @@ const cards = [
     route: "/olustur",
     bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
     options: ["Editöre Git"],
+    sentence: "",
     description: "Projelerin, çalışmaların, süreçlerin. Sahne senin.",
   },
   {
@@ -28,6 +29,7 @@ const cards = [
     side: "right",
     bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
     options: ["Editöre Git"],
+    sentence: "",
     description: "İç sesin, fikirlerin, tecrübelerin. Kendinle baş başa.",
   },
   {
@@ -38,6 +40,7 @@ const cards = [
     side: "left",
     bottomOffset: "-bottom-2 left-0 sm:-bottom-2 sm:left-0 w-60 h-60",
     options: ["Editöre Git"],
+    sentence: "Bak dün ne oldu biliyor musun?",
     description: "Anıların, rutinlerin, sohbetlerin. Okurla kahve eşliğinde.",
   },
   {
@@ -48,6 +51,7 @@ const cards = [
     side: "right",
     bottomOffset: "sm:-bottom-10 sm:-left-10 w-90 h-90",
     options: ["Editöre Git"],
+    sentence: "Herkesin hayran olduğu, bana delilik.",
     description: "Mizahın, ironilerin, ters köşelerin. Kuralları baştan yaz.",
   },
 ];
@@ -241,7 +245,10 @@ const CreateIntroTwo = () => {
                           </motion.button>
                         ))}
                       </motion.div>
-                      <div className="absolute -top-12 w-max pointer-events-none">
+                      <div className="absolute -top-14 w-max pointer-events-none flex flex-col gap-1 items-center justify-center">
+                        <span className="text-[10px] flex items-center justify-end italic">
+                          {`'${card.sentence}'`}
+                        </span>
                         <motion.div
                           variants={containerVariants}
                           initial="hidden"
@@ -250,9 +257,6 @@ const CreateIntroTwo = () => {
                         >
                           <span className="text-xs">{card.description}</span>
                         </motion.div>
-                        {/* <span className="text-green-800 text-[10px] flex items-center justify-end">
-                          sahnesen
-                        </span> */}
                       </div>
                     </div>
                   </>
