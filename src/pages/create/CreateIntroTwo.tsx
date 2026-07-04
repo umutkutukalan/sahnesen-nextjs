@@ -18,6 +18,7 @@ const cards = [
     route: "/olustur",
     bottomOffset: "sm:-bottom-20 sm:-right-4 w-80 h-80",
     options: ["Editöre Git"],
+    description: "Projelerin, çalışmaların, süreçlerin. Sahne senin.",
   },
   {
     id: "monolog",
@@ -27,6 +28,7 @@ const cards = [
     side: "right",
     bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
     options: ["Editöre Git"],
+    description: "İç sesin, fikirlerin, tecrübelerin. Kendinle baş başa.",
   },
   {
     id: "yanyana",
@@ -36,6 +38,7 @@ const cards = [
     side: "left",
     bottomOffset: "-bottom-2 left-0 sm:-bottom-2 sm:left-0 w-60 h-60",
     options: ["Editöre Git"],
+    description: "Anıların, rutinlerin, sohbetlerin. Okurla kahve eşliğinde.",
   },
   {
     id: "tersyuz",
@@ -45,6 +48,7 @@ const cards = [
     side: "right",
     bottomOffset: "sm:-bottom-10 sm:-left-10 w-90 h-90",
     options: ["Editöre Git"],
+    description: "Mizahın, ironilerin, ters köşelerin. Kuralları baştan yaz.",
   },
 ];
 
@@ -214,28 +218,43 @@ const CreateIntroTwo = () => {
                 */}
                 {isSelected && isExpanded && (
                   <>
-                    <motion.div
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="show"
-                      className="absolute -bottom-15 right-0 flex flex-col items-end justify-center gap-2 pointer-events-auto"
-                    >
-                      {card.options?.map((option, idx) => (
-                        <motion.button
-                          key={idx}
-                          variants={itemVariants}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push("/olustur");
-                          }}
-                          className="w-fit text-black flex items-center justify-end gap-1 transition-colors cursor-pointer"
+                    <div className="flex flex-col w-full items-center justify-center">
+                      <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
+                        className="absolute -bottom-15 right-0 flex flex-col items-end justify-center gap-2 pointer-events-auto"
+                      >
+                        {card.options?.map((option, idx) => (
+                          <motion.button
+                            key={idx}
+                            variants={itemVariants}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push("/olustur");
+                            }}
+                            className="w-fit text-black flex items-center justify-end gap-1 transition-colors cursor-pointer"
+                          >
+                            <span>{option}</span>
+                            <IoIosArrowForward />
+                          </motion.button>
+                        ))}
+                      </motion.div>
+                      <div className="absolute -top-12 w-max pointer-events-none">
+                        <motion.div
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="show"
+                          className="flex items-center justify-center"
                         >
-                          <span>{option}</span>
-                          <IoIosArrowForward />
-                        </motion.button>
-                      ))}
-                    </motion.div>
+                          <span className="text-xs">{card.description}</span>
+                        </motion.div>
+                        {/* <span className="text-green-800 text-[10px] flex items-center justify-end">
+                          sahnesen
+                        </span> */}
+                      </div>
+                    </div>
                   </>
                 )}
               </motion.div>
