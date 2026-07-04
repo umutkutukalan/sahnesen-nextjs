@@ -25,9 +25,12 @@ import camasir from "../../public/images/camasir.png";
 import fineday from "../../public/images/fineday.png";
 import sahne from "../../public/images/sahne.png";
 
+import arkaplan from "../../public/images/arkaplan.png";
+import bird from "../../public/images/bird.png";
+
 import tire from "../../public/images/tire.png";
 
-export { tire, fineday, sahne, card1, camasir };
+export { tire, fineday, sahne, card1, camasir, arkaplan, bird };
 
 export { ressam, runner, walker, loginpageimg, profileborder };
 export { undrawloveit, undrawaddfiles };

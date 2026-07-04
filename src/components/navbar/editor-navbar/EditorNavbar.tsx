@@ -174,7 +174,7 @@ const EditorNavbar = ({
                   )}
                 </div> */}
                   <div
-                    className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-gray-200  ${
+                    className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-gray-600  ${
                       !user.profileImg && "border border-gray-300"
                     }`}
                     onClick={() => setShowProfileMenu(!showProfileMenu)}

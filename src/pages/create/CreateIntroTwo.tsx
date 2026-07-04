@@ -1,7 +1,7 @@
 "use client";
 
 import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
-import { camasir, card1, fineday, sahne, tire } from "@/utils";
+import { arkaplan, bird, camasir, card1, fineday, sahne, tire } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
@@ -97,8 +97,16 @@ const CreateIntroTwo = () => {
       />
       <div
         className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden transition-colors duration-500 ease-in-out"
-        style={{ backgroundColor: selected ? selectedCardData?.bg : "#ffffff" }}
+        style={{ backgroundColor: selected ? selectedCardData?.bg : "#fff" }}
       >
+        <div className="absolute right-0 -bottom-20 w-80 h-180 z-0 pointer-events-none user-none">
+          <Image src={arkaplan} fill alt="Background" />
+        </div>
+
+        <div className="absolute left-20 top-20 w-50 h-50 z-0 pointer-events-none user-none">
+          <Image src={bird} fill alt="Bird" />
+        </div>
+
         <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-xl mx-auto">
           {cards.map((card, i) => {
             const isSelected = selected === card.id;
@@ -205,28 +213,30 @@ const CreateIntroTwo = () => {
                     absolute top-full vererek kutunun alt hizasından dışarıya taşmasını sağladık.
                 */}
                 {isSelected && isExpanded && (
-                  <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="show"
-                    className="absolute -bottom-15 right-0 flex flex-col items-end justify-center gap-2 pointer-events-auto"
-                  >
-                    {card.options?.map((option, idx) => (
-                      <motion.button
-                        key={idx}
-                        variants={itemVariants}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push("/olustur");
-                        }}
-                        className="w-fit text-black flex items-center justify-end gap-1 transition-colors cursor-pointer"
-                      >
-                        <span>{option}</span>
-                        <IoIosArrowForward />
-                      </motion.button>
-                    ))}
-                  </motion.div>
+                  <>
+                    <motion.div
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="show"
+                      className="absolute -bottom-15 right-0 flex flex-col items-end justify-center gap-2 pointer-events-auto"
+                    >
+                      {card.options?.map((option, idx) => (
+                        <motion.button
+                          key={idx}
+                          variants={itemVariants}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push("/olustur");
+                          }}
+                          className="w-fit text-black flex items-center justify-end gap-1 transition-colors cursor-pointer"
+                        >
+                          <span>{option}</span>
+                          <IoIosArrowForward />
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  </>
                 )}
               </motion.div>
             );
