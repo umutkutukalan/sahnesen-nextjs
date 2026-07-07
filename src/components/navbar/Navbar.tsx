@@ -18,6 +18,7 @@ import { getProfileAccountWithUser } from "@/constants/index";
 import Link from "next/link";
 import LoginPage from "@/pages/LoginPage";
 import { usePathname } from "next/navigation";
+import { LuTickets } from "react-icons/lu";
 
 const Navbar = ({ transparent }: { transparent: boolean }) => {
   const { user, setUser } = useAuth(); // setToken kaldırıldı
@@ -121,7 +122,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
               <div className="border-r pr-5">
-                <NavLinks href="/create" logo={<FaFilePen />} />
+                <NavLinks href="/create" logo={<LuTickets />} />
               </div>
             )}
             <NavLinks href="/projeler" logo={<RiComputerFill />} />

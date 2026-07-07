@@ -1,10 +1,10 @@
 "use client";
 
 import { FiUser } from "react-icons/fi";
-import { LuImages } from "react-icons/lu";
+import { LuImages, LuTheater } from "react-icons/lu";
 import { CiHeart } from "react-icons/ci";
 import { IoMdHeart } from "react-icons/io";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { TbRosetteDiscountCheckFilled, TbTheater } from "react-icons/tb";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostResponse } from "@/services/server/post.service";
 import { FaTicketSimple } from "react-icons/fa6";
+import { MdCurtainsClosed } from "react-icons/md";
 
 interface ProjectCardProps {
   project: PostResponse; // Tip adını yeni post mimarisine çektik
@@ -201,9 +202,24 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
         {/* FOOTER */}
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <span>
+          <div className="flex items-center gap-2">
+            <div className="relative pr-4 border-r border-gray-200">
+              <span className="relative z-5">
+                <FaTicketSimple
+                  className={`${
+                    project.postType === "SAHNE"
+                      ? "text-[#faf8f6]"
+                      : project.postType === "MONOLOG"
+                        ? "text-[#f3c102]"
+                        : project.postType === "YANYANA"
+                          ? "text-[#fa9ec1]"
+                          : project.postType === "TERSYUZ"
+                            ? "text-[#94c5fd]"
+                            : "text-black"
+                  }`}
+                />
+              </span>
+              <span className="absolute left-2 -top-0.5 rotate-15 z-10">
                 <FaTicketSimple
                   className={`${
                     project.postType === "SAHNE"
@@ -219,8 +235,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                 />
               </span>
             </div>
-            <span>{formatRelativeTime(project.createdAt)}</span>
-            <div className="hidden sm:flex items-center gap-1">
+            {/* <div className="hidden sm:flex items-center gap-1">
               {liked ? (
                 <IoMdHeart className="text-red-600 text-sm" />
               ) : (
@@ -231,7 +246,10 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                   ? `${Math.floor(likeCount / 100) / 10}K`
                   : likeCount}
               </span>
-            </div>
+            </div> */}
+            <span className="text-[10px]">
+              {formatRelativeTime(project.createdAt)}
+            </span>
           </div>
 
           <button
@@ -240,7 +258,10 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             } // Yeni şık rota mantığımız
             className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
           >
-            Okumaya Devam Et
+            <div className="flex items-start gap-1">
+              <LuTheater className="text-sm text-[#d80104]" />
+              <span className="text-[10px]">Perdeyi Arala</span>
+            </div>
           </button>
         </div>
       </div>

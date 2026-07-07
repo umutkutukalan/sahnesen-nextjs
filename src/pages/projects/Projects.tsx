@@ -17,6 +17,11 @@ import { useGetProjects } from "@/hooks/projects/useGetProjects";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { Project } from "@/services/server/post.service";
+import { IoMdHome, IoMdStats } from "react-icons/io";
+import { LuSquareLibrary } from "react-icons/lu";
+import { FiUser } from "react-icons/fi";
+import { AiOutlineFileText } from "react-icons/ai";
+import { MdHomeFilled } from "react-icons/md";
 
 interface ProjectsProps {
   initialProjects: Project[];
@@ -60,9 +65,40 @@ const Projects = ({
   return (
     <div className="page pt-16">
       <div className="flex w-full">
+        <aside className="hidden lg:flex lg:w-2/10 flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 p-5">
+          {user ? (
+            <ul className="flex flex-col gap-4">
+              <li className="flex items-center gap-1">
+                <MdHomeFilled />
+                <span>Home</span>
+              </li>
+              <li className="flex items-center gap-1">
+                <LuSquareLibrary />
+                <span>Library</span>
+              </li>
+              <li className="flex items-center gap-1">
+                <FiUser />
+                <span>Profile</span>
+              </li>
+              <li className="flex items-center gap-1">
+                <AiOutlineFileText />
+                <span>Stories</span>
+              </li>
+              <li className="flex items-center gap-1">
+                <IoMdStats />
+                <span>Stats</span>
+              </li>
+            </ul>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <StickySiteRules user={user} />
+            </div>
+          )}
+        </aside>
+
         {/* SOL ANA AKIŞ */}
-        <div className="w-full lg:w-5/7 flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-5">
-          <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" />
+        <div className="w-full lg:w-full flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-5">
+          {/* <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" /> */}
 
           {/* PROJE LİSTESİ */}
           {projects.map((project) => (
@@ -97,7 +133,7 @@ const Projects = ({
         </div>
 
         {/* SAĞ STICKY SIDEBAR */}
-        <aside className="hidden lg:flex lg:w-2/7 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
+        <aside className="hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
           {/* Popular: infinite listeye bağlı olmasın */}
           <PopularProjects projects={projects.slice(0, 4)} />
 
@@ -113,8 +149,6 @@ const Projects = ({
               <StickySiteRules user={user} />
             </div>
           )}
-
-
         </aside>
       </div>
 
