@@ -1,8 +1,9 @@
 "use client";
 
 import { FiUser } from "react-icons/fi";
-import { LuImages } from "react-icons/lu";
+import { LuImages, LuTheater } from "react-icons/lu";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { PiHandsClappingLight } from "react-icons/pi";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -13,6 +14,9 @@ import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostResponse } from "@/services/server/post.service";
 import { FaTicketSimple } from "react-icons/fa6";
+import { IoMdHeart } from "react-icons/io";
+import { CiHeart } from "react-icons/ci";
+import { BiBookmarks } from "react-icons/bi";
 
 interface ProjectCardProps {
   project: PostResponse; // Tip adını yeni post mimarisine çektik
@@ -239,7 +243,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </div>
 
           {/* FOOTER */}
-          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+          <div className="mt-3 w-full flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center gap-2">
               <div className="relative pr-4 border-r border-gray-200">
                 <span className="relative z-5">
@@ -274,30 +278,48 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                   />
                 </span>
               </div>
-              {/* <button
+              <button
                 onClick={() =>
                   router.push(`/${project.authorUsername}/${project.slug}`)
                 } // Yeni şık rota mantığımız
                 className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
               >
                 <div className="flex items-start gap-1">
-                  <LuTheater className="text-sm text-[#d80104]" />
+                  {/* <LuTheater className="text-sm text-[#d80104]" /> */}
                   <span className="text-[10px]">Perdeyi Arala</span>
                 </div>
-              </button> */}
-              {/* <div className="hidden sm:flex items-center gap-1">
-              {liked ? (
-                <IoMdHeart className="text-red-600 text-sm" />
-              ) : (
-                <CiHeart className="text-red-600 text-sm" />
-              )}
-              <span>
-                {likeCount >= 1000
-                  ? `${Math.floor(likeCount / 100) / 10}K`
-                  : likeCount}
-              </span>
-            </div> */}
+              </button>
             </div>
+            <ul className="flex items-center gap-2">
+              <li className="hidden sm:flex items-center gap-1">
+                {liked ? (
+                  <IoMdHeart className="text-red-600 text-sm" />
+                ) : (
+                  <CiHeart className="text-red-600 text-sm" />
+                )}
+                <span>
+                  {likeCount >= 1000
+                    ? `${Math.floor(likeCount / 100) / 10}K`
+                    : likeCount}
+                </span>
+              </li>
+              <li className="hidden sm:flex items-center gap-1">
+                <PiHandsClappingLight />
+                <span>
+                  {likeCount >= 1000
+                    ? `${Math.floor(likeCount / 100) / 10}K`
+                    : likeCount}
+                </span>
+              </li>
+              <li className="hidden sm:flex items-center gap-1">
+                <BiBookmarks />
+                <span>
+                  {likeCount >= 1000
+                    ? `${Math.floor(likeCount / 100) / 10}K`
+                    : likeCount}
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

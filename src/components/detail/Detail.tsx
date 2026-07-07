@@ -596,6 +596,15 @@ const Detail = ({ post }: DetailProps) => {
   const authorFullName =
     `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
 
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
+  const authorProfileImgUrl = post.authorProfileImg
+    ? post.authorProfileImg.startsWith("http")
+      ? post.authorProfileImg
+      : `${baseUrl}/${post.authorProfileImg}`
+    : null;
+
   return (
     <div className="page pt-25 bg-private text-black min-h-screen">
       {/* Apple Renklendirme CSS injection alanı */}
@@ -644,11 +653,12 @@ const Detail = ({ post }: DetailProps) => {
               <div className="w-full flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 cursor-pointer flex items-end justify-center">
-                    {post.authorProfileImg ? (
+                    {authorProfileImgUrl ? (
                       <Image
-                        src={post.authorProfileImg}
+                        src={authorProfileImgUrl}
                         alt={authorFullName}
                         fill
+                        unoptimized
                         className="object-cover"
                       />
                     ) : (
