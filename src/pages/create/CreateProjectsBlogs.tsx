@@ -2,13 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { GoCheck } from "react-icons/go"; // GoCloudDownload yerine GoCheck kalsın veya alttaki importu kullanalım
-import {
-  AiOutlineLoading3Quarters,
-  AiOutlineCloudSync,
-  AiOutlineCheckCircle,
-} from "react-icons/ai"; // Güvenli ikon seti
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 
@@ -30,14 +24,24 @@ type SaveStatus = "IDLE" | "SAVING" | "SAVED" | "ERROR";
 const CreateProjectsBlog = () => {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
   const [editorJSON, setEditorJSON] = useState<any>(null);
   const editorJSONRef = useRef(editorJSON);
   useEffect(() => {
     editorJSONRef.current = editorJSON;
   }, [editorJSON]);
 
-  const [postType, setPostType] = useState<"PROJECT" | "BLOG">("PROJECT");
+  const [postType, setPostType] = useState<string>("Sahne");
   const postTypeRef = useRef(postType);
+
+  useEffect(() => {
+    const typeParam = searchParams?.get("type");
+    if (typeParam) {
+      setPostType(typeParam);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     postTypeRef.current = postType;
   }, [postType]);

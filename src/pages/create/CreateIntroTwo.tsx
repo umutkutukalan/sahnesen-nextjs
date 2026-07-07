@@ -45,7 +45,7 @@ const cards = [
   },
   {
     id: "tersyuz",
-    label: "Tersyüz",
+    label: "Tersyuz",
     bg: "#93c5fd",
     image: camasir,
     side: "right",
@@ -236,7 +236,9 @@ const CreateIntroTwo = () => {
                             whileTap={{ scale: 0.95 }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push("/olustur");
+                              router.push(
+                                `/olustur?type=${encodeURIComponent(card.label.toUpperCase().trim())}`,
+                              );
                             }}
                             className="w-fit text-black flex items-center justify-end gap-1 transition-colors cursor-pointer"
                           >

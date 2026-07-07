@@ -19,7 +19,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
   const { ToProfile } = useToProfile();
-  
+
   console.log("Popular projects data:", projects);
   const topProjects = projects.slice(0, 4);
 
@@ -29,17 +29,17 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
         <FaStar className="flex-shrink-0 text-blue-600" />
         <h3>Popüler İçerikler</h3> {/* İsim genel akışa göre güncellendi */}
       </div>
-      
+
       <ul className="flex flex-col gap-5">
         {topProjects.map((project) => {
           // Yazar ismini güvenli bir şekilde birleştiriyoruz
-          const authorName = `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
+          const authorName =
+            `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
           return (
             <li key={project.id} className="flex flex-col gap-3 text-xs">
-              
               {/* AUTHOR HEADER */}
-              <div 
+              <div
                 className="flex items-center gap-2 cursor-pointer w-max"
                 onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername
               >
@@ -58,12 +58,15 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="truncate">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1 text-xs text-gray-600">
                       <span className="truncate">{authorName || "Yazar"}</span>
-                      <TbRosetteDiscountCheckFilled className="text-blue-500 shrink-0" title="Onaylı Yazar" />
+                      <TbRosetteDiscountCheckFilled
+                        className="text-blue-500 shrink-0"
+                        title="Onaylı Yazar"
+                      />
                     </div>
                     <span className="truncate text-[8px] text-gray-400">
                       @{project.authorUsername}
@@ -75,7 +78,9 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
               {/* TITLE + TIME */}
               <div
                 className="flex flex-col gap-1 cursor-pointer"
-                onClick={() => router.push(`/kesfet/${project.authorUsername}/${project.slug}`)} // Yeni şık rota mantığımız
+                onClick={() =>
+                  router.push(`/${project.authorUsername}/${project.slug}`)
+                } // Yeni şık rota mantığımız
               >
                 <span
                   className="pr-10 line-clamp-2 font-semibold hover:text-blue-600 transition-colors duration-200"
@@ -88,7 +93,6 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                   <span>{formatRelativeTime(project.createdAt)}</span>
                 </div>
               </div>
-
             </li>
           );
         })}

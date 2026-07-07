@@ -6,7 +6,7 @@ export interface PostResponse {
   slug: string;
   content: string; // Backend'den Stringified JSON string geliyor
   coverImage?: string;
-  postType: "BLOG" | "STUDY" | "PROJECT" | "TUTORIAL" | "OPINION";
+  postType: "SAHNE" | "MONOLOG" | "YANYANA" | "TERSYUZ";
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
   authorName: string;
