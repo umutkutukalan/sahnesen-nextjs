@@ -28,9 +28,22 @@ import sahne from "../../public/images/sahne.png";
 import arkaplan from "../../public/images/arkaplan.png";
 import bird from "../../public/images/bird.png";
 
+import sagperde from "../../public/images/sagperde.png";
+import solperde from "../../public/images/solperde.png";
+
 import tire from "../../public/images/tire.png";
 
-export { tire, fineday, sahne, card1, camasir, arkaplan, bird };
+export {
+  tire,
+  fineday,
+  sahne,
+  card1,
+  camasir,
+  arkaplan,
+  bird,
+  sagperde,
+  solperde,
+};
 
 export { ressam, runner, walker, loginpageimg, profileborder };
 export { undrawloveit, undrawaddfiles };

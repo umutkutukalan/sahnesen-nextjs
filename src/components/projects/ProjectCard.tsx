@@ -187,7 +187,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       </div>
 
       {/* RIGHT CONTENT */}
-      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-center lg:py-6 py-5">
+      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-center">
         {/* TITLE + CONTENT */}
         <div className="mt-2 flex flex-col gap-4">
           {/* AUTHOR */}

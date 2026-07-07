@@ -19,9 +19,11 @@ import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { Project } from "@/services/server/post.service";
 import { IoMdHome, IoMdStats } from "react-icons/io";
 import { LuSquareLibrary } from "react-icons/lu";
-import { FiUser } from "react-icons/fi";
+import { FiUser, FiUsers } from "react-icons/fi";
 import { AiOutlineFileText } from "react-icons/ai";
 import { MdHomeFilled } from "react-icons/md";
+import Image from "next/image";
+import { sagperde, solperde } from "@/utils";
 
 interface ProjectsProps {
   initialProjects: Project[];
@@ -64,40 +66,56 @@ const Projects = ({
 
   return (
     <div className="page pt-16">
-      <div className="flex w-full">
-        <aside className="hidden lg:flex lg:w-3/10 flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 p-5">
-          {user ? (
-            <ul className="flex flex-col gap-4">
-              <li className="flex items-center gap-1">
-                <MdHomeFilled />
-                <span>Home</span>
-              </li>
-              <li className="flex items-center gap-1">
-                <LuSquareLibrary />
-                <span>Library</span>
-              </li>
-              <li className="flex items-center gap-1">
-                <FiUser />
-                <span>Profile</span>
-              </li>
-              <li className="flex items-center gap-1">
-                <AiOutlineFileText />
-                <span>Stories</span>
-              </li>
-              <li className="flex items-center gap-1">
-                <IoMdStats />
-                <span>Stats</span>
-              </li>
-            </ul>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <StickySiteRules user={user} />
-            </div>
-          )}
+      <div className="relative flex w-full">
+        <aside className="hidden lg:flex lg:w-3/12 flex-col gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 px-5 py-10">
+          <div className="border-b border-gray-300 pb-10">
+            {user ? (
+              <ul className="flex flex-col gap-5">
+                <li className="flex items-center gap-3">
+                  <MdHomeFilled className="text-xl" />
+                  <span className="text-gray-600 text-sm">Home</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <LuSquareLibrary className="text-xl" />
+                  <span className="text-gray-600 text-sm">Library</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiUser className="text-xl" />
+                  <span className="text-gray-600 text-sm">Profile</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <AiOutlineFileText className="text-xl" />
+                  <span className="text-gray-600 text-sm">Stories</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <IoMdStats className="text-xl" />
+                  <span className="text-gray-600 text-sm">Stats</span>
+                </li>
+              </ul>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <StickySiteRules user={user} />
+              </div>
+            )}
+          </div>
+          <ul className="flex flex-col gap-4 pt-5">
+            <li className="flex items-center gap-3">
+              <FiUsers className="text-xl" />
+              <span className="text-gray-600 text-sm">Followers</span>
+            </li>
+          </ul>
         </aside>
 
+        {/* <div className="absolute left-0 top-0 z-0 opacity-80">
+          <Image src={solperde} alt="Sol Perde" />
+        </div>
+
+        <div className="absolute right-100 top-0 z-0 opacity-40">
+          <Image src={sagperde} alt="Sag Perde" />
+        </div> */}
+
         {/* SOL ANA AKIŞ */}
-        <div className="w-full lg:w-full flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-10">
+        <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5 px-2 sm:px-20 z-10">
           <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" />
 
           {/* PROJE LİSTESİ */}
@@ -133,7 +151,7 @@ const Projects = ({
         </div>
 
         {/* SAĞ STICKY SIDEBAR */}
-        <aside className="hidden lg:flex lg:w-5/10 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
+        <aside className="hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
           {/* Popular: infinite listeye bağlı olmasın */}
           <PopularProjects projects={projects.slice(0, 4)} />
 
