@@ -1,11 +1,11 @@
 "use client";
 
 import { IoIosPaper } from "react-icons/io";
-import { FaFilePen, FaRegUser } from "react-icons/fa6";
+import { FaFilePen, FaRegUser, FaTicketSimple } from "react-icons/fa6";
 import { RiComputerFill } from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
-import { IoSettingsOutline } from "react-icons/io5";
+import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
 import axios from "axios";
 import { useAuth } from "../../context/UserContext";
 import { FiSearch } from "react-icons/fi";
@@ -105,7 +105,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
         }`}
       >
         <>
-          <NavLinks href="/" logo="sahnesen" />
+          <NavLinks href="/" logo={"sahnesen"} />
 
           <div className="flex items-center gap-2 border-gray-200 border rounded-lg overflow-hidden lg:block hidden">
             <div className="relative rounded-2xl overflow-hidden">
@@ -121,15 +121,16 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
           </div>
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
-              <div className="border-r pr-5">
+              <div className="text-xl">
                 <NavLinks href="/create" logo={<LuTickets />} />
               </div>
             )}
-            <NavLinks href="/projeler" logo={<RiComputerFill />} />
-            <NavLinks href="/bloglar" logo={<IoIosPaper />} />
+            <div className="text-xl">
+              <NavLinks href="/" logo={<IoNotificationsOutline />} />
+            </div>
             {!user && (
               <button
-                className={`border-l border-gray-300 transition-all text-sm pl-2 text-xs cursor-pointer ${
+                className={`transition-all text-sm cursor-pointer ${
                   isProfilePage
                     ? "text-white hover:text-gray-100"
                     : "text-black hover:text-gray-600"
@@ -140,7 +141,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
               </button>
             )}
             {user && (
-              <div className="border-l pl-5 flex items-center md:gap-4 gap-2 relative">
+              <div className="flex items-center md:gap-4 gap-2 relative">
                 {/* <div className="relative">
                   {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">

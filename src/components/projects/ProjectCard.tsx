@@ -124,7 +124,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
   return (
-    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
+    <div className="w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
       {/* LEFT IMAGE */}
       {/* <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
@@ -149,6 +149,32 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           )}
         </div>
       </div> */}
+
+      {/* RIGHT IMAGE */}
+      <div className="h-full flex flex-col justify-center">
+        <div className="w-45 h-35 hidden flex-shrink-0 sm:flex items-center justify-center">
+          {" "}
+          <div
+            className={`relative w-full h-full bg-white overflow-hidden flex items-center justify-center ${
+              finalImageUrl ? "" : ""
+            }`}
+          >
+            {finalImageUrl ? (
+              <Image
+                src={finalImageUrl}
+                alt={project.title}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <LuImages className="text-4xl text-gray-300" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* RIGHT CONTENT */}
       <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between lg:py-6 py-5">
@@ -214,7 +240,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                   <FaTicketSimple
                     className={`${
                       project.postType === "SAHNE"
-                        ? "text-[#faf8f6]"
+                        ? "text-black"
                         : project.postType === "MONOLOG"
                           ? "text-[#f3c102]"
                           : project.postType === "YANYANA"
@@ -226,10 +252,11 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                   />
                 </span>
                 <span className="absolute left-2 -top-0.5 rotate-15 z-10">
+                  {/* "text-[#faf8f6]" */}
                   <FaTicketSimple
                     className={`${
                       project.postType === "SAHNE"
-                        ? "text-[#faf8f6]"
+                        ? "text-black"
                         : project.postType === "MONOLOG"
                           ? "text-[#f3c102]"
                           : project.postType === "YANYANA"
@@ -265,32 +292,6 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               </span>
             </div> */}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT IMAGE */}
-      <div className="h-full flex flex-col justify-center">
-        <div className="w-45 h-30 hidden flex-shrink-0 sm:flex items-center justify-center">
-          {" "}
-          <div
-            className={`relative w-full h-full bg-white overflow-hidden flex items-center justify-center ${
-              finalImageUrl ? "" : ""
-            }`}
-          >
-            {finalImageUrl ? (
-              <Image
-                src={finalImageUrl}
-                alt={project.title}
-                fill
-                unoptimized
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <LuImages className="text-4xl text-gray-300" />
-              </div>
-            )}
           </div>
         </div>
       </div>
