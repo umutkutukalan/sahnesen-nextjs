@@ -65,7 +65,7 @@ const Projects = ({
   return (
     <div className="page pt-16">
       <div className="flex w-full">
-        <aside className="hidden lg:flex lg:w-2/10 flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 p-5">
+        {/* <aside className="hidden lg:flex lg:w-3/10 flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 p-5">
           {user ? (
             <ul className="flex flex-col gap-4">
               <li className="flex items-center gap-1">
@@ -94,11 +94,11 @@ const Projects = ({
               <StickySiteRules user={user} />
             </div>
           )}
-        </aside>
+        </aside> */}
 
         {/* SOL ANA AKIŞ */}
-        <div className="w-full lg:w-full flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-5">
-          {/* <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" /> */}
+        <div className="w-full lg:w-full flex flex-col gap-5 border-gray-200 lg:border-r pb-5 px-2 sm:px-30">
+          <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" />
 
           {/* PROJE LİSTESİ */}
           {projects.map((project) => (

@@ -124,9 +124,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
   return (
-    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-5 px-5">
+    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
       {/* LEFT IMAGE */}
-      <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
+      {/* <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
           className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${
             finalImageUrl
@@ -148,94 +148,111 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* RIGHT CONTENT */}
-      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between sm:px-4 lg:py-6 py-5">
-        {/* AUTHOR */}
-        <div
-          className="flex items-center gap-2 cursor-pointer w-max"
-          onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
-        >
-          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-            {project.authorProfileImg ? (
-              <Image
-                src={project.authorProfileImg}
-                alt="avatar"
-                fill
-                unoptimized
-                className="object-cover"
-              />
-            ) : (
-              <FiUser className="w-full h-full p-1 text-gray-400" />
-            )}
-          </div>
-
-          <div className="truncate">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1 text-xs text-gray-600">
-                <span className="truncate">{authorName || "Yazar"}</span>
-                <TbRosetteDiscountCheckFilled
-                  className="text-blue-500 shrink-0"
-                  title="Onaylı Yazar"
-                />
-              </div>
-              <span className="truncate text-[10px] text-gray-400">
-                @{project.authorUsername}
-              </span>
-            </div>
-          </div>
-        </div>
-
+      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between lg:py-6 py-5">
         {/* TITLE + CONTENT */}
-        <div className="mt-2">
-          <h2 className="text-base sm:text-lg font-semibold line-clamp-2">
-            {project.title}
-          </h2>
-
-          {/* Tiptap string'ini buraya besliyoruz */}
-          <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-            {getFirstParagraphText(project.content) ||
-              "İçerik önizlemesi bulunamadı..."}
-          </p>
-        </div>
-
-        {/* FOOTER */}
-        <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-          <div className="flex items-center gap-2">
-            <div className="relative pr-4 border-r border-gray-200">
-              <span className="relative z-5">
-                <FaTicketSimple
-                  className={`${
-                    project.postType === "SAHNE"
-                      ? "text-[#faf8f6]"
-                      : project.postType === "MONOLOG"
-                        ? "text-[#f3c102]"
-                        : project.postType === "YANYANA"
-                          ? "text-[#fa9ec1]"
-                          : project.postType === "TERSYUZ"
-                            ? "text-[#94c5fd]"
-                            : "text-black"
-                  }`}
+        <div className="mt-2 flex flex-col gap-4">
+          {/* AUTHOR */}
+          <div
+            className="flex items-center gap-2 cursor-pointer w-max"
+            onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
+          >
+            <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
+              {project.authorProfileImg ? (
+                <Image
+                  src={project.authorProfileImg}
+                  alt="avatar"
+                  fill
+                  unoptimized
+                  className="object-cover"
                 />
-              </span>
-              <span className="absolute left-2 -top-0.5 rotate-15 z-10">
-                <FaTicketSimple
-                  className={`${
-                    project.postType === "SAHNE"
-                      ? "text-[#faf8f6]"
-                      : project.postType === "MONOLOG"
-                        ? "text-[#f3c102]"
-                        : project.postType === "YANYANA"
-                          ? "text-[#fa9ec1]"
-                          : project.postType === "TERSYUZ"
-                            ? "text-[#94c5fd]"
-                            : "text-black"
-                  }`}
-                />
+              ) : (
+                <FiUser className="w-full h-full p-1 text-gray-400" />
+              )}
+            </div>
+
+            <div className="truncate flex items-center gap-1">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1 text-xs text-gray-600">
+                  <span className="truncate">{authorName || "Yazar"}</span>
+                  <TbRosetteDiscountCheckFilled
+                    className="text-blue-500 shrink-0 text-xs"
+                    title="Onaylı Yazar"
+                  />
+                </div>
+                {/* <span className="truncate text-[10px] text-gray-400">
+                  @{project.authorUsername}
+                </span> */}
+              </div>
+              <span className="text-[8px]">•</span>
+              <span className="text-[10px] text-gray-500">
+                {formatRelativeTime(project.createdAt)}
               </span>
             </div>
-            {/* <div className="hidden sm:flex items-center gap-1">
+          </div>
+
+          {/* Title & Content */}
+          <div className="flex flex-col gap-1">
+            <h2 className="text-base sm:text-xl font-semibold line-clamp-2">
+              {project.title}
+            </h2>
+
+            {/* Tiptap string'ini buraya besliyoruz */}
+            <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+              {getFirstParagraphText(project.content) ||
+                "İçerik önizlemesi bulunamadı..."}
+            </p>
+          </div>
+
+          {/* FOOTER */}
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center gap-2">
+              <div className="relative pr-4 border-r border-gray-200">
+                <span className="relative z-5">
+                  <FaTicketSimple
+                    className={`${
+                      project.postType === "SAHNE"
+                        ? "text-[#faf8f6]"
+                        : project.postType === "MONOLOG"
+                          ? "text-[#f3c102]"
+                          : project.postType === "YANYANA"
+                            ? "text-[#fa9ec1]"
+                            : project.postType === "TERSYUZ"
+                              ? "text-[#94c5fd]"
+                              : "text-black"
+                    }`}
+                  />
+                </span>
+                <span className="absolute left-2 -top-0.5 rotate-15 z-10">
+                  <FaTicketSimple
+                    className={`${
+                      project.postType === "SAHNE"
+                        ? "text-[#faf8f6]"
+                        : project.postType === "MONOLOG"
+                          ? "text-[#f3c102]"
+                          : project.postType === "YANYANA"
+                            ? "text-[#fa9ec1]"
+                            : project.postType === "TERSYUZ"
+                              ? "text-[#94c5fd]"
+                              : "text-black"
+                    }`}
+                  />
+                </span>
+              </div>
+              {/* <button
+                onClick={() =>
+                  router.push(`/${project.authorUsername}/${project.slug}`)
+                } // Yeni şık rota mantığımız
+                className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
+              >
+                <div className="flex items-start gap-1">
+                  <LuTheater className="text-sm text-[#d80104]" />
+                  <span className="text-[10px]">Perdeyi Arala</span>
+                </div>
+              </button> */}
+              {/* <div className="hidden sm:flex items-center gap-1">
               {liked ? (
                 <IoMdHeart className="text-red-600 text-sm" />
               ) : (
@@ -247,22 +264,34 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                   : likeCount}
               </span>
             </div> */}
-            <span className="text-[10px]">
-              {formatRelativeTime(project.createdAt)}
-            </span>
-          </div>
-
-          <button
-            onClick={() =>
-              router.push(`/${project.authorUsername}/${project.slug}`)
-            } // Yeni şık rota mantığımız
-            className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
-          >
-            <div className="flex items-start gap-1">
-              <LuTheater className="text-sm text-[#d80104]" />
-              <span className="text-[10px]">Perdeyi Arala</span>
             </div>
-          </button>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT IMAGE */}
+      <div className="h-full flex flex-col justify-center">
+        <div className="w-45 h-30 hidden flex-shrink-0 sm:flex items-center justify-center">
+          {" "}
+          <div
+            className={`relative w-full h-full bg-white overflow-hidden flex items-center justify-center ${
+              finalImageUrl ? "" : ""
+            }`}
+          >
+            {finalImageUrl ? (
+              <Image
+                src={finalImageUrl}
+                alt={project.title}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <LuImages className="text-4xl text-gray-300" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
