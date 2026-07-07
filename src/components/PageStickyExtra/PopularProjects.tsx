@@ -43,7 +43,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                 className="flex items-center gap-2 cursor-pointer w-max"
                 onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername
               >
-                <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 shadow-lg shadow-black/20">
+                <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-gray-200">
                   {project.authorProfileImg ? (
                     <Image
                       src={project.authorProfileImg}
@@ -53,8 +53,8 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                       className="object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                      <FiUser className="w-4 h-4 text-gray-400" />
+                    <div className="w-full h-full flex items-center justify-center">
+                      <FiUser className="w-full h-full p-1 text-gray-400" />
                     </div>
                   )}
                 </div>
@@ -68,7 +68,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                         title="Onaylı Yazar"
                       />
                     </div>
-                    <span className="truncate text-[8px] text-gray-400">
+                    <span className="truncate text-[10px] text-gray-400">
                       @{project.authorUsername}
                     </span>
                   </div>

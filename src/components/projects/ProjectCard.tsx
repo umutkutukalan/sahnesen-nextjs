@@ -14,6 +14,7 @@ import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
 import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostResponse } from "@/services/server/post.service";
+import { FaTicketSimple } from "react-icons/fa6";
 
 interface ProjectCardProps {
   project: PostResponse; // Tip adını yeni post mimarisine çektik
@@ -122,14 +123,15 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
   return (
-    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none hover:shadow-lg hover:rounded-lg transition-all duration-300 ease-in-out gap-5 px-5">
+    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-200 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-5 px-5">
       {/* LEFT IMAGE */}
       <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
           className={`relative w-full lg:h-50 sm:h-40 bg-white rounded-lg overflow-hidden flex items-center justify-center ${
-            finalImageUrl ? "" : "border border-gray-100 shadow-sm"
+            finalImageUrl
+              ? "border border-gray-200"
+              : "border border-gray-100 shadow-sm"
           }`}
-          style={{ boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.5)" }}
         >
           {finalImageUrl ? (
             <Image
@@ -154,7 +156,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           className="flex items-center gap-2 cursor-pointer w-max"
           onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
         >
-          <div className="relative w-8 h-8 rounded-full overflow-hidden shadow-lg shadow-black/20">
+          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200">
             {project.authorProfileImg ? (
               <Image
                 src={project.authorProfileImg}
@@ -177,7 +179,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
                   title="Onaylı Yazar"
                 />
               </div>
-              <span className="truncate text-[8px] text-gray-400">
+              <span className="truncate text-[10px] text-gray-400">
                 @{project.authorUsername}
               </span>
             </div>
@@ -200,6 +202,23 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         {/* FOOTER */}
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center gap-3">
+            <div className="relative">
+              <span>
+                <FaTicketSimple
+                  className={`${
+                    project.postType === "SAHNE"
+                      ? "text-[#faf8f6]"
+                      : project.postType === "MONOLOG"
+                        ? "text-[#f3c102]"
+                        : project.postType === "YANYANA"
+                          ? "text-[#fa9ec1]"
+                          : project.postType === "TERSYUZ"
+                            ? "text-[#94c5fd]"
+                            : "text-black"
+                  }`}
+                />
+              </span>
+            </div>
             <span>{formatRelativeTime(project.createdAt)}</span>
             <div className="hidden sm:flex items-center gap-1">
               {liked ? (
