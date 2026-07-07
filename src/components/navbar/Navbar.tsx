@@ -93,6 +93,18 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
   const isHome = pathname === "/";
   const isProfilePage = pathname.startsWith("/profil");
 
+  {
+    /* Profil Resmi Container */
+  }
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
+  const profileImgUrl = user?.profileImg
+    ? user.profileImg.startsWith("http")
+      ? user.profileImg
+      : `${baseUrl}/${user.profileImg}`
+    : null;
+
   return (
     <>
       <nav
@@ -169,10 +181,11 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
                 >
                   {user.profileImg ? (
                     <Image
-                      src={user.profileImg}
+                      src={profileImgUrl}
                       alt="profile-img"
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <FaRegUser

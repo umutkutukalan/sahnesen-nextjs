@@ -1,10 +1,8 @@
 "use client";
 
 import { FiUser } from "react-icons/fi";
-import { LuImages, LuTheater } from "react-icons/lu";
-import { CiHeart } from "react-icons/ci";
-import { IoMdHeart } from "react-icons/io";
-import { TbRosetteDiscountCheckFilled, TbTheater } from "react-icons/tb";
+import { LuImages } from "react-icons/lu";
+import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -15,7 +13,6 @@ import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostResponse } from "@/services/server/post.service";
 import { FaTicketSimple } from "react-icons/fa6";
-import { MdCurtainsClosed } from "react-icons/md";
 
 interface ProjectCardProps {
   project: PostResponse; // Tip adını yeni post mimarisine çektik
@@ -123,6 +120,15 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
   const authorName =
     `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
+  const authorProfileImgUrl = project.authorProfileImg
+    ? project.authorProfileImg.startsWith("http")
+      ? project.authorProfileImg
+      : `${baseUrl}/${project.authorProfileImg}`
+    : null;
+
   return (
     <div className="w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
       {/* LEFT IMAGE */}
@@ -150,7 +156,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         </div>
       </div> */}
 
-      {/* RIGHT IMAGE */}
+      {/* LEFT IMAGE */}
       <div className="h-full flex flex-col justify-center">
         <div className="w-45 h-35 hidden flex-shrink-0 sm:flex items-center justify-center">
           {" "}
@@ -177,7 +183,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       </div>
 
       {/* RIGHT CONTENT */}
-      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-between lg:py-6 py-5">
+      <div className="lg:w-4/5 w-3/4 w-full h-full flex flex-col justify-center lg:py-6 py-5">
         {/* TITLE + CONTENT */}
         <div className="mt-2 flex flex-col gap-4">
           {/* AUTHOR */}
@@ -186,9 +192,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
           >
             <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
-              {project.authorProfileImg ? (
+              {authorProfileImgUrl ? (
                 <Image
-                  src={project.authorProfileImg}
+                  src={authorProfileImgUrl}
                   alt="avatar"
                   fill
                   unoptimized

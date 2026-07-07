@@ -23,6 +23,8 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
   console.log("Popular projects data:", projects);
   const topProjects = projects.slice(0, 4);
 
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
   return (
     <div className="flex flex-col gap-4 mt-1">
       <div className="flex items-center gap-1" style={{ fontSize: "0.8rem" }}>
@@ -46,7 +48,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                 <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-gray-200">
                   {project.authorProfileImg ? (
                     <Image
-                      src={project.authorProfileImg}
+                      src={`${baseUrl}/${project.authorProfileImg}`}
                       alt={project.title}
                       fill
                       unoptimized

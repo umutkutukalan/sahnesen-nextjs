@@ -96,6 +96,15 @@ const EditorNavbar = ({
   const isHome = pathname === "/";
   const isProfilePage = pathname.startsWith("/profil");
 
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
+  const profileImgUrl = user.profileImg
+    ? user.profileImg.startsWith("http")
+      ? user.profileImg
+      : `${baseUrl}/${user.profileImg}`
+    : null;
+
   return (
     <>
       <nav
@@ -179,11 +188,12 @@ const EditorNavbar = ({
                     }`}
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
                   >
-                    {user.profileImg ? (
+                    {profileImgUrl ? (
                       <Image
-                        src={user.profileImg}
+                        src={profileImgUrl}
                         alt="profile-img"
                         fill
+                        unoptimized
                         className="object-cover"
                       />
                     ) : (
