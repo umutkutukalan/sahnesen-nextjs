@@ -12,11 +12,7 @@ const PageAbout = ({ pageTitle, contentType }) => {
 
   return (
     <div className="w-full relative">
-      <div className="absolute top-0 right-0 w-1/2 h-full z-25 opacity-60">
-        <Image src={sagperde} alt="Sag Perde" />
-      </div>
-
-      <div className="w-full h-20 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100 px-20">
+      <div className="w-full h-14 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100 px-20">
         <ul className="w-full flex items-end gap-5 text-gray-600">
           <button
             className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "SAHNE" ? "border-b border-gray-500" : ""}`}

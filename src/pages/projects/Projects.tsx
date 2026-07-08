@@ -67,7 +67,7 @@ const Projects = ({
   return (
     <div className="page pt-16">
       <div className="relative flex w-full">
-        <aside className="hidden lg:flex lg:w-3/12 flex-col gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 px-5 py-10">
+        <aside className="hidden lg:flex lg:w-2/12 flex-col gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 px-5 py-10">
           <div className="border-b border-gray-300 pb-10">
             {user ? (
               <ul className="flex flex-col gap-5">
@@ -108,68 +108,83 @@ const Projects = ({
 
         {/* <div className="absolute left-0 top-0 z-0 opacity-80">
           <Image src={solperde} alt="Sol Perde" />
-        </div>
-
-        <div className="absolute right-100 top-0 z-0 opacity-40">
-          <Image src={sagperde} alt="Sag Perde" />
         </div> */}
 
-        {/* SOL ANA AKIŞ */}
-        <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
-          <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" />
+        <div className="relative w-full flex flex-col">
+          <div className="w-full h-10 bg-red-600"></div>
 
-          <div className="px-2 sm:px-20 z-50">
-            {/* PROJE LİSTESİ */}
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
+          <div className="relative flex w-full">
+            {/* SOL ANA AKIŞ */}
+            <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
+              <PageAbout
+                pageTitle={{ text: "Projeler" }}
+                contentType="Projects"
+              />
+
+              <div className="px-2 sm:px-20 z-50">
+                {/* PROJE LİSTESİ */}
+                {projects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+
+              {hasMore && <div ref={loadMoreRef}></div>}
+
+              {/* LOAD MORE */}
+              {isLoadingMore && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
+                  <span className="ml-3 text-gray-600">
+                    Daha fazla proje yükleniyor...
+                  </span>
+                </div>
+              )}
+
+              {/* BİTTİ MESAJI */}
+              {!hasMore && projects.length > 0 && (
+                <div className="py-8 text-center text-xs text-gray-500">
+                  Tüm projeler yüklendi.
+                </div>
+              )}
+
+              {/* SAYFA BİLGİSİ */}
+              {totalPages > 1 && (
+                <div className="py-4 text-center text-sm text-gray-400">
+                  Sayfa {currentPage + 1} / {totalPages} • {projects.length}{" "}
+                  proje
+                </div>
+              )}
+            </div>
+
+            {/* SAĞ STICKY SIDEBAR */}
+            <aside className="relative hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
+              <div className="absolute right-0 top-0 z-0 opacity-60">
+                <Image
+                  src={sagperde}
+                  alt="Sag Perde"
+                  height={300}
+                  width={300}
+                />
+              </div>
+
+              {/* Popular: infinite listeye bağlı olmasın */}
+              <PopularProjects projects={projects.slice(0, 4)} />
+
+              {user ? (
+                <div className="flex flex-col gap-4">
+                  <Notebook />
+                  <LikedPost type="projects" />
+                  <BookMark />
+                  <StickySiteRules user={user} />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <StickySiteRules user={user} />
+                </div>
+              )}
+            </aside>
           </div>
-
-          {hasMore && <div ref={loadMoreRef}></div>}
-
-          {/* LOAD MORE */}
-          {isLoadingMore && (
-            <div className="flex items-center justify-center py-8">
-              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-              <span className="ml-3 text-gray-600">
-                Daha fazla proje yükleniyor...
-              </span>
-            </div>
-          )}
-
-          {/* BİTTİ MESAJI */}
-          {!hasMore && projects.length > 0 && (
-            <div className="py-8 text-center text-xs text-gray-500">
-              Tüm projeler yüklendi.
-            </div>
-          )}
-
-          {/* SAYFA BİLGİSİ */}
-          {totalPages > 1 && (
-            <div className="py-4 text-center text-sm text-gray-400">
-              Sayfa {currentPage + 1} / {totalPages} • {projects.length} proje
-            </div>
-          )}
         </div>
-
-        {/* SAĞ STICKY SIDEBAR */}
-        <aside className="hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
-          {/* Popular: infinite listeye bağlı olmasın */}
-          <PopularProjects projects={projects.slice(0, 4)} />
-
-          {user ? (
-            <div className="flex flex-col gap-4">
-              <Notebook />
-              <LikedPost type="projects" />
-              <BookMark />
-              <StickySiteRules user={user} />
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <StickySiteRules user={user} />
-            </div>
-          )}
-        </aside>
       </div>
 
       {/* Global loading sadece küçük overlay */}
