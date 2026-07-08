@@ -115,13 +115,15 @@ const Projects = ({
         </div> */}
 
         {/* SOL ANA AKIŞ */}
-        <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5 px-2 sm:px-20 z-10">
+        <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
           <PageAbout pageTitle={{ text: "Projeler" }} contentType="Projects" />
 
-          {/* PROJE LİSTESİ */}
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          <div className="px-2 sm:px-20 z-50">
+            {/* PROJE LİSTESİ */}
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
 
           {hasMore && <div ref={loadMoreRef}></div>}
 

@@ -1,4 +1,7 @@
+import { sagperde } from "@/utils";
+import Image from "next/image";
 import { useState } from "react";
+import { FaTicketSimple } from "react-icons/fa6";
 
 const PageAbout = ({ pageTitle, contentType }) => {
   const [selectedButton, setSelectedButton] = useState(null);
@@ -8,60 +11,44 @@ const PageAbout = ({ pageTitle, contentType }) => {
   };
 
   return (
-    <>
-      {contentType === "Projects" && (
-        <div className="w-full flex items-center justify-between sticky top-[64px] z-30 border-b border-gray-200 p-5 bg-white">
-          <div className="flex items-center gap-2">
-            {pageTitle.icon && (
-              <span className="text-xl">{pageTitle.icon}</span>
-            )}
-            <h2 className="text-xl ">{pageTitle.text}</h2>
-          </div>
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2 text-xs">
-              {["React", "Spring Boot", "Java", "Python"].map((tech) => (
-                <button
-                  key={tech}
-                  onClick={() => selectButton(tech)}
-                  className={`px-3 py-1 border border-gray-200 rounded-lg cursor-pointer ${
-                    selectedButton === tech ? "bg-green-500 text-white" : ""
-                  }`}
-                >
-                  {tech}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 cursor-pointer">Tümünü Gör</p>
-          </div>
-        </div>
-      )}
-      {contentType === "Blogs" && (
-        <div className="w-full flex items-center justify-between sticky top-[64px] z-30 border-b border-gray-200 p-5 bg-white">
-          <div className="flex items-center gap-2">
-            {pageTitle.icon && (
-              <span className="text-xl">{pageTitle.icon}</span>
-            )}
-            <h2 className="text-xl ">{pageTitle.text}</h2>
-          </div>
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2 text-xs">
-              {["Yazılım", "Spor", "Gezi", "Kitap", "Haber"].map((tech) => (
-                <button
-                  key={tech}
-                  onClick={() => selectButton(tech)}
-                  className={`px-3 py-1 border border-gray-200 rounded-lg cursor-pointer ${
-                    selectedButton === tech ? "bg-blue-500 text-white" : ""
-                  }`}
-                >
-                  {tech}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 cursor-pointer">Tümünü Gör</p>
-          </div>
-        </div>
-      )}
-    </>
+    <div className="w-full relative">
+      <div className="absolute top-0 right-0 w-1/2 h-full z-25 opacity-60">
+        <Image src={sagperde} alt="Sag Perde" />
+      </div>
+
+      <div className="w-full h-20 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100 px-20">
+        <ul className="w-full flex items-end gap-5 text-gray-600">
+          <button
+            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "SAHNE" ? "border-b border-gray-500" : ""}`}
+            onClick={() => selectButton("SAHNE")}
+          >
+            <FaTicketSimple className={`text-base text-black`} />
+            <span className="text-xs">Sahne</span>
+          </button>
+          <button
+            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "MONOLOG" ? "border-b border-gray-500" : ""}`}
+            onClick={() => selectButton("MONOLOG")}
+          >
+            <FaTicketSimple className={`${"text-base text-[#f3c102]"}`} />
+            <span className="text-xs">Monolog</span>
+          </button>
+          <button
+            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "YANYANA" ? "border-b border-gray-500" : ""}`}
+            onClick={() => selectButton("YANYANA")}
+          >
+            <FaTicketSimple className={`${"text-base text-[#fa9ec1]"}`} />
+            <span className="text-xs">Yan Yana</span>
+          </button>
+          <button
+            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "TERSYUZ" ? "border-b border-gray-500" : ""}`}
+            onClick={() => selectButton("TERSYUZ")}
+          >
+            <FaTicketSimple className={`${"text-base text-[#94c5fd]"}`} />
+            <span className="text-xs">Tersyüz</span>
+          </button>
+        </ul>
+      </div>
+    </div>
   );
 };
 
