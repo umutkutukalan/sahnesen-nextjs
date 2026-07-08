@@ -78,7 +78,7 @@ body {
 }
 
 .page {
-  @apply w-full md:text-base text-xs;
+  @apply relative w-full md:text-base text-xs;
 }
 
 .flex-center {

@@ -16,7 +16,7 @@ const Notebook = () => {
             fontSize: "0.650rem",
           }}
         >
-          Akışta gezerken notlarınızı alın
+          Notlarınızı alın.
         </span>
       </div>
     </div>

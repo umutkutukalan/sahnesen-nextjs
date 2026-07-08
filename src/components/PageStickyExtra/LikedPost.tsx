@@ -1,6 +1,6 @@
 "use client";
 import { IoMdHeartEmpty } from "react-icons/io";
-import { useAuth  } from "../../context/UserContext";
+import { useAuth } from "../../context/UserContext";
 import { useRouter } from "next/navigation";
 import { generateSlug } from "../../utils/GenerateSlug";
 
@@ -41,7 +41,7 @@ const LikedPost = ({ type }) => {
             fontSize: "0.650rem",
           }}
         >
-          Beğendiğiniz yazılara hızlıca ulaşın
+          Beğendiğiniz sahneler.
         </span>
       </div>
     </div>

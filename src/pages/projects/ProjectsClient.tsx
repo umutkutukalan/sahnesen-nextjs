@@ -4,8 +4,9 @@ import { useAuth } from "@/context/UserContext";
 import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
 import Projects from "./Projects";
-import { PostResponse} from "@/services/server/post.service";
+import { PostResponse } from "@/services/server/post.service";
 import Navbar from "@/components/navbar/Navbar";
+import Sidebar from "@/components/navbar/Sidebar";
 
 interface Props {
   initialProjects: PostResponse[];
@@ -32,11 +33,14 @@ export default function ProjectsClient({
   return (
     <>
       <Navbar transparent={false} />
-      <Projects
-        initialProjects={initialProjects}
-        initialPage={initialPage}
-        totalPages={totalPages}
-      />
+      <div className="h-screen flex">
+        <Sidebar />
+        <Projects
+          initialProjects={initialProjects}
+          initialPage={initialPage}
+          totalPages={totalPages}
+        />
+      </div>
     </>
   );
 }

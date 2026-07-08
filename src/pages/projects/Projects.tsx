@@ -67,75 +67,19 @@ const Projects = ({
     }
   }, [user, getUserLikedProjects]);
 
-  const [selectedSideBarMenu, setSelectedSideBarMenu] = useState("Fuaye");
-
-  const onSideBarMenuSelect = (menu: string) => {
-    setSelectedSideBarMenu(menu);
-  };
-
   return (
     <div className="page pt-16">
       <div className="relative flex w-full">
-        <aside className="hidden lg:flex lg:w-2/10 flex-col gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 pl-6 py-8">
-          <div className="border-b border-gray-300 pb-10">
-            {user ? (
-              <ul className="flex flex-col gap-5">
-                <li
-                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Fuaye" ? "text-black" : "text-gray-500"}`}
-                  onClick={() => onSideBarMenuSelect("Fuaye")}
-                >
-                  <LuTheater className="text-[22px]" />
-                  <span className="text-[15px]">Fuaye</span>
-                </li>
-                <li
-                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Yazılarım" ? "text-black" : "text-gray-500"}`}
-                  onClick={() => onSideBarMenuSelect("Yazılarım")}
-                >
-                  <SiWikibooks className="text-[22px]" />
-                  <span className="text-[15px]">Yazılarım</span>
-                </li>
-                <li
-                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Profil" ? "text-black" : "text-gray-500"}`}
-                  onClick={() => onSideBarMenuSelect("Profil")}
-                >
-                  <RiUser6Line className="text-[22px]" />
-                  <span className="text-[15px]">Profil</span>
-                </li>
-                <li
-                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Koleksiyon" ? "text-black" : "text-gray-500"}`}
-                  onClick={() => onSideBarMenuSelect("Koleksiyon")}
-                >
-                  <BiBookmarkAlt className="text-[22px]" />
-                  <span className="text-[15px]">Koleksiyon</span>
-                </li>
-                <li
-                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Etki" ? "text-black" : "text-gray-500"}`}
-                  onClick={() => onSideBarMenuSelect("Etki")}
-                >
-                  <IoSparklesOutline className="text-[22px]" />
-                  <span className="text-[15px]">Etki</span>
-                </li>
-              </ul>
-            ) : (
-              <div className="flex flex-col gap-4">
-                <StickySiteRules user={user} />
-              </div>
-            )}
-          </div>
-          <ul className="flex flex-col gap-4 pt-5">
-            <li className="flex items-center gap-3">
-              <ImPencil2 className="text-2xl" />
-              <span className="text-[15px]">Followers</span>
-            </li>
-          </ul>
-        </aside>
-
         {/* <div className="absolute left-0 top-0 z-0 opacity-80">
           <Image src={solperde} alt="Sol Perde" />
         </div> */}
 
         <div className="relative w-full flex flex-col">
-          <div className="w-full h-10 bg-yellow-500"></div>
+          <div className="w-full h-10 bg-yellow-500 border-y border-black flex items-center justify-center">
+            <p className="text-xs italic">
+              Welcome Offer Access to everything. Now up to 60% off. Upgrade now
+            </p>
+          </div>
 
           <div className="relative flex w-full">
             {/* SOL ANA AKIŞ */}
@@ -145,7 +89,7 @@ const Projects = ({
                 contentType="Projects"
               />
 
-              <div className="px-2 sm:px-20 z-50 pt-10">
+              <div className="px-2 sm:px-20 z-50 pt-5">
                 {/* PROJE LİSTESİ */}
                 {projects.map((project) => (
                   <ProjectCard key={project.id} project={project} />

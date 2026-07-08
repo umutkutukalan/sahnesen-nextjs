@@ -8,6 +8,7 @@ import { FiUser } from "react-icons/fi";
 import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
 import axios from "axios";
 import { useAuth } from "../../context/UserContext";
+import { useSidebar } from "@/context/SidebarContext";
 import { FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
 // import NotificationsForUser from "./Notifications/NotificationsForUser";
@@ -23,6 +24,7 @@ import { ImPencil2 } from "react-icons/im";
 
 const Navbar = ({ transparent }: { transparent: boolean }) => {
   const { user, setUser } = useAuth(); // setToken kaldırıldı
+  const { toggleSidebar } = useSidebar();
   // const { unreadCount } = useNotification();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -119,13 +121,18 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
       >
         <>
           <div className="flex items-center gap-4">
-            <RiMenu4Line className="text-2xl" />
+            <RiMenu4Line
+              className="text-2xl cursor-pointer"
+              onClick={toggleSidebar}
+            />
             <li className={`list-none`}>
               <Link
                 href={"/"}
                 className={`text-black transition-all duration-100`}
               >
-                <span className="text-3xl playfair-display-600">Sahnesen</span>
+                <span className="text-3xl playfair-display-600 select-none">
+                  Sahnesen
+                </span>
               </Link>
             </li>
           </div>
