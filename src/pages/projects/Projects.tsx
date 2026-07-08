@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import PageAbout from "@/components/PageAbout";
@@ -17,13 +17,16 @@ import { useGetProjects } from "@/hooks/projects/useGetProjects";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { Project } from "@/services/server/post.service";
-import { IoMdHome, IoMdStats } from "react-icons/io";
-import { LuSquareLibrary } from "react-icons/lu";
-import { FiUser, FiUsers } from "react-icons/fi";
+import { SiWikibooks } from "react-icons/si";
+import { IoMdStats } from "react-icons/io";
+import { LuScroll, LuSquareLibrary, LuTheater } from "react-icons/lu";
+import { ImPencil2 } from "react-icons/im";
 import { AiOutlineFileText } from "react-icons/ai";
-import { MdHomeFilled } from "react-icons/md";
 import Image from "next/image";
 import { sagperde, solperde } from "@/utils";
+import { IoSparklesOutline } from "react-icons/io5";
+import { RiUser6Line } from "react-icons/ri";
+import { BiBookmarkAlt } from "react-icons/bi";
 
 interface ProjectsProps {
   initialProjects: Project[];
@@ -64,32 +67,53 @@ const Projects = ({
     }
   }, [user, getUserLikedProjects]);
 
+  const [selectedSideBarMenu, setSelectedSideBarMenu] = useState("Fuaye");
+
+  const onSideBarMenuSelect = (menu: string) => {
+    setSelectedSideBarMenu(menu);
+  };
+
   return (
     <div className="page pt-16">
       <div className="relative flex w-full">
-        <aside className="hidden lg:flex lg:w-2/12 flex-col gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 px-5 py-10">
+        <aside className="hidden lg:flex lg:w-2/10 flex-col gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] border-r border-gray-200 pl-6 py-8">
           <div className="border-b border-gray-300 pb-10">
             {user ? (
               <ul className="flex flex-col gap-5">
-                <li className="flex items-center gap-3">
-                  <MdHomeFilled className="text-xl" />
-                  <span className="text-gray-600 text-sm">Home</span>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Fuaye" ? "text-black" : "text-gray-500"}`}
+                  onClick={() => onSideBarMenuSelect("Fuaye")}
+                >
+                  <LuTheater className="text-[22px]" />
+                  <span className="text-[15px]">Fuaye</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <LuSquareLibrary className="text-xl" />
-                  <span className="text-gray-600 text-sm">Library</span>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Yazılarım" ? "text-black" : "text-gray-500"}`}
+                  onClick={() => onSideBarMenuSelect("Yazılarım")}
+                >
+                  <SiWikibooks className="text-[22px]" />
+                  <span className="text-[15px]">Yazılarım</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <FiUser className="text-xl" />
-                  <span className="text-gray-600 text-sm">Profile</span>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Profil" ? "text-black" : "text-gray-500"}`}
+                  onClick={() => onSideBarMenuSelect("Profil")}
+                >
+                  <RiUser6Line className="text-[22px]" />
+                  <span className="text-[15px]">Profil</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <AiOutlineFileText className="text-xl" />
-                  <span className="text-gray-600 text-sm">Stories</span>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Koleksiyon" ? "text-black" : "text-gray-500"}`}
+                  onClick={() => onSideBarMenuSelect("Koleksiyon")}
+                >
+                  <BiBookmarkAlt className="text-[22px]" />
+                  <span className="text-[15px]">Koleksiyon</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <IoMdStats className="text-xl" />
-                  <span className="text-gray-600 text-sm">Stats</span>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer ${selectedSideBarMenu === "Etki" ? "text-black" : "text-gray-500"}`}
+                  onClick={() => onSideBarMenuSelect("Etki")}
+                >
+                  <IoSparklesOutline className="text-[22px]" />
+                  <span className="text-[15px]">Etki</span>
                 </li>
               </ul>
             ) : (
@@ -100,8 +124,8 @@ const Projects = ({
           </div>
           <ul className="flex flex-col gap-4 pt-5">
             <li className="flex items-center gap-3">
-              <FiUsers className="text-xl" />
-              <span className="text-gray-600 text-sm">Followers</span>
+              <ImPencil2 className="text-2xl" />
+              <span className="text-[15px]">Followers</span>
             </li>
           </ul>
         </aside>
@@ -121,7 +145,7 @@ const Projects = ({
                 contentType="Projects"
               />
 
-              <div className="px-2 sm:px-20 z-50">
+              <div className="px-2 sm:px-20 z-50 pt-10">
                 {/* PROJE LİSTESİ */}
                 {projects.map((project) => (
                   <ProjectCard key={project.id} project={project} />

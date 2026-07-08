@@ -12,34 +12,34 @@ const PageAbout = ({ pageTitle, contentType }) => {
 
   return (
     <div className="w-full relative">
-      <div className="w-full h-14 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100 px-20">
-        <ul className="w-full flex items-end gap-5 text-gray-600">
+      <div className="w-full h-18 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100 px-20">
+        <ul className="w-full flex items-end gap-8 text-gray-600">
           <button
-            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "SAHNE" ? "border-b border-gray-500" : ""}`}
+            className={`pb-3 flex items-center gap-1.5 cursor-pointer ${selectedButton === "SAHNE" ? "border-b border-gray-500" : ""}`}
             onClick={() => selectButton("SAHNE")}
           >
-            <FaTicketSimple className={`text-base text-black`} />
+            <FaTicketSimple className={`text-xl text-black`} />
             <span className="text-xs">Sahne</span>
           </button>
           <button
-            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "MONOLOG" ? "border-b border-gray-500" : ""}`}
+            className={`pb-3 flex items-center gap-1.5 cursor-pointer ${selectedButton === "MONOLOG" ? "border-b border-gray-500" : ""}`}
             onClick={() => selectButton("MONOLOG")}
           >
-            <FaTicketSimple className={`${"text-base text-[#f3c102]"}`} />
+            <FaTicketSimple className={`${"text-xl text-[#f3c102]"}`} />
             <span className="text-xs">Monolog</span>
           </button>
           <button
-            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "YANYANA" ? "border-b border-gray-500" : ""}`}
+            className={`pb-3 flex items-center gap-1.5 cursor-pointer ${selectedButton === "YANYANA" ? "border-b border-gray-500" : ""}`}
             onClick={() => selectButton("YANYANA")}
           >
-            <FaTicketSimple className={`${"text-base text-[#fa9ec1]"}`} />
+            <FaTicketSimple className={`${"text-xl text-[#fa9ec1]"}`} />
             <span className="text-xs">Yan Yana</span>
           </button>
           <button
-            className={`pb-1 flex items-center gap-1 cursor-pointer ${selectedButton === "TERSYUZ" ? "border-b border-gray-500" : ""}`}
+            className={`pb-3 flex items-center gap-1.5 cursor-pointer ${selectedButton === "TERSYUZ" ? "border-b border-gray-500" : ""}`}
             onClick={() => selectButton("TERSYUZ")}
           >
-            <FaTicketSimple className={`${"text-base text-[#94c5fd]"}`} />
+            <FaTicketSimple className={`${"text-xl text-[#94c5fd]"}`} />
             <span className="text-xs">Tersyüz</span>
           </button>
         </ul>

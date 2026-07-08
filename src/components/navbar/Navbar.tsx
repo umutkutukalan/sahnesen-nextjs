@@ -2,7 +2,7 @@
 
 import { IoIosPaper } from "react-icons/io";
 import { FaFilePen, FaRegUser, FaTicketSimple } from "react-icons/fa6";
-import { RiComputerFill } from "react-icons/ri";
+import { RiComputerFill, RiMenu4Line } from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
 import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
@@ -19,6 +19,7 @@ import Link from "next/link";
 import LoginPage from "@/pages/LoginPage";
 import { usePathname } from "next/navigation";
 import { LuTickets } from "react-icons/lu";
+import { ImPencil2 } from "react-icons/im";
 
 const Navbar = ({ transparent }: { transparent: boolean }) => {
   const { user, setUser } = useAuth(); // setToken kaldırıldı
@@ -108,7 +109,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
   return (
     <>
       <nav
-        className={`navbar md:py-4 p-10 ${
+        className={`navbar md:py-4 py-10 pr-10 pl-6 ${
           transparent && isHome
             ? "bg-transparent text-black shadow-none static py-12 px-20"
             : transparent && !isHome
@@ -117,7 +118,17 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
         }`}
       >
         <>
-          <NavLinks href="/" logo={"sahnesen"} />
+          <div className="flex items-center gap-4">
+            <RiMenu4Line className="text-2xl" />
+            <li className={`list-none`}>
+              <Link
+                href={"/"}
+                className={`text-black transition-all duration-100`}
+              >
+                <span className="text-3xl playfair-display-600">Sahnesen</span>
+              </Link>
+            </li>
+          </div>
 
           <div className="flex items-center gap-2 border-gray-200 border rounded-lg overflow-hidden lg:block hidden">
             <div className="relative rounded-2xl overflow-hidden">
@@ -134,7 +145,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
               <div className="text-xl">
-                <NavLinks href="/create" logo={<LuTickets />} />
+                <NavLinks href="/create" logo={<ImPencil2 />} />
               </div>
             )}
             <div className="text-xl">
