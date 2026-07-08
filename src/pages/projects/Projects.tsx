@@ -27,6 +27,7 @@ import { sagperde, solperde } from "@/utils";
 import { IoSparklesOutline } from "react-icons/io5";
 import { RiUser6Line } from "react-icons/ri";
 import { BiBookmarkAlt } from "react-icons/bi";
+import { useSidebar } from "@/context/SidebarContext";
 
 interface ProjectsProps {
   initialProjects: Project[];
@@ -67,6 +68,8 @@ const Projects = ({
     }
   }, [user, getUserLikedProjects]);
 
+  const { isSidebarOpen } = useSidebar();
+
   return (
     <div className="page pt-16">
       <div className="relative flex w-full">
@@ -84,16 +87,20 @@ const Projects = ({
           <div className="relative flex w-full">
             {/* SOL ANA AKIŞ */}
             <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
-              <PageAbout
-                pageTitle={{ text: "Projeler" }}
-                contentType="Projects"
-              />
+              <div className="w-full flex justify-center">
+                <PageAbout
+                  pageTitle={{ text: "Projeler" }}
+                  contentType="Projects"
+                />
+              </div>
 
-              <div className="px-2 sm:px-20 z-50 pt-5">
-                {/* PROJE LİSTESİ */}
-                {projects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
+              <div className="w-full flex flex-col items-center">
+                <div className={`max-w-2xl z-50 pt-5`}>
+                  {/* PROJE LİSTESİ */}
+                  {projects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
               </div>
 
               {hasMore && <div ref={loadMoreRef}></div>}
