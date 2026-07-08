@@ -27,10 +27,11 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   return (
-    <div className="flex flex-col gap-4 mt-1">
+    <div className="flex flex-col gap-4 h-full">
       <div className="flex items-center gap-1" style={{ fontSize: "0.8rem" }}>
-        <FaStar className="flex-shrink-0 text-blue-600" />
-        <h3>Popüler İçerikler</h3> {/* İsim genel akışa göre güncellendi */}
+        {/* <FaStar className="flex-shrink-0 text-blue-600" /> */}
+        <h3 className="text-sm font-semibold">Popüler İçerikler</h3>{" "}
+        {/* İsim genel akışa göre güncellendi */}
       </div>
 
       <ul className="flex flex-col gap-5">
@@ -40,7 +41,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
             `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
           return (
-            <li key={project.id} className="flex flex-col gap-1 text-xs">
+            <li key={project.id} className="flex flex-col gap-2 text-xs">
               {/* AUTHOR HEADER */}
               <div
                 className="flex items-center gap-2 cursor-pointer w-max"
@@ -80,15 +81,12 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
 
               {/* TITLE + TIME */}
               <div
-                className="flex flex-col gap-1 cursor-pointer"
+                className="flex flex-col gap-2 cursor-pointer"
                 onClick={() =>
                   router.push(`/${project.authorUsername}/${project.slug}`)
                 } // Yeni şık rota mantığımız
               >
-                <span
-                  className="pr-10 line-clamp-2 font-semibold hover:text-blue-600 transition-colors duration-200"
-                  style={{ fontSize: "0.8rem" }}
-                >
+                <span className="line-clamp-2 font-semibold hover:text-blue-600 transition-colors duration-200 text-sm">
                   {project.title}
                 </span>
                 <div className="flex items-center gap-1 mt-1">

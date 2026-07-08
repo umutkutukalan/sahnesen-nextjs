@@ -134,7 +134,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     : null;
 
   return (
-    <div className="w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
+    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
       {/* LEFT IMAGE */}
       {/* <div className="lg:w-1/5 sm:w-1/4 w-1/5 hidden rounded-lg flex-shrink-0 sm:flex items-center justify-center">
         <div
@@ -230,7 +230,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </div>
 
           {/* Title & Content */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             <h2 className="text-base sm:text-xl font-semibold line-clamp-2">
               {project.title}
             </h2>

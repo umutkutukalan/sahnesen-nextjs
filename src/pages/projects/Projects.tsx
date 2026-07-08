@@ -135,7 +135,7 @@ const Projects = ({
         </div> */}
 
         <div className="relative w-full flex flex-col">
-          <div className="w-full h-10 bg-red-600"></div>
+          <div className="w-full h-10 bg-yellow-500"></div>
 
           <div className="relative flex w-full">
             {/* SOL ANA AKIŞ */}
@@ -181,15 +181,15 @@ const Projects = ({
             </div>
 
             {/* SAĞ STICKY SIDEBAR */}
-            <aside className="relative hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 p-5 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)]">
-              <div className="absolute right-0 top-0 z-0 opacity-60">
+            <aside className="relative hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] px-10 pt-8 pb-5">
+              {/* <div className="absolute right-0 top-0 z-0 opacity-60">
                 <Image
                   src={sagperde}
                   alt="Sag Perde"
                   height={300}
                   width={300}
                 />
-              </div>
+              </div> */}
 
               {/* Popular: infinite listeye bağlı olmasın */}
               <PopularProjects projects={projects.slice(0, 4)} />
