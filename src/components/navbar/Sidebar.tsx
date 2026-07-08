@@ -24,9 +24,9 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`relative hidden lg:flex h-[calc(100vh-64px)] top-16 flex-col justify-between bg-white z-80 transition-all duration-500 ease-in-out overflow-hidden ${
+      className={`hidden lg:flex h-[calc(100vh-64px)] sticky top-16 flex-col justify-between bg-white z-80 transition-all duration-500 ease-in-out overflow-hidden ${
         isSidebarOpen
-          ? "w-60 opacity-100 border-r border-gray-100 px-6 py-8"
+          ? "w-70 opacity-100 border-r border-gray-100 px-6 py-8"
           : "w-0 opacity-0 border-r-0 px-0 py-8 pointer-events-none"
       }`}
     >

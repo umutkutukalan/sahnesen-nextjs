@@ -33,7 +33,7 @@ export default function ProjectsClient({
   return (
     <>
       <Navbar transparent={false} />
-      <div className="h-screen flex">
+      <div className="min-h-screen flex">
         <Sidebar />
         <Projects
           initialProjects={initialProjects}

@@ -145,7 +145,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
               <input
                 type="text"
                 placeholder="Ara..."
-                className="xl:w-180 lg:w-120 focus:outline-none pl-12 pr-5 py-1 text-sm relative z-10 text-lg"
+                className="xl:w-180 lg:w-120 focus:outline-none pl-12 pr-5 py-1 text-sm relative z-10 text-lg select-none"
               />
             </div>
           </div>

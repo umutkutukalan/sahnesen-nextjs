@@ -27,7 +27,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="w-full flex flex-col gap-4 h-full">
       <div className="flex items-center gap-1" style={{ fontSize: "0.8rem" }}>
         {/* <FaStar className="flex-shrink-0 text-blue-600" /> */}
         <h3 className="text-sm font-semibold">Popüler İçerikler</h3>{" "}

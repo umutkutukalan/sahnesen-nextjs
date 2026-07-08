@@ -132,7 +132,9 @@ const Projects = ({
             </div>
 
             {/* SAĞ STICKY SIDEBAR */}
-            <aside className="relative hidden lg:flex lg:w-4/10 flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] px-10 pt-8 pb-5">
+            <aside
+              className={`relative hidden lg:flex ${isSidebarOpen ? "w-sm px-10" : "w-[500px] px-10"} transition-all duration-500 ease-in-out flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] pt-8 pb-5`}
+            >
               {/* <div className="absolute right-0 top-0 z-0 opacity-60">
                 <Image
                   src={sagperde}
@@ -142,21 +144,10 @@ const Projects = ({
                 />
               </div> */}
 
+              <div className="w-[240px]">
+                <PopularProjects projects={projects.slice(0, 4)} />
+              </div>
               {/* Popular: infinite listeye bağlı olmasın */}
-              <PopularProjects projects={projects.slice(0, 4)} />
-
-              {user ? (
-                <div className="flex flex-col gap-4">
-                  <Notebook />
-                  <LikedPost type="projects" />
-                  <BookMark />
-                  <StickySiteRules user={user} />
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  <StickySiteRules user={user} />
-                </div>
-              )}
             </aside>
           </div>
         </div>
