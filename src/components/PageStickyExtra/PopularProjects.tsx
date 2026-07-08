@@ -9,6 +9,7 @@ import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostResponse } from "@/services/server/post.service";
 import { FiUser } from "react-icons/fi";
+import { FaTicketSimple } from "react-icons/fa6";
 // import { useToProfile } from "../../hooks/useToProfile";
 
 interface PopularProjectsProps {
@@ -39,13 +40,13 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
             `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
 
           return (
-            <li key={project.id} className="flex flex-col gap-3 text-xs">
+            <li key={project.id} className="flex flex-col gap-1 text-xs">
               {/* AUTHOR HEADER */}
               <div
                 className="flex items-center gap-2 cursor-pointer w-max"
                 onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername
               >
-                <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-gray-200">
+                <div className="relative w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-gray-200">
                   {project.authorProfileImg ? (
                     <Image
                       src={`${baseUrl}/${project.authorProfileImg}`}
@@ -61,18 +62,18 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                   )}
                 </div>
 
-                <div className="truncate">
+                <div className="truncate flex items-center gap-1">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1 text-xs text-gray-600">
                       <span className="truncate">{authorName || "Yazar"}</span>
                       <TbRosetteDiscountCheckFilled
-                        className="text-blue-500 shrink-0"
+                        className="text-blue-500 shrink-0 text-xs"
                         title="Onaylı Yazar"
                       />
                     </div>
-                    <span className="truncate text-[10px] text-gray-400">
-                      @{project.authorUsername}
-                    </span>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                  @{project.authorUsername}
+                </span> */}
                   </div>
                 </div>
               </div>
@@ -90,9 +91,31 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                 >
                   {project.title}
                 </span>
-                <div className="flex items-center gap-1 text-gray-400">
-                  <FaStarHalf className="flex-shrink-0 text-blue-600 text-[10px]" />
-                  <span>{formatRelativeTime(project.createdAt)}</span>
+                <div className="flex items-center gap-1 mt-1">
+                  <div className="flex items-center gap-1 text-gray-400">
+                    <FaStarHalf className="flex-shrink-0 text-blue-600 text-[10px]" />
+                    <span className="text-[10px]">
+                      {formatRelativeTime(project.createdAt)}
+                    </span>
+                  </div>
+                  <span className="text-[8px]">•</span>
+                  <div className="relative pr-4">
+                    <span className="relative z-5 text-[10px]">
+                      <FaTicketSimple
+                        className={`${
+                          project.postType === "SAHNE"
+                            ? "text-black"
+                            : project.postType === "MONOLOG"
+                              ? "text-[#f3c102]"
+                              : project.postType === "YANYANA"
+                                ? "text-[#fa9ec1]"
+                                : project.postType === "TERSYUZ"
+                                  ? "text-[#94c5fd]"
+                                  : "text-black"
+                        }`}
+                      />
+                    </span>
+                  </div>
                 </div>
               </div>
             </li>
