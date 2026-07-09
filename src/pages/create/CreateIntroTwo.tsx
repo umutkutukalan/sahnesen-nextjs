@@ -101,18 +101,39 @@ const CreateIntroTwo = () => {
 
   const selectedCardData = cards.find((card) => card.id === selected);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [offsets, setOffsets] = useState<{ x: string; y: string }[]>([]);
+
   const handleClick = (card: (typeof cards)[0]) => {
     if (selected === card.id) {
       setIsExpanded(false);
       setSelected(null);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      setOffsets([]);
       return;
     }
-
     if (selected !== null) return;
+
+    // Tüm kartların merkeze olan offset'ini hesapla
+    if (containerRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const centerX = containerRect.left + containerRect.width / 2;
+      const centerY = containerRect.top + containerRect.height / 2;
+
+      const newOffsets = cardRefs.current.map((ref) => {
+        if (!ref) return { x: "0px", y: "0px" };
+        const rect = ref.getBoundingClientRect();
+        const cardCenterX = rect.left + rect.width / 2;
+        const cardCenterY = rect.top + rect.height / 2;
+        return {
+          x: `${centerX - cardCenterX}px`,
+          y: `${centerY - cardCenterY}px`,
+        };
+      });
+
+      setOffsets(newOffsets);
+    }
+
     setSelected(card.id);
   };
 
@@ -136,15 +157,13 @@ const CreateIntroTwo = () => {
           <Image src={bird} fill alt="Bird" />
         </div>
 
-        <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-5xl mx-auto">
+        <div
+          ref={containerRef}
+          className="flex flex-wrap content-center justify-center gap-10 w-full max-w-5xl mx-auto"
+        >
           {cards.map((card, i) => {
             const isSelected = selected === card.id;
             const isOther = selected !== null && !isSelected;
-
-            const offsetX =
-              i % 2 === 0 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
-            const offsetY =
-              i < 2 ? "calc(50% + 1.25rem)" : "calc(-50% - 1.25rem)";
 
             const getDelay = () => {
               if (selected !== null) {
@@ -157,22 +176,25 @@ const CreateIntroTwo = () => {
             return (
               <motion.div
                 key={card.id}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
                 className="relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group"
                 onClick={() => handleClick(card)}
                 animate={
                   isSelected
                     ? {
-                        x: offsetX,
-                        y: offsetY,
+                        x: offsets[i]?.x ?? 0,
+                        y: offsets[i]?.y ?? 0,
                         scale: 1.1,
                         zIndex: 50,
                         opacity: 1,
                       }
                     : isOther
                       ? {
-                          x: offsetX,
-                          y: offsetY,
-                          scale: 0.9,
+                          x: offsets[i]?.x ?? 0,
+                          y: offsets[i]?.y ?? 0,
+                          scale: 0.85,
                           opacity: 0,
                           zIndex: 1,
                         }
