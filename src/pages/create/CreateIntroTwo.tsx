@@ -1,7 +1,17 @@
 "use client";
 
 import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
-import { arkaplan, bird, camasir, card1, fineday, sahne, tire } from "@/utils";
+import {
+  arkaplan,
+  bird,
+  camasir,
+  card1,
+  etut,
+  fineday,
+  sahne,
+  tire,
+  yanyana,
+} from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
@@ -33,10 +43,21 @@ const cards = [
     description: "İç sesin, fikirlerin, tecrübelerin. Kendinle baş başa.",
   },
   {
+    id: "etut",
+    label: "Etüt",
+    bg: "#f79292ff",
+    image: etut,
+    side: "right",
+    bottomOffset: "sm:-bottom-10 sm:-left-2 w-60 h-60",
+    options: ["Editöre Git"],
+    sentence: "Herkesin hayran olduğu, bana delilik.",
+    description: "Mizahın, ironilerin, ters köşelerin. Kuralları baştan yaz.",
+  },
+  {
     id: "yanyana",
     label: "Yan Yana",
-    bg: "#fa9ec1",
-    image: card1,
+    bg: "#52e699ff",
+    image: yanyana,
     side: "left",
     bottomOffset: "-bottom-2 left-0 sm:-bottom-2 sm:left-0 w-60 h-60",
     options: ["Editöre Git"],
@@ -115,7 +136,7 @@ const CreateIntroTwo = () => {
           <Image src={bird} fill alt="Bird" />
         </div>
 
-        <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-xl mx-auto">
+        <div className="flex flex-wrap content-center justify-center gap-10 w-full max-w-5xl mx-auto">
           {cards.map((card, i) => {
             const isSelected = selected === card.id;
             const isOther = selected !== null && !isSelected;

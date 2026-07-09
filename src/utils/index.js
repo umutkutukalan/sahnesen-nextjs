@@ -21,9 +21,11 @@ import penguinandgirl from "../../public/images/penguinandgirl.png";
 import rabbit from "../../public/images/rabbit.png";
 
 import card1 from "../../public/images/card1.png";
+import yanyana from "../../public/images/yanyana.png";
 import camasir from "../../public/images/camasir.png";
 import fineday from "../../public/images/fineday.png";
 import sahne from "../../public/images/sahne.png";
+import etut from "../../public/images/etut.png";
 
 import arkaplan from "../../public/images/arkaplan.png";
 import bird from "../../public/images/bird.png";
@@ -38,7 +40,9 @@ export {
   fineday,
   sahne,
   card1,
+  yanyana,
   camasir,
+  etut,
   arkaplan,
   bird,
   sagperde,

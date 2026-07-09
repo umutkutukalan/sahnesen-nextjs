@@ -99,7 +99,7 @@ const EditorNavbar = ({
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
-  const profileImgUrl = user.profileImg
+  const profileImgUrl = user?.profileImg
     ? user.profileImg.startsWith("http")
       ? user.profileImg
       : `${baseUrl}/${user.profileImg}`
@@ -184,7 +184,7 @@ const EditorNavbar = ({
                 </div> */}
                   <div
                     className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-gray-600  ${
-                      !user.profileImg && "border border-gray-300"
+                      profileImgUrl && "border border-gray-300"
                     }`}
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
                   >
