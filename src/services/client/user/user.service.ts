@@ -9,6 +9,35 @@ export interface UpdateUserData {
 export const getUserProfile = async (username: string) => {
   try {
     const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${username}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    console.log("Response status:", response.status);
+    console.log(
+      "API URL:",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${username}`,
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("User profile alınırken hata:", error);
+    throw error;
+  }
+};
+
+export const getUserProfileMe = async () => {
+  try {
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
       {
         method: "GET",
