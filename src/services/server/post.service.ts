@@ -17,14 +17,14 @@ export interface PostResponse {
 
 // 1. Genel Akış (Ana sayfa / Projeler & Bloglar ortak akışı)
 export const getPublishedPostsServer = async (page = 0, size = 5) => {
-  const apiUrl = process.env.API_URL || 'http://localhost:8080';
-  
+  const apiUrl = process.env.API_URL || "http://localhost:8080";
+
   // Backend'deki genel yayındaki postları getiren endpoint
   const res = await fetch(
     `${apiUrl}/api/posts?page=${page}&size=${size}&sort=createdAt,desc`,
     {
       cache: "no-store", // Akışın her zaman güncel kalması için
-    }
+    },
   );
 
   if (!res.ok) {
@@ -35,19 +35,31 @@ export const getPublishedPostsServer = async (page = 0, size = 5) => {
 };
 
 // 2. Slug ile Detay Getirme (Redis + Canlı Sayaç Entegrasyonu)
-export const getPostDetailServer = async (slug: string): Promise<PostResponse | null> => {
-  const apiUrl = process.env.API_URL || 'http://localhost:8080';
-  
+export const getPostDetailServer = async (
+  slug: string,
+): Promise<PostResponse | null> => {
+  const apiUrl = process.env.API_URL || "http://localhost:8080";
+
   // Backend'de yazdığımız getPostWithViewCount metodunu tetikleyen endpoint
-  const res = await fetch(
-    `${apiUrl}/api/posts/${slug}`,
-    {
-      cache: "no-store", 
-    }
-  );
+  const res = await fetch(`${apiUrl}/api/posts/${slug}`, {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     return null;
+  }
+
+  return res.json();
+};
+
+export const getUserPosts = async (username: string) => {
+  const apiUrl = process.env.API_URL || "http://localhost:8080";
+  const res = await fetch(`${apiUrl}/api/posts/user/${username}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Kullanıcı postları yüklenirken bir hata oluştu");
   }
 
   return res.json();
