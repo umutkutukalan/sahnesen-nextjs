@@ -36,8 +36,8 @@ const cards = [
     label: "Monolog",
     bg: "#f2c103",
     image: fineday,
-    side: "right",
-    bottomOffset: "sm:-bottom-13 sm:left-0 w-80 h-80",
+    side: "top",
+    bottomOffset: "sm:-bottom-13 sm:left-5 w-60 h-60",
     options: ["Editöre Git"],
     sentence: "",
     description: "İç sesin, fikirlerin, tecrübelerin. Kendinle baş başa.",
@@ -179,7 +179,7 @@ const CreateIntroTwo = () => {
                 ref={(el) => {
                   cardRefs.current[i] = el;
                 }}
-                className="relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group"
+                className={`relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group`}
                 onClick={() => handleClick(card)}
                 animate={
                   isSelected
@@ -218,8 +218,10 @@ const CreateIntroTwo = () => {
                   <div
                     className={`absolute w-1/2 h-8 flex items-center justify-center bg-gray-600 text-white ${
                       card.side === "left"
-                        ? "-left-18 bottom-14 -rotate-90"
-                        : "-right-18 bottom-14 rotate-90"
+                        ? "-left-19 bottom-14 -rotate-90"
+                        : card.side === "right"
+                          ? "-right-19 bottom-14 rotate-90"
+                          : "top-0 left-1/2 -translate-x-1/2" // top
                     }`}
                   >
                     <span className="text-sm">{card.label}</span>
@@ -244,11 +246,10 @@ const CreateIntroTwo = () => {
                 </motion.div>
 
                 {/* 1. Maskelenmiş Gerçek Kutu (İçerik) - overflow-hidden BURADA kalıyor */}
-                <div className="relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto z-100">
-                  <div
-                    className="w-full h-full"
-                    style={{ background: card.bg }}
-                  />
+                <div
+                  className={`relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto z-100`}
+                >
+                  <div className="w-full h-full" />
                   <div className={`absolute ${card.bottomOffset}`}>
                     <Image
                       src={card.image}
