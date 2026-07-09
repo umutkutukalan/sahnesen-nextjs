@@ -11,16 +11,32 @@ import { SiWikibooks } from "react-icons/si";
 import StickySiteRules from "../PageStickyExtra/StickySiteRules";
 import Notebook from "../PageStickyExtra/Notebook";
 import LikedPost from "../PageStickyExtra/LikedPost";
+import { FiUser, FiUsers } from "react-icons/fi";
+import Image from "next/image";
+import { useToProfile } from "@/utils/useToProfile";
+import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { useRelativeTime } from "@/hooks/useRelativeTime";
 
 const Sidebar = () => {
   const { user } = useAuth();
   const { isSidebarOpen } = useSidebar();
+  const { ToProfile } = useToProfile();
+  const { formatRelativeTime } = useRelativeTime();
 
   const [selectedSideBarMenu, setSelectedSideBarMenu] = useState("Fuaye");
 
   const onSideBarMenuSelect = (menu: string) => {
     setSelectedSideBarMenu(menu);
   };
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
+  const userProfileImg = user.profileImg
+    ? user.profileImg.startsWith("http")
+      ? user.profileImg
+      : `${baseUrl}/${user.profileImg}`
+    : null;
 
   return (
     <aside
@@ -31,50 +47,243 @@ const Sidebar = () => {
       }`}
     >
       <div className="w-48 h-full flex flex-col justify-between gap-4 flex-shrink-0">
-        <div className="border-b border-gray-100 pb-10">
-          {user ? (
-            <ul className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5">
+          <div className="border-b border-gray-100 pb-10">
+            {user ? (
+              <ul className="flex flex-col gap-5">
+                <li
+                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Fuaye" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+                  onClick={() => onSideBarMenuSelect("Fuaye")}
+                >
+                  <LuTheater className="text-[22px]" />
+                  <span className="text-[15px]">Fuaye</span>
+                </li>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Yazılarım" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+                  onClick={() => onSideBarMenuSelect("Yazılarım")}
+                >
+                  <SiWikibooks className="text-[22px]" />
+                  <span className="text-[15px]">Yazılarım</span>
+                </li>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Profil" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+                  onClick={() => onSideBarMenuSelect("Profil")}
+                >
+                  <RiUser6Line className="text-[22px]" />
+                  <span className="text-[15px]">Profil</span>
+                </li>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Koleksiyon" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+                  onClick={() => onSideBarMenuSelect("Koleksiyon")}
+                >
+                  <BiBookmarkAlt className="text-[22px]" />
+                  <span className="text-[15px]">Koleksiyon</span>
+                </li>
+                <li
+                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Etki" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+                  onClick={() => onSideBarMenuSelect("Etki")}
+                >
+                  <IoSparklesOutline className="text-[22px]" />
+                  <span className="text-[15px]">Etki</span>
+                </li>
+              </ul>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <StickySiteRules user={user} />
+              </div>
+            )}
+          </div>
+          <ul className="flex flex-col gap-5">
+            <li
+              className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Topluluk" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+              onClick={() => onSideBarMenuSelect("Topluluk")}
+            >
+              <FiUsers className="text-[22px]" />
+              <span className="text-[15px]">Topluluk</span>
+            </li>
+            <ul className="flex flex-col gap-2">
               <li
-                className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Fuaye" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
-                onClick={() => onSideBarMenuSelect("Fuaye")}
+                className="flex items-center gap-5 cursor-pointer w-max"
+                onClick={() => ToProfile(null, user?.username || "")}
               >
-                <LuTheater className="text-[22px]" />
-                <span className="text-[15px]">Fuaye</span>
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                  {userProfileImg ? (
+                    <Image
+                      src={userProfileImg}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{user.name}</span>
+                      <span className="truncate">{user.surname}</span>
+                    </div>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                                  @{project.authorUsername}
+                                </span> */}
+                  </div>
+                </div>
               </li>
               <li
-                className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Yazılarım" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
-                onClick={() => onSideBarMenuSelect("Yazılarım")}
+                className="flex items-center gap-5 cursor-pointer w-max"
+                onClick={() => ToProfile(null, user?.username || "")}
               >
-                <SiWikibooks className="text-[22px]" />
-                <span className="text-[15px]">Yazılarım</span>
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                  {userProfileImg ? (
+                    <Image
+                      src={userProfileImg}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{user.name}</span>
+                      <span className="truncate">{user.surname}</span>
+                    </div>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                                  @{project.authorUsername}
+                                </span> */}
+                  </div>
+                </div>
               </li>
               <li
-                className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Profil" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
-                onClick={() => onSideBarMenuSelect("Profil")}
+                className="flex items-center gap-5 cursor-pointer w-max"
+                onClick={() => ToProfile(null, user?.username || "")}
               >
-                <RiUser6Line className="text-[22px]" />
-                <span className="text-[15px]">Profil</span>
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                  {userProfileImg ? (
+                    <Image
+                      src={userProfileImg}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{user.name}</span>
+                      <span className="truncate">{user.surname}</span>
+                    </div>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                                  @{project.authorUsername}
+                                </span> */}
+                  </div>
+                </div>
               </li>
               <li
-                className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Koleksiyon" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
-                onClick={() => onSideBarMenuSelect("Koleksiyon")}
+                className="flex items-center gap-5 cursor-pointer w-max"
+                onClick={() => ToProfile(null, user?.username || "")}
               >
-                <BiBookmarkAlt className="text-[22px]" />
-                <span className="text-[15px]">Koleksiyon</span>
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                  {userProfileImg ? (
+                    <Image
+                      src={userProfileImg}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{user.name}</span>
+                      <span className="truncate">{user.surname}</span>
+                    </div>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                                  @{project.authorUsername}
+                                </span> */}
+                  </div>
+                </div>
               </li>
               <li
-                className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Etki" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
-                onClick={() => onSideBarMenuSelect("Etki")}
+                className="flex items-center gap-5 cursor-pointer w-max"
+                onClick={() => ToProfile(null, user?.username || "")}
               >
-                <IoSparklesOutline className="text-[22px]" />
-                <span className="text-[15px]">Etki</span>
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                  {userProfileImg ? (
+                    <Image
+                      src={userProfileImg}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{user.name}</span>
+                      <span className="truncate">{user.surname}</span>
+                    </div>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                                  @{project.authorUsername}
+                                </span> */}
+                  </div>
+                </div>
+              </li>
+              <li
+                className="flex items-center gap-5 cursor-pointer w-max"
+                onClick={() => ToProfile(null, user?.username || "")}
+              >
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                  {userProfileImg ? (
+                    <Image
+                      src={userProfileImg}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate">{user.name}</span>
+                      <span className="truncate">{user.surname}</span>
+                    </div>
+                    {/* <span className="truncate text-[10px] text-gray-400">
+                                  @{project.authorUsername}
+                                </span> */}
+                  </div>
+                </div>
               </li>
             </ul>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <StickySiteRules user={user} />
-            </div>
-          )}
+          </ul>
         </div>
         <ul className="flex flex-col gap-4 pt-5">
           <li>
