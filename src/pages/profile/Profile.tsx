@@ -52,6 +52,18 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const [followingList, setFollowingList] = useState(false);
   const [followersList, setFollowersList] = useState(false);
 
+  const [isSidebarStuck, setIsSidebarStuck] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // 64px navbar + cover image yüksekliği (320px) + mt offset
+      setIsSidebarStuck(window.scrollY > 320);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // username varsa getUser'da username ile bulacağız
   const { getUser, profileUser, isLoading } = useGetUser();
 
@@ -116,7 +128,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
       <div className="w-full">
         <div className="w-full">
           {/* Profil resmi ve bilgileri */}
-          <div className="w-full h-80 bg-gray-700 relative z-10">
+          <div className="w-full h-80 bg-gray-700 relative z-20">
             <div className="w-full h-full overflow-hidden relative">
               <div className="absolute inset-0"></div>
               <div>
@@ -131,30 +143,32 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 />
               </div>
             </div>
-            <div className="absolute h-35 w-35 rounded-full overflow-hidden bg-gray-200 -bottom-15 left-10 z-20 flex items-center justify-center shadow-lg shadow-black/20">
-              {profileImgUrl ? (
-                <Image
-                  src={getOptimizedImageUrl(profileImgUrl)}
-                  alt=""
-                  fill
-                  unoptimized
-                  className="hover:scale-105 transition-transform duration-200 object-cover"
-                  style={{
-                    imageRendering: "auto",
-                  }}
-                />
-              ) : (
-                <FiUser className="text-7xl text-gray-500" />
-              )}
-            </div>
           </div>
-          <div className="mt-10 px-10 w-full flex gap-10">
+          <div className="mt-10 px-10 w-full flex gap-10 items-start">
             {/* Kullanıcı adı ve takip butonu */}
             <div
-              className="w-1/4 mt-12"
-              style={{ position: "sticky", top: "64px" }}
+              className={`w-xs -mt-20 sticky scrollbar-hide z-20 transition-all duration-200 ${isSidebarStuck ? "overflow-y-auto" : ""}`}
+              style={{
+                top: "42px",
+                maxHeight: "calc(100vh - 64px)",
+              }}
             >
               <div className="flex flex-col">
+                {/* Profil fotoğrafını buraya taşı */}
+                <div className="relative w-30 h-30 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
+                  {profileImgUrl ? (
+                    <Image
+                      src={getOptimizedImageUrl(profileImgUrl)}
+                      alt=""
+                      fill
+                      unoptimized
+                      className="hover:scale-105 transition-transform duration-200 object-cover"
+                    />
+                  ) : (
+                    <FiUser className="text-5xl text-gray-500" />
+                  )}
+                </div>
+
                 {rozets.length > 0 && (
                   <ul className="flex items-center gap-0.5 mb-2">
                     {rozets.map((rozet) => (
@@ -289,6 +303,166 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                     <span> Biyografi alanı doldurulmadı. </span>
                   </div>
                 )}
+                <div
+                  className="flex flex-col gap-1 mt-5 text-gray-600"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  <div className="flex items-center gap-1">
+                    <MdOutlineWorkspacePremium className="text-xl" />
+                    <span>Yazılım Mühendisi</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TiLocationArrow className="text-xl" />
+                    <span>Eskişehir, Türkiye</span>
+                  </div>
+                </div>
+                {profileUser?.bio ? (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <p>{profileUser?.bio}</p>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <span> Biyografi alanı doldurulmadı. </span>
+                  </div>
+                )}
+                <div
+                  className="flex flex-col gap-1 mt-5 text-gray-600"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  <div className="flex items-center gap-1">
+                    <MdOutlineWorkspacePremium className="text-xl" />
+                    <span>Yazılım Mühendisi</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TiLocationArrow className="text-xl" />
+                    <span>Eskişehir, Türkiye</span>
+                  </div>
+                </div>
+                {profileUser?.bio ? (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <p>{profileUser?.bio}</p>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <span> Biyografi alanı doldurulmadı. </span>
+                  </div>
+                )}
+                <div
+                  className="flex flex-col gap-1 mt-5 text-gray-600"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  <div className="flex items-center gap-1">
+                    <MdOutlineWorkspacePremium className="text-xl" />
+                    <span>Yazılım Mühendisi</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TiLocationArrow className="text-xl" />
+                    <span>Eskişehir, Türkiye</span>
+                  </div>
+                </div>
+                {profileUser?.bio ? (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <p>{profileUser?.bio}</p>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <span> Biyografi alanı doldurulmadı. </span>
+                  </div>
+                )}
+                <div
+                  className="flex flex-col gap-1 mt-5 text-gray-600"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  <div className="flex items-center gap-1">
+                    <MdOutlineWorkspacePremium className="text-xl" />
+                    <span>Yazılım Mühendisi</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TiLocationArrow className="text-xl" />
+                    <span>Eskişehir, Türkiye</span>
+                  </div>
+                </div>
+                {profileUser?.bio ? (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <p>{profileUser?.bio}</p>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <span> Biyografi alanı doldurulmadı. </span>
+                  </div>
+                )}
+                <div
+                  className="flex flex-col gap-1 mt-5 text-gray-600"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  <div className="flex items-center gap-1">
+                    <MdOutlineWorkspacePremium className="text-xl" />
+                    <span>Yazılım Mühendisi</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TiLocationArrow className="text-xl" />
+                    <span>Eskişehir, Türkiye</span>
+                  </div>
+                </div>
+                {profileUser?.bio ? (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <p>{profileUser?.bio}</p>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
+                    style={{
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    <span> Biyografi alanı doldurulmadı. </span>
+                  </div>
+                )}
 
                 {publicSocialAccounts.length > 0 && (
                   <div className="mt-5 flex flex-col gap-1">
@@ -335,49 +509,51 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 )}
               </div>
             </div>
-            <div className="w-3/4">
-              {/* Tab Navigation */}
-              <div className="flex gap-8 border-b border-gray-200">
-                <button
-                  onClick={() => setActiveTab("projeler")}
-                  className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                    activeTab === "projeler"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Projeler
-                </button>
-                <button
-                  onClick={() => setActiveTab("bloglar")}
-                  className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                    activeTab === "bloglar"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Bloglar
-                </button>
-                <button
-                  onClick={() => setActiveTab("kitaplık")}
-                  className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                    activeTab === "kitaplık"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Kitaplık
-                </button>
-              </div>
+            <div className="w-full flex justify-center border-l border-gray-100">
+              <div className={`max-w-3xl flex flex-col`}>
+                {/* Tab Navigation */}
+                <div className="flex gap-8 border-b border-gray-200">
+                  <button
+                    onClick={() => setActiveTab("projeler")}
+                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                      activeTab === "projeler"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Projeler
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("bloglar")}
+                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                      activeTab === "bloglar"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Bloglar
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("kitaplık")}
+                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                      activeTab === "kitaplık"
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Kitaplık
+                  </button>
+                </div>
 
-              {/* Tab Content */}
-              <div className="mt-6">
-                {activeTab === "projeler" && (
-                  <ProfileUserProjects targetUsername={targetUsername} />
-                )}
-                {activeTab === "bloglar" && (
-                  <ProfileUserBlogs targetUserId={targetUserId} />
-                )}
+                {/* Tab Content */}
+                <div className="mt-6">
+                  {activeTab === "projeler" && (
+                    <ProfileUserProjects targetUsername={targetUsername} />
+                  )}
+                  {activeTab === "bloglar" && (
+                    <ProfileUserBlogs targetUserId={targetUserId} />
+                  )}
+                </div>
               </div>
             </div>
           </div>
