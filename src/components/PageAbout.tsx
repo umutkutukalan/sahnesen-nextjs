@@ -42,6 +42,13 @@ const PageAbout = ({ pageTitle, contentType }) => {
             <FaTicketSimple className={`${"text-xl text-[#94c5fd]"}`} />
             <span className="text-xs">Tersyüz</span>
           </button>
+          <button
+            className={`pb-3 flex items-center gap-1.5 cursor-pointer ${selectedButton === "ETUT" ? "border-b border-gray-500" : ""}`}
+            onClick={() => selectButton("ETUT")}
+          >
+            <FaTicketSimple className={`${"text-xl text-[#f79293]"}`} />
+            <span className="text-xs">Etüt</span>
+          </button>
         </ul>
       </div>
     </div>
