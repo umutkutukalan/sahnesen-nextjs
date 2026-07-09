@@ -19,7 +19,18 @@ import { CiSettings } from "react-icons/ci";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils"; // Özel karakterleri kaldırmak için yardımcı fonksiyon
 import Image from "next/image";
-import { duck2, duck3, duck4, duck5, duck7, profileborder } from "@/utils";
+import {
+  duck2,
+  duck3,
+  duck4,
+  duck5,
+  duck7,
+  profilebg,
+  profileborder,
+  profilebordertwo,
+  sagperde,
+  solperde,
+} from "@/utils";
 import ProfileUserProjects from "./ProfileUserProject";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
@@ -31,6 +42,7 @@ import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 import ProfileUserBlogs from "./ProfileUserBlogs";
 import { MdOutlineWorkspacePremium } from "react-icons/md";
 import { TiLocationArrow } from "react-icons/ti";
+import PageAbout from "@/components/PageAbout";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const { user } = useAuth();
@@ -128,34 +140,93 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
       <div className="w-full">
         <div className="w-full">
           {/* Profil resmi ve bilgileri */}
-          <div className="w-full h-80 bg-gray-700 relative z-20">
-            <div className="w-full h-full overflow-hidden relative">
-              <div className="absolute inset-0"></div>
-              <div>
-                <Image
-                  src={
-                    getOptimizedImageUrl(profileUser?.coverImg) || profileborder
-                  }
-                  fill
-                  unoptimized
-                  alt=""
-                  className="object-cover"
-                />
+          <div className="w-full flex gap-10 items-start">
+            <div className="w-full flex flex-col">
+              <div className="w-full h-60 bg-white relative z-20">
+                <div className="w-full h-full overflow-hidden relative">
+                  {profileUser?.coverImg && (
+                    <div>
+                      <Image
+                        src={getOptimizedImageUrl(profileUser?.coverImg)}
+                        fill
+                        unoptimized
+                        alt=""
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  {!profileUser?.coverImg && (
+                    <>
+                      <div className="absolute inset-0">
+                        <Image
+                          src={profilebg}
+                          fill
+                          unoptimized
+                          alt=""
+                          className="object-cover"
+                        />
+                      </div>
+                      {/* <div className="absolute w-80 h-80 left-0 top-0">
+                        <Image
+                          src={solperde}
+                          fill
+                          unoptimized
+                          alt=""
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="absolute w-60 h-60 right-0 bottom-0">
+                        <Image
+                          src={profilebordertwo}
+                          fill
+                          unoptimized
+                          alt=""
+                          className="object-cover"
+                        />
+                      </div> */}
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="w-full flex justify-center border-r border-gray-100">
+                <div className={`max-w-4xl flex flex-col`}>
+                  {/* Tab Navigation */}
+                  <PageAbout pageTitle={"POSTS"} contentType={"SAHNE"} />
+
+                  {/* Tab Content */}
+                  <div className="mt-6">
+                    {activeTab === "projeler" && (
+                      <ProfileUserProjects targetUsername={targetUsername} />
+                    )}
+                    {activeTab === "bloglar" && (
+                      <ProfileUserBlogs targetUserId={targetUserId} />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-10 px-10 w-full flex gap-10 items-start">
             {/* Kullanıcı adı ve takip butonu */}
             <div
-              className={`w-sm -mt-20 sticky scrollbar-hide z-20 transition-all duration-200 ${isSidebarStuck ? "overflow-y-auto" : ""}`}
+              className={`w-lg sticky scrollbar-hide z-20 transition-all duration-200 ${isSidebarStuck ? "overflow-y-auto" : ""}`}
               style={{
-                top: "42px",
+                top: "0px",
                 maxHeight: "calc(100vh - 64px)",
               }}
             >
-              <div className="flex flex-col">
+              <div className="absolute w-64 h-64 right-0 top-0">
+                <Image
+                  src={sagperde}
+                  fill
+                  unoptimized
+                  alt=""
+                  className="hue-rotate-[240deg] saturate-150 brightness-90"
+                />
+              </div>
+
+              <div className="relative flex flex-col pt-10">
                 {/* Profil fotoğrafını buraya taşı */}
-                <div className="relative w-30 h-30 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
+
+                <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
                   {profileImgUrl ? (
                     <Image
                       src={getOptimizedImageUrl(profileImgUrl)}
@@ -254,16 +325,17 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                     </button>
                   )}
                   {/* Takip/Takipçi sayıları */}
-                  <div className="flex text-xs">
+                  <div className="flex items-center gap-2 text-xs">
                     <div
-                      className="flex items-center gap-1 border-r pr-2 border-gray-400 cursor-pointer"
+                      className="flex items-center gap-1  cursor-pointer"
                       onClick={() => setFollowersList(!followersList)}
                     >
                       <span>{followCounts?.followerCount || 0}</span>
                       <span className="text-gray-700">Takipçi</span>
                     </div>
+                    <span className="text-gray-600">•</span>
                     <div
-                      className="flex items-center gap-1 pl-2 cursor-pointer"
+                      className="flex items-center gap-1 cursor-pointer"
                       onClick={() => setFollowingList(!followingList)}
                     >
                       <span>{followCounts?.followingCount || 0}</span>
@@ -348,53 +420,6 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                     ))}
                   </div>
                 )}
-              </div>
-            </div>
-            <div className="w-full flex justify-center border-l border-gray-100">
-              <div className={`max-w-3xl flex flex-col`}>
-                {/* Tab Navigation */}
-                <div className="flex gap-8 border-b border-gray-200">
-                  <button
-                    onClick={() => setActiveTab("projeler")}
-                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      activeTab === "projeler"
-                        ? "border-blue-500 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    Projeler
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("bloglar")}
-                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      activeTab === "bloglar"
-                        ? "border-blue-500 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    Bloglar
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("kitaplık")}
-                    className={`pb-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      activeTab === "kitaplık"
-                        ? "border-blue-500 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    Kitaplık
-                  </button>
-                </div>
-
-                {/* Tab Content */}
-                <div className="mt-6">
-                  {activeTab === "projeler" && (
-                    <ProfileUserProjects targetUsername={targetUsername} />
-                  )}
-                  {activeTab === "bloglar" && (
-                    <ProfileUserBlogs targetUserId={targetUserId} />
-                  )}
-                </div>
               </div>
             </div>
           </div>

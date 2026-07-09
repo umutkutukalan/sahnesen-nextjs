@@ -32,6 +32,8 @@ import bird from "../../public/images/bird.png";
 
 import sagperde from "../../public/images/sagperde.png";
 import solperde from "../../public/images/solperde.png";
+import profilebordertwo from "../../public/images/profilebordertwo.png";
+import profilebg from "../../public/images/profilebg.jpg";
 
 import tire from "../../public/images/tire.png";
 
@@ -47,6 +49,8 @@ export {
   bird,
   sagperde,
   solperde,
+  profilebordertwo,
+  profilebg,
 };
 
 export { ressam, runner, walker, loginpageimg, profileborder };
