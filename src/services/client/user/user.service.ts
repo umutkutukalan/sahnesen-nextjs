@@ -18,12 +18,6 @@ export const getUserProfile = async (username: string) => {
       },
     );
 
-    console.log("Response status:", response.status);
-    console.log(
-      "API URL:",
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${username}`,
-    );
-
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
     }

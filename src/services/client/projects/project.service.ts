@@ -15,14 +15,14 @@ export const getProjectsClient = async (page = 0, size = 5) => {
 };
 
 // Belirli kullanıcının projeleri
-export const getUserProjectsService = async (
-  userId: string | number,
+export const getUserPostsService = async (
+  username: string,
   page = 0,
   size = 5,
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/projects?userId=${userId}&page=${page}&size=${size}&sort=createdAt,desc`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/posts/user/${username}?page=${page}&size=${size}&sort=createdAt,desc`,
       {
         credentials: "include",
         cache: "no-store",

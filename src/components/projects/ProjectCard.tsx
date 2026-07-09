@@ -4,7 +4,7 @@ import { FiUser } from "react-icons/fi";
 import { LuImages, LuTheater } from "react-icons/lu";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { PiHandsClappingLight } from "react-icons/pi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -17,17 +17,37 @@ import { FaTicketSimple } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
 import { BiBookmarks } from "react-icons/bi";
+import { useAuth } from "@/context/UserContext";
+import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
 
 interface ProjectCardProps {
   project: PostResponse; // Tip adını yeni post mimarisine çektik
+  showActions?: boolean;
+  onDelete?: () => void;
 }
 
-const ProjectCard = ({ project }: ProjectCardProps) => {
+const ProjectCard = ({
+  project,
+  showActions = false,
+  onDelete,
+}: ProjectCardProps) => {
+  const { user } = useAuth();
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
   const { ToProfile } = useToProfile();
   const { hasUserLiked, liked } = useHasUserLiked();
   const { likeCount, getLikeCount } = useGetLikeCount();
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const { deleteProject } = useDeleteProject();
+
+  const handleConfirmDelete = () => {
+    if (user?.username !== project.authorUsername) return;
+    deleteProject(project.id, () => {
+      onDelete?.();
+    });
+    setShowConfirm(false);
+  };
 
   useEffect(() => {
     hasUserLiked(project.id, "project");
@@ -321,6 +341,27 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               </li>
             </ul>
           </div>
+          {showConfirm && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-xs z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col gap-4">
+                <span>Bu gönderiyi silmek istediğinize emin misiniz?</span>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
+                    onClick={() => setShowConfirm(false)}
+                  >
+                    Vazgeç
+                  </button>
+                  <button
+                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
+                    onClick={handleConfirmDelete}
+                  >
+                    Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

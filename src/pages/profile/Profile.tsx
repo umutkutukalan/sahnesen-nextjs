@@ -31,7 +31,6 @@ import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 import ProfileUserBlogs from "./ProfileUserBlogs";
 import { MdOutlineWorkspacePremium } from "react-icons/md";
 import { TiLocationArrow } from "react-icons/ti";
-import { profile } from "console";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const { user } = useAuth();
@@ -60,14 +59,14 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
 
   console.log("ProfileUser in Profile component:", profileUser);
 
-  const targetUserId = profileUser?.id;
+  const targetUsername = profileUser?.username;
   // kendi profili mi kontrolü — artık id state'i yok, username ile karşılaştır
   const isOwnProfile = usernameSlug === user?.username;
 
   const { getPublicSocialAccounts, publicSocialAccounts } =
-    useSocialAccount(targetUserId);
+    useSocialAccount(targetUsername);
 
-  const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
+  const { isFollowing, followCounts, toggleFollow } = useFollow(targetUsername);
   const { getFollowing, followings } = useGetFollowing();
   const { getFollowers, followers } = useGetFollowers();
 
@@ -78,23 +77,23 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   }, [usernameSlug]);
 
   useEffect(() => {
-    if (targetUserId) {
-      getFollowing(targetUserId);
+    if (targetUsername) {
+      getFollowing(targetUsername);
     }
-  }, [targetUserId, getFollowing]);
+  }, [targetUsername, getFollowing]);
 
   useEffect(() => {
-    if (targetUserId) {
-      getFollowers(targetUserId);
+    if (targetUsername) {
+      getFollowers(targetUsername);
     }
-  }, [targetUserId, getFollowers]);
+  }, [targetUsername, getFollowers]);
 
   useEffect(() => {
-    if (targetUserId) {
-      console.log("Fetching social accounts for ID:", targetUserId);
-      getPublicSocialAccounts(targetUserId);
+    if (targetUsername) {
+      console.log("Fetching social accounts for ID:", targetUsername);
+      getPublicSocialAccounts(targetUsername);
     }
-  }, [targetUserId]);
+  }, [targetUsername]);
   console.log("Social Accounts:", publicSocialAccounts);
   console.log("Followings:", followings);
   console.log("Followers:", followers);
@@ -123,8 +122,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
               <div>
                 <Image
                   src={
-                    getOptimizedImageUrl(profileUser?.profileBorder) ||
-                    profileborder
+                    getOptimizedImageUrl(profileUser?.coverImg) || profileborder
                   }
                   fill
                   unoptimized
@@ -375,7 +373,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
               {/* Tab Content */}
               <div className="mt-6">
                 {activeTab === "projeler" && (
-                  <ProfileUserProjects targetUserId={targetUserId} />
+                  <ProfileUserProjects targetUsername={targetUsername} />
                 )}
                 {activeTab === "bloglar" && (
                   <ProfileUserBlogs targetUserId={targetUserId} />

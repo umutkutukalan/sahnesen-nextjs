@@ -1,4 +1,4 @@
-import { getUserProjectsService } from "@/services/client/projects/project.service";
+import { getUserPostsService } from "@/services/client/projects/project.service";
 import { useState, useCallback } from "react";
 
 export const useGetUserProjects = () => {
@@ -11,7 +11,7 @@ export const useGetUserProjects = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const getUserProjects = useCallback(
-    async (userId: string | number, page = 0, isLoadMore = false) => {
+    async (username: string, page = 0, isLoadMore = false) => {
       try {
         if (isLoadMore) {
           setIsLoadingMore(true);
@@ -19,7 +19,7 @@ export const useGetUserProjects = () => {
           setIsLoading(true);
         }
 
-        const response = await getUserProjectsService(userId, page, 5);
+        const response = await getUserPostsService(username, page, 5);
 
         if (isLoadMore) {
           // Spring Boot pagination: response.data.content içinde projeler var
@@ -29,7 +29,7 @@ export const useGetUserProjects = () => {
             // Duplicate kontrolü - id'ye göre filtreleme
             const existingIds = new Set(prev.map((project) => project.id));
             const uniqueNewProjects = newProjects.filter(
-              (project) => !existingIds.has(project.id)
+              (project) => !existingIds.has(project.id),
             );
 
             return [...prev, ...uniqueNewProjects];
@@ -61,7 +61,7 @@ export const useGetUserProjects = () => {
         setIsLoadingMore(false);
       }
     },
-    []
+    [],
   );
 
   const loadMoreUserProjects = useCallback(
@@ -70,7 +70,7 @@ export const useGetUserProjects = () => {
         getUserProjects(userId, currentPage + 1, true);
       }
     },
-    [currentPage, hasMore, isLoadingMore, getUserProjects]
+    [currentPage, hasMore, isLoadingMore, getUserProjects],
   );
 
   return {
