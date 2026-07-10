@@ -80,6 +80,33 @@ export const updateUser = async (userData: UpdateUserData) => {
   }
 };
 
+export const updateProfileImg = async (img: File) => {
+  const form = new FormData();
+  form.append("file", img);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/profile-image`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: form,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    return response.text();
+  } catch (error) {
+    console.error(
+      "Kullanıcı profil fotoğrafı güncellenirken hata oluştu:",
+      error,
+    );
+    throw error;
+  }
+};
+
 export const userService = {
   getUserProfile,
   updateUser,

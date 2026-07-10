@@ -3,7 +3,10 @@ import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { RiImageEditLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/UserContext";
-import { updateUser } from "../../services/client/user/user.service";
+import {
+  updateProfileImg,
+  updateUser,
+} from "../../services/client/user/user.service";
 import {
   compressProfileBorder,
   compressProfileImage,
@@ -44,16 +47,13 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   // Resim kaydetme fonksiyonu
   const handleSaveImage = async () => {
     try {
-      const formData = {};
       if (compressedProfileImageData) {
-        formData.profileImg = compressedProfileImageData;
-      } else if (compressedCoverImgData) {
-        formData.coverImg = compressedCoverImgData;
+        // compressedProfileImageData artık bir metin değil, doğrudan File nesnesi!
+        const updatedUser = await updateProfileImg(compressedProfileImageData);
+        setUser(updatedUser);
       }
 
-      const updatedUser = await updateUser(formData);
-      setUser(updatedUser); // UserContext'i güncelle
-
+      // Sıfırlama işlemleri
       setPreviewProfileImage(null);
       setCompressedProfileImageData(null);
       setPreviewCoverImg(null);
@@ -70,44 +70,28 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   const handleProfileImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      try {
-        // Utility fonksiyonu ile sıkıştır
-        const compressedBase64 = await compressProfileImage(file);
+      // 1. Tarayıcıda resmi hemen göstermek için geçici bir güvenli URL üretir (Base64 DEĞİLDİR)
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewProfileImage(previewUrl);
 
-        // Preview ve veriyi sakla
-        setPreviewProfileImage(compressedBase64);
-        setCompressedProfileImageData(compressedBase64);
+      // 2. Veri olarak DOĞRUDAN dosyanın kendisini sakla!
+      setCompressedProfileImageData(file);
 
-        console.log("Seçilen resim:", file);
-        console.log("Resim adı:", file.name);
-        console.log("Resim boyutu:", file.size);
-        console.log("Resim tipi:", file.type);
-      } catch (error) {
-        console.error("Resim sıkıştırma hatası:", error);
-        alert("Resim işlenirken bir hata oluştu: " + error.message);
-      }
+      console.log("Seçilen gerçek dosya nesnesi:", file);
     }
   };
 
   const handleProfileBorderChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      try {
-        // Utility fonksiyonu ile sıkıştır
-        const compressedBase64 = await compressProfileBorder(file);
+      // 1. Tarayıcıda resmi hemen göstermek için geçici bir güvenli URL üretir (Base64 DEĞİLDİR)
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewCoverImg(previewUrl);
 
-        // Preview ve veriyi sakla
-        setPreviewCoverImg(compressedBase64);
-        setCompressedCoverImgData(compressedBase64);
+      // 2. Veri olarak DOĞRUDAN dosyanın kendisini sakla!
+      setCompressedCoverImgData(file);
 
-        console.log("Seçilen resim:", file);
-        console.log("Resim adı:", file.name);
-        console.log("Resim boyutu:", file.size);
-        console.log("Resim tipi:", file.type);
-      } catch (error) {
-        console.error("Resim sıkıştırma hatası:", error);
-        alert("Resim işlenirken bir hata oluştu: " + error.message);
-      }
+      console.log("Seçilen gerçek dosya nesnesi:", file);
     }
   };
 
@@ -263,15 +247,10 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
             <div className="flex gap-3">
               <button
                 onClick={() => {
-                  `
-                    ${
-                      previewProfileImage
-                        ? (setPreviewProfileImage(null),
-                          setCompressedProfileImageData(null))
-                        : (setPreviewCoverImg(null),
-                          setCompressedCoverImgData(null))
-                    }
-                `;
+                  setPreviewProfileImage(null);
+                  setCompressedProfileImageData(null);
+                  setPreviewCoverImg(null);
+                  setCompressedCoverImgData(null);
                 }}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors cursor-pointer"
               >
