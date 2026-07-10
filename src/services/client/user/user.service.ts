@@ -107,6 +107,33 @@ export const updateProfileImg = async (img: File) => {
   }
 };
 
+export const updateCoverImg = async (img: File) => {
+  const form = new FormData();
+  form.append("file", img);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/cover-image`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: form,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    return response.text();
+  } catch (error) {
+    console.error(
+      "Kullanıcı kapak fotoğrafı güncellenirken hata oluştu:",
+      error,
+    );
+    throw error;
+  }
+};
+
 export const userService = {
   getUserProfile,
   updateUser,

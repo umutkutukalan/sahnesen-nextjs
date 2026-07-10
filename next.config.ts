@@ -17,13 +17,19 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "8080",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8080",
         pathname: "/profileImgs/**",
       },
       {
         protocol: "http",
-        hostname: "127.0.0.1", // Logda çıkan private IP'yi doğrudan buraya da ekleyelim
+        hostname: "localhost",
         port: "8080",
-        pathname: "/profileImgs/**",
+        pathname: "/coverImgs/**",
       },
     ],
   },

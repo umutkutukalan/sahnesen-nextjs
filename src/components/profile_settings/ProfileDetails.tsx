@@ -4,6 +4,7 @@ import { RiImageEditLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/UserContext";
 import {
+  updateCoverImg,
   updateProfileImg,
   updateUser,
 } from "../../services/client/user/user.service";
@@ -47,19 +48,42 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   // Resim kaydetme fonksiyonu
   const handleSaveImage = async () => {
     try {
+      let newProfileImgName = user?.profileImg;
+      let newCoverImgName = profileUser?.coverImg;
+
+      // 1. Profil Resmi Güncelleme
       if (compressedProfileImageData) {
-        // compressedProfileImageData artık bir metin değil, doğrudan File nesnesi!
-        const updatedUser = await updateProfileImg(compressedProfileImageData);
+        const responseName = await updateProfileImg(compressedProfileImageData);
+        // Backend'den düz string (dosya adı) geldiğini varsayıyoruz
+        newProfileImgName = responseName;
+
+        // Context'i ve mevcut profileUser state'ini yerelde anında güncelle
+        const updatedUser = { ...user, profileImg: responseName };
         setUser(updatedUser);
+
+        if (profileUser) {
+          profileUser.profileImg = responseName; // Ekranın anında tetiklenmesi için
+        }
       }
 
-      // Sıfırlama işlemleri
+      // 2. Kapak Resmi Güncelleme (Geliştireceğin zaman buraya ekleyebilirsin)
+      if (compressedCoverImgData) {
+        const responseName = await updateCoverImg(compressedCoverImgData);
+        newCoverImgName = responseName;
+        const updatedUser = { ...user, coverImg: responseName };
+        setUser(updatedUser);
+        if (profileUser) {
+          profileUser.coverImg = responseName;
+        }
+      }
+
+      // State'leri temizle (Yeşil barın kapanması için)
       setPreviewProfileImage(null);
       setCompressedProfileImageData(null);
       setPreviewCoverImg(null);
       setCompressedCoverImgData(null);
 
-      alert("Güncellemeler başarıyla kaydedildi !");
+      alert("Güncellemeler başarıyla kaydedildi!");
     } catch (error) {
       console.error("Resim güncellenirken hata:", error);
       alert("Resim güncellenirken bir hata oluştu.");
@@ -97,21 +121,23 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
-  const profileImgUrl = user?.profileImg
-    ? user.profileImg.startsWith("http")
-      ? user.profileImg
-      : `${baseUrl}/${user.profileImg}`
+  const currentProfileImg = user?.profileImg ?? profileUser?.profileImg;
+  const currentCoverImg = user?.coverImg ?? profileUser?.coverImg;
+
+  const profileImgUrl = currentProfileImg
+    ? currentProfileImg.startsWith("http")
+      ? currentProfileImg
+      : `${baseUrl}/${currentProfileImg.startsWith("/") ? currentProfileImg.slice(1) : currentProfileImg}`
     : null;
 
-  const coverImgUrl = profileUser?.coverImg
-    ? profileUser.coverImg.startsWith("http")
-      ? profileUser.coverImg
-      : `${baseUrl}/${profileUser.coverImg}`
+  const coverImgUrl = currentCoverImg
+    ? currentCoverImg.startsWith("http")
+      ? currentCoverImg
+      : `${baseUrl}/${currentCoverImg.startsWith("/") ? currentCoverImg.slice(1) : currentCoverImg}`
     : null;
 
-  console.log("profileImgUrl: ", profileImgUrl);
-  console.log("profileUser", profileUser);
+  // Hatanın nerede olduğunu görmek için buraya mutlaka log atıp terminalden/konsoldan izle:
+  console.log("Hesaplanan Tam Kapak URL'i: ", coverImgUrl);
 
   return (
     <div className="min-h-screen">
@@ -141,20 +167,17 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
               {previewCoverImg ? (
                 <div className="w-full h-full transition-transform duration-200 group-hover:scale-105">
                   <Image
-                    src={getOptimizedImageUrl(previewCoverImg)}
-                    alt=""
+                    src={previewCoverImg}
+                    alt="Kapak Önizleme"
                     fill
                     className="object-cover"
-                    style={{
-                      imageRendering: "auto",
-                    }}
                   />
                 </div>
               ) : coverImgUrl ? (
                 <div className="relative w-full h-full transition-transform duration-200 group-hover:scale-105">
                   <Image
-                    src={getOptimizedImageUrl(coverImgUrl)}
-                    alt=""
+                    src={coverImgUrl}
+                    alt="Kapak Resmi"
                     fill
                     className="object-cover"
                   />

@@ -138,6 +138,12 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
       : `${baseUrl}/${profileUser.profileImg}`
     : null;
 
+  const coverImgUrl = profileUser?.coverImg
+    ? profileUser.coverImg.startsWith("http")
+      ? profileUser.coverImg
+      : `${baseUrl}/${profileUser.coverImg}`
+    : null;
+
   return (
     <div className="min-h-screen">
       <div className="w-full">
@@ -147,10 +153,10 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div className="w-full flex flex-col">
               <div className="w-full h-60 bg-white relative z-20">
                 <div className="w-full h-full overflow-hidden relative">
-                  {profileUser?.coverImg && (
+                  {coverImgUrl && (
                     <div>
                       <Image
-                        src={getOptimizedImageUrl(profileUser?.coverImg)}
+                        src={getOptimizedImageUrl(coverImgUrl)}
                         fill
                         unoptimized
                         alt=""
@@ -158,7 +164,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                       />
                     </div>
                   )}
-                  {!profileUser?.coverImg && (
+                  {!coverImgUrl && (
                     <>
                       <div className="absolute inset-0">
                         <Image
