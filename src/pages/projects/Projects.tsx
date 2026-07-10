@@ -87,19 +87,20 @@ const Projects = ({
           <div className="relative flex w-full">
             {/* SOL ANA AKIŞ */}
             <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
-              <div className="w-full flex justify-center">
-                <PageAbout
-                  pageTitle={{ text: "Projeler" }}
-                  contentType="Projects"
-                />
-              </div>
-
               <div className="w-full flex flex-col items-center">
-                <div className={`max-w-2xl z-50 pt-5`}>
+                <div className={`max-w-[700px] z-50 px-6`}>
+                  <div className="w-full flex justify-center">
+                    <PageAbout
+                      pageTitle={{ text: "Projeler" }}
+                      contentType="Projects"
+                    />
+                  </div>
                   {/* PROJE LİSTESİ */}
-                  {projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
+                  <div className="pt-5">
+                    {projects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </div>
                 </div>
               </div>
 

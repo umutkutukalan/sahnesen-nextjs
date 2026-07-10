@@ -43,11 +43,14 @@ import ProfileUserBlogs from "./ProfileUserBlogs";
 import { MdOutlineWorkspacePremium } from "react-icons/md";
 import { TiLocationArrow } from "react-icons/ti";
 import PageAbout from "@/components/PageAbout";
+import { useSidebar } from "@/context/SidebarContext";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const { user } = useAuth();
   const router = useRouter();
   const currentUserId = user?.id; // Giriş yapan kullanıcının ID'si
+
+  const { isSidebarOpen } = useSidebar();
 
   const rozets = [
     // { id: 1, rozet: quickdraw, name: "Hızlı Çizer" },
@@ -190,7 +193,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
               </div>
               <div className="w-full flex justify-center border-r border-gray-100">
                 <div
-                  className={`max-w-4xl flex flex-col ${isSidebarStuck ? "px-15" : ""} `}
+                  className={`flex px-5 flex-col ${isSidebarOpen ? "max-w-3xl" : "max-w-4xl"} transition-all duration-500 ease-in-ou`}
                 >
                   {/* Tab Navigation */}
                   <PageAbout pageTitle={"POSTS"} contentType={"SAHNE"} />
@@ -209,7 +212,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             </div>
             {/* Kullanıcı adı ve takip butonu */}
             <div
-              className={`w-lg sticky scrollbar-hide z-20 transition-all duration-200 overflow-y-auto ${isSidebarStuck ? "" : ""}`}
+              className={`w-md sticky scrollbar-hide z-20 transition-all duration-200 overflow-y-auto`}
               style={{
                 top: "36px",
                 maxHeight: "100vh",
