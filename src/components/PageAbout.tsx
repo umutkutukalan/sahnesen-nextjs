@@ -11,7 +11,7 @@ const PageAbout = ({ pageTitle, contentType }) => {
   };
 
   return (
-    <div className="w-2xl relative flex items-start">
+    <div className="w-full relative flex items-start">
       <div className="w-full h-18 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100">
         <ul className="w-full flex items-end gap-8 text-gray-600">
           <button

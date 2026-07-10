@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useToProfile } from "@/utils/useToProfile";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
+import Link from "next/link";
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -32,10 +33,10 @@ const Sidebar = () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
-  const userProfileImg = user.profileImg
-    ? user.profileImg.startsWith("http")
-      ? user.profileImg
-      : `${baseUrl}/${user.profileImg}`
+  const userProfileImg = user?.profileImg
+    ? user?.profileImg.startsWith("http")
+      ? user?.profileImg
+      : `${baseUrl}/${user?.profileImg}`
     : null;
 
   return (
@@ -51,13 +52,14 @@ const Sidebar = () => {
           <div className="border-b border-gray-100 pb-10">
             {user ? (
               <ul className="flex flex-col gap-5">
-                <li
+                <Link
+                  href={`/`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Fuaye" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Fuaye")}
                 >
                   <LuTheater className="text-[22px]" />
                   <span className="text-[15px]">Fuaye</span>
-                </li>
+                </Link>
                 <li
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Yazılarım" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Yazılarım")}
@@ -65,13 +67,14 @@ const Sidebar = () => {
                   <SiWikibooks className="text-[22px]" />
                   <span className="text-[15px]">Yazılarım</span>
                 </li>
-                <li
+                <Link
+                  href={`/profile/${user?.username}`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Profil" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Profil")}
                 >
                   <RiUser6Line className="text-[22px]" />
                   <span className="text-[15px]">Profil</span>
-                </li>
+                </Link>
                 <li
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Koleksiyon" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Koleksiyon")}
@@ -101,188 +104,6 @@ const Sidebar = () => {
               <FiUsers className="text-[22px]" />
               <span className="text-[15px]">Topluluk</span>
             </li>
-            <ul className="flex flex-col gap-2">
-              <li
-                className="flex items-center gap-5 cursor-pointer w-max"
-                onClick={() => ToProfile(null, user?.username || "")}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
-                  {userProfileImg ? (
-                    <Image
-                      src={userProfileImg}
-                      alt="avatar"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-full h-full p-1 text-gray-400" />
-                  )}
-                </div>
-
-                <div className="truncate flex items-center gap-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <span className="truncate">{user.name}</span>
-                      <span className="truncate">{user.surname}</span>
-                    </div>
-                    {/* <span className="truncate text-[10px] text-gray-400">
-                                  @{project.authorUsername}
-                                </span> */}
-                  </div>
-                </div>
-              </li>
-              <li
-                className="flex items-center gap-5 cursor-pointer w-max"
-                onClick={() => ToProfile(null, user?.username || "")}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
-                  {userProfileImg ? (
-                    <Image
-                      src={userProfileImg}
-                      alt="avatar"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-full h-full p-1 text-gray-400" />
-                  )}
-                </div>
-
-                <div className="truncate flex items-center gap-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <span className="truncate">{user.name}</span>
-                      <span className="truncate">{user.surname}</span>
-                    </div>
-                    {/* <span className="truncate text-[10px] text-gray-400">
-                                  @{project.authorUsername}
-                                </span> */}
-                  </div>
-                </div>
-              </li>
-              <li
-                className="flex items-center gap-5 cursor-pointer w-max"
-                onClick={() => ToProfile(null, user?.username || "")}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
-                  {userProfileImg ? (
-                    <Image
-                      src={userProfileImg}
-                      alt="avatar"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-full h-full p-1 text-gray-400" />
-                  )}
-                </div>
-
-                <div className="truncate flex items-center gap-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <span className="truncate">{user.name}</span>
-                      <span className="truncate">{user.surname}</span>
-                    </div>
-                    {/* <span className="truncate text-[10px] text-gray-400">
-                                  @{project.authorUsername}
-                                </span> */}
-                  </div>
-                </div>
-              </li>
-              <li
-                className="flex items-center gap-5 cursor-pointer w-max"
-                onClick={() => ToProfile(null, user?.username || "")}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
-                  {userProfileImg ? (
-                    <Image
-                      src={userProfileImg}
-                      alt="avatar"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-full h-full p-1 text-gray-400" />
-                  )}
-                </div>
-
-                <div className="truncate flex items-center gap-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <span className="truncate">{user.name}</span>
-                      <span className="truncate">{user.surname}</span>
-                    </div>
-                    {/* <span className="truncate text-[10px] text-gray-400">
-                                  @{project.authorUsername}
-                                </span> */}
-                  </div>
-                </div>
-              </li>
-              <li
-                className="flex items-center gap-5 cursor-pointer w-max"
-                onClick={() => ToProfile(null, user?.username || "")}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
-                  {userProfileImg ? (
-                    <Image
-                      src={userProfileImg}
-                      alt="avatar"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-full h-full p-1 text-gray-400" />
-                  )}
-                </div>
-
-                <div className="truncate flex items-center gap-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <span className="truncate">{user.name}</span>
-                      <span className="truncate">{user.surname}</span>
-                    </div>
-                    {/* <span className="truncate text-[10px] text-gray-400">
-                                  @{project.authorUsername}
-                                </span> */}
-                  </div>
-                </div>
-              </li>
-              <li
-                className="flex items-center gap-5 cursor-pointer w-max"
-                onClick={() => ToProfile(null, user?.username || "")}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
-                  {userProfileImg ? (
-                    <Image
-                      src={userProfileImg}
-                      alt="avatar"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-full h-full p-1 text-gray-400" />
-                  )}
-                </div>
-
-                <div className="truncate flex items-center gap-1">
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <span className="truncate">{user.name}</span>
-                      <span className="truncate">{user.surname}</span>
-                    </div>
-                    {/* <span className="truncate text-[10px] text-gray-400">
-                                  @{project.authorUsername}
-                                </span> */}
-                  </div>
-                </div>
-              </li>
-            </ul>
           </ul>
         </div>
         <ul className="flex flex-col gap-4 pt-5">

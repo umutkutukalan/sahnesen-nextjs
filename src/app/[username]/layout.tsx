@@ -1,7 +1,5 @@
 // app/bloglar/layout.tsx
 
-import Navbar from "@/components/navbar/Navbar";
-
 export default function BlogsLayout({
   children,
 }: {
@@ -9,7 +7,6 @@ export default function BlogsLayout({
 }) {
   return (
     <>
-      <Navbar transparent={false} />
       <div>{children}</div>
     </>
   );

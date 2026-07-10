@@ -189,7 +189,9 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 </div>
               </div>
               <div className="w-full flex justify-center border-r border-gray-100">
-                <div className={`max-w-4xl flex flex-col`}>
+                <div
+                  className={`max-w-4xl flex flex-col ${isSidebarStuck ? "px-15" : ""} `}
+                >
                   {/* Tab Navigation */}
                   <PageAbout pageTitle={"POSTS"} contentType={"SAHNE"} />
 
@@ -209,7 +211,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div
               className={`w-lg sticky scrollbar-hide z-20 transition-all duration-200 overflow-y-auto ${isSidebarStuck ? "" : ""}`}
               style={{
-                top: "0px",
+                top: "36px",
                 maxHeight: "100vh",
               }}
             >

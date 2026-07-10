@@ -2,10 +2,10 @@
 import Profile from "@/pages/profile/Profile";
 
 export default async function ProfilePage({
-    params
+  params,
 }: {
-    params: Promise<{ usernameSlug: string }> // Promise olarak tip
+  params: Promise<{ usernameSlug: string }>; // Promise olarak tip
 }) {
-    const { usernameSlug } = await params; // await ile unwrap
-    return <Profile usernameSlug={usernameSlug} />;
+  const { usernameSlug } = await params; // await ile unwrap
+  return <Profile usernameSlug={usernameSlug} />;
 }

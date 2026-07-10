@@ -4,26 +4,23 @@ import { useAuth } from "@/context/UserContext";
 import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
 import { Project } from "@/services/server/post.service";
-import Navbar from "@/components/navbar/Navbar";
 import LikedProjects from "./LikedProjects";
 
 interface Props {
-    initialProjects: Project[];
-    initialPage: number;
-    totalPages: number;
+  initialProjects: Project[];
+  initialPage: number;
+  totalPages: number;
 }
 
 export default function LikedProjectsClient() {
+  const { user, loading } = useAuth();
 
-    const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Home />;
 
-    if (loading) return <LoadingScreen />;
-    if (!user) return <Home />;
-
-    return (
-        <>
-            <Navbar transparent={false} />
-            <LikedProjects />
-        </>
-    );
+  return (
+    <>
+      <LikedProjects />
+    </>
+  );
 }

@@ -71,7 +71,7 @@ const Projects = ({
   const { isSidebarOpen } = useSidebar();
 
   return (
-    <div className="page pt-16">
+    <div className="page">
       <div className="relative flex w-full">
         {/* <div className="absolute left-0 top-0 z-0 opacity-80">
           <Image src={solperde} alt="Sol Perde" />

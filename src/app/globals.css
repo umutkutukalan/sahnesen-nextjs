@@ -87,7 +87,7 @@ body {
 
 /* Navbar */
 .navbar {
-  @apply fixed w-full z-[100];
+  @apply sticky top-0 w-full z-[100];
   @apply flex items-center justify-between h-[64px];
   @apply md:text-lg text-xs;
   @apply transition-transform duration-300 ease-in-out;

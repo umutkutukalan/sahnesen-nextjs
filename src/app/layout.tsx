@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 import { SidebarProvider } from "@/context/SidebarContext";
+import Sidebar from "@/components/navbar/Sidebar";
+import Navbar from "@/components/navbar/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,8 +33,13 @@ export default function RootLayout({
       >
         <UserProvider>
           <SidebarProvider>
-            <div className="min-h-screen">
-              {children}
+            <Navbar transparent={false} />
+            <div className="flex min-h-screen">
+              {/* Sidebar burada sabit kalacak, sayfa değiştikçe re-render olmayacak */}
+              <Sidebar />
+
+              {/* main alanı kalan tüm genişliği (flex-1) dolduracak ve sayfalar burada açılacak */}
+              <main className="flex-1 min-w-0">{children}</main>
             </div>
           </SidebarProvider>
         </UserProvider>
