@@ -28,7 +28,7 @@ const ProfileSettings = () => {
         </div>
         <div className="w-4/5 h-full flex flex-col gap-5">
           {settingsTitle === "Hesap Bilgileri" && (
-            <ProfileDetails user={user} />
+            <ProfileDetails usernameSlug={user?.username} />
           )}
           {settingsTitle === "Profiller" && <SocialAccounts user={user} />}
         </div>
