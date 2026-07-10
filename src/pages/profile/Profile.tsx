@@ -207,10 +207,10 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             </div>
             {/* Kullanıcı adı ve takip butonu */}
             <div
-              className={`w-lg sticky scrollbar-hide z-20 transition-all duration-200 ${isSidebarStuck ? "overflow-y-auto" : ""}`}
+              className={`w-lg sticky scrollbar-hide z-20 transition-all duration-200 overflow-y-auto ${isSidebarStuck ? "" : ""}`}
               style={{
                 top: "0px",
-                maxHeight: "calc(100vh - 64px)",
+                maxHeight: "100vh",
               }}
             >
               <div className="absolute w-64 h-64 right-0 top-0">
@@ -223,7 +223,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 />
               </div>
 
-              <div className="relative flex flex-col pt-10">
+              <div className="relative flex flex-col pt-10 pb-5">
                 {/* Profil fotoğrafını buraya taşı */}
 
                 <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
