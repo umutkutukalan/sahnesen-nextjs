@@ -284,9 +284,11 @@ const CreateIntroTwo = () => {
                                 `/olustur?type=${encodeURIComponent(
                                   card.label === "Tersyüz"
                                     ? "TERSYUZ"
-                                    : card.label === "Yan Yana"
-                                      ? "YANYANA"
-                                      : card.label.toUpperCase().trim(),
+                                    : card.label === "Etüt"
+                                      ? "ETUT"
+                                      : card.label === "Yan Yana"
+                                        ? "YANYANA"
+                                        : card.label.toUpperCase().trim(),
                                 )}`,
                               );
                             }}
