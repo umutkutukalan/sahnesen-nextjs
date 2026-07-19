@@ -19,18 +19,7 @@ import { CiSettings } from "react-icons/ci";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils"; // Özel karakterleri kaldırmak için yardımcı fonksiyon
 import Image from "next/image";
-import {
-  duck2,
-  duck3,
-  duck4,
-  duck5,
-  duck7,
-  profilebg,
-  profileborder,
-  profilebordertwo,
-  sagperde,
-  solperde,
-} from "@/utils";
+import { duck2, duck3, duck4, duck5, duck7, profilebg } from "@/utils";
 import ProfileUserProjects from "./ProfileUserProject";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
@@ -147,35 +136,31 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   return (
     <div className="min-h-screen">
       <div className="w-full">
-        <div className="w-full">
-          {/* Profil resmi ve bilgileri */}
-          <div className="w-full flex gap-10 items-start">
-            <div className="w-full flex flex-col">
-              <div className="w-full h-60 bg-white relative z-20">
-                <div className="w-full h-full overflow-hidden relative">
-                  {coverImgUrl && (
-                    <div>
-                      <Image
-                        src={getOptimizedImageUrl(coverImgUrl)}
-                        fill
-                        unoptimized
-                        alt=""
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-                  {!coverImgUrl && (
-                    <>
-                      <div className="absolute inset-0">
-                        <Image
-                          src={profilebg}
-                          fill
-                          unoptimized
-                          alt=""
-                          className="object-cover"
-                        />
-                      </div>
-                      {/* <div className="absolute w-80 h-80 left-0 top-0">
+        <div className="w-full h-80 bg-white relative z-20">
+          <div className="w-full h-full overflow-hidden relative">
+            {coverImgUrl && (
+              <div>
+                <Image
+                  src={getOptimizedImageUrl(coverImgUrl)}
+                  fill
+                  unoptimized
+                  alt=""
+                  className="object-cover"
+                />
+              </div>
+            )}
+            {!coverImgUrl && (
+              <>
+                <div className="absolute inset-0">
+                  <Image
+                    src={profilebg}
+                    fill
+                    unoptimized
+                    alt=""
+                    className="object-cover"
+                  />
+                </div>
+                {/* <div className="absolute w-80 h-80 left-0 top-0">
                         <Image
                           src={solperde}
                           fill
@@ -193,13 +178,18 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                           className="object-cover"
                         />
                       </div> */}
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="w-full flex justify-center border-r border-gray-100">
+              </>
+            )}
+          </div>
+        </div>
+        <div className="w-full px-10">
+          <div className="w-full flex gap-15 items-start">
+            <div className="w-full flex flex-col">
+              <div className="w-full flex justify-center">
+                {/* Profil resmi ve bilgileri */}
                 <div
-                  className={`flex px-5 flex-col ${isSidebarOpen ? "max-w-3xl" : "max-w-4xl"} transition-all duration-500 ease-in-ou`}
+                  // ${isSidebarOpen ? "max-w-3xl" : "max-w-4xl"}
+                  className={`flex flex-col w-full transition-all duration-500 ease-in-out`}
                 >
                   {/* Tab Navigation */}
                   <PageAbout pageTitle={"POSTS"} contentType={"SAHNE"} />
@@ -216,15 +206,14 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 </div>
               </div>
             </div>
-            {/* Kullanıcı adı ve takip butonu */}
             <div
-              className={`w-md sticky scrollbar-hide z-20 transition-all duration-200 overflow-y-auto`}
+              className={`w-md sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto`}
               style={{
-                top: "36px",
+                top: "0px",
                 maxHeight: "100vh",
               }}
             >
-              <div className="absolute w-64 h-64 right-0 top-0">
+              {/* <div className="absolute w-64 h-64 right-0 top-0">
                 <Image
                   src={sagperde}
                   fill
@@ -232,12 +221,12 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                   alt=""
                   className="hue-rotate-[240deg] saturate-150 brightness-90"
                 />
-              </div>
+              </div> */}
 
               <div className="relative flex flex-col pt-10 pb-5">
                 {/* Profil fotoğrafını buraya taşı */}
 
-                <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
+                <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0 border-3 border-white">
                   {profileImgUrl ? (
                     <Image
                       src={getOptimizedImageUrl(profileImgUrl)}
@@ -251,7 +240,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                   )}
                 </div>
 
-                {rozets.length > 0 && (
+                {/* {rozets.length > 0 && (
                   <ul className="flex items-center gap-0.5 mb-2">
                     {rozets.map((rozet) => (
                       <li key={rozet?.id}>
@@ -278,7 +267,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                       </li>
                     ))}
                   </ul>
-                )}
+                )} */}
                 <div className="flex flex-col my-1">
                   <h3 className="text-gray-500 text-xs">
                     @{profileUser?.username || "user"}
@@ -302,7 +291,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                       className="px-3 py-1 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-200"
                     >
                       <CiSettings className="text-sm" />
-                      <span>Profili Düzenle</span>
+                      <span>Sahneni Düzenle</span>
                     </button>
                   ) : (
                     // Başkasının profili - Takip butonu
