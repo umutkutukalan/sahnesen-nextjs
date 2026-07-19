@@ -5,7 +5,7 @@
 export const compressCoverImage = (file, options = {}) => {
   return new Promise((resolve, reject) => {
     const {
-      maxWidth = 2400, // Retina + geniş ekranlar için yeterli
+      maxWidth = 3200, // hedef genişlik
       quality = 0.9,
       format = "image/jpeg",
     } = options;

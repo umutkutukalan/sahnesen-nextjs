@@ -110,13 +110,27 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
     }
   };
 
+  const MIN_COVER_WIDTH = 2400;
+
   const handleProfileBorderChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+
+    // Resmin gerçek boyutlarını öğren
+    const img = new window.Image();
+    img.onload = () => {
+      if (img.width < MIN_COVER_WIDTH) {
+        alert(
+          `Kapak fotoğrafı için en az ${MIN_COVER_WIDTH}px genişliğinde bir görsel önerilir. Seçtiğiniz görsel ${img.width}px genişliğinde, netlik düşük olabilir.`,
+        );
+        // yine de devam etmesine izin verebilir ya da engelleyebilirsin
+      }
       setRawCoverImage(previewUrl);
       setShowCropModal(true);
-    }
+    };
+    img.src = previewUrl;
   };
 
   const handleCropComplete = async (croppedFile: File) => {
@@ -161,7 +175,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
       <div className="w-full">
         <div className="w-full">
           {/* Profil resmi ve bilgileri */}
-          <div className="w-full h-70 bg-gray-700 relative z-10">
+          <div className="w-full aspect-[4.5] bg-gray-700 relative z-10">
             <div
               className="relative w-full h-full overflow-hidden group cursor-pointer relative"
               onClick={handleProfileBorderSelect}

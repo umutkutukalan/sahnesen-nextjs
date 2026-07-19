@@ -9,7 +9,7 @@ interface Props {
   onCropComplete: (croppedFile: File) => void;
 }
 
-const COVER_ASPECT = 16 / 5; // w-full / h-80 oranına karşılık gelen sabit oran
+const COVER_ASPECT = 4.5;
 
 export default function CoverCropModal({
   imageSrc,
@@ -42,6 +42,8 @@ export default function CoverCropModal({
             crop={crop}
             zoom={zoom}
             aspect={COVER_ASPECT}
+            minZoom={1}
+            maxZoom={3}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={handleCropComplete}
@@ -51,7 +53,7 @@ export default function CoverCropModal({
           <input
             type="range"
             min={1}
-            max={3}
+            max={2}
             step={0.1}
             value={zoom}
             onChange={(e) => setZoom(Number(e.target.value))}
