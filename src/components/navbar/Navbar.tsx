@@ -22,9 +22,15 @@ import { usePathname } from "next/navigation";
 import { LuTickets } from "react-icons/lu";
 import { ImPencil2 } from "react-icons/im";
 
-const Navbar = ({ transparent }: { transparent: boolean }) => {
+const Navbar = ({
+  transparent,
+  isProfile,
+}: {
+  transparent: boolean;
+  isProfile?: boolean;
+}) => {
   const { user, setUser } = useAuth(); // setToken kaldırıldı
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, toggleProfileSidebar } = useSidebar();
   // const { unreadCount } = useNotification();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -123,7 +129,7 @@ const Navbar = ({ transparent }: { transparent: boolean }) => {
           <div className="flex items-center gap-4">
             <RiMenu4Line
               className="text-2xl cursor-pointer"
-              onClick={toggleSidebar}
+              onClick={isProfile ? toggleProfileSidebar : toggleSidebar}
             />
             <li className={`list-none`}>
               <Link

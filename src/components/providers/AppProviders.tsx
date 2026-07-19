@@ -3,7 +3,7 @@
 import React from "react";
 import { UserProvider } from "@/context/UserContext"; // Kendi context hook adın neyse (useUser veya useAuth)
 import { SidebarProvider } from "@/context/SidebarContext";
-import Sidebar from "@/components/navbar/Sidebar";
+import Sidebar from "@/components/sidebar/Sidebar";
 import Navbar from "@/components/navbar/Navbar";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/UserContext";
@@ -35,7 +35,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
   // Giriş yapılmış ve ana akış görünümü
   return (
     <>
-      <Navbar transparent={false} />
+      <Navbar transparent={false} isProfile={false} />
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="flex-1 min-w-0">{children}</main>
