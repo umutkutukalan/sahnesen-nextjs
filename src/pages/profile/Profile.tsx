@@ -209,7 +209,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div
               className={`w-md sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto`}
               style={{
-                top: "0px",
+                top: "36px",
                 maxHeight: "100vh",
               }}
             >

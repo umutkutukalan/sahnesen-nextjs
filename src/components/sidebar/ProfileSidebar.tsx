@@ -26,6 +26,7 @@ const ProfileSidebar = () => {
 
   const onSideBarMenuSelect = (menu: string) => {
     setSelectedSideBarMenu(menu);
+    setProfileSidebarOpen(false);
   };
 
   const onClose = () => {
