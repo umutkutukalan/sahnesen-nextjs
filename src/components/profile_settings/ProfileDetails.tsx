@@ -9,6 +9,7 @@ import {
   updateUser,
 } from "../../services/client/user/user.service";
 import {
+  compressCoverImage,
   compressProfileBorder,
   compressProfileImage,
 } from "../../utils/ImageCompression";
@@ -19,6 +20,7 @@ import DeleteAccount from "../profile_settings_item/DeleteAccount";
 import DeactivateAccount from "../profile_settings_item/DeactivateAccount";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { getOptimizedImageUrl } from "@/utils/ImageUtils";
+import CoverCropModal from "../CoverCropModal";
 
 const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   const { user, setUser } = useAuth(); // sadece setUser için (kaydetme sonrası güncelleme)
@@ -30,6 +32,9 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   const [compressedCoverImgData, setCompressedCoverImgData] = useState(null); // Sıkıştırılmış border veri
   const profileImageRef = useRef(null); // File input referansı
   const profileBorderRef = useRef(null); // File input referansı for border
+
+  const [rawCoverImage, setRawCoverImage] = useState<string | null>(null);
+  const [showCropModal, setShowCropModal] = useState(false);
 
   useEffect(() => {
     if (usernameSlug) {
@@ -108,15 +113,27 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   const handleProfileBorderChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      // 1. Tarayıcıda resmi hemen göstermek için geçici bir güvenli URL üretir (Base64 DEĞİLDİR)
       const previewUrl = URL.createObjectURL(file);
-      setPreviewCoverImg(previewUrl);
-
-      // 2. Veri olarak DOĞRUDAN dosyanın kendisini sakla!
-      setCompressedCoverImgData(file);
-
-      console.log("Seçilen gerçek dosya nesnesi:", file);
+      setRawCoverImage(previewUrl);
+      setShowCropModal(true);
     }
+  };
+
+  const handleCropComplete = async (croppedFile: File) => {
+    try {
+      const compressed = await compressCoverImage(croppedFile);
+      const previewUrl = URL.createObjectURL(compressed);
+      setPreviewCoverImg(previewUrl);
+      setCompressedCoverImgData(compressed);
+    } catch (error) {
+      console.error("Cover sıkıştırma hatası:", error);
+      // Sıkıştırma başarısız olursa kırpılmış orijinali kullan
+      const previewUrl = URL.createObjectURL(croppedFile);
+      setPreviewCoverImg(previewUrl);
+      setCompressedCoverImgData(croppedFile);
+    }
+    setShowCropModal(false);
+    setRawCoverImage(null);
   };
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
@@ -170,6 +187,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                     src={previewCoverImg}
                     alt="Kapak Önizleme"
                     fill
+                    quality={90}
                     className="object-cover"
                   />
                 </div>
@@ -179,6 +197,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                     src={coverImgUrl}
                     alt="Kapak Resmi"
                     fill
+                    quality={90}
                     className="object-cover"
                   />
                 </div>
@@ -287,6 +306,16 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
               </button>
             </div>
           </div>
+        )}
+        {showCropModal && rawCoverImage && (
+          <CoverCropModal
+            imageSrc={rawCoverImage}
+            onCancel={() => {
+              setShowCropModal(false);
+              setRawCoverImage(null);
+            }}
+            onCropComplete={handleCropComplete}
+          />
         )}
       </div>
     </div>

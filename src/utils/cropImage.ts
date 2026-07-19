@@ -1,17 +1,25 @@
-// utils/cropImage.ts
 export async function getCroppedImg(
   imageSrc: string,
   croppedAreaPixels: { x: number; y: number; width: number; height: number },
 ): Promise<File> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
-  canvas.width = croppedAreaPixels.width;
-  canvas.height = croppedAreaPixels.height;
+
+  // Retina ekranlar için ekstra piksel yoğunluğu (max 2x ile sınırla, dosya çok büyümesin)
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+  canvas.width = croppedAreaPixels.width * pixelRatio;
+  canvas.height = croppedAreaPixels.height * pixelRatio;
+
   const ctx = canvas.getContext("2d");
 
   if (!ctx) {
     throw new Error("2D canvas context is not supported on this device");
   }
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.scale(pixelRatio, pixelRatio);
 
   ctx.drawImage(
     image,
@@ -36,8 +44,8 @@ export async function getCroppedImg(
         resolve(file);
       },
       "image/jpeg",
-      0.92,
-    ); // kalite oranı
+      0.95,
+    );
   });
 }
 
