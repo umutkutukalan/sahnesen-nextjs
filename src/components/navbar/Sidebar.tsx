@@ -61,11 +61,11 @@ const Sidebar = () => {
                   <span className="text-[15px]">Fuaye</span>
                 </Link>
                 <li
-                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Yazılarım" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
-                  onClick={() => onSideBarMenuSelect("Yazılarım")}
+                  className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Sahnelerim" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
+                  onClick={() => onSideBarMenuSelect("Sahnelerim")}
                 >
                   <SiWikibooks className="text-[22px]" />
-                  <span className="text-[15px]">Yazılarım</span>
+                  <span className="text-[15px]">Sahnelerim</span>
                 </li>
                 <Link
                   href={`/profile/${user?.username}`}
