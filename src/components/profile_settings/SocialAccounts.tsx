@@ -19,7 +19,7 @@ const SocialAccounts = ({ user }: SocialAccountsProps) => {
 
   return (
     <div className="min-h-screen">
-      <ProfileBorderImage user={user} />
+      <ProfileBorderImage usernameSlug={user?.username} />
       <div className="mt-15 px-20 flex flex-col">
         <YourLinksAccount onUpdate={() => getSocialAccounts()} />
         <div className="flex flex-col gap-2 mt-5">

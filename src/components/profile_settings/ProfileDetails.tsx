@@ -222,7 +222,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
               )}
             </div>
             <div
-              className="absolute h-30 w-30 rounded-full overflow-hidden bg-gray-200 -bottom-10 left-20 z-20 flex items-center justify-center group shadow-lg shadow-black/20 transition-all cursor-pointer"
+              className="absolute h-34 w-34 rounded-full overflow-hidden bg-gray-200 -bottom-10 left-20 z-20 flex items-center justify-center group shadow-lg shadow-black/20 transition-all cursor-pointer"
               onClick={handleProfileImageSelect}
             >
               {/* Gizli file input */}
@@ -235,7 +235,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
               />
 
               {/* Resim önizlemesi - eğer yeni resim seçildiyse onu göster, yoksa mevcut resmi göster */}
-              <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
+              <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
                 {previewProfileImage ? (
                   <Image
                     src={getOptimizedImageUrl(previewProfileImage)}
@@ -247,15 +247,17 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                     }}
                   />
                 ) : profileImgUrl ? (
-                  <Image
-                    src={profileImgUrl}
-                    alt=""
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-200 w-full h-full"
-                    style={{
-                      imageRendering: "auto",
-                    }}
-                  />
+                  <div className="relative w-34 h-34">
+                    <Image
+                      src={profileImgUrl}
+                      alt=""
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-200"
+                      style={{
+                        imageRendering: "auto",
+                      }}
+                    />
+                  </div>
                 ) : (
                   <FiUser className="text-7xl text-gray-500 group-hover:text-gray-300 transition-all" />
                 )}
