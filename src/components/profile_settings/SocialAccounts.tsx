@@ -4,24 +4,24 @@ import YourLinksAccount from "../profile_settings_item/YourLinksAccount";
 import SocialAccountCard from "../profile_settings_item/SocialAccountCard";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
 
+interface SocialAccountsProps {
+  user: { username: string; [key: string]: unknown };
+}
 
-
-const SocialAccounts = ({ user }) => {
+const SocialAccounts = ({ user }: SocialAccountsProps) => {
   const { getSocialAccounts, socialAccounts, isLoading } = useSocialAccount();
-  
+
   useEffect(() => {
-    if (user?.id) {
-      getSocialAccounts(user.id);
+    if (user?.username) {
+      getSocialAccounts();
     }
-  }, [user?.id, getSocialAccounts]);
-  
-  console.log("SocialAccounts component - user:", socialAccounts);
-  
+  }, [user?.username, getSocialAccounts]);
+
   return (
     <div className="min-h-screen">
       <ProfileBorderImage user={user} />
       <div className="mt-15 px-20 flex flex-col">
-        <YourLinksAccount onUpdate={() => getSocialAccounts(user.id)} />
+        <YourLinksAccount onUpdate={() => getSocialAccounts()} />
         <div className="flex flex-col gap-2 mt-5">
           {isLoading ? (
             <p>Loading...</p>
@@ -30,7 +30,7 @@ const SocialAccounts = ({ user }) => {
               <div key={account.id}>
                 <SocialAccountCard
                   account={account}
-                  onUpdate={() => getSocialAccounts(user.id)}
+                  onUpdate={() => getSocialAccounts()}
                 />
               </div>
             ))

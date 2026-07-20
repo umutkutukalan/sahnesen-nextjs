@@ -184,12 +184,12 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
         </div>
         <div className="w-full px-10">
           <div className="w-full flex gap-15 items-start">
-            <div className="w-full flex flex-col">
+            <div className="w-full flex flex-col border-r border-gray-100">
               <div className="w-full flex justify-center">
                 {/* Profil resmi ve bilgileri */}
                 <div
                   // ${isSidebarOpen ? "max-w-3xl" : "max-w-4xl"}
-                  className={`flex flex-col w-full transition-all duration-500 ease-in-out`}
+                  className={`flex flex-col max-w-4xl transition-all duration-500 ease-in-out`}
                 >
                   {/* Tab Navigation */}
                   <PageAbout pageTitle={"POSTS"} contentType={"SAHNE"} />
@@ -209,7 +209,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div
               className={`w-md sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto`}
               style={{
-                top: "36px",
+                top: "50px",
                 maxHeight: "100vh",
               }}
             >

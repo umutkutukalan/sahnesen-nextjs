@@ -98,10 +98,7 @@ const YourLinksAccount = ({ onUpdate }) => {
     const updatedAccountData = { ...accountData, url: urlToSave };
     console.log("Kaydedilecek hesap verisi:", updatedAccountData);
     try {
-      const updatedUser = await createSocialAccount(
-        user?.id,
-        updatedAccountData
-      );
+      const updatedUser = await createSocialAccount(updatedAccountData);
       setEditSettings(false);
       setHasChanges(false);
       if (typeof onUpdate === "function") {
@@ -161,12 +158,12 @@ const YourLinksAccount = ({ onUpdate }) => {
                     className="focus:outline-none border border-gray-200 focus:border-gray-600 rounded-md p-2 w-full h-10"
                   >
                     <option value="">Platform Seçin</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="YouTube">YouTube</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Twitter/X">Twitter/X</option>
-                    <option value="LinkedIn">LinkedIn</option>
-                    <option value="Github">Github</option>
+                    <option value="INSTAGRAM">Instagram</option>
+                    <option value="YOUTUBE">YouTube</option>
+                    <option value="FACEBOOK">Facebook</option>
+                    <option value="TWITTER">Twitter</option>
+                    <option value="LINKEDIN">LinkedIn</option>
+                    <option value="GITHUB">GitHub</option>
                   </select>
                 </div>
 
@@ -189,7 +186,7 @@ const YourLinksAccount = ({ onUpdate }) => {
                     <span
                       className={
                         (accountData.username || "").length >
-                          limits.username * 0.8
+                        limits.username * 0.8
                           ? "text-orange-500"
                           : ""
                       }
@@ -208,7 +205,7 @@ const YourLinksAccount = ({ onUpdate }) => {
                         <strong>Önizleme:</strong>{" "}
                         {generatePreviewUrl(
                           accountData.platform,
-                          accountData.username
+                          accountData.username,
                         )}
                       </div>
                     )}
@@ -249,10 +246,11 @@ const YourLinksAccount = ({ onUpdate }) => {
               <button
                 onClick={handleSave}
                 disabled={!hasChanges || isLoading}
-                className={`rounded-md px-4 py-2 text-xs transition-colors ${hasChanges && !isLoading
+                className={`rounded-md px-4 py-2 text-xs transition-colors ${
+                  hasChanges && !isLoading
                     ? "bg-gray-500 hover:bg-gray-600 text-white cursor-pointer"
                     : "bg-gray-100 text-gray-500 cursor-not-allowed"
-                  }`}
+                }`}
               >
                 {isLoading ? "Kaydediliyor..." : "Kaydet"}
               </button>
