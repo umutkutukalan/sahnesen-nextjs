@@ -175,7 +175,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
       <div className="w-full">
         <div className="w-full">
           {/* Profil resmi ve bilgileri */}
-          <div className="w-full aspect-[4.5] bg-gray-700 relative z-10">
+          <div className="w-full aspect-[5/1] bg-gray-700 relative z-10">
             <div
               className="relative w-full h-full overflow-hidden group cursor-pointer relative"
               onClick={handleProfileBorderSelect}

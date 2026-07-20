@@ -9,7 +9,7 @@ interface Props {
   onCropComplete: (croppedFile: File) => void;
 }
 
-const COVER_ASPECT = 4.5;
+const COVER_ASPECT = 5 / 1;
 
 export default function CoverCropModal({
   imageSrc,
@@ -43,7 +43,7 @@ export default function CoverCropModal({
             zoom={zoom}
             aspect={COVER_ASPECT}
             minZoom={1}
-            maxZoom={3}
+            maxZoom={2}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={handleCropComplete}

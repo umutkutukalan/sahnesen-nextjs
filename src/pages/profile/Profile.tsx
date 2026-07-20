@@ -136,7 +136,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   return (
     <div className="min-h-screen">
       <div className="w-full">
-        <div className="w-full aspect-[4.5] bg-white relative z-20">
+        <div className="w-full aspect-[5/1] bg-white relative z-20">
           <div className="w-full h-full overflow-hidden relative">
             {coverImgUrl && (
               <div>
