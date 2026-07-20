@@ -120,7 +120,7 @@ export const profileSettingsOptions = [
   },
   {
     id: 2,
-    title: "Profiller",
+    title: "Bağlantılar",
   },
   {
     id: 3,

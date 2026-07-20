@@ -30,7 +30,7 @@ const ProfileSettings = () => {
           {settingsTitle === "Hesap Bilgileri" && (
             <ProfileDetails usernameSlug={user?.username} />
           )}
-          {settingsTitle === "Profiller" && <SocialAccounts user={user} />}
+          {settingsTitle === "Bağlantılar" && <SocialAccounts user={user} />}
         </div>
       </div>
     </div>

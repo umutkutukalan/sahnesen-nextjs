@@ -28,22 +28,22 @@ const SocialAccountCard = ({ account, onUpdate }) => {
       </div>
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {account.platform === "Instagram" && (
+          {account.platform === "INSTAGRAM" && (
             <AiFillInstagram className="text-2xl text-gray-700" />
           )}
-          {account.platform === "Facebook" && (
+          {account.platform === "FACEBOOK" && (
             <AiFillFacebook className="text-2xl text-gray-700" />
           )}
-          {account.platform === "YouTube" && (
+          {account.platform === "YOUTUBE" && (
             <AiFillYoutube className="text-2xl text-gray-700" />
           )}
-          {account.platform === "Twitter" && (
+          {account.platform === "TWITTER" && (
             <AiFillTwitterSquare className="text-2xl text-gray-700" />
           )}
-          {account.platform === "LinkedIn" && (
+          {account.platform === "LINKEDIN" && (
             <AiFillLinkedin className="text-2xl text-gray-700" />
           )}
-          {account.platform === "Github" && (
+          {account.platform === "GITHUB" && (
             <AiFillGithub className="text-2xl text-gray-700" />
           )}
           <p className="text-sm">{account.username}</p>

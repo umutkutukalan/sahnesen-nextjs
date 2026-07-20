@@ -391,22 +391,22 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                         >
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full overflow-hidden">
-                              {account.platform === "Instagram" && (
+                              {account.platform === "INSTAGRAM" && (
                                 <AiFillInstagram className="w-full h-full object-cover" />
                               )}
-                              {account.platform === "Facebook" && (
+                              {account.platform === "FACEBOOK" && (
                                 <AiFillFacebook className="w-full h-full object-cover" />
                               )}
-                              {account.platform === "YouTube" && (
+                              {account.platform === "YOUTUBE" && (
                                 <AiFillYoutube className="w-full h-full object-cover" />
                               )}
-                              {account.platform === "Twitter" && (
+                              {account.platform === "TWITTER" && (
                                 <AiFillTwitterSquare className="w-full h-full object-cover" />
                               )}
-                              {account.platform === "LinkedIn" && (
+                              {account.platform === "LINKEDIN" && (
                                 <AiFillLinkedin className="w-full h-full object-cover" />
                               )}
-                              {account.platform === "Github" && (
+                              {account.platform === "GITHUB" && (
                                 <AiFillGithub className="w-full h-full object-cover" />
                               )}
                             </div>
