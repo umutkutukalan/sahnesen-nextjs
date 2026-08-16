@@ -189,7 +189,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 {/* Profil resmi ve bilgileri */}
                 <div
                   // ${isSidebarOpen ? "max-w-3xl" : "max-w-4xl"}
-                  className={`flex flex-col max-w-4xl transition-all duration-500 ease-in-out`}
+                  className={`flex flex-col max-w-4xl min-w-4xl transition-all duration-500 ease-in-out`}
                 >
                   {/* Tab Navigation */}
                   <PageAbout pageTitle={"POSTS"} contentType={"SAHNE"} />
