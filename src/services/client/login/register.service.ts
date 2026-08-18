@@ -1,11 +1,12 @@
 import api from "../config";
 
 export interface RegisterData {
-    name: string;
-    surname: string;
-    email: string;
-    username: string;
-    password: string;
+  name: string;
+  surname: string;
+  email: string;
+  username: string;
+  password: string;
+  inviteCode?: string;
 }
 
 export const RegisterService = async (data: RegisterData) => {
