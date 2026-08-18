@@ -5,7 +5,7 @@ import {
   RegisterService,
 } from "@/services/client/login/register.service";
 
-export const useBetaRegister = (onSuccess: () => void) => {
+export const useBetaRegister = (onSuccess: (username?: string) => void) => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [email, setMail] = useState("");
@@ -29,8 +29,11 @@ export const useBetaRegister = (onSuccess: () => void) => {
     try {
       const response = await RegisterService(data);
       setUser(response.data.user);
-      onSuccess();
-      console.log("Kurucu Sahne kaydı başarılı:", response.data);
+
+      // Doğrudan dönen verideki username'i parametre olarak veriyoruz
+      if (onSuccess) {
+        onSuccess(response.data.user?.username);
+      }
     } catch (error) {
       console.error("Beta Kayıt Hatası:", error);
     }
