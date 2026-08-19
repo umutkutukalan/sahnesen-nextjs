@@ -1,83 +1,69 @@
 import { getUserPostsService } from "@/services/client/post.service";
-import { useState, useCallback } from "react";
+import { PostResponse } from "@/services/server/post.service";
+import { useEffect, useState } from "react";
 
-export const useGetUserPosts = () => {
-  const [userPosts, setUserPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+export const useGetUserPosts = (
+  initialPosts: PostResponse[] = [],
+  initialPage: number = 0,
+  initialTotalPages: number = 0,
+  username?: string,
+) => {
+  const [userPosts, setUserPosts] = useState<PostResponse[]>(
+    initialPosts || [],
+  );
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [hasMore, setHasMore] = useState(initialPage + 1 < initialTotalPages);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  const getUserPosts = useCallback(
-    async (username: string, page = 0, isLoadMore = false) => {
-      try {
-        if (isLoadMore) {
-          setIsLoadingMore(true);
-        } else {
-          setIsLoading(true);
-        }
+  // Initial veriler veya prop'lar değiştikçe state'leri senkronize et
+  useEffect(() => {
+    if (initialPosts) setUserPosts(initialPosts);
+    setCurrentPage(initialPage);
+    setTotalPages(initialTotalPages);
+    setHasMore(initialPage + 1 < initialTotalPages);
+  }, [initialPosts, initialPage, initialTotalPages]);
 
-        const response = await getUserPostsService(username, page, 5);
+  const loadMoreUserPosts = async () => {
+    if (isLoadingMore || !hasMore || !username) return;
 
-        if (isLoadMore) {
-          // Spring Boot pagination: response.data.content içinde postlar var
-          const newPosts = response.content || response;
+    setIsLoadingMore(true);
 
-          setUserPosts((prev) => {
-            // Duplicate kontrolü - id'ye göre filtreleme
-            const existingIds = new Set(prev.map((post) => post.id));
-            const uniqueNewPosts = newPosts.filter(
-              (post) => !existingIds.has(post.id),
-            );
+    try {
+      const nextPage = currentPage + 1;
+      const response = await getUserPostsService(username, nextPage, 5);
 
-            return [...prev, ...uniqueNewPosts];
-          });
-        } else {
-          setUserPosts(response.content || response);
-        }
+      // 🔑 KRİTİK DÜZELTME: Spring Boot Page yapısını esnek şekilde çözümlüyoruz
+      // Yanıt 'response.content' de gelebilir, direkt 'response' (array/page) de olabilir.
+      const newPosts: PostResponse[] =
+        response?.content || (Array.isArray(response) ? response : []);
+      const pageNum = response?.number ?? nextPage;
+      const totalPageCount = response?.totalPages ?? totalPages;
 
-        // Spring Boot pagination bilgilerini kullan
-        if (response.totalPages !== undefined) {
-          setTotalPages(response.totalPages);
-          setCurrentPage(response.number || page);
-          // Son sayfada mıyız kontrol et
-          setHasMore(response.number + 1 < response.totalPages);
-        } else {
-          // Fallback: Eğer Spring pagination bilgisi yoksa
-          const contentLength = response.content
-            ? response.content.length
-            : response.length;
-          setHasMore(contentLength === 5);
-          setCurrentPage(page);
-        }
+      if (newPosts.length > 0) {
+        setUserPosts((prev) => {
+          const existingIds = new Set(prev.map((post) => post.id));
+          const uniqueNewPosts = newPosts.filter(
+            (post) => !existingIds.has(post.id),
+          );
+          return [...prev, ...uniqueNewPosts];
+        });
 
-        setIsLoading(false);
-        setIsLoadingMore(false);
-      } catch (error) {
-        console.error("Postlar çekilirken hata oluştu:", error);
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        setCurrentPage(pageNum);
+        setTotalPages(totalPageCount);
+        setHasMore(pageNum + 1 < totalPageCount);
+      } else {
+        setHasMore(false);
       }
-    },
-    [],
-  );
-
-  const loadMoreUserPosts = useCallback(
-    (username: string) => {
-      if (!isLoadingMore && hasMore) {
-        getUserPosts(username, currentPage + 1, true);
-      }
-    },
-    [currentPage, hasMore, isLoadingMore, getUserPosts],
-  );
+    } catch (error) {
+      console.error("Kullanıcı gönderileri yüklenirken hata:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   return {
     userPosts,
-    isLoading,
-    error,
-    getUserPosts,
     loadMoreUserPosts,
     isLoadingMore,
     hasMore,

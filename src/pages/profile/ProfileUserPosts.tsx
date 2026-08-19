@@ -58,7 +58,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
     <div className="w-full flex flex-col gap-5">
       {/* Projeler Listesi */}
       {userPosts && userPosts.length > 0 ? (
-        userPosts.map((post: PostResponse) => (
+        userPosts.map((post) => (
           <PostCard
             key={post.id}
             post={post}
