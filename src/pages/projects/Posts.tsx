@@ -4,14 +4,12 @@ import { useEffect } from "react";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import PageAbout from "@/components/PageAbout";
-import ProjectCard from "@/components/projects/PostCard";
-import PopularProjects from "@/components/PageStickyExtra/PopularPosts";
 import { useAuth } from "@/context/UserContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { useSidebar } from "@/context/SidebarContext";
 import { PostResponse } from "@/services/server/post.service";
-import { useGetPosts } from "@/hooks/projects/useGetProjects";
+import { useGetPosts } from "@/hooks/projects/useGetPosts";
 import PostCard from "@/components/projects/PostCard";
 import PopularPosts from "@/components/PageStickyExtra/PopularPosts";
 
@@ -76,7 +74,7 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
                   {/* PROJE LİSTESİ */}
                   <div className="pt-5">
                     {posts.map((post) => (
-                      <PostCard key={post.id} post={post} />
+                      <PostCard key={post?.id} post={post} />
                     ))}
                   </div>
                 </div>

@@ -5,6 +5,8 @@ export const useGetUser = () => {
   const [profileUser, setProfileUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log("HOCA", profileUser);
+
   const getUser = useCallback(async (username: string) => {
     try {
       const userData = await getUserProfile(username);

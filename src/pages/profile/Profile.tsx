@@ -20,7 +20,7 @@ import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils"; // Özel karakterleri kaldırmak için yardımcı fonksiyon
 import Image from "next/image";
 import { duck2, duck3, duck4, duck5, duck7, profilebg } from "@/utils";
-import ProfileUserProjects from "./ProfileUserProject";
+import ProfileUserProjects from "./ProfileUserPosts";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
 import { useGetFollowers } from "@/hooks/follow/useGetFollowers";

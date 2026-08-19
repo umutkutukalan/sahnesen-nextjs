@@ -38,16 +38,16 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
   const { deletePost } = useDeletePosts();
 
   const handleConfirmDelete = () => {
-    if (user?.username !== post.authorUsername) return;
-    deletePost(post.id, () => {
+    if (user?.username !== post?.authorUsername) return;
+    deletePost(post?.id, () => {
       onDelete?.();
     });
     setShowConfirm(false);
   };
 
   useEffect(() => {
-    hasUserLiked(post.id, "post");
-    getLikeCount(post.id, "post");
+    hasUserLiked(post?.id, "post");
+    getLikeCount(post?.id, "post");
   }, [post?.id]);
 
   // 🔥 AKILLI TIPTAP METİN ÇIKARMA SİHİRBAZI
@@ -129,7 +129,7 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
   };
 
   // Kullanımı tetikleyeceğimiz değişken: Öncelik coverImage, yoksa içerikteki ilk resim
-  const displayImage = post.coverImage || getFirstImageSrc(post.content);
+  const displayImage = post?.coverImage || getFirstImageSrc(post?.content);
   const finalImageUrl = displayImage
     ? displayImage.startsWith("http")
       ? displayImage
@@ -138,15 +138,15 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
 
   // Yeni backend mimarimizde yazarı doğrudan düzleştirilmiş (flat) olarak alıyoruz
   const authorName =
-    `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
+    `${post?.authorName || ""} ${post?.authorSurname || ""}`.trim();
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
-  const authorProfileImgUrl = post.authorProfileImg
-    ? post.authorProfileImg.startsWith("http")
-      ? post.authorProfileImg
-      : `${baseUrl}/${post.authorProfileImg}`
+  const authorProfileImgUrl = post?.authorProfileImg
+    ? post?.authorProfileImg.startsWith("http")
+      ? post?.authorProfileImg
+      : `${baseUrl}/${post?.authorProfileImg}`
     : null;
 
   return (
@@ -240,7 +240,7 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
               </div>
               <span className="text-[8px]">•</span>
               <span className="text-[10px] text-gray-500">
-                {formatRelativeTime(post.createdAt)}
+                {formatRelativeTime(post?.createdAt)}
               </span>
             </div>
           </div>
@@ -248,12 +248,12 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
           {/* Title & Content */}
           <div className="flex flex-col gap-2">
             <h2 className="text-base sm:text-xl font-semibold line-clamp-2">
-              {post.title}
+              {post?.title}
             </h2>
 
             {/* Tiptap string'ini buraya besliyoruz */}
             <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-              {getFirstParagraphText(post.content) ||
+              {getFirstParagraphText(post?.content) ||
                 "İçerik önizlemesi bulunamadı..."}
             </p>
           </div>
@@ -265,13 +265,13 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
                 <span className="relative z-5">
                   <FaTicketSimple
                     className={`${
-                      post.postType === "SAHNE"
+                      post?.postType === "SAHNE"
                         ? "text-black"
-                        : post.postType === "MONOLOG"
+                        : post?.postType === "MONOLOG"
                           ? "text-[#f3c102]"
-                          : post.postType === "YANYANA"
+                          : post?.postType === "YANYANA"
                             ? "text-[#fa9ec1]"
-                            : post.postType === "TERSYUZ"
+                            : post?.postType === "TERSYUZ"
                               ? "text-[#94c5fd]"
                               : "text-black"
                     }`}
@@ -281,13 +281,13 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
                   {/* "text-[#faf8f6]" */}
                   <FaTicketSimple
                     className={`${
-                      post.postType === "SAHNE"
+                      post?.postType === "SAHNE"
                         ? "text-black"
-                        : post.postType === "MONOLOG"
+                        : post?.postType === "MONOLOG"
                           ? "text-[#f3c102]"
-                          : post.postType === "YANYANA"
+                          : post?.postType === "YANYANA"
                             ? "text-[#fa9ec1]"
-                            : post.postType === "TERSYUZ"
+                            : post?.postType === "TERSYUZ"
                               ? "text-[#94c5fd]"
                               : "text-black"
                     }`}
@@ -296,7 +296,7 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
               </div>
               <button
                 onClick={() =>
-                  router.push(`/${post.authorUsername}/${post.slug}`)
+                  router.push(`/${post?.authorUsername}/${post?.slug}`)
                 } // Yeni şık rota mantığımız
                 className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
               >

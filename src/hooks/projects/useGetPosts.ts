@@ -8,7 +8,7 @@ export const useGetPosts = (
   initialTotalPages: number,
 ) => {
   console.log("INIT", {
-    initialPostsLength: initialPosts.length,
+    initialPostsLength: initialPosts?.length,
     initialPage,
     initialTotalPages,
   });

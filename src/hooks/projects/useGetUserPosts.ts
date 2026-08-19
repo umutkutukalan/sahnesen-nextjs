@@ -1,8 +1,8 @@
 import { getUserPostsService } from "@/services/client/post.service";
 import { useState, useCallback } from "react";
 
-export const useGetUserProjects = () => {
-  const [userProjects, setUserProjects] = useState([]);
+export const useGetUserPosts = () => {
+  const [userPosts, setUserPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -10,7 +10,7 @@ export const useGetUserProjects = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const getUserProjects = useCallback(
+  const getUserPosts = useCallback(
     async (username: string, page = 0, isLoadMore = false) => {
       try {
         if (isLoadMore) {
@@ -22,20 +22,20 @@ export const useGetUserProjects = () => {
         const response = await getUserPostsService(username, page, 5);
 
         if (isLoadMore) {
-          // Spring Boot pagination: response.data.content içinde projeler var
-          const newProjects = response.content || response;
+          // Spring Boot pagination: response.data.content içinde postlar var
+          const newPosts = response.content || response;
 
-          setUserProjects((prev) => {
+          setUserPosts((prev) => {
             // Duplicate kontrolü - id'ye göre filtreleme
-            const existingIds = new Set(prev.map((project) => project.id));
-            const uniqueNewProjects = newProjects.filter(
-              (project) => !existingIds.has(project.id),
+            const existingIds = new Set(prev.map((post) => post.id));
+            const uniqueNewPosts = newPosts.filter(
+              (post) => !existingIds.has(post.id),
             );
 
-            return [...prev, ...uniqueNewProjects];
+            return [...prev, ...uniqueNewPosts];
           });
         } else {
-          setUserProjects(response.content || response);
+          setUserPosts(response.content || response);
         }
 
         // Spring Boot pagination bilgilerini kullan
@@ -56,7 +56,7 @@ export const useGetUserProjects = () => {
         setIsLoading(false);
         setIsLoadingMore(false);
       } catch (error) {
-        console.error("Projeler çekilirken hata oluştu:", error);
+        console.error("Postlar çekilirken hata oluştu:", error);
         setIsLoading(false);
         setIsLoadingMore(false);
       }
@@ -64,21 +64,21 @@ export const useGetUserProjects = () => {
     [],
   );
 
-  const loadMoreUserProjects = useCallback(
-    (userId: string | number) => {
+  const loadMoreUserPosts = useCallback(
+    (username: string) => {
       if (!isLoadingMore && hasMore) {
-        getUserProjects(userId, currentPage + 1, true);
+        getUserPosts(username, currentPage + 1, true);
       }
     },
-    [currentPage, hasMore, isLoadingMore, getUserProjects],
+    [currentPage, hasMore, isLoadingMore, getUserPosts],
   );
 
   return {
-    userProjects,
+    userPosts,
     isLoading,
     error,
-    getUserProjects,
-    loadMoreUserProjects,
+    getUserPosts,
+    loadMoreUserPosts,
     isLoadingMore,
     hasMore,
     currentPage,

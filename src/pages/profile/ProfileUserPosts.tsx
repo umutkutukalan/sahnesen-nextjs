@@ -2,40 +2,36 @@
 
 import { useEffect } from "react";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
-import ProjectCardForProfile from "./ProjectCardForProfile";
 // import { undrawaddfiles } from "../../utils";
 import { useAuth } from "../../context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useGetUserProjects } from "@/hooks/projects/useGetUserProjects";
 import Image from "next/image";
 import { undrawaddfiles } from "@/utils";
-import ProjectCard from "@/components/projects/PostCard";
+import { useGetUserPosts } from "@/hooks/projects/useGetUserPosts";
+import PostCard from "@/components/projects/PostCard";
+import { PostResponse } from "@/services/server/post.service";
 
-const ProfileUserProjects = ({
-  targetUsername,
-}: {
-  targetUsername: string;
-}) => {
+const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
   const { user } = useAuth();
   const currentUsername = user?.username;
   console.log("targetUserId:", targetUsername);
   console.log("currentUserId:", currentUsername);
   const {
-    userProjects,
+    userPosts,
     isLoading,
     isLoadingMore,
     hasMore,
-    loadMoreUserProjects,
-    getUserProjects,
+    loadMoreUserPosts,
+    getUserPosts,
     currentPage,
     totalPages,
-  } = useGetUserProjects();
+  } = useGetUserPosts();
 
   // Infinite scroll için targetUserId ile
   useInfiniteScroll(
     () => {
       if (targetUsername) {
-        loadMoreUserProjects(targetUsername);
+        loadMoreUserPosts(targetUsername);
       }
     },
     hasMore,
@@ -45,14 +41,14 @@ const ProfileUserProjects = ({
 
   const handleProjectDelete = () => {
     // Proje silindikten sonra listeyi yeniden al
-    getUserProjects(targetUsername, 0, false);
+    getUserPosts(targetUsername, 0, false);
   };
 
   useEffect(() => {
     if (targetUsername) {
-      getUserProjects(targetUsername);
+      getUserPosts(targetUsername);
     }
-  }, [targetUsername, getUserProjects]);
+  }, [targetUsername, getUserPosts]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -61,11 +57,11 @@ const ProfileUserProjects = ({
   return (
     <div className="w-full flex flex-col gap-5">
       {/* Projeler Listesi */}
-      {userProjects && userProjects.length > 0 ? (
-        userProjects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
+      {userPosts && userPosts.length > 0 ? (
+        userPosts.map((post: PostResponse) => (
+          <PostCard
+            key={post.id}
+            post={post}
             showActions={targetUsername === currentUsername}
             onDelete={handleProjectDelete}
           />
@@ -103,7 +99,7 @@ const ProfileUserProjects = ({
       )}
 
       {/* Veri Bittiğinde Gösterilecek Mesaj */}
-      {!hasMore && userProjects.length > 0 && (
+      {!hasMore && userPosts.length > 0 && (
         <div className="flex justify-center items-center py-8">
           <p className="text-gray-500 text-xs">Tüm projeler yüklendi.</p>
         </div>
@@ -113,7 +109,7 @@ const ProfileUserProjects = ({
       {totalPages > 1 && (
         <div className="flex justify-center items-center py-4">
           <p className="text-sm text-gray-400">
-            Sayfa {currentPage + 1} / {totalPages} • {userProjects.length} proje
+            Sayfa {currentPage + 1} / {totalPages} • {userPosts.length} proje
             gösteriliyor
           </p>
         </div>
@@ -122,4 +118,4 @@ const ProfileUserProjects = ({
   );
 };
 
-export default ProfileUserProjects;
+export default ProfileUserPosts;
