@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import { useAuth } from "../../context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import Image from "next/image";
@@ -11,7 +13,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
   const { user } = useAuth();
   const currentUsername = user?.username;
 
-  // TanStack Query ile baştan yazdığımız hook
+  // TanStack Query hook'umuz
   const {
     userPosts,
     isLoading,
@@ -21,7 +23,19 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
     refetch,
   } = useGetUserPosts(targetUsername);
 
-  // Proje silindiğinde veriyi sıfırlayıp API'den taze çekmek için
+  // Intersection Observer hook'u
+  const { ref, inView } = useInView({
+    threshold: 0.1, // Elementin %10'u ekrana girdiğinde tetikle
+  });
+
+  // Ekranın altına gelindiğinde otomatik yeni sayfa çek
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      loadMoreUserPosts();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, loadMoreUserPosts]);
+
+  // Proje silindiğinde listeyi tazelemek için
   const handleProjectDelete = () => {
     refetch();
   };
@@ -62,25 +76,17 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
         </p>
       )}
 
-      {/* Alt Katman Yükleniyor Göstergesi */}
-      {isFetchingNextPage && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          <span className="ml-3 text-gray-600">
-            Daha fazla proje yükleniyor...
-          </span>
-        </div>
-      )}
-
-      {/* Daha Fazla Yükle Butonu (İstenirse intersection observer ile otomatikleştirilebilir) */}
-      {hasNextPage && !isFetchingNextPage && (
-        <div className="flex justify-center py-4">
-          <button
-            onClick={() => loadMoreUserPosts()}
-            className="px-6 py-2 bg-gray-100 text-gray-800 rounded-xl hover:bg-gray-200 transition-colors text-sm font-medium"
-          >
-            Daha Fazla Proje Yükle
-          </button>
+      {/* Otomatik Yükleme Tetikleyici (Observer Target) & Loading Göstergesi */}
+      {hasNextPage && (
+        <div ref={ref} className="flex justify-center items-center py-6">
+          {isFetchingNextPage && (
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+              <span className="text-xs text-gray-500">
+                Daha fazla proje yükleniyor...
+              </span>
+            </div>
+          )}
         </div>
       )}
 
