@@ -1,9 +1,9 @@
 import { getProjectsClient } from "@/services/client/projects/project.service";
-import { Project } from "@/services/server/post.service";
+import { PostResponse } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 
 export const useGetProjects = (
-  initialProjects: Project[],
+  initialProjects: PostResponse[],
   initialPage: number,
   initialTotalPages: number,
 ) => {
@@ -13,7 +13,7 @@ export const useGetProjects = (
     initialTotalPages,
   });
 
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [projects, setProjects] = useState<PostResponse[]>(initialProjects);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [hasMore, setHasMore] = useState(initialPage + 1 < initialTotalPages);

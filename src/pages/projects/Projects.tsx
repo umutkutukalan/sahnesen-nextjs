@@ -1,36 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import PageAbout from "@/components/PageAbout";
 import ProjectCard from "@/components/projects/ProjectCard";
-
-import Notebook from "@/components/PageStickyExtra/Notebook";
-import LikedPost from "@/components/PageStickyExtra/LikedPost";
-import BookMark from "@/components/PageStickyExtra/BookMark";
-import StickySiteRules from "@/components/PageStickyExtra/StickySiteRules";
 import PopularProjects from "@/components/PageStickyExtra/PopularProjects";
-
 import { useAuth } from "@/context/UserContext";
 import { useGetProjects } from "@/hooks/projects/useGetProjects";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
-import { Project } from "@/services/server/post.service";
-import { SiWikibooks } from "react-icons/si";
-import { IoMdStats } from "react-icons/io";
-import { LuScroll, LuSquareLibrary, LuTheater } from "react-icons/lu";
-import { ImPencil2 } from "react-icons/im";
-import { AiOutlineFileText } from "react-icons/ai";
-import Image from "next/image";
-import { sagperde, solperde } from "@/utils";
-import { IoSparklesOutline } from "react-icons/io5";
-import { RiUser6Line } from "react-icons/ri";
-import { BiBookmarkAlt } from "react-icons/bi";
 import { useSidebar } from "@/context/SidebarContext";
+import { PostResponse } from "@/services/server/post.service";
 
 interface ProjectsProps {
-  initialProjects: Project[];
+  initialProjects: PostResponse[];
   initialPage: number;
   totalPages: number;
 }
