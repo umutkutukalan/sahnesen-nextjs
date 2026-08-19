@@ -1,7 +1,7 @@
 import {
   getLikeCountServiceBlog,
   getLikeCountServiceProject,
-} from "@/services/client/projects/likes_project.service";
+} from "@/services/client/posts/likes_post.service";
 import { useState } from "react";
 
 export const useGetLikeCount = () => {

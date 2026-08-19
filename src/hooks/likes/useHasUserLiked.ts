@@ -1,6 +1,8 @@
-import { hasUserLikedBlog, hasUserLikedProject } from "@/services/client/projects/likes_project.service";
+import {
+  hasUserLikedBlog,
+  hasUserLikedProject,
+} from "@/services/client/posts/likes_post.service";
 import { useState } from "react";
-
 
 export const useHasUserLiked = () => {
   const [liked, setLiked] = useState(null);

@@ -3,22 +3,23 @@
 import { useAuth } from "@/context/UserContext";
 import Home from "@/pages/Home";
 import LoadingScreen from "@/components/LoadingScreen";
-import Projects from "./Projects";
+
 import { PostResponse } from "@/services/server/post.service";
+import Posts from "./Posts";
 
 interface Props {
-  initialProjects: PostResponse[];
+  initialPosts: PostResponse[];
   initialPage: number;
   totalPages: number;
 }
 
-export default function ProjectsClient({
-  initialProjects,
+export default function PostsClient({
+  initialPosts,
   initialPage,
   totalPages,
 }: Props) {
-  console.log("ProjectsClient rendered with props:", {
-    initialProjects,
+  console.log("PostsClient rendered with props:", {
+    initialPosts,
     initialPage,
     totalPages,
   });
@@ -31,8 +32,8 @@ export default function ProjectsClient({
   return (
     <>
       <div className="min-h-screen flex">
-        <Projects
-          initialProjects={initialProjects}
+        <Posts
+          initialPosts={initialPosts}
           initialPage={initialPage}
           totalPages={totalPages}
         />

@@ -9,7 +9,7 @@ import Notebook from "@/components/PageStickyExtra/Notebook";
 import LikedPost from "@/components/PageStickyExtra/LikedPost";
 import BookMark from "@/components/PageStickyExtra/BookMark";
 import StickySiteRules from "@/components/PageStickyExtra/StickySiteRules";
-import PopularProjects from "@/components/PageStickyExtra/PopularProjects";
+import PopularProjects from "@/components/PageStickyExtra/PopularPosts";
 
 import { useAuth } from "@/context/UserContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -25,11 +25,7 @@ interface BlogsProps {
   totalPages: number;
 }
 
-const Blogs = ({
-  initialBlogs,
-  initialPage,
-  totalPages,
-}: BlogsProps) => {
+const Blogs = ({ initialBlogs, initialPage, totalPages }: BlogsProps) => {
   const { user } = useAuth();
 
   console.log("Blogs component rendered with:", {
@@ -45,11 +41,7 @@ const Blogs = ({
     useGetUserLikedProjects();
 
   // Infinite scroll
-  const loadMoreRef = useInfiniteScroll(
-    loadMoreBlogs,
-    hasMore,
-    isLoadingMore,
-  );
+  const loadMoreRef = useInfiniteScroll(loadMoreBlogs, hasMore, isLoadingMore);
 
   // Kullanıcı varsa liked projeleri çek
   useEffect(() => {
@@ -114,8 +106,6 @@ const Blogs = ({
               <StickySiteRules user={user} />
             </div>
           )}
-
-
         </aside>
       </div>
 

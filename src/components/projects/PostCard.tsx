@@ -1,7 +1,7 @@
 "use client";
 
 import { FiUser } from "react-icons/fi";
-import { LuImages, LuTheater } from "react-icons/lu";
+import { LuImages } from "react-icons/lu";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { PiHandsClappingLight } from "react-icons/pi";
 import { useEffect, useState } from "react";
@@ -18,19 +18,15 @@ import { IoMdHeart } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
 import { BiBookmarks } from "react-icons/bi";
 import { useAuth } from "@/context/UserContext";
-import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
+import { useDeletePosts } from "@/hooks/projects/useDeleteProject";
 
-interface ProjectCardProps {
-  project: PostResponse; // Tip adını yeni post mimarisine çektik
+interface PostCardProps {
+  post: PostResponse; // Tip adını yeni post mimarisine çektik
   showActions?: boolean;
   onDelete?: () => void;
 }
 
-const ProjectCard = ({
-  project,
-  showActions = false,
-  onDelete,
-}: ProjectCardProps) => {
+const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
   const { user } = useAuth();
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
@@ -39,20 +35,20 @@ const ProjectCard = ({
   const { likeCount, getLikeCount } = useGetLikeCount();
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const { deleteProject } = useDeleteProject();
+  const { deletePost } = useDeletePosts();
 
   const handleConfirmDelete = () => {
-    if (user?.username !== project.authorUsername) return;
-    deleteProject(project.id, () => {
+    if (user?.username !== post.authorUsername) return;
+    deletePost(post.id, () => {
       onDelete?.();
     });
     setShowConfirm(false);
   };
 
   useEffect(() => {
-    hasUserLiked(project.id, "project");
-    getLikeCount(project.id, "project");
-  }, [project?.id]);
+    hasUserLiked(post.id, "post");
+    getLikeCount(post.id, "post");
+  }, [post?.id]);
 
   // 🔥 AKILLI TIPTAP METİN ÇIKARMA SİHİRBAZI
   const getFirstParagraphText = (contentStr: string): string => {
@@ -133,7 +129,7 @@ const ProjectCard = ({
   };
 
   // Kullanımı tetikleyeceğimiz değişken: Öncelik coverImage, yoksa içerikteki ilk resim
-  const displayImage = project.coverImage || getFirstImageSrc(project.content);
+  const displayImage = post.coverImage || getFirstImageSrc(post.content);
   const finalImageUrl = displayImage
     ? displayImage.startsWith("http")
       ? displayImage
@@ -142,15 +138,15 @@ const ProjectCard = ({
 
   // Yeni backend mimarimizde yazarı doğrudan düzleştirilmiş (flat) olarak alıyoruz
   const authorName =
-    `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
+    `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
-  const authorProfileImgUrl = project.authorProfileImg
-    ? project.authorProfileImg.startsWith("http")
-      ? project.authorProfileImg
-      : `${baseUrl}/${project.authorProfileImg}`
+  const authorProfileImgUrl = post.authorProfileImg
+    ? post.authorProfileImg.startsWith("http")
+      ? post.authorProfileImg
+      : `${baseUrl}/${post.authorProfileImg}`
     : null;
 
   return (
@@ -167,7 +163,7 @@ const ProjectCard = ({
           {finalImageUrl ? (
             <Image
               src={finalImageUrl}
-              alt={project.title}
+              alt={post.title}
               fill
               unoptimized
               className="object-cover"
@@ -192,7 +188,7 @@ const ProjectCard = ({
             {finalImageUrl ? (
               <Image
                 src={finalImageUrl}
-                alt={project.title}
+                alt={post.title}
                 fill
                 unoptimized
                 className="object-cover"
@@ -213,7 +209,7 @@ const ProjectCard = ({
           {/* AUTHOR */}
           <div
             className="flex items-center gap-2 cursor-pointer w-max"
-            onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
+            onClick={() => ToProfile(null, post.authorUsername)} // Doğrudan authorUsername'e yönlendiriyoruz
           >
             <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
               {authorProfileImgUrl ? (
@@ -244,7 +240,7 @@ const ProjectCard = ({
               </div>
               <span className="text-[8px]">•</span>
               <span className="text-[10px] text-gray-500">
-                {formatRelativeTime(project.createdAt)}
+                {formatRelativeTime(post.createdAt)}
               </span>
             </div>
           </div>
@@ -252,12 +248,12 @@ const ProjectCard = ({
           {/* Title & Content */}
           <div className="flex flex-col gap-2">
             <h2 className="text-base sm:text-xl font-semibold line-clamp-2">
-              {project.title}
+              {post.title}
             </h2>
 
             {/* Tiptap string'ini buraya besliyoruz */}
             <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-              {getFirstParagraphText(project.content) ||
+              {getFirstParagraphText(post.content) ||
                 "İçerik önizlemesi bulunamadı..."}
             </p>
           </div>
@@ -269,13 +265,13 @@ const ProjectCard = ({
                 <span className="relative z-5">
                   <FaTicketSimple
                     className={`${
-                      project.postType === "SAHNE"
+                      post.postType === "SAHNE"
                         ? "text-black"
-                        : project.postType === "MONOLOG"
+                        : post.postType === "MONOLOG"
                           ? "text-[#f3c102]"
-                          : project.postType === "YANYANA"
+                          : post.postType === "YANYANA"
                             ? "text-[#fa9ec1]"
-                            : project.postType === "TERSYUZ"
+                            : post.postType === "TERSYUZ"
                               ? "text-[#94c5fd]"
                               : "text-black"
                     }`}
@@ -285,13 +281,13 @@ const ProjectCard = ({
                   {/* "text-[#faf8f6]" */}
                   <FaTicketSimple
                     className={`${
-                      project.postType === "SAHNE"
+                      post.postType === "SAHNE"
                         ? "text-black"
-                        : project.postType === "MONOLOG"
+                        : post.postType === "MONOLOG"
                           ? "text-[#f3c102]"
-                          : project.postType === "YANYANA"
+                          : post.postType === "YANYANA"
                             ? "text-[#fa9ec1]"
-                            : project.postType === "TERSYUZ"
+                            : post.postType === "TERSYUZ"
                               ? "text-[#94c5fd]"
                               : "text-black"
                     }`}
@@ -300,7 +296,7 @@ const ProjectCard = ({
               </div>
               <button
                 onClick={() =>
-                  router.push(`/${project.authorUsername}/${project.slug}`)
+                  router.push(`/${post.authorUsername}/${post.slug}`)
                 } // Yeni şık rota mantığımız
                 className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
               >
@@ -368,4 +364,4 @@ const ProjectCard = ({
   );
 };
 
-export default ProjectCard;
+export default PostCard;

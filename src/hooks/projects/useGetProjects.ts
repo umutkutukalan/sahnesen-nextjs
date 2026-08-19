@@ -1,19 +1,19 @@
-import { getProjectsClient } from "@/services/client/projects/project.service";
+import { getPostsClient } from "@/services/client/posts/posts.service";
 import { PostResponse } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 
-export const useGetProjects = (
-  initialProjects: PostResponse[],
+export const useGetPosts = (
+  initialPosts: PostResponse[],
   initialPage: number,
   initialTotalPages: number,
 ) => {
   console.log("INIT", {
-    initialProjectsLength: initialProjects.length,
+    initialPostsLength: initialPosts.length,
     initialPage,
     initialTotalPages,
   });
 
-  const [projects, setProjects] = useState<PostResponse[]>(initialProjects);
+  const [posts, setPosts] = useState<PostResponse[]>(initialPosts);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [hasMore, setHasMore] = useState(initialPage + 1 < initialTotalPages);
@@ -24,15 +24,15 @@ export const useGetProjects = (
     setHasMore(currentPage + 1 < totalPages);
   }, [currentPage, totalPages]);
 
-  const loadMoreProjects = async () => {
+  const loadMorePosts = async () => {
     if (isLoadingMore || !hasMore) return;
 
     setIsLoadingMore(true);
 
     const nextPage = currentPage + 1;
-    const data = await getProjectsClient(nextPage, 5);
+    const data = await getPostsClient(nextPage, 5);
 
-    setProjects((prev) => [...prev, ...data.content]);
+    setPosts((prev) => [...prev, ...data.content]);
     setCurrentPage(data.number);
     setTotalPages(data.totalPages);
     setHasMore(data.number + 1 < data.totalPages);
@@ -43,8 +43,8 @@ export const useGetProjects = (
   };
 
   return {
-    projects,
-    loadMoreProjects,
+    posts,
+    loadMorePosts,
     isLoadingMore,
     hasMore,
     currentPage,

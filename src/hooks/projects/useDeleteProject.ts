@@ -1,16 +1,16 @@
-import { deleteProjectService } from "@/services/client/projects/project.service";
+import { deletePostService } from "@/services/client/posts/posts.service";
 import { useState } from "react";
 
-export const useDeleteProject = () => {
+export const useDeletePosts = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState(null);
 
-  const deleteProject = async (projectId: number, onSuccess: () => void) => {
+  const deletePost = async (projectId: number, onSuccess: () => void) => {
     setIsDeleting(true);
     setError(null);
 
     try {
-      await deleteProjectService(projectId);
+      await deletePostService(projectId);
       console.log("Proje başarıyla silindi:", projectId);
 
       // Başarı durumunda callback çağır
@@ -25,5 +25,5 @@ export const useDeleteProject = () => {
     }
   };
 
-  return { deleteProject, isDeleting, error };
+  return { deletePost, isDeleting, error };
 };

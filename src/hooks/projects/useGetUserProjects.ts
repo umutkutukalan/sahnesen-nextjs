@@ -1,4 +1,4 @@
-import { getUserPostsService } from "@/services/client/projects/project.service";
+import { getUserPostsService } from "@/services/client/posts/posts.service";
 import { useState, useCallback } from "react";
 
 export const useGetUserProjects = () => {

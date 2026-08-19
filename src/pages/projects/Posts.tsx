@@ -4,46 +4,40 @@ import { useEffect } from "react";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import PageAbout from "@/components/PageAbout";
-import ProjectCard from "@/components/projects/ProjectCard";
-import PopularProjects from "@/components/PageStickyExtra/PopularProjects";
+import ProjectCard from "@/components/projects/PostCard";
+import PopularProjects from "@/components/PageStickyExtra/PopularPosts";
 import { useAuth } from "@/context/UserContext";
-import { useGetProjects } from "@/hooks/projects/useGetProjects";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
 import { useSidebar } from "@/context/SidebarContext";
 import { PostResponse } from "@/services/server/post.service";
+import { useGetPosts } from "@/hooks/projects/useGetProjects";
+import PostCard from "@/components/projects/PostCard";
+import PopularPosts from "@/components/PageStickyExtra/PopularPosts";
 
-interface ProjectsProps {
-  initialProjects: PostResponse[];
+interface PostsProps {
+  initialPosts: PostResponse[];
   initialPage: number;
   totalPages: number;
 }
 
-const Projects = ({
-  initialProjects,
-  initialPage,
-  totalPages,
-}: ProjectsProps) => {
+const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
   const { user } = useAuth();
 
-  console.log("Projects component rendered with:", {
-    initialProjectsLength: initialProjects.length,
+  console.log("Posts component rendered with:", {
+    initialPostsLength: initialPosts.length,
     initialPage,
     totalPages,
   });
 
-  const { projects, isLoadingMore, hasMore, loadMoreProjects, currentPage } =
-    useGetProjects(initialProjects, initialPage, totalPages);
+  const { posts, isLoadingMore, hasMore, loadMorePosts, currentPage } =
+    useGetPosts(initialPosts, initialPage, totalPages);
 
   const { getUserLikedProjects, isLoading: isLoadingLikes } =
     useGetUserLikedProjects();
 
   // Infinite scroll
-  const loadMoreRef = useInfiniteScroll(
-    loadMoreProjects,
-    hasMore,
-    isLoadingMore,
-  );
+  const loadMoreRef = useInfiniteScroll(loadMorePosts, hasMore, isLoadingMore);
 
   // Kullanıcı varsa liked projeleri çek
   useEffect(() => {
@@ -81,8 +75,8 @@ const Projects = ({
                   </div>
                   {/* PROJE LİSTESİ */}
                   <div className="pt-5">
-                    {projects.map((project) => (
-                      <ProjectCard key={project.id} project={project} />
+                    {posts.map((post) => (
+                      <PostCard key={post.id} post={post} />
                     ))}
                   </div>
                 </div>
@@ -101,7 +95,7 @@ const Projects = ({
               )}
 
               {/* BİTTİ MESAJI */}
-              {!hasMore && projects.length > 0 && (
+              {!hasMore && posts.length > 0 && (
                 <div className="py-8 text-center text-xs text-gray-500">
                   Tüm projeler yüklendi.
                 </div>
@@ -110,8 +104,7 @@ const Projects = ({
               {/* SAYFA BİLGİSİ */}
               {totalPages > 1 && (
                 <div className="py-4 text-center text-sm text-gray-400">
-                  Sayfa {currentPage + 1} / {totalPages} • {projects.length}{" "}
-                  proje
+                  Sayfa {currentPage + 1} / {totalPages} • {posts.length} proje
                 </div>
               )}
             </div>
@@ -130,7 +123,7 @@ const Projects = ({
               </div> */}
 
               <div className="w-[240px]">
-                <PopularProjects projects={projects.slice(0, 4)} />
+                <PopularPosts posts={posts.slice(0, 4)} />
               </div>
               {/* Popular: infinite listeye bağlı olmasın */}
             </aside>
@@ -144,4 +137,4 @@ const Projects = ({
   );
 };
 
-export default Projects;
+export default Posts;

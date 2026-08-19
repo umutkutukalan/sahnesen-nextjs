@@ -1,8 +1,7 @@
 "use client";
 
-import { FaStar, FaStarHalf } from "react-icons/fa";
+import { FaStarHalf } from "react-icons/fa";
 import { useRelativeTime } from "../../hooks/useRelativeTime";
-import { handleViewProject } from "../../utils/HandleViewProject";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
@@ -12,17 +11,16 @@ import { FiUser } from "react-icons/fi";
 import { FaTicketSimple } from "react-icons/fa6";
 // import { useToProfile } from "../../hooks/useToProfile";
 
-interface PopularProjectsProps {
-  projects: PostResponse[]; // Tip dizisi güncellendi
+interface PopularPostsProps {
+  posts: PostResponse[]; // Tip dizisi güncellendi
 }
 
-const PopularProjects = ({ projects }: PopularProjectsProps) => {
+const PopularPosts = ({ posts }: PopularPostsProps) => {
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
   const { ToProfile } = useToProfile();
 
-  console.log("Popular projects data:", projects);
-  const topProjects = projects.slice(0, 4);
+  const topPosts = posts.slice(0, 4);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -35,23 +33,23 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
       </div>
 
       <ul className="flex flex-col gap-5">
-        {topProjects.map((project) => {
+        {topPosts.map((post) => {
           // Yazar ismini güvenli bir şekilde birleştiriyoruz
           const authorName =
-            `${project.authorName || ""} ${project.authorSurname || ""}`.trim();
+            `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
 
           return (
-            <li key={project.id} className="flex flex-col gap-2 text-xs">
+            <li key={post.id} className="flex flex-col gap-2 text-xs">
               {/* AUTHOR HEADER */}
               <div
                 className="flex items-center gap-2 cursor-pointer w-max"
-                onClick={() => ToProfile(null, project.authorUsername)} // Doğrudan authorUsername
+                onClick={() => ToProfile(null, post.authorUsername)} // Doğrudan authorUsername
               >
                 <div className="relative w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-gray-200">
-                  {project.authorProfileImg ? (
+                  {post.authorProfileImg ? (
                     <Image
-                      src={`${baseUrl}/${project.authorProfileImg}`}
-                      alt={project.title}
+                      src={`${baseUrl}/${post.authorProfileImg}`}
+                      alt={post.title}
                       fill
                       unoptimized
                       className="object-cover"
@@ -73,7 +71,7 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                       />
                     </div>
                     {/* <span className="truncate text-[10px] text-gray-400">
-                  @{project.authorUsername}
+                  @{post.authorUsername}
                 </span> */}
                   </div>
                 </div>
@@ -83,17 +81,17 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
               <div
                 className="flex flex-col gap-2 cursor-pointer"
                 onClick={() =>
-                  router.push(`/${project.authorUsername}/${project.slug}`)
+                  router.push(`/${post.authorUsername}/${post.slug}`)
                 } // Yeni şık rota mantığımız
               >
                 <span className="line-clamp-2 font-semibold hover:text-blue-600 transition-colors duration-200 text-sm">
-                  {project.title}
+                  {post.title}
                 </span>
                 <div className="flex items-center gap-1 mt-1">
                   <div className="flex items-center gap-1 text-gray-400">
                     <FaStarHalf className="flex-shrink-0 text-blue-600 text-[10px]" />
                     <span className="text-[10px]">
-                      {formatRelativeTime(project.createdAt)}
+                      {formatRelativeTime(post.createdAt)}
                     </span>
                   </div>
                   <span className="text-[8px]">•</span>
@@ -101,13 +99,13 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
                     <span className="relative z-5 text-[10px]">
                       <FaTicketSimple
                         className={`${
-                          project.postType === "SAHNE"
+                          post.postType === "SAHNE"
                             ? "text-black"
-                            : project.postType === "MONOLOG"
+                            : post.postType === "MONOLOG"
                               ? "text-[#f3c102]"
-                              : project.postType === "YANYANA"
+                              : post.postType === "YANYANA"
                                 ? "text-[#fa9ec1]"
-                                : project.postType === "TERSYUZ"
+                                : post.postType === "TERSYUZ"
                                   ? "text-[#94c5fd]"
                                   : "text-black"
                         }`}
@@ -124,4 +122,4 @@ const PopularProjects = ({ projects }: PopularProjectsProps) => {
   );
 };
 
-export default PopularProjects;
+export default PopularPosts;

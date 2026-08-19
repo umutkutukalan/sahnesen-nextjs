@@ -4,12 +4,12 @@ import Notebook from "@/components/PageStickyExtra/Notebook";
 import BookMark from "@/components/PageStickyExtra/BookMark";
 import { undrawloveit } from "@/utils";
 import { useAuth } from "@/context/UserContext";
-import PopularProjects from "@/components/PageStickyExtra/PopularProjects";
+import PopularProjects from "@/components/PageStickyExtra/PopularPosts";
 import StickySiteRules from "@/components/PageStickyExtra/StickySiteRules";
 import PageAbout from "@/components/PageAbout";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import ProjectCard from "@/components/projects/ProjectCard";
+import ProjectCard from "@/components/projects/PostCard";
 import { useGetUserLikedProjects } from "@/hooks/like/useGetUserLikedProjects";
 
 const LikedProjects = () => {

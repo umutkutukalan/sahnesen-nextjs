@@ -9,7 +9,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useGetUserProjects } from "@/hooks/projects/useGetUserProjects";
 import Image from "next/image";
 import { undrawaddfiles } from "@/utils";
-import ProjectCard from "@/components/projects/ProjectCard";
+import ProjectCard from "@/components/projects/PostCard";
 
 const ProfileUserProjects = ({
   targetUsername,

@@ -1,6 +1,8 @@
-import { getLikeCountServiceBlog, getLikeCountServiceProject } from "@/services/client/projects/likes_project.service";
+import {
+  getLikeCountServiceBlog,
+  getLikeCountServiceProject,
+} from "@/services/client/posts/likes_post.service";
 import { useState } from "react";
-
 
 export const useGetLikeCount = () => {
   const [likeCount, setLikeCount] = useState(0);

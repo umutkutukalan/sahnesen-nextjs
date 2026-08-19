@@ -1,4 +1,4 @@
-export const getProjectsClient = async (page = 0, size = 5) => {
+export const getPostsClient = async (page = 0, size = 5) => {
   console.log("API_URL:", process.env.NEXT_PUBLIC_API_URL);
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/projects?page=${page}&size=${size}&sort=createdAt,desc`,
@@ -35,7 +35,7 @@ export const getUserPostsService = async (
   }
 };
 
-export const deleteProjectService = async (projectId: number) => {
+export const deletePostService = async (projectId: number) => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`,
