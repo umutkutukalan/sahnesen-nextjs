@@ -40,6 +40,9 @@ const CreateProjectsBlog = () => {
   const [postType, setPostType] = useState<string>("SAHNE");
   const postTypeRef = useRef(postType);
 
+  // 1. Kilit Ref'i ekliyoruz
+  const isCreatingRef = useRef<boolean>(false);
+
   useEffect(() => {
     const typeParam = searchParams?.get("type");
     if (typeParam) {
@@ -57,14 +60,19 @@ const CreateProjectsBlog = () => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 1. Taslak Oluşturucu (Ilk Defa Post Atma)
+  // 2. Taslak Oluşturucu (Yarış Durumu Engellenmiş Hali)
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
-    if (activePostIdRef.current) return;
+    // Zaten ID varsa VEYA şu an arka planda bir oluşturma isteği devam ediyorsa KİLİTLE ve ÇIK
+    if (activePostIdRef.current || isCreatingRef.current) return;
+
     const json = currentJson || editorJSONRef.current;
     const currentTitle = extractTitle(json);
-    if (!currentTitle || currentTitle.length < 3) return;
+    if (!currentTitle || currentTitle.trim().length < 3) return;
 
+    // Kiliti kapatıyoruz ki aynı anda 2. bir POST isteği çıkamasın
+    isCreatingRef.current = true;
     setSaveStatus("SAVING");
+
     try {
       const data = await createPostClient({
         postType: postTypeRef.current,
@@ -81,6 +89,9 @@ const CreateProjectsBlog = () => {
     } catch (err) {
       console.error("Taslak oluşturma hatası:", err);
       setSaveStatus("ERROR");
+    } finally {
+      // İşlem bittiğinde kilidi açıyoruz
+      isCreatingRef.current = false;
     }
   });
 
@@ -131,39 +142,46 @@ const CreateProjectsBlog = () => {
 
   // 4. Yayınlama (Publish) İşlemi
   const handleSave = async () => {
-    // Bekleyen auto-save timer'ı varsa iptal et (Race condition engeli)
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    const currentId = activePostIdRef.current || activePostId;
+    const currentTitle = extractTitle(editorJSONRef.current);
+    if (!currentTitle || currentTitle.trim().length < 3) {
+      alert("Lütfen en az 3 karakterlik bir başlık yazın.");
+      return;
+    }
+
+    setSaveStatus("SAVING");
+
     const payload = {
       postType: postTypeRef.current,
-      title: extractTitle(editorJSONRef.current) || "Başlıksız Sahne",
+      title: currentTitle,
       content: editorJSONRef.current,
-      isPublished: true, // Direkt yayınlıyoruz
+      isPublished: true, // Direkt yayınlıyoruz (Taslak durumu bitti)
     };
 
     try {
       let savedPost;
+      const currentId = activePostIdRef.current || activePostId;
 
       if (currentId) {
+        // ✅ Mevcut taslağı UPDATE eder. Veritabanındaki is_published = 1 olur.
+        // Dolayısıyla bu kayıt artık "Taslak" değil, yayınlanmış gönderinin kendisidir.
         savedPost = await updatePostClient(currentId, payload);
       } else {
+        // Eğer hiç taslak oluşmadan anında Publish'e bastıysa tek bir yayınlanmış post oluşturur
         savedPost = await createPostClient(payload);
       }
 
       setSaveStatus("SAVED");
 
-      // Backend'den dönen slug ve username ile dinamik yönlendirme
-      // (Eğer response içinde authorUsername yoksa UserContext'ten gelen user.username kullanılabilir)
       const username = savedPost?.authorUsername || user?.username;
       const slug = savedPost?.slug;
 
       if (username && slug) {
         router.push(`/${username}/${slug}`);
       } else {
-        // Yönlendirme bilgisi eksikse fallback olarak profile veya akışa at
         router.push("/akis");
       }
     } catch (error: any) {
