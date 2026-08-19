@@ -3,8 +3,12 @@
 import dynamic from "next/dynamic";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import axios from "axios";
 import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
+import {
+  createPostClient,
+  updatePostClient,
+} from "@/services/client/post.service";
+import { useAuth } from "@/context/UserContext";
 
 const TiptapEditor = dynamic(() => import("@/components/editor/TiptapEditor"), {
   ssr: false,
@@ -22,8 +26,8 @@ const extractTitle = (json: any): string => {
 type SaveStatus = "IDLE" | "SAVING" | "SAVED" | "ERROR";
 
 const CreateProjectsBlog = () => {
+  const { user } = useAuth();
   const router = useRouter();
-
   const searchParams = useSearchParams();
 
   const [editorJSON, setEditorJSON] = useState<any>(null);
@@ -32,13 +36,14 @@ const CreateProjectsBlog = () => {
     editorJSONRef.current = editorJSON;
   }, [editorJSON]);
 
-  const [postType, setPostType] = useState<string>("Sahne");
+  // Enum değerin "SAHNE" gibi büyük harf olması gerekebilir (Backend DTO PostType kontrolü için)
+  const [postType, setPostType] = useState<string>("SAHNE");
   const postTypeRef = useRef(postType);
 
   useEffect(() => {
     const typeParam = searchParams?.get("type");
     if (typeParam) {
-      setPostType(typeParam);
+      setPostType(typeParam.toUpperCase());
     }
   }, [searchParams]);
 
@@ -52,7 +57,7 @@ const CreateProjectsBlog = () => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Taslak Oluşturucu
+  // 1. Taslak Oluşturucu (Ilk Defa Post Atma)
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
     if (activePostIdRef.current) return;
     const json = currentJson || editorJSONRef.current;
@@ -61,62 +66,48 @@ const CreateProjectsBlog = () => {
 
     setSaveStatus("SAVING");
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/posts/me",
-        {
-          postType: postTypeRef.current,
-          title: currentTitle,
-          content: json,
-          isPublished: false,
-        },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-      if (response.data?.id) {
-        activePostIdRef.current = response.data.id;
-        setActivePostId(response.data.id);
+      const data = await createPostClient({
+        postType: postTypeRef.current,
+        title: currentTitle,
+        content: json,
+        isPublished: false,
+      });
+
+      if (data?.id) {
+        activePostIdRef.current = data.id;
+        setActivePostId(data.id);
         setSaveStatus("SAVED");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Taslak oluşturma hatası:", err);
       setSaveStatus("ERROR");
     }
   });
 
-  // Otomatik Kaydediciyi bu mantığa çekebilirsin
+  // 2. Otomatik Kaydedici (Var Olan Taslağı Güncelleme)
   const autoSaveContentRef = useRef(async (currentJson: any) => {
     if (!activePostIdRef.current) return;
 
-    // Eğer kullanıcı her şeyi sildiyse başlığı kurtaralım
     const extracted = extractTitle(currentJson);
     const finalTitle =
       extracted && extracted.length >= 3 ? extracted : "Başlıksız Taslak";
 
     try {
-      await axios.put(
-        `http://localhost:8080/api/posts/me/${activePostIdRef.current}`,
-        {
-          postType: postTypeRef.current,
-          title: finalTitle,
-          content: currentJson, // Boş içerik (sadece boş bir node) gidebilir, sorun değil
-          isPublished: false,
-        },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      await updatePostClient(activePostIdRef.current, {
+        postType: postTypeRef.current,
+        title: finalTitle,
+        content: currentJson,
+        isPublished: false,
+      });
 
       setSaveStatus("SAVED");
     } catch (err) {
-      console.error(err);
+      console.error("Auto-save hatası:", err);
       setSaveStatus("ERROR");
     }
   });
 
-  // Editor Güncelleme Motoru
+  // 3. Editor Güncelleme Motoru (Debounce)
   const handleEditorUpdate = useCallback((json: any) => {
     setEditorJSON(json);
 
@@ -126,7 +117,6 @@ const CreateProjectsBlog = () => {
       setSaveStatus("SAVING");
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
-      // Süreyi 1500ms'e çekerek Tiptap'ın DOM'u rahatça işlemesine izin veriyoruz
       debounceTimerRef.current = setTimeout(() => {
         autoSaveContentRef.current(json);
       }, 1500);
@@ -139,48 +129,51 @@ const CreateProjectsBlog = () => {
     };
   }, []);
 
+  // 4. Yayınlama (Publish) İşlemi
   const handleSave = async () => {
-    const currentId = activePostIdRef.current || activePostId;
-    try {
-      const payload = {
-        postType: postTypeRef.current,
-        title: extractTitle(editorJSONRef.current) || "Başlıksız",
-        content: editorJSONRef.current,
-        isPublished: true,
-      };
+    // Bekleyen auto-save timer'ı varsa iptal et (Race condition engeli)
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
 
-      let response;
+    const currentId = activePostIdRef.current || activePostId;
+    const payload = {
+      postType: postTypeRef.current,
+      title: extractTitle(editorJSONRef.current) || "Başlıksız Sahne",
+      content: editorJSONRef.current,
+      isPublished: true, // Direkt yayınlıyoruz
+    };
+
+    try {
+      let savedPost;
+
       if (currentId) {
-        response = await axios.put(
-          `http://localhost:8080/api/posts/me/${currentId}`,
-          payload,
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        savedPost = await updatePostClient(currentId, payload);
       } else {
-        response = await axios.post(
-          "http://localhost:8080/api/posts/me",
-          payload,
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        savedPost = await createPostClient(payload);
       }
 
-      if (response.status === 200 || response.status === 201) {
-        alert("Harika! İçerik sahneye başarıyla gönderildi.");
+      setSaveStatus("SAVED");
+
+      // Backend'den dönen slug ve username ile dinamik yönlendirme
+      // (Eğer response içinde authorUsername yoksa UserContext'ten gelen user.username kullanılabilir)
+      const username = savedPost?.authorUsername || user?.username;
+      const slug = savedPost?.slug;
+
+      if (username && slug) {
+        router.push(`/${username}/${slug}`);
+      } else {
+        // Yönlendirme bilgisi eksikse fallback olarak profile veya akışa at
         router.push("/akis");
       }
     } catch (error: any) {
       console.error("Yayınlama hatası:", error);
+      setSaveStatus("ERROR");
     }
   };
 
   return (
-    <main className="h-[100vh-64px] bg-white text-black">
+    <main className="min-h-screen bg-white text-black">
       <EditorNavbar
         transparent={false}
         contentStatus={saveStatus}
@@ -188,40 +181,8 @@ const CreateProjectsBlog = () => {
         handleSave={handleSave}
       />
 
-      <div className="w-full lg:w-190 mx-auto px-6">
-        {/* ÜST BAR */}
-        {/* <div className="flex items-center justify-between mb-8 select-none">
-          <div className="flex gap-2 bg-gray-100 p-1 rounded-lg w-max text-xs font-medium">
-            <button
-              type="button"
-              onClick={() => setPostType('PROJECT')}
-              className={`px-4 py-1.5 rounded-md transition-all cursor-pointer ${postType === 'PROJECT' ? 'bg-white shadow-sm text-blue-600 font-semibold' : 'text-gray-500 hover:text-gray-900'}`}
-            >
-              Proje
-            </button>
-            <button
-              type="button"
-              onClick={() => setPostType('BLOG')}
-              className={`px-4 py-1.5 rounded-md transition-all cursor-pointer ${postType === 'BLOG' ? 'bg-white shadow-sm text-blue-600 font-semibold' : 'text-gray-500 hover:text-gray-900'}`}
-            >
-              Blog Yazısı
-            </button>
-          </div>
-        </div> */}
-
-        {/* TIPTAP EDITOR */}
-
+      <div className="w-full lg:w-[760px] mx-auto px-6 pt-6">
         <TiptapEditor onUpdate={handleEditorUpdate} postId={activePostId} />
-
-        {/* DEBUG ALANI */}
-        {/* <div className="mt-20 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-          <p className="text-[10px] font-mono text-gray-400 mb-2 underline">MİMARİ KONTROL</p>
-          <div className="text-[10px] text-gray-500 flex flex-col gap-1 font-mono">
-            <p><strong>Active Post ID (Taslak):</strong> {activePostId ?? "Henüz Oluşturulmadı"}</p>
-            <p><strong>Kaydetme Durumu:</strong> {saveStatus}</p>
-            <p><strong>Tiptap Node Sayısı:</strong> {editorJSON?.content?.length || 0}</p>
-          </div>
-        </div> */}
       </div>
     </main>
   );
