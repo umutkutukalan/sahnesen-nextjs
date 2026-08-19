@@ -1,4 +1,4 @@
-import { deletePostService } from "@/services/client/posts/posts.service";
+import { deletePostService } from "@/services/client/post.service";
 import { useState } from "react";
 
 export const useDeletePosts = () => {

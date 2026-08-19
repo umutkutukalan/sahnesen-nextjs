@@ -1,4 +1,4 @@
-import { getPostsClient } from "@/services/client/posts/posts.service";
+import { getPostsClient } from "@/services/client/post.service";
 import { PostResponse } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 
