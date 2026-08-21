@@ -1,4 +1,5 @@
 "use client";
+
 import axios from "axios";
 import {
   createContext,
@@ -13,6 +14,7 @@ interface UserContextType {
   user: any;
   setUser: Dispatch<React.SetStateAction<any>>;
   loading: boolean;
+  logout: () => Promise<void>;
 }
 
 interface UserProviderProps {
@@ -22,36 +24,47 @@ interface UserProviderProps {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("UserContext: Fetching user from cookie...");
-
-        // Cookie-based authentication
-        const response = await axios.get("http://localhost:8080/api/users/me", {
-          withCredentials: true, // HttpOnly cookie gönder
+        const response = await axios.get(`${baseUrl}/api/users/me`, {
+          withCredentials: true,
         });
 
-        console.log("UserContext: User data from cookie:", response.data);
-        setUser(response.data); // ✅ User var = authenticated
-      } catch (error) {
-        console.error("UserContext: Kullanıcı alınamadı:", error);
-        console.log("UserContext: Cookie authentication failed");
-        setUser(null); // ❌ User yok = not authenticated
+        setUser(response.data);
+      } catch (error: any) {
+        // Oturum süresi dolduğunda veya yetkisiz erişimde state sıfırlanır
+        setUser(null);
       } finally {
-        console.log("UserContext: Loading finished");
         setLoading(false);
       }
     };
 
     fetchUser();
-  }, []);
+  }, [baseUrl]);
+
+  const logout = async () => {
+    try {
+      await axios.post(
+        `${baseUrl}/api/auth/logout`,
+        {},
+        { withCredentials: true },
+      );
+    } catch (error) {
+      console.error("Çıkış yapılırken hata oluştu:", error);
+    } finally {
+      setUser(null);
+      window.location.href = "/login";
+    }
+  };
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={{ user, setUser, loading, logout }}>
       {children}
     </UserContext.Provider>
   );

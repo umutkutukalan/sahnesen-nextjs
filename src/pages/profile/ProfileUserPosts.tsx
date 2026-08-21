@@ -9,11 +9,19 @@ import { undrawaddfiles } from "@/utils";
 import { useGetUserPosts } from "@/hooks/projects/useGetUserPosts";
 import PostCard from "@/components/projects/PostCard";
 
-const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
+interface ProfileUserPostsProps {
+  targetUsername: string;
+  postType?: string;
+}
+
+const ProfileUserPosts = ({
+  targetUsername,
+  postType,
+}: ProfileUserPostsProps) => {
   const { user } = useAuth();
   const currentUsername = user?.username;
 
-  // TanStack Query hook'umuz
+  // postType parametresini hook'a aktarıyoruz
   const {
     userPosts,
     isLoading,
@@ -21,11 +29,11 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
     hasNextPage,
     loadMoreUserPosts,
     refetch,
-  } = useGetUserPosts(targetUsername);
+  } = useGetUserPosts(targetUsername, postType);
 
   // Intersection Observer hook'u
   const { ref, inView } = useInView({
-    threshold: 0.1, // Elementin %10'u ekrana girdiğinde tetikle
+    threshold: 0.1,
   });
 
   // Ekranın altına gelindiğinde otomatik yeni sayfa çek
@@ -35,7 +43,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, loadMoreUserPosts]);
 
-  // Proje silindiğinde listeyi tazelemek için
+  // Proje/Gönderi silindiğinde listeyi tazelemek için
   const handleProjectDelete = () => {
     refetch();
   };
@@ -47,7 +55,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
 
   return (
     <div className="w-full flex flex-col gap-5">
-      {/* Projeler Listesi */}
+      {/* Gönderiler Listesi */}
       {userPosts && userPosts.length > 0 ? (
         userPosts.map((post) => (
           <PostCard
@@ -63,7 +71,11 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
             <Image src={undrawaddfiles} alt="" width={100} />
           </div>
           <div className="w-full flex flex-col text-left">
-            <p className="text-xl">İlk projenizi tanıtın!</p>
+            <p className="text-xl">
+              {postType
+                ? `İlk ${postType.toLowerCase()} içeriğinizi oluşturun!`
+                : "İlk sahnenizi oluşturun!"}
+            </p>
             <p className="text-xs opacity-50">
               Çalışmalarınızı paylaşarak başkalarına ilham verin ve yaptığınız
               çalışmaları kendi özel alanınızda sergileyin.
@@ -72,7 +84,9 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
         </button>
       ) : (
         <p className="text-gray-500 text-xs">
-          Kullanıcı henüz bir proje paylaşmadı.
+          {postType
+            ? `Kullanıcının bu kategoride (${postType}) henüz bir gönderisi yok.`
+            : "Kullanıcı henüz bir gönderi paylaşmadı."}
         </p>
       )}
 
@@ -83,7 +97,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
             <div className="flex items-center gap-3">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
               <span className="text-xs text-gray-500">
-                Daha fazla sahne yükleniyor...
+                Daha fazla içerik yükleniyor...
               </span>
             </div>
           )}
@@ -93,7 +107,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
       {/* Veri Bittiğinde Gösterilecek Mesaj */}
       {!hasNextPage && userPosts.length > 0 && (
         <div className="flex justify-center items-center py-8">
-          <p className="text-gray-500 text-xs">Tüm sahneler yüklendi.</p>
+          <p className="text-gray-500 text-xs">Tüm içerikler yüklendi.</p>
         </div>
       )}
     </div>

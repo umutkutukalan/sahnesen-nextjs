@@ -2,14 +2,19 @@ import PostsClient from "@/pages/projects/PostsClient";
 import { getPublishedPostsServer } from "@/services/server/post.service";
 
 export default async function Page() {
-  const data = await getPublishedPostsServer(0, 5); // İlk sayfa projelerini sunucu tarafında al
-  console.log("Server side fetched projects:", data);
+  let data = { content: [], number: 0, totalPages: 0 };
+
+  try {
+    data = await getPublishedPostsServer(0, 5);
+  } catch (error) {
+    console.error("SSR Post fetch hatası:", error);
+  }
 
   return (
     <PostsClient
-      initialPosts={data.content || []} // İlk başta boş bir dizi veriyoruz, gerçek projeler useGetProjects hook'u tarafından yüklenecek
-      initialPage={data.number ?? 0} // İlk başta 0 sayfa veriyoruz, gerçek sayfa sayısı useGetProjects hook'u tarafından yüklenecek
-      totalPages={data.totalPages ?? 0} // İlk başta 0 sayfa veriyoruz, gerçek sayfa sayısı useGetProjects hook'u tarafından yüklenecek
+      initialPosts={data?.content || []}
+      initialPage={data?.number ?? 0}
+      totalPages={data?.totalPages ?? 0}
     />
   );
 }

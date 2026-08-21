@@ -1,3 +1,4 @@
+import { type } from "os";
 import api from "./config";
 
 // services/client/post.service.ts
@@ -5,14 +6,28 @@ import api from "./config";
 export interface FetchPostsParams {
   page?: number;
   size?: number;
+  type?: string;
   isPublished?: boolean;
 }
 
-// 1. PUBLIC: Tum yayinlanmis gönderileri getir (Ana Akis / Feed)
-export const getPostsClient = async (page = 0, size = 10) => {
+// 1. PUBLIC: Tüm yayınlanmış gönderileri getir (Ana Akış / Feed)
+export const getPostsClient = async (
+  postType?: string,
+  page = 0,
+  size = 10,
+) => {
   try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+
+    if (postType) {
+      params.append("postType", postType);
+    }
+
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/posts?page=${page}&size=${size}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/posts?${params.toString()}`,
       {
         cache: "no-store",
       },
@@ -29,15 +44,25 @@ export const getPostsClient = async (page = 0, size = 10) => {
   }
 };
 
-// 2. PUBLIC: Belirli bir kullanicinin kamuya açik gönderileri
+// 2. PUBLIC: Belirli bir kullanıcının kamuya açık gönderileri (Profil Sayfası)
 export const getUserPostsService = async (
   username: string,
+  postType?: string,
   page = 0,
   size = 10,
 ) => {
   try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+
+    if (postType) {
+      params.append("postType", postType);
+    }
+
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/posts/user/${username}?page=${page}&size=${size}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/posts/user/${username}?${params.toString()}`,
       {
         cache: "no-store",
       },
@@ -54,9 +79,10 @@ export const getUserPostsService = async (
   }
 };
 
-// 3. AUTH (ME): Giris yapmis kullanicinin kendi postlari (Yayinlananlar veya Taslaklar)
+// 3. AUTH (ME): Giriş yapmış kullanıcının kendi postları (Yayınlananlar, Taslaklar ve Tipe göre)
 export const getMyPostsClient = async (
   isPublished?: boolean,
+  postType?: string,
   page = 0,
   size = 10,
 ) => {
@@ -67,6 +93,10 @@ export const getMyPostsClient = async (
 
   if (isPublished !== undefined) {
     params.append("isPublished", isPublished.toString());
+  }
+
+  if (postType) {
+    params.append("postType", postType);
   }
 
   const response = await api.get(`/api/posts/me?${params.toString()}`);
