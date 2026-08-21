@@ -34,7 +34,12 @@ export const getPostsClient = async (
     );
 
     if (!res.ok) {
-      throw new Error(`Posts fetch failed with status: ${res.status}`);
+      // Backend'den dönen detaylı hata gövdesini alıp fırlatıyoruz
+      const errorText = await res.text();
+      console.error("Backend Error Details:", errorText);
+      throw new Error(
+        `Posts fetch failed status [${res.status}]: ${errorText}`,
+      );
     }
 
     return await res.json();
