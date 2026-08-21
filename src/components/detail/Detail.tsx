@@ -72,11 +72,14 @@ const Detail = ({ post }: DetailProps) => {
   ];
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant", // Sayfa açılır açılmaz anında en üste zıplasın
-    });
+    // 1. Standart window scroll'unu en üste çek
+    window.scrollTo(0, 0);
+
+    // 2. Eğer CSS'teki layout/page container'ı kendi içinde scroll aldıysa onu da sıfırla
+    const pageContainer = document.querySelector(".page");
+    if (pageContainer) {
+      pageContainer.scrollTop = 0;
+    }
   }, []);
 
   useEffect(() => {
