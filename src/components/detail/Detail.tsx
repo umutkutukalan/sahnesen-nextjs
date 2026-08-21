@@ -72,6 +72,14 @@ const Detail = ({ post }: DetailProps) => {
   ];
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant", // Sayfa açılır açılmaz anında en üste zıplasın
+    });
+  }, []);
+
+  useEffect(() => {
     setLikedLocal(liked);
   }, [liked]);
 

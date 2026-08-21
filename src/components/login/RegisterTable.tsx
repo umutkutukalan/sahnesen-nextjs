@@ -4,8 +4,9 @@ import { useRegister } from "@/hooks/login/useRegister";
 import Agreements from "./Agreements";
 import GoogleLogin from "./GoogleLogin";
 
-const RegisterTable = ( { onSuccess }: { onSuccess: () => void } ) => {
-  const { register, setName, setSurname, setMail, setPassword, setUsername } = useRegister(onSuccess);
+const RegisterTable = ({ onSuccess }: { onSuccess: () => void }) => {
+  const { register, setName, setSurname, setMail, setPassword, setUsername } =
+    useRegister(onSuccess);
 
   return (
     <div className="flex flex-col gap-5 w-full">
