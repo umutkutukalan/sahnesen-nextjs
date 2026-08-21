@@ -350,7 +350,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 >
                   <div className="flex items-center gap-1">
                     <MdOutlineWorkspacePremium className="text-xl" />
-                    <span>Yazılım Mühendisi</span>
+                    <span>Sanatçı</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <TiLocationArrow className="text-xl" />

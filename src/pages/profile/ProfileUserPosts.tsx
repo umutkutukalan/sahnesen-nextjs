@@ -83,7 +83,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
             <div className="flex items-center gap-3">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
               <span className="text-xs text-gray-500">
-                Daha fazla proje yükleniyor...
+                Daha fazla sahne yükleniyor...
               </span>
             </div>
           )}
@@ -93,7 +93,7 @@ const ProfileUserPosts = ({ targetUsername }: { targetUsername: string }) => {
       {/* Veri Bittiğinde Gösterilecek Mesaj */}
       {!hasNextPage && userPosts.length > 0 && (
         <div className="flex justify-center items-center py-8">
-          <p className="text-gray-500 text-xs">Tüm projeler yüklendi.</p>
+          <p className="text-gray-500 text-xs">Tüm sahneler yüklendi.</p>
         </div>
       )}
     </div>

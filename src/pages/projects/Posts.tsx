@@ -56,7 +56,7 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
         <div className="relative w-full flex flex-col">
           <div className="w-full h-10 bg-yellow-500 border-y border-black flex items-center justify-center">
             <p className="text-xs italic">
-              Welcome Offer Access to everything. Now up to 60% off. Upgrade now
+              {/* Welcome Offer Access to everything. Now up to 60% off. Upgrade now */}
             </p>
           </div>
 
