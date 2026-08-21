@@ -253,8 +253,7 @@ const PostCard = ({ post, showActions = false, onDelete }: PostCardProps) => {
 
             {/* Tiptap string'ini buraya besliyoruz */}
             <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-              {getFirstParagraphText(post?.content) ||
-                "İçerik önizlemesi bulunamadı..."}
+              {post?.subtitle || "İçerik önizlemesi bulunamadı..."}
             </p>
           </div>
 

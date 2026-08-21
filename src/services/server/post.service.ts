@@ -3,10 +3,11 @@
 export interface PostResponse {
   id: number;
   title: string;
+  subtitle: string;
   slug: string;
   content: string; // Backend'den Stringified JSON string geliyor
   coverImage?: string;
-  postType: "SAHNE" | "MONOLOG" | "YANYANA" | "TERSYUZ";
+  postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
   authorName: string;
