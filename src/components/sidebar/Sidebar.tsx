@@ -60,35 +60,38 @@ const Sidebar = () => {
                   <LuTheater className="text-[22px]" />
                   <span className="text-[15px]">Fuaye</span>
                 </Link>
-                <li
+                <Link
+                  href={`/sahnelerim`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Sahnelerim" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Sahnelerim")}
                 >
                   <SiWikibooks className="text-[22px]" />
                   <span className="text-[15px]">Sahnelerim</span>
-                </li>
+                </Link>
                 <Link
-                  href={`/profile/${user?.username}`}
+                  href={`/profil/${user?.username}`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Profil" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Profil")}
                 >
                   <RiUser6Line className="text-[22px]" />
                   <span className="text-[15px]">Profil</span>
                 </Link>
-                <li
+                <Link
+                  href={`/koleksiyon`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Koleksiyon" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Koleksiyon")}
                 >
                   <BiBookmarkAlt className="text-[22px]" />
                   <span className="text-[15px]">Koleksiyon</span>
-                </li>
-                <li
+                </Link>
+                <Link
+                  href={`/etki`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${selectedSideBarMenu === "Etki" ? "text-black font-medium" : "text-gray-500 hover:text-black"}`}
                   onClick={() => onSideBarMenuSelect("Etki")}
                 >
                   <IoSparklesOutline className="text-[22px]" />
                   <span className="text-[15px]">Etki</span>
-                </li>
+                </Link>
               </ul>
             ) : (
               <div className="flex flex-col gap-4">
