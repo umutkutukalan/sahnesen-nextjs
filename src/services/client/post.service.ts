@@ -85,12 +85,19 @@ export const getUserPostsService = async (
 };
 
 // 3. AUTH (ME): Giriş yapmış kullanıcının kendi postları (Yayınlananlar, Taslaklar ve Tipe göre)
-export const getMyPostsClient = async (
-  isPublished?: boolean,
-  postType?: string,
+interface GetMyPostsParams {
+  isPublished?: boolean;
+  postType?: string;
+  page?: number;
+  size?: number;
+}
+
+export const getMyPostsClient = async ({
+  isPublished,
+  postType,
   page = 0,
   size = 10,
-) => {
+}: GetMyPostsParams) => {
   const params = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
@@ -100,7 +107,7 @@ export const getMyPostsClient = async (
     params.append("isPublished", isPublished.toString());
   }
 
-  if (postType) {
+  if (postType && postType !== "ALL") {
     params.append("postType", postType);
   }
 

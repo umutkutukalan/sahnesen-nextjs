@@ -16,6 +16,21 @@ export interface PostResponse {
   authorProfileImg?: string;
 }
 
+export interface PostSummaryResponse {
+  id: number;
+  title: string;
+  subtitle: string;
+  slug: string;
+  coverImage?: string;
+  postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
+  createdAt: string;
+  viewCount?: number; // Redis'ten beslenen sayaç alanı
+  authorName: string;
+  authorSurname: string;
+  authorUsername: string;
+  authorProfileImg?: string;
+}
+
 // 1. Genel Akış (Ana sayfa / Projeler & Bloglar ortak akışı)
 export const getPublishedPostsServer = async (page = 0, size = 5) => {
   const apiUrl = process.env.API_URL || "http://localhost:8080";
