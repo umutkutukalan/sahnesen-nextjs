@@ -16,17 +16,23 @@ import { PostSummaryResponse } from "@/services/server/post.service";
 import { FaTicketSimple } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
-import { BiBookmarks } from "react-icons/bi";
+import { BiBookmarks as BiBookmarksIcon } from "react-icons/bi";
 import { useAuth } from "@/context/UserContext";
 import { useDeletePosts } from "@/hooks/projects/useDeleteProject";
 
 interface PostCardProps {
   post: PostSummaryResponse;
   isOwner?: boolean;
+  showReadButton?: boolean;
   onDelete?: () => void;
 }
 
-const PostCard = ({ post, isOwner = false, onDelete }: PostCardProps) => {
+const PostCard = ({
+  post,
+  isOwner = false,
+  showReadButton = true,
+  onDelete,
+}: PostCardProps) => {
   const { user } = useAuth();
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
@@ -53,7 +59,6 @@ const PostCard = ({ post, isOwner = false, onDelete }: PostCardProps) => {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-  // Kapak görseli ve Yazar Profil Görseli hesaplamaları
   const displayImage = post?.coverImage;
   const finalImageUrl = displayImage
     ? displayImage.startsWith("http")
@@ -99,7 +104,7 @@ const PostCard = ({ post, isOwner = false, onDelete }: PostCardProps) => {
           {/* YAZAR BİLGİSİ */}
           <div
             className="flex items-center gap-2 cursor-pointer w-max"
-            onClick={() => ToProfile(null, post.authorUsername)}
+            onClick={() => ToProfile(post.authorUsername)}
           >
             <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
               {authorProfileImgUrl ? (
@@ -132,12 +137,16 @@ const PostCard = ({ post, isOwner = false, onDelete }: PostCardProps) => {
             </div>
           </div>
 
-          {/* BAŞLIK & SUBTITLE (Artık JSON Parse Edilmiyor) */}
+          {/* BAŞLIK & SUBTITLE */}
           <div className="flex flex-col gap-2">
             <h2
-              onClick={() =>
-                router.push(`/${post?.authorUsername}/${post?.slug}`)
-              }
+              onClick={() => {
+                if (isOwner) {
+                  router.push(`/olustur?slug=${post?.slug}`);
+                } else {
+                  router.push(`/${post?.authorUsername}/${post?.slug}`);
+                }
+              }}
               className="text-base sm:text-xl font-semibold line-clamp-2 cursor-pointer hover:underline"
             >
               {post?.title}
@@ -168,21 +177,25 @@ const PostCard = ({ post, isOwner = false, onDelete }: PostCardProps) => {
                   />
                 </span>
               </div>
-              <button
-                onClick={() =>
-                  router.push(`/${post?.authorUsername}/${post?.slug}`)
-                }
-                className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
-              >
-                <span className="text-[10px] font-medium">Perdeyi Arala</span>
-              </button>
+
+              {/* EĞER showReadButton true ise VEYA sahibi DEĞİLSE "Perdeyi Arala" gösterilir */}
+              {(showReadButton || !isOwner) && (
+                <button
+                  onClick={() =>
+                    router.push(`/${post?.authorUsername}/${post?.slug}`)
+                  }
+                  className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
+                >
+                  <span className="text-[10px] font-medium">Perdeyi Arala</span>
+                </button>
+              )}
             </div>
 
             {/* SAHİBİ İSE DÜZENLE/SİL, DEĞİLSE ETKİLEŞİMLERİ GÖSTER */}
             {isOwner ? (
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => router.push(`/yaz?id=${post.id}`)}
+                  onClick={() => router.push(`/olustur?slug=${post.slug}`)}
                   className="flex items-center gap-1 text-gray-600 hover:text-black transition cursor-pointer"
                 >
                   <FiEdit3 className="text-sm" />
@@ -219,7 +232,7 @@ const PostCard = ({ post, isOwner = false, onDelete }: PostCardProps) => {
                   </span>
                 </li>
                 <li className="hidden sm:flex items-center gap-1">
-                  <BiBookmarks />
+                  <BiBookmarksIcon />
                   <span>
                     {likeCount >= 1000
                       ? `${Math.floor(likeCount / 100) / 10}K`

@@ -7,6 +7,7 @@ import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 import {
   createPostClient,
   updatePostClient,
+  getPostBySlugClient, // Slug ile gönderi getiren servis fonksiyonunuz
 } from "@/services/client/post.service";
 import { useAuth } from "@/context/UserContext";
 
@@ -36,17 +37,61 @@ const CreateProjectsBlog = () => {
     editorJSONRef.current = editorJSON;
   }, [editorJSON]);
 
-  // Enum değerin "SAHNE" gibi büyük harf olması gerekebilir (Backend DTO PostType kontrolü için)
   const [postType, setPostType] = useState<string>("SAHNE");
   const postTypeRef = useRef(postType);
-
-  // 1. Kilit Ref'i ekliyoruz
   const isCreatingRef = useRef<boolean>(false);
 
+  const [activePostId, setActivePostId] = useState<number | null>(null);
+  const activePostIdRef = useRef<number | null>(null);
+
+  const [initialContent, setInitialContent] = useState<any>(null);
+  const [isLoadingPost, setIsLoadingPost] = useState<boolean>(false);
+
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 1. URL'den "slug" Parametresini Okuma & Gönderiyi Çekme
   useEffect(() => {
+    const slugParam = searchParams?.get("slug");
     const typeParam = searchParams?.get("type");
+
     if (typeParam) {
       setPostType(typeParam.toUpperCase());
+    }
+
+    // Eğer URL'de slug varsa VE elimizde henüz o post'un ID'si yoksa veri çek
+    if (slugParam && !activePostIdRef.current) {
+      setIsLoadingPost(true);
+
+      getPostBySlugClient(slugParam)
+        .then((postData) => {
+          if (postData) {
+            setActivePostId(postData.id);
+            activePostIdRef.current = postData.id;
+
+            if (postData.postType) {
+              setPostType(postData.postType);
+            }
+
+            let parsedContent = postData.content;
+            if (typeof postData.content === "string") {
+              try {
+                parsedContent = JSON.parse(postData.content);
+              } catch (e) {
+                console.error("Content JSON Parse Hatası:", e);
+              }
+            }
+
+            setInitialContent(parsedContent);
+            setEditorJSON(parsedContent);
+          }
+        })
+        .catch((err) => {
+          console.error("Slug ile içerik çekilirken hata oluştu:", err);
+        })
+        .finally(() => {
+          setIsLoadingPost(false);
+        });
     }
   }, [searchParams]);
 
@@ -54,22 +99,15 @@ const CreateProjectsBlog = () => {
     postTypeRef.current = postType;
   }, [postType]);
 
-  const [activePostId, setActivePostId] = useState<number | null>(null);
-  const activePostIdRef = useRef<number | null>(null);
-
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // 2. Taslak Oluşturucu (Yarış Durumu Engellenmiş Hali)
+  // 2. Taslak Oluşturucu (Yeni Yazı Yazılıyorsa)
+  // 2. Taslak Oluşturucu (Yeni Yazı Yazılıyorsa)
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
-    // Zaten ID varsa VEYA şu an arka planda bir oluşturma isteği devam ediyorsa KİLİTLE ve ÇIK
     if (activePostIdRef.current || isCreatingRef.current) return;
 
     const json = currentJson || editorJSONRef.current;
     const currentTitle = extractTitle(json);
     if (!currentTitle || currentTitle.trim().length < 3) return;
 
-    // Kiliti kapatıyoruz ki aynı anda 2. bir POST isteği çıkamasın
     isCreatingRef.current = true;
     setSaveStatus("SAVING");
 
@@ -85,17 +123,21 @@ const CreateProjectsBlog = () => {
         activePostIdRef.current = data.id;
         setActivePostId(data.id);
         setSaveStatus("SAVED");
+
+        // DÜZELTME: /yaz yerine /olustur kullanıyoruz
+        if (data.slug) {
+          router.replace(`/olustur?slug=${data.slug}`, { scroll: false });
+        }
       }
     } catch (err) {
       console.error("Taslak oluşturma hatası:", err);
       setSaveStatus("ERROR");
     } finally {
-      // İşlem bittiğinde kilidi açıyoruz
       isCreatingRef.current = false;
     }
   });
 
-  // 2. Otomatik Kaydedici (Var Olan Taslağı Güncelleme)
+  // 3. Otomatik Kaydedici
   const autoSaveContentRef = useRef(async (currentJson: any) => {
     if (!activePostIdRef.current) return;
 
@@ -104,7 +146,8 @@ const CreateProjectsBlog = () => {
       extracted && extracted.length >= 3 ? extracted : "Başlıksız Taslak";
 
     try {
-      await updatePostClient(activePostIdRef.current, {
+      // Backend update isteği yeni slug'ı dönmeli (Örn: { id, slug, ... })
+      const updatedPost = await updatePostClient(activePostIdRef.current, {
         postType: postTypeRef.current,
         title: finalTitle,
         content: currentJson,
@@ -112,13 +155,23 @@ const CreateProjectsBlog = () => {
       });
 
       setSaveStatus("SAVED");
+
+      // EĞER backend güncel slug'ı dönüyorsa ve URL'deki slug ile farklıysa URL'i güncelle!
+      if (updatedPost?.slug) {
+        const currentUrlSlug = searchParams?.get("slug");
+        if (currentUrlSlug !== updatedPost.slug) {
+          router.replace(`/olustur?slug=${updatedPost.slug}`, {
+            scroll: false,
+          });
+        }
+      }
     } catch (err) {
       console.error("Auto-save hatası:", err);
       setSaveStatus("ERROR");
     }
   });
 
-  // 3. Editor Güncelleme Motoru (Debounce)
+  // 4. Editor Güncelleme Motoru (Debounce)
   const handleEditorUpdate = useCallback((json: any) => {
     setEditorJSON(json);
 
@@ -140,7 +193,7 @@ const CreateProjectsBlog = () => {
     };
   }, []);
 
-  // 4. Yayınlama (Publish) İşlemi
+  // 5. Yayınlama (Publish) İşlemi
   const handleSave = async () => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -158,7 +211,7 @@ const CreateProjectsBlog = () => {
       postType: postTypeRef.current,
       title: currentTitle,
       content: editorJSONRef.current,
-      isPublished: true, // Direkt yayınlıyoruz (Taslak durumu bitti)
+      isPublished: true,
     };
 
     try {
@@ -166,11 +219,8 @@ const CreateProjectsBlog = () => {
       const currentId = activePostIdRef.current || activePostId;
 
       if (currentId) {
-        // ✅ Mevcut taslağı UPDATE eder. Veritabanındaki is_published = 1 olur.
-        // Dolayısıyla bu kayıt artık "Taslak" değil, yayınlanmış gönderinin kendisidir.
         savedPost = await updatePostClient(currentId, payload);
       } else {
-        // Eğer hiç taslak oluşmadan anında Publish'e bastıysa tek bir yayınlanmış post oluşturur
         savedPost = await createPostClient(payload);
       }
 
@@ -200,7 +250,15 @@ const CreateProjectsBlog = () => {
       />
 
       <div className="w-full lg:w-[760px] mx-auto px-6 pt-6">
-        <TiptapEditor onUpdate={handleEditorUpdate} postId={activePostId} />
+        {isLoadingPost ? (
+          <div className="h-64 bg-gray-50 animate-pulse rounded-xl" />
+        ) : (
+          <TiptapEditor
+            onUpdate={handleEditorUpdate}
+            postId={activePostId}
+            initialContent={initialContent}
+          />
+        )}
       </div>
     </main>
   );

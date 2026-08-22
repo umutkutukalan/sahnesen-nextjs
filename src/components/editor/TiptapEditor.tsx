@@ -434,11 +434,17 @@ const isDropcapEligible = (editor: any): boolean => {
 
 interface TiptapEditorProps {
   content?: any;
+  initialContent?: any;
   onUpdate: (json: any) => void;
   postId: number | null;
 }
 
-const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
+const TiptapEditor = ({
+  content,
+  initialContent,
+  onUpdate,
+  postId,
+}: TiptapEditorProps) => {
   const bubbleToolbarRef = useRef<HTMLDivElement | null>(null);
   const linkInputRef = useRef<HTMLDivElement | null>(null);
 
@@ -660,10 +666,11 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       }),
     ],
     autofocus: false,
-    content: content || {
-      type: "doc",
-      content: [{ type: "heading", attrs: { level: 1 }, content: [] }],
-    },
+    content: initialContent ||
+      content || {
+        type: "doc",
+        content: [{ type: "heading", attrs: { level: 1 }, content: [] }],
+      },
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
@@ -938,6 +945,17 @@ const TiptapEditor = ({ content, onUpdate, postId }: TiptapEditorProps) => {
       },
     },
   });
+
+  // Backend'den veri geldiğinde editör içeriğini bir defaya mahsus günceller
+  useEffect(() => {
+    if (!editor || !initialContent || editor.isDestroyed) return;
+
+    // Editör zaten kullanıcının yazdığı veriyle doluysa veya içerik aynıysa tekrar set etmiyoruz
+    if (!isContentInitialized.current) {
+      editor.commands.setContent(initialContent, false); // false: geçmişe (undo-redo) yazmaz
+      isContentInitialized.current = true;
+    }
+  }, [editor, initialContent]);
 
   useEffect(() => {
     if (editor && !isContentInitialized.current) {

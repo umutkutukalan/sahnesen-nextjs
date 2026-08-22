@@ -113,7 +113,9 @@ export default function MyStagesClient() {
             <PostCard
               key={post.id}
               post={post}
-              isOwner={true} // Kendi sahneleri olduğu için Düzenle/Sil yetkisi verebilirsin
+              isOwner={true}
+              showReadButton={activeTab === "PUBLISHED"} // <-- YAYINLANANLARDA TRUE, TASLAKLARDA FALSE
+              onDelete={() => fetchMyPosts(activeTab, page)} // Silme işleminden sonra listeyi tazelemek için
             />
           ))}
         </div>

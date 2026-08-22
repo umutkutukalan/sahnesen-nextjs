@@ -115,6 +115,12 @@ export const getMyPostsClient = async ({
   return response.data;
 };
 
+// 3.1. AUTH (ME): Giriş yapmış kullanıcının kendi postları (Yayınlananlar, Taslaklar ve Tipe göre)
+export const getPostBySlugClient = async (slug: string) => {
+  const response = await api.get(`/api/posts/${slug}`);
+  return response.data;
+};
+
 // 4. AUTH: Yeni Gönderi / Taslak Oluşturma
 export const createPostClient = async (payload: any) => {
   const response = await api.post("/api/posts/me", payload);

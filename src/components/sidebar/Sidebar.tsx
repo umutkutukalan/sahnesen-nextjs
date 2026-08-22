@@ -11,18 +11,12 @@ import { SiWikibooks } from "react-icons/si";
 import StickySiteRules from "../PageStickyExtra/StickySiteRules";
 import Notebook from "../PageStickyExtra/Notebook";
 import LikedPost from "../PageStickyExtra/LikedPost";
-import { FiUser, FiUsers } from "react-icons/fi";
-import Image from "next/image";
-import { useToProfile } from "@/utils/useToProfile";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
-import { useRelativeTime } from "@/hooks/useRelativeTime";
+import { FiUsers } from "react-icons/fi";
 import Link from "next/link";
 
 const Sidebar = () => {
   const { user } = useAuth();
   const { isSidebarOpen } = useSidebar();
-  const { ToProfile } = useToProfile();
-  const { formatRelativeTime } = useRelativeTime();
 
   const [selectedSideBarMenu, setSelectedSideBarMenu] = useState("Fuaye");
 
