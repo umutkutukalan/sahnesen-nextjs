@@ -1,19 +1,26 @@
+// hooks/projects/useDeleteProject.ts
 import { deletePostService } from "@/services/client/post.service";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useDeletePosts = () => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<unknown>(null);
+  const queryClient = useQueryClient();
 
-  const deletePost = async (projectId: number, onSuccess: () => void) => {
+  const deletePost = async (projectId: number, onSuccess?: () => void) => {
     setIsDeleting(true);
     setError(null);
 
     try {
       await deletePostService(projectId);
-      console.log("Proje başarıyla silindi:", projectId);
 
-      // Başarı durumunda callback çağır
+      // 💥 CRITICAL FIX: "userPosts" ile başlayan tüm query cache'lerini sıfırla
+      // exact: false (varsayılan) olduğu için ["userPosts", "username", "SAHNE"] gibi tüm alt key'leri otomatik yakalar ve refetch eder.
+      await queryClient.invalidateQueries({
+        queryKey: ["userPosts"],
+      });
+
       if (onSuccess && typeof onSuccess === "function") {
         onSuccess();
       }

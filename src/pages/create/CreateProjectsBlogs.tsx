@@ -10,6 +10,7 @@ import {
   getPostBySlugClient,
 } from "@/services/client/post.service";
 import { useAuth } from "@/context/UserContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 const TiptapEditor = dynamic(() => import("@/components/editor/TiptapEditor"), {
   ssr: false,
@@ -30,6 +31,7 @@ const CreateProjectsBlog = () => {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const [editorJSON, setEditorJSON] = useState<any>(null);
   const editorJSONRef = useRef(editorJSON);
@@ -40,6 +42,13 @@ const CreateProjectsBlog = () => {
   const [postType, setPostType] = useState<string>("SAHNE");
   const postTypeRef = useRef(postType);
   const isCreatingRef = useRef<boolean>(false);
+
+  // Yayınlanmış içerik kontrolü ref'i
+  const [isPublished, setIsPublished] = useState<boolean>(false);
+  const isPublishedRef = useRef<boolean>(false);
+  useEffect(() => {
+    isPublishedRef.current = isPublished;
+  }, [isPublished]);
 
   const [activePostId, setActivePostId] = useState<number | null>(null);
   const activePostIdRef = useRef<number | null>(null);
@@ -71,6 +80,12 @@ const CreateProjectsBlog = () => {
               setPostType(postData.postType);
             }
 
+            // Backend'den gelen yayınlanma durumunu tutuyoruz
+            if (typeof postData.isPublished === "boolean") {
+              setIsPublished(postData.isPublished);
+              isPublishedRef.current = postData.isPublished;
+            }
+
             let parsedContent = postData.content;
             if (typeof postData.content === "string") {
               try {
@@ -97,9 +112,27 @@ const CreateProjectsBlog = () => {
     postTypeRef.current = postType;
   }, [postType]);
 
-  // İlk Taslak Oluşturma (Yazmaya başlandığı an)
+  // Sayfadan çıkarken (kaydedilmemiş canlı içerik değişikliği varsa) uyarı çıkar
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isPublishedRef.current && saveStatus === "IDLE") {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [saveStatus]);
+
+  // İlk Taslak Oluşturma (Sadece yeni sıfır yazılarda çalışır)
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
-    if (activePostIdRef.current || isCreatingRef.current) return;
+    if (
+      activePostIdRef.current ||
+      isCreatingRef.current ||
+      isPublishedRef.current
+    )
+      return;
 
     const json = currentJson || editorJSONRef.current;
     const currentTitle = extractTitle(json);
@@ -133,9 +166,9 @@ const CreateProjectsBlog = () => {
     }
   });
 
-  // Otomatik Kaydetme (Auto-Save - 1.5 sn Debounce ile)
+  // Otomatik Kaydetme (Sadece TASLAK durumundaki içeriklerde çalışır)
   const autoSaveContentRef = useRef(async (currentJson: any) => {
-    if (!activePostIdRef.current) return;
+    if (!activePostIdRef.current || isPublishedRef.current) return;
 
     const extracted = extractTitle(currentJson);
     const finalTitle =
@@ -165,6 +198,12 @@ const CreateProjectsBlog = () => {
   const handleEditorUpdate = useCallback((json: any) => {
     setEditorJSON(json);
 
+    // Yayınlanmış içerik düzenleniyorsa auto-save tetikleme!
+    if (isPublishedRef.current) {
+      setSaveStatus("IDLE");
+      return;
+    }
+
     if (!activePostIdRef.current) {
       ensureDraftExistsRef.current(json);
     } else {
@@ -183,7 +222,7 @@ const CreateProjectsBlog = () => {
     };
   }, []);
 
-  // Yayınlama (Publish) İşlemi
+  // Yayınlama / Güncelleme İşlemi (Manuel Trigger)
   const handleSave = async () => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -216,9 +255,16 @@ const CreateProjectsBlog = () => {
 
       setSaveStatus("SAVED");
 
+      // 🔑 3. EN KRİTİK ADIM: Profil sayfasındaki React Query cache'ini temizle/sıfırla!
+      await queryClient.invalidateQueries({ queryKey: ["userPosts"] });
+
+      // Yayınlama/Güncelleme sonrası Next.js cache'ini tazeliyoruz
+      router.refresh();
+
       const username = savedPost?.authorUsername || user?.username;
       const slug = savedPost?.slug;
 
+      // Güncel adrese yönlendiriyoruz
       if (username && slug) {
         router.push(`/${username}/${slug}`);
       } else {

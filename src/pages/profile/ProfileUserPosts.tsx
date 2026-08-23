@@ -21,14 +21,12 @@ const ProfileUserPosts = ({
   const { user } = useAuth();
   const currentUsername = user?.username;
 
-  // postType parametresini hook'a aktarıyoruz
   const {
     userPosts,
     isLoading,
     isFetchingNextPage,
     hasNextPage,
     loadMoreUserPosts,
-    refetch,
   } = useGetUserPosts(targetUsername, postType);
 
   // Intersection Observer hook'u
@@ -42,11 +40,6 @@ const ProfileUserPosts = ({
       loadMoreUserPosts();
     }
   }, [inView, hasNextPage, isFetchingNextPage, loadMoreUserPosts]);
-
-  // Proje/Gönderi silindiğinde listeyi tazelemek için
-  const handleProjectDelete = () => {
-    refetch();
-  };
 
   // İlk yüklenme durumu
   if (isLoading) {
@@ -62,7 +55,8 @@ const ProfileUserPosts = ({
             key={post.id}
             post={post}
             showActions={targetUsername === currentUsername}
-            onDelete={handleProjectDelete}
+            // onDelete prop'unu kaldırdık; silme işlemi useDeletePosts içindeki
+            // queryClient.invalidateQueries sayesinde burayı otomatik re-render eder.
           />
         ))
       ) : targetUsername === currentUsername ? (
@@ -105,7 +99,7 @@ const ProfileUserPosts = ({
       )}
 
       {/* Veri Bittiğinde Gösterilecek Mesaj */}
-      {!hasNextPage && userPosts.length > 0 && (
+      {!hasNextPage && userPosts && userPosts.length > 0 && (
         <div className="flex justify-center items-center py-8">
           <p className="text-gray-500 text-xs">Tüm içerikler yüklendi.</p>
         </div>

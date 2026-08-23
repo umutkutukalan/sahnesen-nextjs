@@ -24,6 +24,7 @@ interface PostCardProps {
   post: PostSummaryResponse;
   isOwner?: boolean;
   showReadButton?: boolean;
+  showActions?: boolean;
   onDelete?: () => void;
 }
 
@@ -31,6 +32,7 @@ const PostCard = ({
   post,
   isOwner = false,
   showReadButton = true,
+  showActions = false,
   onDelete,
 }: PostCardProps) => {
   const { user } = useAuth();
