@@ -7,7 +7,7 @@ import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 import {
   createPostClient,
   updatePostClient,
-  getPostBySlugClient, // Slug ile gönderi getiren servis fonksiyonunuz
+  getPostBySlugClient,
 } from "@/services/client/post.service";
 import { useAuth } from "@/context/UserContext";
 
@@ -50,7 +50,6 @@ const CreateProjectsBlog = () => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 1. URL'den "slug" Parametresini Okuma & Gönderiyi Çekme
   useEffect(() => {
     const slugParam = searchParams?.get("slug");
     const typeParam = searchParams?.get("type");
@@ -59,7 +58,6 @@ const CreateProjectsBlog = () => {
       setPostType(typeParam.toUpperCase());
     }
 
-    // Eğer URL'de slug varsa VE elimizde henüz o post'un ID'si yoksa veri çek
     if (slugParam && !activePostIdRef.current) {
       setIsLoadingPost(true);
 
@@ -99,8 +97,7 @@ const CreateProjectsBlog = () => {
     postTypeRef.current = postType;
   }, [postType]);
 
-  // 2. Taslak Oluşturucu (Yeni Yazı Yazılıyorsa)
-  // 2. Taslak Oluşturucu (Yeni Yazı Yazılıyorsa)
+  // İlk Taslak Oluşturma (Yazmaya başlandığı an)
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
     if (activePostIdRef.current || isCreatingRef.current) return;
 
@@ -124,7 +121,6 @@ const CreateProjectsBlog = () => {
         setActivePostId(data.id);
         setSaveStatus("SAVED");
 
-        // DÜZELTME: /yaz yerine /olustur kullanıyoruz
         if (data.slug) {
           router.replace(`/olustur?slug=${data.slug}`, { scroll: false });
         }
@@ -137,17 +133,18 @@ const CreateProjectsBlog = () => {
     }
   });
 
-  // 3. Otomatik Kaydedici
+  // Otomatik Kaydetme (Auto-Save - 1.5 sn Debounce ile)
   const autoSaveContentRef = useRef(async (currentJson: any) => {
     if (!activePostIdRef.current) return;
 
     const extracted = extractTitle(currentJson);
     const finalTitle =
-      extracted && extracted.length >= 3 ? extracted : "Başlıksız Taslak";
+      extracted && extracted.trim().length >= 3
+        ? extracted
+        : "Başlıksız Taslak";
 
     try {
-      // Backend update isteği yeni slug'ı dönmeli (Örn: { id, slug, ... })
-      const updatedPost = await updatePostClient(activePostIdRef.current, {
+      await updatePostClient(activePostIdRef.current, {
         postType: postTypeRef.current,
         title: finalTitle,
         content: currentJson,
@@ -155,23 +152,16 @@ const CreateProjectsBlog = () => {
       });
 
       setSaveStatus("SAVED");
-
-      // EĞER backend güncel slug'ı dönüyorsa ve URL'deki slug ile farklıysa URL'i güncelle!
-      if (updatedPost?.slug) {
-        const currentUrlSlug = searchParams?.get("slug");
-        if (currentUrlSlug !== updatedPost.slug) {
-          router.replace(`/olustur?slug=${updatedPost.slug}`, {
-            scroll: false,
-          });
-        }
-      }
-    } catch (err) {
-      console.error("Auto-save hatası:", err);
+    } catch (err: any) {
+      console.error(
+        "Auto-save detaylı hata yanıtı:",
+        err?.response?.data || err,
+      );
       setSaveStatus("ERROR");
     }
   });
 
-  // 4. Editor Güncelleme Motoru (Debounce)
+  // Editor Güncelleme Motoru
   const handleEditorUpdate = useCallback((json: any) => {
     setEditorJSON(json);
 
@@ -193,7 +183,7 @@ const CreateProjectsBlog = () => {
     };
   }, []);
 
-  // 5. Yayınlama (Publish) İşlemi
+  // Yayınlama (Publish) İşlemi
   const handleSave = async () => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);

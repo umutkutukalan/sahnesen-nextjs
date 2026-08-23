@@ -44,11 +44,12 @@ const EditorNavbar = ({
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showProfileMenu && !event.target.closest(".profile-menu-container")) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showProfileMenu && !target.closest(".profile-menu-container")) {
         setShowProfileMenu(false);
       }
-      if (notification && !event.target.closest(".notification-container")) {
+      if (notification && !target.closest(".notification-container")) {
         setNotification(false);
       }
     };
@@ -60,45 +61,28 @@ const EditorNavbar = ({
 
   const handleLogout = async () => {
     try {
-      console.log("Logout işlemi başlatılıyor...");
-      console.log("Logout öncesi cookies:", document.cookie);
-
-      const response = await axios.post(
-        "http://localhost:8080/auth/logout",
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/auth/logout`,
         {},
-        {
-          withCredentials: true, // Cookie'leri gönder
-        },
+        { withCredentials: true },
       );
       setUser(null);
-
-      console.log("Logout sonrası cookies:", document.cookie);
-
-      // 1 saniye bekleyip sayfayı yenile
       setTimeout(() => {
         window.location.href = "/";
-      }, 1000);
+      }, 500);
     } catch (error) {
       console.error("Logout failed:", error);
-
-      // Hata olsa bile local state'i temizle
-      localStorage.removeItem("user");
       localStorage.clear();
       setUser(null);
-
-      // Sayfayı yenile
       window.location.href = "/";
     }
   };
 
   const pathname = usePathname();
-
   const isHome = pathname === "/";
   const isProfilePage = pathname.startsWith("/profil");
-
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
   const profileImgUrl = user?.profileImg
     ? user.profileImg.startsWith("http")
       ? user.profileImg
@@ -106,165 +90,120 @@ const EditorNavbar = ({
     : null;
 
   return (
-    <>
-      <nav
-        className={`editor-navbar py-4 lg:px-40 px-6 z-50 ${
-          transparent && isHome
-            ? "bg-transparent text-black shadow-none static py-12 px-20"
-            : transparent && !isHome
-              ? "bg-transparent text-white shadow-none static py-12 px-20"
-              : "text-black bg-white fixed top-0 left-0 w-full z-50"
-        }`}
-      >
-        <>
-          <div className="flex items-top gap-2 text-black">
-            <div className="text-3xl playfair-display-600">
-              <NavLinks href="/" logo="Sahnesen" />
-            </div>
-            <div className="flex items-center gap-4 text-sm font-light">
-              <h3>Sahne</h3>
-              {/* 🔥 GÜVENLİ VE ŞIK BULUT DURUMU */}
-              <div className="transition-all duration-300">
-                {contentStatus === "SAVING" && <span>Saving...</span>}
-                {contentStatus === "SAVED" && (
-                  <span className="text-green-800 flex items-center gap-1.5 font-medium">
-                    Saved
-                  </span>
-                )}
-                {contentStatus === "ERROR" && (
-                  <span className="text-rose-500 font-medium">Save Failed</span>
-                )}
-                {contentStatus === "IDLE" && activePostId && (
-                  <span className="text-gray-300">Değişiklik bekleniyor</span>
-                )}
-              </div>
+    <nav
+      className={`editor-navbar py-4 lg:px-40 px-6 z-50 ${
+        transparent && isHome
+          ? "bg-transparent text-black shadow-none static py-12 px-20"
+          : transparent && !isHome
+            ? "bg-transparent text-white shadow-none static py-12 px-20"
+            : "text-black bg-white fixed top-0 left-0 w-full z-50"
+      }`}
+    >
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-4 text-black">
+          <div className="text-3xl playfair-display-600">
+            <NavLinks href="/" logo="Sahnesen" />
+          </div>
+          <div className="flex items-center gap-4 text-sm font-light">
+            <h3>Sahne</h3>
+            <div className="transition-all duration-300">
+              {contentStatus === "SAVING" && (
+                <span className="text-gray-400">Saving...</span>
+              )}
+              {contentStatus === "SAVED" && (
+                <span className="text-green-800 flex items-center gap-1.5 font-medium">
+                  Saved
+                </span>
+              )}
+              {contentStatus === "ERROR" && (
+                <span className="text-rose-500 font-medium">Save Failed</span>
+              )}
+              {contentStatus === "IDLE" && activePostId && (
+                <span className="text-gray-300">Değişiklik bekleniyor</span>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2  overflow-hidden">
-            <button
-              className={`bg-green-800 text-xs text-white py-1 px-3 rounded-xl ${!activePostId ? "opacity-50" : "hover:bg-green-700 cursor-pointer"}`}
-              disabled={!activePostId}
-              onClick={handleSave}
-            >
-              Publish
-            </button>
-            <ul className="navbar-links">
-              {!user && (
-                <button
-                  className={`transition-all text-sm pl-2 text-xs cursor-pointer ${
-                    isProfilePage
-                      ? "text-white hover:text-gray-100"
-                      : "text-black hover:text-gray-600"
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
+              !activePostId
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-green-700 cursor-pointer shadow-sm"
+            }`}
+            disabled={!activePostId || contentStatus === "SAVING"}
+            onClick={handleSave}
+          >
+            Publish
+          </button>
+
+          <ul className="navbar-links flex items-center">
+            {!user && (
+              <button
+                className={`transition-all text-sm cursor-pointer ${
+                  isProfilePage
+                    ? "text-white hover:text-gray-100"
+                    : "text-black hover:text-gray-600"
+                }`}
+                onClick={() => setShowLoginModal(true)}
+              >
+                Giriş Yap
+              </button>
+            )}
+            {user && (
+              <div className="flex items-center gap-2 relative">
+                <div
+                  className={`relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center cursor-pointer border ${
+                    profileImgUrl ? "border-gray-300" : "border-gray-600"
                   }`}
-                  onClick={() => setShowLoginModal(true)}
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
                 >
-                  Giris Yap
-                </button>
-              )}
-              {user && (
-                <div className="flex items-center md:gap-4 gap-2 relative">
-                  {/* <div className="relative">
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
-                      {unreadCount}
-                    </span>
-                  )}
-                  <div className="notification-container">
-                    <GoBellFill
-                      className="cursor-pointer"
-                      onClick={() => setNotification(!notification)}
+                  {profileImgUrl ? (
+                    <Image
+                      src={profileImgUrl}
+                      alt="profile-img"
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
-                  </div>
-                  {notification && (
-                    <NotificationsForUser
-                      notification={notification}
-                      setNotification={setNotification}
-                    />
-                  )}
-                </div> */}
-                  <div
-                    className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-gray-600  ${
-                      profileImgUrl && "border border-gray-300"
-                    }`}
-                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  >
-                    {profileImgUrl ? (
-                      <Image
-                        src={profileImgUrl}
-                        alt="profile-img"
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
-                    ) : (
-                      <FaRegUser
-                        className={`text-xl ${
-                          isProfilePage ? "text-white" : "text-gray-500"
-                        }`}
-                      />
-                    )}
-                  </div>
-                  {showProfileMenu && !isProfilePage ? (
-                    <div className="absolute top-8 -right-2 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
-                      {getProfileAccountWithUser(user).map((item) => (
-                        <Link
-                          href={item.href}
-                          key={item.title}
-                          className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
-                          onClick={() => setShowProfileMenu(false)}
-                        >
-                          <span className="text-lg">
-                            {renderIcon(item.icon)}
-                          </span>
-                          <p className="">{item.title}</p>
-                        </Link>
-                      ))}
-                      <button
-                        className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                        onClick={handleLogout}
-                      >
-                        <CiLogout />
-                        Çıkış Yap
-                      </button>
-                    </div>
                   ) : (
-                    showProfileMenu &&
-                    isProfilePage && (
-                      <>
-                        {/* Üçgen pointer */}
-                        <div className="absolute top-12 right-2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
-                        <div className="absolute top-14 -right-5 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
-                          {getProfileAccountWithUser(user).map((item) => (
-                            <Link
-                              href={item.href}
-                              key={item.title}
-                              className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
-                              onClick={() => setShowProfileMenu(false)}
-                            >
-                              <span className="text-lg">
-                                {renderIcon(item.icon)}
-                              </span>
-                              <p className="">{item.title}</p>
-                            </Link>
-                          ))}
-                          <button
-                            className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                            onClick={handleLogout}
-                          >
-                            <CiLogout />
-                            Çıkış Yap
-                          </button>
-                        </div>
-                      </>
-                    )
+                    <FaRegUser
+                      className={`text-sm ${isProfilePage ? "text-white" : "text-gray-500"}`}
+                    />
                   )}
                 </div>
-              )}
-            </ul>
-          </div>
-        </>
-      </nav>
-    </>
+
+                {showProfileMenu && (
+                  <div className="absolute top-10 right-0 bg-white text-black rounded-lg shadow-lg p-3 w-52 z-50 profile-menu-container border border-gray-100">
+                    {getProfileAccountWithUser(user).map((item) => (
+                      <Link
+                        href={item.href}
+                        key={item.title}
+                        className="w-full p-2.5 text-left text-sm flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-md transition-colors"
+                        onClick={() => setShowProfileMenu(false)}
+                      >
+                        <span className="text-base">
+                          {renderIcon(item.icon)}
+                        </span>
+                        <p>{item.title}</p>
+                      </Link>
+                    ))}
+                    <button
+                      className="w-full p-2.5 text-left text-sm flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-md transition-colors text-rose-600"
+                      onClick={handleLogout}
+                    >
+                      <CiLogout className="text-base" />
+                      Çıkış Yap
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </ul>
+        </div>
+      </div>
+    </nav>
   );
 };
 

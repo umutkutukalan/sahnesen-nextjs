@@ -8,6 +8,7 @@ export interface PostResponse {
   content: string; // Backend'den Stringified JSON string geliyor
   coverImage?: string;
   postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
+  isPublished: boolean;
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
   authorName: string;

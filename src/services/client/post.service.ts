@@ -1,7 +1,4 @@
-import { type } from "os";
 import api from "./config";
-
-// services/client/post.service.ts
 
 export interface FetchPostsParams {
   page?: number;
@@ -9,6 +6,21 @@ export interface FetchPostsParams {
   type?: string;
   isPublished?: boolean;
 }
+
+// Helper: Content'in Map<String, Object> formatında (JS Object) olmasını garanti et
+const ensureValidContent = (content: any) => {
+  if (!content) {
+    return { type: "doc", content: [] };
+  }
+  if (typeof content === "string") {
+    try {
+      return JSON.parse(content);
+    } catch {
+      return { type: "doc", content: [] };
+    }
+  }
+  return content;
+};
 
 // 1. PUBLIC: Tüm yayınlanmış gönderileri getir (Ana Akış / Feed)
 export const getPostsClient = async (
@@ -28,13 +40,10 @@ export const getPostsClient = async (
 
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/posts?${params.toString()}`,
-      {
-        cache: "no-store",
-      },
+      { cache: "no-store" },
     );
 
     if (!res.ok) {
-      // Backend'den dönen detaylı hata gövdesini alıp fırlatıyoruz
       const errorText = await res.text();
       console.error("Backend Error Details:", errorText);
       throw new Error(
@@ -49,7 +58,7 @@ export const getPostsClient = async (
   }
 };
 
-// 2. PUBLIC: Belirli bir kullanıcının kamuya açık gönderileri (Profil Sayfası)
+// 2. PUBLIC: Belirli bir kullanıcının kamuya açık gönderileri
 export const getUserPostsService = async (
   username: string,
   postType?: string,
@@ -68,9 +77,7 @@ export const getUserPostsService = async (
 
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/posts/user/${username}?${params.toString()}`,
-      {
-        cache: "no-store",
-      },
+      { cache: "no-store" },
     );
 
     if (!res.ok) {
@@ -84,20 +91,18 @@ export const getUserPostsService = async (
   }
 };
 
-// 3. AUTH (ME): Giriş yapmış kullanıcının kendi postları (Yayınlananlar, Taslaklar ve Tipe göre)
-interface GetMyPostsParams {
-  isPublished?: boolean;
-  postType?: string;
-  page?: number;
-  size?: number;
-}
-
+// 3. AUTH (ME): Kullanıcının kendi postları
 export const getMyPostsClient = async ({
   isPublished,
   postType,
   page = 0,
   size = 10,
-}: GetMyPostsParams) => {
+}: {
+  isPublished?: boolean;
+  postType?: string;
+  page?: number;
+  size?: number;
+}) => {
   const params = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
@@ -115,7 +120,7 @@ export const getMyPostsClient = async ({
   return response.data;
 };
 
-// 3.1. AUTH (ME): Giriş yapmış kullanıcının kendi postları (Yayınlananlar, Taslaklar ve Tipe göre)
+// 3.1. AUTH (ME): Slug ile gönderi getir
 export const getPostBySlugClient = async (slug: string) => {
   const response = await api.get(`/api/posts/${slug}`);
   return response.data;
@@ -123,13 +128,37 @@ export const getPostBySlugClient = async (slug: string) => {
 
 // 4. AUTH: Yeni Gönderi / Taslak Oluşturma
 export const createPostClient = async (payload: any) => {
-  const response = await api.post("/api/posts/me", payload);
+  const formattedPayload = {
+    postType: payload.postType || "SAHNE",
+    title:
+      payload.title && payload.title.trim().length >= 3
+        ? payload.title
+        : "Başlıksız Taslak",
+    subtitle: payload.subtitle || null,
+    content: ensureValidContent(payload.content),
+    coverImage: payload.coverImage || null,
+    isPublished: Boolean(payload.isPublished),
+  };
+
+  const response = await api.post("/api/posts/me", formattedPayload);
   return response.data;
 };
 
 // 5. AUTH: Gönderi / Taslak Güncelleme
 export const updatePostClient = async (postId: number, payload: any) => {
-  const response = await api.put(`/api/posts/me/${postId}`, payload);
+  const formattedPayload = {
+    postType: payload.postType || "SAHNE",
+    title:
+      payload.title && payload.title.trim().length >= 3
+        ? payload.title
+        : "Başlıksız Taslak",
+    subtitle: payload.subtitle || null,
+    content: ensureValidContent(payload.content),
+    coverImage: payload.coverImage || null,
+    isPublished: Boolean(payload.isPublished),
+  };
+
+  const response = await api.put(`/api/posts/me/${postId}`, formattedPayload);
   return response.data;
 };
 
