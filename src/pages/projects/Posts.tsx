@@ -37,8 +37,8 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
       <div className="relative flex w-full">
         <div className="relative w-full flex flex-col">
           {/* Üst Bilgi / Duyuru Bandı */}
-          <div className="w-full h-10 bg-yellow-500 border-y border-black flex items-center justify-center">
-            <p className="text-xs italic">
+          <div className="w-full h-10 bg-emerald-800 border-y border-black flex items-center justify-center">
+            <p className="text-xs text-white italic">
               Sahnesen Fuaye alanına hoş geldiniz.
             </p>
           </div>

@@ -128,8 +128,13 @@ const Navbar = ({
                 href={"/"}
                 className={`text-black transition-all duration-100`}
               >
-                <span className="text-3xl playfair-display-600 select-none">
-                  Sahnesen
+                <span className="text-3xl merriweather-sans font-semibold tracking-tighter select-none">
+                  <span className="inline-block italic -rotate-6 transform hover:rotate-0 transition-transform duration-300 origin-bottom">
+                    S
+                  </span>
+                  ahne
+                  <span className="">s</span>
+                  en
                 </span>
               </Link>
             </li>
