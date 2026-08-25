@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import LoadingScreen from "@/components/LoadingScreen";
 import PageAbout from "@/components/PageAbout";
-import { useAuth } from "@/context/UserContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useGetUserLikedProjects } from "@/hooks/likes/useGetLikedProjects";
-import { useSidebar } from "@/context/SidebarContext";
 import { PostResponse } from "@/services/server/post.service";
 import { useGetPosts } from "@/hooks/projects/useGetPosts";
 import PostCard from "@/components/projects/PostCard";
-import PopularPosts from "@/components/PageStickyExtra/PopularPosts";
 
 interface PostsProps {
   initialPosts: PostResponse[];
@@ -20,8 +15,6 @@ interface PostsProps {
 }
 
 const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
-  const { user } = useAuth();
-
   // Aktif filtrenin state'i (undefined = Tümü)
   const [selectedPostType, setSelectedPostType] = useState<string | undefined>(
     undefined,
@@ -31,20 +24,8 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
   const { posts, isLoadingMore, hasMore, loadMorePosts, currentPage } =
     useGetPosts(initialPosts, initialPage, totalPages, selectedPostType);
 
-  const { getUserLikedProjects, isLoading: isLoadingLikes } =
-    useGetUserLikedProjects();
-
   // Infinite scroll hook'u
   const loadMoreRef = useInfiniteScroll(loadMorePosts, hasMore, isLoadingMore);
-
-  // Kullanıcı oturum açtıysa beğendiği içerikleri çek
-  useEffect(() => {
-    if (user) {
-      getUserLikedProjects(0, false);
-    }
-  }, [user, getUserLikedProjects]);
-
-  const { isSidebarOpen } = useSidebar();
 
   // Seçilen tipe göre filtrelenmiş yayınlar
   const displayedPosts = selectedPostType
@@ -66,7 +47,7 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
             {/* SOL ANA AKIŞ */}
             <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
               <div className="w-full flex flex-col items-center">
-                <div className="max-w-[800px] z-50 px-6 w-full">
+                <div className="max-w-[1000px] z-50 px-6 w-full">
                   {/* Sekme Seçim Başlıkları (PageAbout) */}
                   <div className="w-full flex justify-center">
                     <PageAbout
@@ -119,23 +100,9 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
                 </div>
               )}
             </div>
-
-            {/* SAĞ STICKY SIDEBAR */}
-            <aside
-              className={`relative hidden lg:flex ${
-                isSidebarOpen ? "w-sm px-10" : "w-[500px] px-10"
-              } transition-all duration-500 ease-in-out flex-col justify-between gap-4 sticky top-[64px] h-[calc(100vh-64px)] max-h-[calc(150vh)] pt-8 pb-5`}
-            >
-              <div className="w-[260px]">
-                <div></div>
-              </div>
-            </aside>
           </div>
         </div>
       </div>
-
-      {/* Global Beğeni Yüklenme Durumu */}
-      {isLoadingLikes && <LoadingScreen />}
     </div>
   );
 };
