@@ -20,7 +20,7 @@ import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils";
 import Image from "next/image";
 import { profilebg } from "@/utils";
-import ProfileUserPosts from "./ProfileUserPosts"; // Yeni tekil Post listeleme bileşenimiz
+import ProfileUserPosts from "./ProfileUserPosts";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
 import { useGetFollowers } from "@/hooks/follow/useGetFollowers";
@@ -37,7 +37,6 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const router = useRouter();
   const currentUserId = user?.id;
 
-  // Post Türü Seçim State'i (undefined = Tümü)
   const [selectedPostType, setSelectedPostType] = useState<string | undefined>(
     undefined,
   );
@@ -91,6 +90,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   return (
     <div className="min-h-screen">
       <div className="w-full">
+        {/* Kapak Görseli */}
         <div className="w-full aspect-[5/1] bg-white relative z-20">
           <div className="w-full h-full overflow-hidden relative">
             {coverImgUrl ? (
@@ -113,19 +113,21 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
           </div>
         </div>
 
-        <div className="w-full px-10">
-          <div className="w-full flex gap-15 items-start">
-            <div className="w-full flex flex-col border-r border-gray-100">
+        {/* Ana İçerik Konteyneri */}
+        <div className="w-full px-4 md:px-8 lg:px-10">
+          <div className="w-full flex gap-6 lg:gap-12 items-start">
+            {/* SOL ALAN: Esnek Daralan Kısım */}
+            <div className="flex-1 min-w-0 border-r border-gray-100 pr-4 lg:pr-8">
               <div className="w-full flex justify-center">
-                <div className="flex flex-col max-w-4xl min-w-4xl transition-all duration-500 ease-in-out">
-                  {/* Filtreleme Başlıkları (Tab Structure) */}
+                <div className="w-full max-w-4xl flex flex-col transition-all duration-300">
+                  {/* Filtreleme Başlıkları */}
                   <PageAbout
                     selectedType={selectedPostType}
                     onSelectType={(type) => setSelectedPostType(type)}
                   />
 
                   {/* Dinamik Gönderi Akışı */}
-                  <div className="mt-6">
+                  <div className="mt-6 w-full min-w-0">
                     {targetUsername && (
                       <ProfileUserPosts
                         targetUsername={targetUsername}
@@ -137,9 +139,9 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
               </div>
             </div>
 
-            {/* Sağ Sidebar (Kullanıcı Kartı) */}
+            {/* SAĞ ALAN: Genişliği Korunan Sabit Kullanıcı Kartı */}
             <div
-              className="w-md sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto"
+              className="w-64 lg:w-80 flex-shrink-0 sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto"
               style={{ top: "50px", maxHeight: "100vh" }}
             >
               <div className="relative flex flex-col pt-10 pb-5">
@@ -172,7 +174,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 mt-2">
+                <div className="flex lg:flex-row flex-col lg:items-center gap-4 mt-2">
                   {isOwnProfile ? (
                     <button
                       onClick={() => router.push("/profile/me/settings")}
