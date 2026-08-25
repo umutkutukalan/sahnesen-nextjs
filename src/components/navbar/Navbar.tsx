@@ -1,7 +1,7 @@
 "use client";
 
 import { IoIosPaper } from "react-icons/io";
-import { FaFilePen, FaRegUser, FaTicketSimple } from "react-icons/fa6";
+import { FaRegUser } from "react-icons/fa6";
 import { RiComputerFill, RiMenu4Line } from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
@@ -11,15 +11,12 @@ import { useAuth } from "../../context/UserContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
-// import NotificationsForUser from "./Notifications/NotificationsForUser";
-// import { useNotification } from "../context/NotificationContext";
 import Image from "next/image";
 import NavLinks from "./NavbarLinks";
 import { getProfileAccountWithUser } from "@/constants/index";
 import Link from "next/link";
 import LoginPage from "@/pages/LoginPage";
 import { usePathname } from "next/navigation";
-import { LuTickets } from "react-icons/lu";
 import { ImPencil2 } from "react-icons/im";
 
 const Navbar = ({
@@ -29,14 +26,12 @@ const Navbar = ({
   transparent: boolean;
   isProfile?: boolean;
 }) => {
-  const { user, setUser } = useAuth(); // setToken kaldırıldı
+  const { user, setUser } = useAuth();
   const { toggleSidebar, toggleProfileSidebar } = useSidebar();
-  // const { unreadCount } = useNotification();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notification, setNotification] = useState(false);
 
-  // Icon mapping
   const iconMap = {
     FiUser: FiUser,
     RiComputerFill: RiComputerFill,
@@ -64,50 +59,46 @@ const Navbar = ({
     };
   }, [showProfileMenu, notification]);
 
+  // Hamburger İkonu Tıklama Yönetimi
+  const handleMenuClick = () => {
+    // Mobil veya Tablet (lg öncesi) ekranlarda HER ZAMAN ProfileSidebar açılır
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      toggleProfileSidebar();
+    } else {
+      // Masaüstünde sayfanın türüne göre ilgili sidebar açılır
+      if (isProfile) {
+        toggleProfileSidebar();
+      } else {
+        toggleSidebar();
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      console.log("Logout işlemi başlatılıyor...");
-      console.log("Logout öncesi cookies:", document.cookie);
-
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8080/auth/logout",
         {},
-        {
-          withCredentials: true, // Cookie'leri gönder
-        },
+        { withCredentials: true },
       );
       setUser(null);
-
-      console.log("Logout sonrası cookies:", document.cookie);
-
-      // 1 saniye bekleyip sayfayı yenile
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
     } catch (error) {
       console.error("Logout failed:", error);
-
-      // Hata olsa bile local state'i temizle
       localStorage.removeItem("user");
       localStorage.clear();
       setUser(null);
-
-      // Sayfayı yenile
       window.location.href = "/";
     }
   };
 
   const pathname = usePathname();
-
   const isHome = pathname === "/";
   const isProfilePage = pathname.startsWith("/profil");
 
-  {
-    /* Profil Resmi Container */
-  }
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
   const profileImgUrl = user?.profileImg
     ? user.profileImg.startsWith("http")
       ? user.profileImg
@@ -127,9 +118,10 @@ const Navbar = ({
       >
         <>
           <div className="flex items-center gap-4">
+            {/* Tıklama mantığı güncellenen menü ikonu */}
             <RiMenu4Line
               className="text-2xl cursor-pointer"
-              onClick={isProfile ? toggleProfileSidebar : toggleSidebar}
+              onClick={handleMenuClick}
             />
             <li className={`list-none`}>
               <Link
@@ -178,25 +170,6 @@ const Navbar = ({
             )}
             {user && (
               <div className="flex items-center md:gap-4 gap-2 relative">
-                {/* <div className="relative">
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
-                      {unreadCount}
-                    </span>
-                  )}
-                  <div className="notification-container">
-                    <GoBellFill
-                      className="cursor-pointer"
-                      onClick={() => setNotification(!notification)}
-                    />
-                  </div>
-                  {notification && (
-                    <NotificationsForUser
-                      notification={notification}
-                      setNotification={setNotification}
-                    />
-                  )}
-                </div> */}
                 <div
                   className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-black ${
                     !user.profileImg && "border border-gray-300"
@@ -244,7 +217,6 @@ const Navbar = ({
                   showProfileMenu &&
                   isProfilePage && (
                     <>
-                      {/* Üçgen pointer */}
                       <div className="absolute top-12 right-2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
                       <div className="absolute top-14 -right-5 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
                         {getProfileAccountWithUser(user).map((item) => (
