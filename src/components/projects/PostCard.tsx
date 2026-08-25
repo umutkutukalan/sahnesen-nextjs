@@ -78,11 +78,11 @@ const PostCard = ({
     : null;
 
   return (
-    <div className="w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
+    <div className="w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
       {/* SOL GÖRSEL */}
       <div className="h-full flex flex-col justify-center">
         <div className="w-45 h-35 hidden flex-shrink-0 sm:flex items-center justify-center">
-          <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center rounded-lg border border-gray-100">
+          <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center border border-gray-100">
             {finalImageUrl ? (
               <Image
                 src={finalImageUrl}
@@ -101,8 +101,8 @@ const PostCard = ({
       </div>
 
       {/* SAĞ İÇERİK */}
-      <div className="lg:w-4/5 w-3/4 flex-1 h-full flex flex-col justify-center">
-        <div className="mt-2 flex flex-col gap-4">
+      <div className="lg:w-4/5 w-3/4 flex-1 h-full flex flex-col justify-center merriweather-sans">
+        <div className="flex flex-col gap-4">
           {/* YAZAR BİLGİSİ */}
           <div
             className="flex items-center gap-2 cursor-pointer w-max"
@@ -133,7 +133,7 @@ const PostCard = ({
                 </div>
               </div>
               <span className="text-[8px]">•</span>
-              <span className="text-[10px] text-gray-500">
+              <span className="text-xs text-gray-500">
                 {formatRelativeTime(post?.createdAt)}
               </span>
             </div>
@@ -149,7 +149,7 @@ const PostCard = ({
                   router.push(`/${post?.authorUsername}/${post?.slug}`);
                 }
               }}
-              className="text-base sm:text-xl font-semibold line-clamp-2 cursor-pointer hover:underline"
+              className="text-base sm:text-[22px] line-clamp-2 font-semibold cursor-pointer hover:underline tracking-tight leading-snug"
             >
               {post?.title}
             </h2>
@@ -164,6 +164,21 @@ const PostCard = ({
             <div className="flex items-center gap-2">
               <div className="relative pr-4 border-r border-gray-200">
                 <span className="relative z-5">
+                  <FaTicketSimple
+                    className={`${
+                      post?.postType === "SAHNE"
+                        ? "text-black"
+                        : post?.postType === "MONOLOG"
+                          ? "text-[#f3c102]"
+                          : post?.postType === "YANYANA"
+                            ? "text-[#fa9ec1]"
+                            : post?.postType === "TERSYUZ"
+                              ? "text-[#94c5fd]"
+                              : "text-black"
+                    }`}
+                  />
+                </span>
+                <span className="absolute z-0 top-0 left-1 rotate-30">
                   <FaTicketSimple
                     className={`${
                       post?.postType === "SAHNE"
