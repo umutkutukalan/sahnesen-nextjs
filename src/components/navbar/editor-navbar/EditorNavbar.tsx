@@ -100,23 +100,37 @@ const EditorNavbar = ({
       }`}
     >
       <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-4 text-black">
+        <div className="flex items-center gap-3 text-black">
           <div className="text-3xl playfair-display-600">
-            <NavLinks href="/" logo="Sahnesen" />
+            <NavLinks
+              href="/"
+              logo={
+                <span className="text-3xl merriweather-sans font-semibold tracking-tighter select-none">
+                  <span className="inline-block italic -rotate-6 transform transition-transform duration-300 origin-bottom">
+                    S
+                  </span>
+                  ahne
+                  <span className="">s</span>
+                  en
+                </span>
+              }
+            />
           </div>
-          <div className="flex items-center gap-4 text-sm font-light">
+          <div className="flex items-center gap-4 text-sm font-light pointer-events-none">
             <h3>Sahne</h3>
             <div className="transition-all duration-300">
               {contentStatus === "SAVING" && (
-                <span className="text-gray-400">Saving...</span>
+                <span className="text-gray-400">Kaydediliyor...</span>
               )}
               {contentStatus === "SAVED" && (
                 <span className="text-green-800 flex items-center gap-1.5 font-medium">
-                  Saved
+                  Kaydedildi
                 </span>
               )}
               {contentStatus === "ERROR" && (
-                <span className="text-rose-500 font-medium">Save Failed</span>
+                <span className="text-rose-500 font-medium">
+                  Kaydetme başarısız
+                </span>
               )}
               {contentStatus === "IDLE" && activePostId && (
                 <span className="text-gray-300">Değişiklik bekleniyor</span>
@@ -135,7 +149,7 @@ const EditorNavbar = ({
             disabled={!activePostId || contentStatus === "SAVING"}
             onClick={handleSave}
           >
-            Publish
+            Sahnele
           </button>
 
           <ul className="navbar-links flex items-center">
