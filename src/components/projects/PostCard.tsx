@@ -9,8 +9,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { useRelativeTime } from "../../hooks/useRelativeTime";
-import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
-import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostSummaryResponse } from "@/services/server/post.service";
 import { FaTicketSimple } from "react-icons/fa6";
@@ -19,6 +17,11 @@ import { CiHeart } from "react-icons/ci";
 import { BiBookmarks as BiBookmarksIcon } from "react-icons/bi";
 import { useAuth } from "@/context/UserContext";
 import { useDeletePosts } from "@/hooks/projects/useDeleteProject";
+import {
+  interactionService,
+  PostInteractionStatus,
+} from "@/services/client/interaction/interaction.service";
+import { IoSparkles } from "react-icons/io5";
 
 interface PostCardProps {
   post: PostSummaryResponse;
@@ -39,11 +42,77 @@ const PostCard = ({
   const { formatRelativeTime } = useRelativeTime();
   const router = useRouter();
   const { ToProfile } = useToProfile();
-  const { hasUserLiked, liked } = useHasUserLiked();
-  const { likeCount, getLikeCount } = useGetLikeCount();
 
   const [showConfirm, setShowConfirm] = useState(false);
   const { deletePost } = useDeletePosts();
+
+  // Etkileşim State'leri
+  const [interactionStatus, setInteractionStatus] =
+    useState<PostInteractionStatus>({
+      isLiked: false,
+      isShined: false,
+      isBookmarked: false,
+      likeCount: 0,
+      shineCount: 0,
+    });
+
+  // Post kartı yüklendiğinde kullanıcının bu post üzerindeki durumunu ve sayıları çek
+  useEffect(() => {
+    if (!isOwner && user) {
+      interactionService
+        .getPostInteractionStatus(post.id)
+        .then((res) => setInteractionStatus(res))
+        .catch((err) => console.error("Etkileşim durumu alınamadı:", err));
+    }
+  }, [post.id, isOwner, user]);
+
+  // Beğeni Toggle Aksiyonu
+  const handleToggleLike = async () => {
+    if (!user) return;
+    try {
+      const res = await interactionService.toggleReaction(post.id, "LIKE");
+      setInteractionStatus((prev) => ({
+        ...prev,
+        isLiked: res.reacted,
+        likeCount: res.reacted
+          ? prev.likeCount + 1
+          : Math.max(0, prev.likeCount - 1),
+      }));
+    } catch (error) {
+      console.error("Beğeni güncellenemedi:", error);
+    }
+  };
+
+  // Parlat (Shine/Clap) Toggle Aksiyonu
+  const handleToggleShine = async () => {
+    if (!user) return;
+    try {
+      const res = await interactionService.toggleReaction(post.id, "SHINE");
+      setInteractionStatus((prev) => ({
+        ...prev,
+        isShined: res.reacted,
+        shineCount: res.reacted
+          ? prev.shineCount + 1
+          : Math.max(0, prev.shineCount - 1),
+      }));
+    } catch (error) {
+      console.error("Parlatma güncellenemedi:", error);
+    }
+  };
+
+  // Kaydet (Bookmark) Toggle Aksiyonu
+  const handleToggleBookmark = async () => {
+    if (!user) return;
+    try {
+      const res = await interactionService.toggleBookmark(post.id);
+      setInteractionStatus((prev) => ({
+        ...prev,
+        isBookmarked: res.bookmarked,
+      }));
+    } catch (error) {
+      console.error("Kaydetme güncellenemedi:", error);
+    }
+  };
 
   const handleConfirmDelete = () => {
     deletePost(post?.id, () => {
@@ -51,13 +120,6 @@ const PostCard = ({
     });
     setShowConfirm(false);
   };
-
-  useEffect(() => {
-    if (post?.id) {
-      hasUserLiked(post.id, "post");
-      getLikeCount(post.id, "post");
-    }
-  }, [post?.id]);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -227,34 +289,51 @@ const PostCard = ({
                 </button>
               </div>
             ) : (
-              <ul className="flex items-center gap-2">
-                <li className="hidden sm:flex items-center gap-1">
-                  {liked ? (
-                    <IoMdHeart className="text-red-600 text-sm" />
+              <ul className="flex items-center gap-4">
+                {/* LIKE */}
+                <li
+                  onClick={handleToggleLike}
+                  className="hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition"
+                >
+                  {interactionStatus.isLiked ? (
+                    <IoMdHeart className="text-red-600 text-base" />
                   ) : (
-                    <CiHeart className="text-red-600 text-sm" />
+                    <CiHeart className="text-red-600 text-base" />
                   )}
                   <span>
-                    {likeCount >= 1000
-                      ? `${Math.floor(likeCount / 100) / 10}K`
-                      : likeCount}
+                    {interactionStatus.likeCount >= 1000
+                      ? `${Math.floor(interactionStatus.likeCount / 100) / 10}K`
+                      : interactionStatus.likeCount}
                   </span>
                 </li>
-                <li className="hidden sm:flex items-center gap-1">
-                  <PiHandsClappingLight />
+
+                {/* SHINE (PARLAT) */}
+                <li
+                  onClick={handleToggleShine}
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
+                    interactionStatus.isShined
+                      ? "text-amber-500 font-semibold"
+                      : ""
+                  }`}
+                >
+                  <IoSparkles className="text-sm" />
                   <span>
-                    {likeCount >= 1000
-                      ? `${Math.floor(likeCount / 100) / 10}K`
-                      : likeCount}
+                    {interactionStatus.shineCount >= 1000
+                      ? `${Math.floor(interactionStatus.shineCount / 100) / 10}K`
+                      : interactionStatus.shineCount}
                   </span>
                 </li>
-                <li className="hidden sm:flex items-center gap-1">
-                  <BiBookmarksIcon />
-                  <span>
-                    {likeCount >= 1000
-                      ? `${Math.floor(likeCount / 100) / 10}K`
-                      : likeCount}
-                  </span>
+
+                {/* BOOKMARK (KAYDET) */}
+                <li
+                  onClick={handleToggleBookmark}
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
+                    interactionStatus.isBookmarked
+                      ? "text-blue-600 font-semibold"
+                      : ""
+                  }`}
+                >
+                  <BiBookmarksIcon className="text-base" />
                 </li>
               </ul>
             )}
