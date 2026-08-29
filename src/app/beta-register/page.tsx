@@ -7,7 +7,7 @@ import BetaRegisterTable from "@/components/login/BetaRegisterTable";
 export default function BetaRegisterPage() {
   const router = useRouter();
   const handleSuccess = (username?: string) => {
-    router.push(`/profile/${username}`);
+    router.push(`/profil/${username}`);
   };
 
   return (

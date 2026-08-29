@@ -21,7 +21,9 @@ export default async function Page({ params }: PageProps) {
 
   // Eğer içerik bulunamadıysa veya URL'deki yazar ile içeriğin asıl yazarı uyuşmuyorsa güvenlik için 404
   if (!post || post.authorUsername !== username) {
-    console.log(`İçerik bulunamadı veya yazar uyuşmazlığı: URL @${username} -> Gelen @${post?.authorUsername}`);
+    console.log(
+      `İçerik bulunamadı veya yazar uyuşmazlığı: URL @${username} -> Gelen @${post?.authorUsername}`,
+    );
     notFound(); // Next.js 404 sayfasına pürüzsüz geçiş
   }
 
