@@ -20,17 +20,25 @@ export interface PostInteractionStatus {
 export const interactionService = {
   // Beğen veya Parlat Toggle
   toggleReaction: async (postId: number, reactionType: ReactionType) => {
-    const res = await api.post(`/posts/${postId}/reactions/toggle`, null, {
-      params: { reactionType },
-    });
+    const res = await api.post(
+      `/api/interaction/posts/${postId}/reactions/toggle`,
+      null,
+      {
+        params: { reactionType },
+      },
+    );
     return res.data;
   },
 
   // Kaydet / Kaydı Kaldır (collectionId opsiyoneldir, verilmezse varsayılan klasöre atar)
   toggleBookmark: async (postId: number, collectionId?: number) => {
-    const res = await api.post(`/posts/${postId}/bookmarks/toggle`, null, {
-      params: { collectionId },
-    });
+    const res = await api.post(
+      `/api/interaction/posts/${postId}/bookmarks/toggle`,
+      null,
+      {
+        params: { collectionId },
+      },
+    );
     return res.data;
   },
 
@@ -38,19 +46,22 @@ export const interactionService = {
   getPostInteractionStatus: async (
     postId: number,
   ): Promise<PostInteractionStatus> => {
-    const res = await api.get(`/posts/${postId}/interactions`);
+    const res = await api.get(`/api/interaction/posts/${postId}/interactions`);
     return res.data;
   },
 
   // Kullanıcının klasörlerini getir
   getUserCollections: async (): Promise<BookmarkCollection[]> => {
-    const res = await api.get(`/bookmark-collections`);
+    const res = await api.get(`/api/interaction/bookmark-collections`);
     return res.data;
   },
 
   // Yeni klasör oluştur
   createCollection: async (name: string, description?: string) => {
-    const res = await api.post(`/bookmark-collections`, { name, description });
+    const res = await api.post(`/api/interaction/bookmark-collections`, {
+      name,
+      description,
+    });
     return res.data;
   },
 };

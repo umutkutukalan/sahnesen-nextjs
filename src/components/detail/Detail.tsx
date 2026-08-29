@@ -3,15 +3,16 @@
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { PostResponse } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
-import { BiCommentDetail } from "react-icons/bi";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser } from "react-icons/fi";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
-import { IoIosMore, IoMdHeart } from "react-icons/io";
-import { usePostLike } from "@/hooks/like/usePostLike";
-import { useUnlikedPost } from "@/hooks/like/useUnlikedPost";
-import { useGetLikeCount } from "@/hooks/likes/useGetLikeCount";
-import { useHasUserLiked } from "@/hooks/likes/useHasUserLiked";
+import {
+  IoIosMore,
+  IoMdHeart,
+  IoIosBookmark,
+  IoIosHeartEmpty,
+} from "react-icons/io";
+import { HiSparkles, HiOutlineSparkles } from "react-icons/hi2";
 import Image from "next/image";
 
 // Syntax Highlighting için Gerekli Yapılar
@@ -23,6 +24,7 @@ import python from "highlight.js/lib/languages/python";
 import csharp from "highlight.js/lib/languages/csharp";
 import cpp from "highlight.js/lib/languages/cpp";
 import sql from "highlight.js/lib/languages/sql";
+import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -35,10 +37,6 @@ lowlight.register("csharp", csharp);
 lowlight.register("cpp", cpp);
 lowlight.register("sql", sql);
 
-const SAMPLE_COMMENT_CREATED_AT = new Date(
-  Date.now() - 2 * 60 * 60 * 1000,
-).toISOString();
-
 interface DetailProps {
   post: PostResponse;
 }
@@ -46,30 +44,27 @@ interface DetailProps {
 const Detail = ({ post }: DetailProps) => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const { formatRelativeTime } = useRelativeTime();
-  const { likedPost } = usePostLike();
-  const { hasUserLiked, liked, isLoading } = useHasUserLiked();
-  const [likedLocal, setLikedLocal] = useState<null | boolean>(liked);
-  const { unlikedPost } = useUnlikedPost();
-  const { likeCount, getLikeCount } = useGetLikeCount();
-  const [likeCountLocal, setLikeCountLocal] = useState(likeCount);
 
-  const type = post.postType.toLowerCase();
+  // YENİ POST ETKİLEŞİM HOOK'UMUZ
+  const {
+    status,
+    isLoading: isInteractionLoading,
+    toggleLike,
+    toggleShine,
+    toggleBookmark,
+  } = usePostInteraction(post.id);
 
-  const toggleComments = () => {
-    setIsCommentsOpen(!isCommentsOpen);
+  // Sayı Formatlayıcı Helper (Örn: 1200 -> 1.2K)
+  const formatCount = (count: number) => {
+    if (count >= 1000) {
+      return (
+        (count % 1000 === 0
+          ? (count / 1000).toFixed(0)
+          : Math.floor(count / 100) / 10) + "K"
+      );
+    }
+    return count;
   };
-
-  const sampleComments = [
-    {
-      id: 1,
-      username: "ahmet_dev",
-      avatar: "A",
-      avatarColor: "from-blue-500 to-purple-500",
-      comment:
-        "Çok güzel anlatmışsın! Bu konuyu araştırıyordum tam zamanında geldi 🚀",
-      createdAt: SAMPLE_COMMENT_CREATED_AT,
-    },
-  ];
 
   useEffect(() => {
     // 1. Standart window scroll'unu en üste çek
@@ -81,31 +76,6 @@ const Detail = ({ post }: DetailProps) => {
       pageContainer.scrollTop = 0;
     }
   }, []);
-
-  useEffect(() => {
-    setLikedLocal(liked);
-  }, [liked]);
-
-  useEffect(() => {
-    setLikeCountLocal(likeCount);
-  }, [likeCount]);
-
-  useEffect(() => {
-    hasUserLiked(post.id, type);
-    getLikeCount(post.id, type);
-  }, [post.id, type, hasUserLiked, getLikeCount]);
-
-  const checkedLikeBtn = () => {
-    if (likedLocal) {
-      setLikedLocal(false);
-      setLikeCountLocal((prev) => prev - 1);
-      unlikedPost(post.id, type);
-    } else {
-      setLikedLocal(true);
-      setLikeCountLocal((prev) => prev + 1);
-      likedPost(post.id, type);
-    }
-  };
 
   // Lowlight AST (Abstract Syntax Tree) yapısını React elementlerine dönüştüren zırhlı render fonksiyonu
   const renderLowlightNodes = (
@@ -168,19 +138,16 @@ const Detail = ({ post }: DetailProps) => {
       for (let i = 0; i < parsed.content.length; i++) {
         const node = parsed.content[i];
 
-        // Eğer gelen eleman paragraf değilse direkt anlamlı içeriktir, index'i kilitle ve çık
         if (node.type !== "paragraph") {
           firstMeaningfulIndex = i;
           break;
         }
 
-        // 1. Durum: node.content hiç yoksa veya boş array ise
         const isAbsolutelyEmpty =
           !node.content ||
           !Array.isArray(node.content) ||
           node.content.length === 0;
 
-        // 2. Durum: Paragrafın içindeki tüm metin parçalarını toplayıp temizliyoruz
         let totalTextContent = "";
         if (node.content && Array.isArray(node.content)) {
           node.content.forEach((child: any) => {
@@ -190,23 +157,18 @@ const Detail = ({ post }: DetailProps) => {
           });
         }
 
-        // Eğer içeride hiç 'text' düğümü yoksa veya olan tüm metinler tamamen boşluk karakteriyse ("   " gibi)
         const isTextContentEmpty = totalTextContent.trim() === "";
 
-        // 💡 EĞER PARAGRAF YAPISAL OLARAK BOŞSA VEYA İÇİNDEKİ METİNLERİN TAMAMI BOŞLUKSA
         if (isAbsolutelyEmpty || isTextContentEmpty) {
-          continue; // Boş satırdır, es geç!
+          continue;
         }
 
-        // Yukarıdaki filtrelere takılmadıysa içinde gerçek, görünür bir metin veya görsel öğe vardır!
         firstMeaningfulIndex = i;
         break;
       }
 
-      // Eğer dökümanın tamamı boş satırlardan oluşuyorsa hiçbir şey render etme
       if (firstMeaningfulIndex === -1) return null;
 
-      // Döküman içeriğini sadece ilk anlamlı verinin başladığı yerden itibaren kesiyoruz
       const cleanedContent = parsed.content.slice(firstMeaningfulIndex);
 
       const renderTextNodes = (textNodes: any[]) => {
@@ -217,7 +179,6 @@ const Detail = ({ post }: DetailProps) => {
             return <br key={idx} />;
           }
 
-          // Dropcap node'unu büyük baş harf olarak render et
           if (node.type === "dropcap") {
             return (
               <span key={idx} className="dropcap-letter" aria-hidden="true">
@@ -286,7 +247,6 @@ const Detail = ({ post }: DetailProps) => {
 
         switch (node.type) {
           case "paragraph":
-            // İçeriği tamamen boş olan paragrafları render etme
             if (!node.content || node.content.length === 0) return null;
 
             const textContent = node.content
@@ -348,7 +308,6 @@ const Detail = ({ post }: DetailProps) => {
           case "heading":
             const headingLevel = node.attrs?.level || 2;
 
-            // İlk H1'i zaten atlıyorduk, şimdi hemen ardından gelen H2'yi de atla
             if (headingLevel === 2) {
               try {
                 const parsedContent =
@@ -360,7 +319,6 @@ const Detail = ({ post }: DetailProps) => {
                   (n: any) => n.type === "heading" && n.attrs?.level === 1,
                 );
 
-                // Bu node, h1'den hemen sonraki h2 mi?
                 const absoluteIndex = firstMeaningfulIndex + index;
                 if (h1Index !== -1 && absoluteIndex === h1Index + 1) {
                   return null;
@@ -370,18 +328,15 @@ const Detail = ({ post }: DetailProps) => {
 
             if (headingLevel === 1) {
               try {
-                // 1. Elindeki string'i güvenle objeye çeviriyoruz
                 const parsedContent =
                   typeof contentStr === "string"
                     ? JSON.parse(contentStr)
                     : contentStr;
 
-                // 2. Obje içindeki düğümlerden ilk H1'in index'ini buluyoruz
                 const firstH1Index = parsedContent?.content?.findIndex(
                   (n: any) => n.type === "heading" && n.attrs?.level === 1,
                 );
 
-                // 3. Eğer şu an dönen element ilk H1 ise ekrana basma, es geç
                 if (index === firstH1Index) {
                   return null;
                 }
@@ -417,10 +372,8 @@ const Detail = ({ post }: DetailProps) => {
                 : `http://localhost:8080${node.attrs.src}`;
 
               const width = node.attrs.width || "100%";
-              // Eğer genişlik '100%' ise tam ekran (isFull) modundadır
               const isFull = width === "100%";
               const isMedium = width === "75%";
-              const isSmall = width === "50%";
 
               const rawAlt = node.attrs.alt || "";
               const cleanAlt = rawAlt
@@ -434,8 +387,8 @@ const Detail = ({ post }: DetailProps) => {
                     isFull
                       ? "w-screen relative left-1/2 -translate-x-1/2"
                       : isMedium
-                        ? "relative left-1/2 -translate-x-1/2 w-[120%]" // 👈 içerikten taşar
-                        : "w-full" // small: içerik genişliğinde
+                        ? "relative left-1/2 -translate-x-1/2 w-[120%]"
+                        : "w-full"
                   }`}
                 >
                   <div
@@ -528,7 +481,6 @@ const Detail = ({ post }: DetailProps) => {
               </blockquote>
             );
 
-          // 5. Apple Tarzı Renklendirilmiş Kod Bloğu (Code Block)
           case "codeBlock":
             const codeLang = node.attrs?.language || "auto";
             const rawContent = node.content
@@ -538,7 +490,6 @@ const Detail = ({ post }: DetailProps) => {
             let highlightedAst = null;
 
             try {
-              // Sadece içi gerçekten kod benzeri bir şeyse ve dil kayıtlıysa highlight et
               if (
                 codeLang &&
                 codeLang !== "auto" &&
@@ -546,15 +497,12 @@ const Detail = ({ post }: DetailProps) => {
               ) {
                 highlightedAst = lowlight.highlight(codeLang, rawContent);
               } else if (rawContent.trim().length > 0) {
-                // Düz metin çıktısı değilse auto-highlight dene
                 highlightedAst = lowlight.highlightAuto(rawContent);
               }
             } catch (err) {
               console.error("Highlighting hatası:", err);
             }
 
-            // Güvenlik Kilidi: Eğer lowlight içi boş bir AST ürettiyse veya başarısız olduysa
-            // ya da gelen içerik düz bir çıktıysa (3\n3\n3 gibi), ham içeriğe geri dön
             const hasValidAst =
               highlightedAst &&
               highlightedAst.children &&
@@ -562,7 +510,6 @@ const Detail = ({ post }: DetailProps) => {
 
             return (
               <div key={index} className="w-full my-6">
-                {/* Kod Alanı - whitespace-pre-wrap ve break-words eklendi */}
                 <pre className="apple-code-theme p-6 text-sm md:text-[14px] font-mono overflow-x-auto leading-relaxed text-black bg-[#f5f5f7] rounded-lg whitespace-pre-wrap break-words">
                   <code>
                     {hasValidAst && highlightedAst
@@ -600,16 +547,11 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
   const authorFullName =
     `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
   const authorProfileImgUrl = post.authorProfileImg
     ? post.authorProfileImg.startsWith("http")
       ? post.authorProfileImg
@@ -618,7 +560,6 @@ const Detail = ({ post }: DetailProps) => {
 
   return (
     <div className="page pt-5 bg-private text-black min-h-screen">
-      {/* Apple Renklendirme CSS injection alanı */}
       <style jsx global>{`
         .apple-code-theme .hljs-keyword {
           color: #9b2385;
@@ -725,28 +666,73 @@ const Detail = ({ post }: DetailProps) => {
               </div>
             </div>
 
-            {/* BEĞENİ VE ETKİLEŞİM BARI */}
-            <div className="h-full w-full flex items-center py-2 justify-between border-b border-gray-200">
-              <div className="h-full flex items-center gap-0.5 text-gray-500">
-                <IoMdHeart
-                  className={`text-2xl cursor-pointer hover:scale-110 transition-transform ${likedLocal ? "text-red-500" : ""}`}
-                  onClick={() => checkedLikeBtn()}
-                />
-                <span className="text-sm">
-                  {likeCountLocal >= 1000
-                    ? (likeCountLocal % 1000 === 0
-                        ? (likeCountLocal / 1000).toFixed(0)
-                        : Math.floor(likeCountLocal / 100) / 10) + "K"
-                    : likeCountLocal}
-                </span>
+            {/* GÜNCELLENMİŞ BEĞENİ, PARLATMA VE KAYDETME BARI */}
+            <div className="h-full w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
+              <div className="flex items-center gap-6">
+                {/* Beğeni Butonu */}
+                <button
+                  onClick={toggleLike}
+                  disabled={isInteractionLoading}
+                  className="flex items-center gap-1.5 text-gray-600 hover:text-red-500 transition-colors group cursor-pointer"
+                  title="Beğen"
+                >
+                  {status.isLiked ? (
+                    <IoMdHeart className="text-2xl text-red-500 scale-110 transition-transform" />
+                  ) : (
+                    <IoIosHeartEmpty className="text-2xl group-hover:scale-110 transition-transform" />
+                  )}
+                  <span
+                    className={`text-xs font-medium ${status.isLiked ? "text-red-500 font-semibold" : ""}`}
+                  >
+                    {formatCount(status.likeCount)}
+                  </span>
+                </button>
+
+                {/* Parlatma (Shine) Butonu */}
+                <button
+                  onClick={toggleShine}
+                  disabled={isInteractionLoading}
+                  className="flex items-center gap-1.5 text-gray-600 hover:text-amber-500 transition-colors group cursor-pointer"
+                  title="Parlat"
+                >
+                  {status.isShined ? (
+                    <HiSparkles className="text-xl text-amber-500 scale-110 transition-transform" />
+                  ) : (
+                    <HiOutlineSparkles className="text-xl group-hover:scale-110 transition-transform" />
+                  )}
+                  <span
+                    className={`text-xs font-medium ${status.isShined ? "text-amber-500 font-semibold" : ""}`}
+                  >
+                    {formatCount(status.shineCount)}
+                  </span>
+                </button>
               </div>
-              <div className="flex items-center gap-3 h-full">
-                <div className="flex items-center gap-1 h-full text-xs">
-                  <div className="px-3 py-1 rounded-md border border-gray-300 flex items-center justify-center gap-1 cursor-pointer hover:bg-gray-50">
-                    <span>#{post.postType.toLowerCase()}</span>
-                  </div>
+
+              {/* Sağ Etkileşim Grubu */}
+              <div className="flex items-center gap-4">
+                {/* Kaydetme (Bookmark) Butonu */}
+                <button
+                  onClick={() => toggleBookmark()}
+                  disabled={isInteractionLoading}
+                  className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
+                  title={status.isBookmarked ? "Kaydedildi" : "Kaydet"}
+                >
+                  {status.isBookmarked ? (
+                    <IoIosBookmark className="text-xl text-blue-600 scale-110 transition-transform" />
+                  ) : (
+                    <IoIosBookmark className="text-xl hover:scale-110 transition-transform" />
+                  )}
+                </button>
+
+                {/* Post Tipi Etiketi */}
+                <div className="px-3 py-1 rounded-md border border-gray-200 flex items-center justify-center text-xs text-gray-500">
+                  #{post.postType.toLowerCase()}
                 </div>
-                <IoIosMore className="text-2xl cursor-pointer text-gray-400 hover:text-gray-700" />
+
+                {/* Diğer Seçenekler */}
+                <button className="text-2xl text-gray-400 hover:text-gray-700 transition-colors cursor-pointer">
+                  <IoIosMore />
+                </button>
               </div>
             </div>
           </div>
