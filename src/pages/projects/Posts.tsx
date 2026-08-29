@@ -37,7 +37,7 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
       <div className="relative flex w-full">
         <div className="relative w-full flex flex-col">
           {/* Üst Bilgi / Duyuru Bandı */}
-          <div className="w-full h-12 bg-yellow-500 border-y border-black flex items-center justify-center">
+          {/* <div className="w-full h-12 bg-yellow-500 border-y border-black flex items-center justify-center">
             <p className="text-xs italic">
               <span className="py-1 px-2 bg-white border border-white rounded-lg">
                 Welcome Offer
@@ -47,7 +47,7 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
                 Upgrade now
               </span>
             </p>
-          </div>
+          </div> */}
 
           <div className="relative flex w-full">
             {/* SOL ANA AKIŞ */}

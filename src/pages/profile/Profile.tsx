@@ -177,7 +177,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 <div className="flex lg:flex-row flex-col lg:items-center gap-4 mt-2">
                   {isOwnProfile ? (
                     <button
-                      onClick={() => router.push("/profile/me/settings")}
+                      onClick={() => router.push("/profil/me/settings")}
                       className="px-3 py-1 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-200"
                     >
                       <CiSettings className="text-sm" />
@@ -226,19 +226,19 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                   </div>
                 </div>
 
-                <div
+                {/* <div
                   className="flex flex-col gap-1 mt-5 text-gray-600"
                   style={{ fontSize: "0.7rem" }}
                 >
                   <div className="flex items-center gap-1">
                     <MdOutlineWorkspacePremium className="text-xl" />
-                    <span>Sanatçı</span>
+                    <span>Klinik Psikolog</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <TiLocationArrow className="text-xl" />
                     <span>Eskişehir, Türkiye</span>
                   </div>
-                </div>
+                </div> */}
 
                 <div
                   className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"

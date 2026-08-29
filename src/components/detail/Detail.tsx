@@ -756,21 +756,6 @@ const Detail = ({ post }: DetailProps) => {
             {renderTiptapContent(post.content)}
           </div>
         </div>
-
-        {/* YORUMLAR TOGGLE BUTONU */}
-        <button
-          onClick={toggleComments}
-          className={`fixed bottom-6 right-6 flex items-center gap-2 rounded-full border shadow-md px-4 py-2.5 transition-all cursor-pointer ${
-            isCommentsOpen
-              ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-              : "text-gray-600 border-gray-200 hover:text-gray-800 hover:bg-gray-50 bg-white"
-          }`}
-        >
-          <BiCommentDetail className="text-base" />
-          <span className="text-xs font-semibold">
-            {sampleComments.length} Yorum
-          </span>
-        </button>
       </div>
     </div>
   );
