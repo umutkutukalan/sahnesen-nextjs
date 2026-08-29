@@ -1,4 +1,4 @@
-import PostsClient from "@/pages/projects/PostsClient";
+import PostsClient from "@/pages/posts/PostsClient";
 import { getPublishedPostsServer } from "@/services/server/post.service";
 
 export default async function Page() {

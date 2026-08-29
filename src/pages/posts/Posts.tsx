@@ -5,7 +5,7 @@ import { useState } from "react";
 import PageAbout from "@/components/PageAbout";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { PostResponse } from "@/services/server/post.service";
-import { useGetPosts } from "@/hooks/projects/useGetPosts";
+import { useGetPosts } from "@/hooks/posts/useGetPosts";
 import PostCard from "@/components/projects/PostCard";
 
 interface PostsProps {

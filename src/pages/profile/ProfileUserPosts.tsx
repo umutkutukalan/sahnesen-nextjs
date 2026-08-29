@@ -6,7 +6,7 @@ import { useAuth } from "../../context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import Image from "next/image";
 import { undrawaddfiles } from "@/utils";
-import { useGetUserPosts } from "@/hooks/projects/useGetUserPosts";
+import { useGetUserPosts } from "@/hooks/posts/useGetUserPosts";
 import PostCard from "@/components/projects/PostCard";
 
 interface ProfileUserPostsProps {

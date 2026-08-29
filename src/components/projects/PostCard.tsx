@@ -16,7 +16,7 @@ import { IoMdHeart } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
 import { BiBookmarks as BiBookmarksIcon } from "react-icons/bi";
 import { useAuth } from "@/context/UserContext";
-import { useDeletePosts } from "@/hooks/projects/useDeleteProject";
+import { useDeletePosts } from "@/hooks/posts/useDeletePost";
 import {
   interactionService,
   PostInteractionStatus,
