@@ -20,12 +20,12 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
   return (
     <div className="w-full relative flex items-start">
       <div className="w-full h-18 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100">
-        <ul className="w-full flex items-end gap-8 text-gray-600">
+        <ul className="w-full flex items-end gap-8">
           <button
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === undefined
-                ? "border-b-2 border-black text-black font-medium"
+                ? "border-b-2 border-black font-medium"
                 : "opacity-70 hover:opacity-100"
             }`}
             onClick={() => onSelectType(undefined)}
@@ -37,12 +37,12 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === "SAHNE"
-                ? "border-b-2 border-black text-black font-medium"
-                : "opacity-70 hover:opacity-100"
+                ? "border-b-2 border-[#ffb3ba] font-medium"
+                : ""
             }`}
             onClick={() => handleSelect("SAHNE")}
           >
-            <FaTicketSimple className="text-xl text-black" />
+            <FaTicketSimple className="text-xl" style={{ color: "#ffb3ba" }} />
             <span className="text-xs">Sahne</span>
           </button>
 
@@ -55,7 +55,7 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             }`}
             onClick={() => handleSelect("MONOLOG")}
           >
-            <FaTicketSimple className="text-xl text-[#f3c102]" />
+            <FaTicketSimple className="text-xl" style={{ color: "#bbffc9" }} />
             <span className="text-xs">Monolog</span>
           </button>
 
@@ -68,7 +68,7 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             }`}
             onClick={() => handleSelect("YANYANA")}
           >
-            <FaTicketSimple className="text-xl text-[#fa9ec1]" />
+            <FaTicketSimple className="text-xl" style={{ color: "#bae1ff" }} />
             <span className="text-xs">Yan Yana</span>
           </button>
 
@@ -81,21 +81,8 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             }`}
             onClick={() => handleSelect("TERSYUZ")}
           >
-            <FaTicketSimple className="text-xl text-[#94c5fd]" />
+            <FaTicketSimple className="text-xl" style={{ color: "#ffffbb" }} />
             <span className="text-xs">Tersyüz</span>
-          </button>
-
-          <button
-            type="button"
-            className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-              selectedType === "ETUT"
-                ? "border-b-2 border-[#f79293] text-black font-medium"
-                : "opacity-70 hover:opacity-100"
-            }`}
-            onClick={() => handleSelect("ETUT")}
-          >
-            <FaTicketSimple className="text-xl text-[#f79293]" />
-            <span className="text-xs">Etüt</span>
           </button>
         </ul>
       </div>
