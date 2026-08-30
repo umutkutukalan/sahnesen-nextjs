@@ -27,6 +27,5 @@ export default async function Page({ params }: PageProps) {
     notFound(); // Next.js 404 sayfasına pürüzsüz geçiş
   }
 
-  // Artık project={project} veya blog={blog} diye ayırmıyoruz, tek bir post objesi geçiyoruz!
   return <Detail post={post} />;
 }

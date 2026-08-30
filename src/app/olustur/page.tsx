@@ -4,8 +4,6 @@ import CreateProjectsBlogs from "@/pages/create/CreateProjectsBlogs";
 import { Suspense } from "react";
 
 export default function CreatePage() {
-  // Project & Blog için içerik oluşturma sayfası
-
   return (
     <Suspense
       fallback={

@@ -1,6 +1,4 @@
-// app/bloglar/layout.tsx
-
-export default function BlogsLayout({
+export default function UsernameLayout({
   children,
 }: {
   children: React.ReactNode;

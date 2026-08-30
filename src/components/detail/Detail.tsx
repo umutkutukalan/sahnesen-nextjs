@@ -21,6 +21,14 @@ import csharp from "highlight.js/lib/languages/csharp";
 import cpp from "highlight.js/lib/languages/cpp";
 import sql from "highlight.js/lib/languages/sql";
 import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
+import { GiCandleFlame } from "react-icons/gi";
+import {
+  RiCandleFill,
+  RiCupFill,
+  RiQuillPenFill,
+  RiUserSmileFill,
+} from "react-icons/ri";
+import { FaHandsClapping } from "react-icons/fa6";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -672,11 +680,10 @@ const Detail = ({ post }: DetailProps) => {
                   className="flex items-center gap-1.5 text-gray-600 hover:text-red-500 transition-colors group cursor-pointer"
                   title="Beğen"
                 >
-                  {status.isLiked ? (
-                    <IoMdHeart className="text-2xl text-red-500 scale-110 transition-transform" />
-                  ) : (
-                    <CiHeart className="text-2xl text-red-600 group-hover:scale-110 transition-transform" />
-                  )}
+                  <RiCandleFill
+                    className={`text-2xl ${status.isLiked ? "text-red-600" : ""}`}
+                  />
+
                   <span
                     className={`text-xs font-medium ${status.isLiked ? "text-red-500 font-semibold" : ""}`}
                   >
@@ -691,16 +698,29 @@ const Detail = ({ post }: DetailProps) => {
                   className="flex items-center gap-1.5 text-gray-600 hover:text-amber-500 transition-colors group cursor-pointer"
                   title="Parlat"
                 >
-                  {status.isShined ? (
-                    <HiSparkles className="text-xl text-amber-500 scale-110 transition-transform" />
+                  {post.postType === "SAHNE" ? (
+                    <FaHandsClapping
+                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
+                    />
+                  ) : post.postType === "MONOLOG" ? (
+                    <RiQuillPenFill
+                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
+                    />
+                  ) : post.postType === "YANYANA" ? (
+                    <RiCupFill
+                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
+                    />
                   ) : (
-                    <HiOutlineSparkles className="text-xl group-hover:scale-110 transition-transform" />
+                    <RiUserSmileFill
+                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
+                    />
                   )}
-                  <span
+
+                  {/* <span
                     className={`text-xs font-medium ${status.isShined ? "text-amber-500 font-semibold" : ""}`}
                   >
                     {formatCount(status.shineCount)}
-                  </span>
+                  </span> */}
                 </button>
               </div>
 

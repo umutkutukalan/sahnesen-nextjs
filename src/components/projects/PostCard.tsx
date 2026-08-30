@@ -1,9 +1,14 @@
 "use client";
 
 import { FiUser, FiEdit3, FiTrash2 } from "react-icons/fi";
-import { LuImages } from "react-icons/lu";
+import { LuImages, LuNotebookTabs } from "react-icons/lu";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
-import { PiHandsClappingLight } from "react-icons/pi";
+import {
+  PiHandsClappingFill,
+  PiHandsClappingLight,
+  PiNotebookFill,
+} from "react-icons/pi";
+import { GiCandleFlame } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -11,19 +16,28 @@ import Image from "next/image";
 import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostSummaryResponse } from "@/services/server/post.service";
-import { FaTicketSimple } from "react-icons/fa6";
+import {
+  FaBookBookmark,
+  FaHandsClapping,
+  FaTicketSimple,
+} from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
-import { BiBookmarks as BiBookmarksIcon } from "react-icons/bi";
+import {
+  BiBookmarks as BiBookmarksIcon,
+  BiSolidUserRectangle,
+} from "react-icons/bi";
 import { useAuth } from "@/context/UserContext";
 import { useDeletePosts } from "@/hooks/posts/useDeletePost";
 import {
   interactionService,
   PostInteractionStatus,
 } from "@/services/client/interaction/interaction.service";
-import { IoSparkles } from "react-icons/io5";
+import { IoHeart, IoSparkles } from "react-icons/io5";
 import { MdBookmarks } from "react-icons/md";
 import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
+import { RiCupFill, RiQuillPenFill, RiUserSmileFill } from "react-icons/ri";
+import { BsCupFill } from "react-icons/bs";
 
 interface PostCardProps {
   post: PostSummaryResponse;
@@ -291,23 +305,22 @@ const PostCard = ({
                 </button>
               </div>
             ) : (
-              <ul className="flex items-center gap-4">
+              <ul className="flex items-center gap-2">
                 {/* LIKE */}
-                <li
+                {/* <li
                   onClick={handleToggleLike}
-                  className="hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition"
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition`}
                 >
-                  {interactionStatus.isLiked ? (
-                    <IoMdHeart className="text-red-600 text-base" />
-                  ) : (
-                    <CiHeart className="text-red-600 text-base" />
-                  )}
+                  <IoHeart
+                    className={`text-base ${interactionStatus.isLiked ? "text-red-600" : ""}`}
+                  />
+
                   <span>
                     {interactionStatus.likeCount >= 1000
                       ? `${Math.floor(interactionStatus.likeCount / 100) / 10}K`
                       : interactionStatus.likeCount}
                   </span>
-                </li>
+                </li> */}
 
                 {/* SHINE (PARLAT) */}
                 <li
@@ -318,16 +331,29 @@ const PostCard = ({
                       : "text-gray-600"
                   }`}
                 >
-                  {interactionStatus.isShined ? (
-                    <HiSparkles className="text-base text-amber-500 scale-110 transition-transform" />
+                  {post.postType === "SAHNE" ? (
+                    <FaHandsClapping
+                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                    />
+                  ) : post.postType === "MONOLOG" ? (
+                    <RiQuillPenFill
+                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                    />
+                  ) : post.postType === "YANYANA" ? (
+                    <RiCupFill
+                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                    />
                   ) : (
-                    <HiOutlineSparkles className="text-base hover:scale-110 transition-transform" />
+                    <RiUserSmileFill
+                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                    />
                   )}
-                  <span>
+
+                  {/* <span>
                     {interactionStatus.shineCount >= 1000
                       ? `${Math.floor(interactionStatus.shineCount / 100) / 10}K`
                       : interactionStatus.shineCount}
-                  </span>
+                  </span> */}
                 </li>
 
                 {/* BOOKMARK (KAYDET) */}
@@ -339,7 +365,7 @@ const PostCard = ({
                       : ""
                   }`}
                 >
-                  <MdBookmarks className="text-base" />
+                  <FaBookBookmark className="text-base" />
                 </li>
               </ul>
             )}
