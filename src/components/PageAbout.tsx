@@ -36,52 +36,56 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
           <button
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-              selectedType === "SAHNE"
-                ? "border-b-2 border-[#ffb3ba] font-medium"
-                : ""
+              selectedType === "SAHNE" ? "border-b-2 font-medium" : ""
             }`}
+            style={{
+              borderColor: selectedType === "SAHNE" ? "#c86b5a" : undefined,
+            }}
             onClick={() => handleSelect("SAHNE")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#ffb3ba" }} />
+            <FaTicketSimple className="text-xl" style={{ color: "#c86b5a" }} />
             <span className="text-xs">Sahne</span>
           </button>
 
           <button
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-              selectedType === "MONOLOG"
-                ? "border-b-2 border-[#f3c102] text-black font-medium"
-                : "opacity-70 hover:opacity-100"
+              selectedType === "MONOLOG" ? "border-b-2 font-medium" : ""
             }`}
+            style={{
+              borderColor: selectedType === "MONOLOG" ? "#66788a" : undefined,
+            }}
             onClick={() => handleSelect("MONOLOG")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#bbffc9" }} />
+            <FaTicketSimple className="text-xl" style={{ color: "#66788a" }} />
             <span className="text-xs">Monolog</span>
           </button>
 
           <button
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-              selectedType === "YANYANA"
-                ? "border-b-2 border-[#fa9ec1] text-black font-medium"
-                : "opacity-70 hover:opacity-100"
+              selectedType === "YANYANA" ? "border-b-2 font-medium" : ""
             }`}
+            style={{
+              borderColor: selectedType === "YANYANA" ? "#789680" : undefined,
+            }}
             onClick={() => handleSelect("YANYANA")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#bae1ff" }} />
+            <FaTicketSimple className="text-xl" style={{ color: "#789680" }} />
             <span className="text-xs">Yan Yana</span>
           </button>
 
           <button
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-              selectedType === "TERSYUZ"
-                ? "border-b-2 border-[#94c5fd] text-black font-medium"
-                : "opacity-70 hover:opacity-100"
+              selectedType === "TERSYUZ" ? "border-b-2 font-medium" : ""
             }`}
+            style={{
+              borderColor: selectedType === "TERSYUZ" ? "#fdfd96" : undefined,
+            }}
             onClick={() => handleSelect("TERSYUZ")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#ffffbb" }} />
+            <FaTicketSimple className="text-xl" style={{ color: "#fdfd96" }} />
             <span className="text-xs">Tersyüz</span>
           </button>
         </ul>

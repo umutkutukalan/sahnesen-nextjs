@@ -243,32 +243,34 @@ const PostCard = ({
               <div className="relative pr-4 border-r border-gray-200">
                 <span className="relative z-5">
                   <FaTicketSimple
-                    className={`${
-                      post?.postType === "SAHNE"
-                        ? "text-black"
-                        : post?.postType === "MONOLOG"
-                          ? "text-[#f3c102]"
-                          : post?.postType === "YANYANA"
-                            ? "text-[#fa9ec1]"
-                            : post?.postType === "TERSYUZ"
-                              ? "text-[#94c5fd]"
-                              : "text-black"
-                    }`}
+                    style={{
+                      color:
+                        post?.postType === "SAHNE"
+                          ? "#c86b5a"
+                          : post?.postType === "MONOLOG"
+                            ? "#66788a"
+                            : post?.postType === "YANYANA"
+                              ? "#789680"
+                              : post?.postType === "TERSYUZ"
+                                ? "#fdfd96"
+                                : "#000000",
+                    }}
                   />
                 </span>
                 <span className="absolute z-0 top-0 left-1 rotate-30">
                   <FaTicketSimple
-                    className={`${
-                      post?.postType === "SAHNE"
-                        ? "text-black"
-                        : post?.postType === "MONOLOG"
-                          ? "text-[#f3c102]"
-                          : post?.postType === "YANYANA"
-                            ? "text-[#fa9ec1]"
-                            : post?.postType === "TERSYUZ"
-                              ? "text-[#94c5fd]"
-                              : "text-black"
-                    }`}
+                    style={{
+                      color:
+                        post?.postType === "SAHNE"
+                          ? "#c86b5a"
+                          : post?.postType === "MONOLOG"
+                            ? "#66788a"
+                            : post?.postType === "YANYANA"
+                              ? "#789680"
+                              : post?.postType === "TERSYUZ"
+                                ? "#fdfd96"
+                                : "#000000",
+                    }}
                   />
                 </span>
               </div>
@@ -325,27 +327,35 @@ const PostCard = ({
                 {/* SHINE (PARLAT) */}
                 <li
                   onClick={handleToggleShine}
-                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
-                    interactionStatus.isShined
-                      ? "text-amber-500 font-semibold"
-                      : "text-gray-600"
-                  }`}
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition`}
                 >
                   {post.postType === "SAHNE" ? (
                     <FaHandsClapping
-                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                      className={`text-base`}
+                      style={{
+                        color: interactionStatus.isShined ? "#c86b5a" : "",
+                      }}
                     />
                   ) : post.postType === "MONOLOG" ? (
                     <RiQuillPenFill
-                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                      className={`text-base`}
+                      style={{
+                        color: interactionStatus.isShined ? "#66788a" : "",
+                      }}
                     />
                   ) : post.postType === "YANYANA" ? (
                     <RiCupFill
-                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                      className={`text-base`}
+                      style={{
+                        color: interactionStatus.isShined ? "#789680" : "",
+                      }}
                     />
                   ) : (
                     <RiUserSmileFill
-                      className={`text-base ${interactionStatus.isShined ? "text-amber-500" : ""}`}
+                      className={`text-base`}
+                      style={{
+                        color: interactionStatus.isShined ? "#fdfd96" : "",
+                      }}
                     />
                   )}
 
