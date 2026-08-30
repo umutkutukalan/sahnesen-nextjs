@@ -22,6 +22,8 @@ import {
   PostInteractionStatus,
 } from "@/services/client/interaction/interaction.service";
 import { IoSparkles } from "react-icons/io5";
+import { MdBookmarks } from "react-icons/md";
+import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
 
 interface PostCardProps {
   post: PostSummaryResponse;
@@ -313,10 +315,14 @@ const PostCard = ({
                   className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
                     interactionStatus.isShined
                       ? "text-amber-500 font-semibold"
-                      : ""
+                      : "text-gray-600"
                   }`}
                 >
-                  <IoSparkles className="text-sm" />
+                  {interactionStatus.isShined ? (
+                    <HiSparkles className="text-base text-amber-500 scale-110 transition-transform" />
+                  ) : (
+                    <HiOutlineSparkles className="text-base hover:scale-110 transition-transform" />
+                  )}
                   <span>
                     {interactionStatus.shineCount >= 1000
                       ? `${Math.floor(interactionStatus.shineCount / 100) / 10}K`
@@ -333,7 +339,7 @@ const PostCard = ({
                       : ""
                   }`}
                 >
-                  <BiBookmarksIcon className="text-base" />
+                  <MdBookmarks className="text-base" />
                 </li>
               </ul>
             )}

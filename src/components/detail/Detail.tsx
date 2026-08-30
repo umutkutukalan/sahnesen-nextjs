@@ -6,12 +6,8 @@ import { useEffect, useState } from "react";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser } from "react-icons/fi";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
-import {
-  IoIosMore,
-  IoMdHeart,
-  IoIosBookmark,
-  IoIosHeartEmpty,
-} from "react-icons/io";
+import { IoIosMore, IoMdHeart, IoIosBookmark } from "react-icons/io";
+import { CiHeart } from "react-icons/ci";
 import { HiSparkles, HiOutlineSparkles } from "react-icons/hi2";
 import Image from "next/image";
 
@@ -679,7 +675,7 @@ const Detail = ({ post }: DetailProps) => {
                   {status.isLiked ? (
                     <IoMdHeart className="text-2xl text-red-500 scale-110 transition-transform" />
                   ) : (
-                    <IoIosHeartEmpty className="text-2xl group-hover:scale-110 transition-transform" />
+                    <CiHeart className="text-2xl text-red-600 group-hover:scale-110 transition-transform" />
                   )}
                   <span
                     className={`text-xs font-medium ${status.isLiked ? "text-red-500 font-semibold" : ""}`}
