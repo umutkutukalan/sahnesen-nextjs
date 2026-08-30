@@ -34,10 +34,11 @@ import {
   PostInteractionStatus,
 } from "@/services/client/interaction/interaction.service";
 import { IoHeart, IoSparkles } from "react-icons/io5";
-import { MdBookmarks } from "react-icons/md";
+import { MdBookmarks, MdCoffee, MdOutlineCoffee } from "react-icons/md";
 import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
 import { RiCupFill, RiQuillPenFill, RiUserSmileFill } from "react-icons/ri";
 import { BsCupFill } from "react-icons/bs";
+import { SiWikibooks } from "react-icons/si";
 
 interface PostCardProps {
   post: PostSummaryResponse;
@@ -327,7 +328,7 @@ const PostCard = ({
                 {/* SHINE (PARLAT) */}
                 <li
                   onClick={handleToggleShine}
-                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition`}
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition-all duration-300`}
                 >
                   {post.postType === "SAHNE" ? (
                     <FaHandsClapping
@@ -344,12 +345,18 @@ const PostCard = ({
                       }}
                     />
                   ) : post.postType === "YANYANA" ? (
-                    <RiCupFill
-                      className={`text-base`}
-                      style={{
-                        color: interactionStatus.isShined ? "#789680" : "",
-                      }}
-                    />
+                    <>
+                      {interactionStatus.isShined ? (
+                        // Basıldığında: DOLU İKON + Mod Rengi (Yeşil/Terracotta)
+                        <MdCoffee
+                          className="text-base"
+                          style={{ color: "#789680" }}
+                        />
+                      ) : (
+                        // Basılmadığında: BOŞ İKON + Varsayılan Soluk Renk (Hover'da koyulaşır)
+                        <MdOutlineCoffee className="text-base text-neutral-400 hover:text-neutral-600" />
+                      )}
+                    </>
                   ) : (
                     <RiUserSmileFill
                       className={`text-base`}
@@ -375,7 +382,7 @@ const PostCard = ({
                       : ""
                   }`}
                 >
-                  <FaBookBookmark className="text-base" />
+                  <SiWikibooks className="text-base" />
                 </li>
               </ul>
             )}
