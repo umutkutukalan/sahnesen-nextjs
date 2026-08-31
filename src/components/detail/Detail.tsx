@@ -752,7 +752,10 @@ const Detail = ({ post }: DetailProps) => {
                   ) : (
                     <>
                       {status.isShined ? (
-                        <RiUserSmileFill className={`text-2xl text-gray-700`} />
+                        <RiUserSmileFill
+                          className={`text-2xl`}
+                          style={{ color: "#fdfd96" }}
+                        />
                       ) : (
                         <RiUserSmileLine className={`text-2xl`} />
                       )}
