@@ -5,8 +5,6 @@ import {
   arkaplan,
   bird,
   camasir,
-  card1,
-  etut,
   fineday,
   sahne,
   tire,
@@ -15,7 +13,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { IoIosArrowForward } from "react-icons/io";
 
 const cards = [
@@ -77,7 +75,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
 };
@@ -86,8 +84,6 @@ const CreateIntroTwo = () => {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const selectedCardData = cards.find((card) => card.id === selected);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -103,7 +99,6 @@ const CreateIntroTwo = () => {
     }
     if (selected !== null) return;
 
-    // Tüm kartların merkeze olan offset'ini hesapla
     if (containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const centerX = containerRect.left + containerRect.width / 2;
