@@ -9,6 +9,7 @@ import { GoCode, GoPlus } from "react-icons/go";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { useEffect, useState, useRef } from "react";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { createLowlight, common } from "lowlight";
 import java from "highlight.js/lib/languages/java";
 import javascript from "highlight.js/lib/languages/javascript";
@@ -33,7 +34,12 @@ lowlight.register("csharp", csharp);
 lowlight.register("cpp", cpp);
 lowlight.register("sql", sql);
 
-import { Extension, Node } from "@tiptap/core";
+import {
+  Editor,
+  Extension,
+  JSONContent,
+  Node as TiptapCoreNode,
+} from "@tiptap/core";
 
 const EditorShortcuts = Extension.create({
   name: "editorShortcuts",
@@ -133,7 +139,7 @@ const CustomParagraph = Paragraph.extend({
 });
 
 // 🔥 MİMARİ ADIM: Dropcap Inline Atom Node Tanımı
-const Dropcap = Node.create({
+const Dropcap = TiptapCoreNode.create({
   name: "dropcap",
   group: "inline",
   inline: true,
@@ -146,7 +152,7 @@ const Dropcap = Node.create({
       letter: {
         default: "A",
         parseHTML: (element) => element.textContent || "A",
-        renderHTML: (attributes) => ({}),
+        renderHTML: () => ({}),
       },
     };
   },
@@ -233,8 +239,8 @@ const CustomImage = Image.extend({
         const sizeBtn = (e.target as HTMLElement).closest("[data-size]");
         if (sizeBtn) {
           const size = sizeBtn.getAttribute("data-size");
-          const pos = typeof getPos === "function" ? getPos() : null;
-          if (pos !== null && size) {
+          const pos = getPos(); // artık her zaman fonksiyon
+          if (pos !== undefined && size) {
             editor
               .chain()
               .setNodeSelection(pos)
@@ -248,13 +254,11 @@ const CustomImage = Image.extend({
           ".image-toolbar-alt-btn",
         );
         if (altBtn) {
-          // editor'daki openAltModal'ı tetikle
-          // Bunun için editor üzerinden custom event fırlatabilirsin:
-          const pos = typeof getPos === "function" ? getPos() : null;
-          if (pos !== null) {
+          const pos = getPos();
+          if (pos !== undefined) {
             editor.chain().setNodeSelection(pos).run();
           }
-          editor.emit("openAltModal" as any);
+          editor.emit("openAltModal", undefined);
           return;
         }
       });
@@ -273,7 +277,7 @@ const CustomImage = Image.extend({
       let prevSrc: string | null = null;
       let prevAlt: string | null = null;
 
-      const update = (node: any) => {
+      const update = (node: ProseMirrorNode) => {
         const width = node.attrs.width || "50%";
         const src = node.attrs.src || "";
         const alt = node.attrs.alt || "";
@@ -367,7 +371,7 @@ const CustomImage = Image.extend({
   },
 });
 
-const toggleParagraphDropcap = (editor: any) => {
+const toggleParagraphDropcap = (editor: Editor) => {
   if (!editor) return;
   const { state } = editor;
   const { selection } = state;
@@ -408,7 +412,7 @@ const toggleParagraphDropcap = (editor: any) => {
 };
 
 // Component'in üst seviyesine, toggleParagraphDropcap'in yanına ekle:
-const isDropcapEligible = (editor: any): boolean => {
+const isDropcapEligible = (editor: Editor): boolean => {
   if (editor.isActive("heading") || editor.isActive("blockquote")) {
     return false;
   }
@@ -432,10 +436,16 @@ const isDropcapEligible = (editor: any): boolean => {
   }
 };
 
+declare module "@tiptap/core" {
+  interface EditorEvents {
+    openAltModal: undefined;
+  }
+}
+
 interface TiptapEditorProps {
-  content?: any;
-  initialContent?: any;
-  onUpdate: (json: any) => void;
+  content?: JSONContent;
+  initialContent?: JSONContent;
+  onUpdate: (json: JSONContent) => void;
   postId: number | null;
 }
 
@@ -446,7 +456,6 @@ const TiptapEditor = ({
   postId,
 }: TiptapEditorProps) => {
   const bubbleToolbarRef = useRef<HTMLDivElement | null>(null);
-  const linkInputRef = useRef<HTMLDivElement | null>(null);
 
   const postIdRef = useRef<number | null>(postId);
   useEffect(() => {
@@ -465,10 +474,9 @@ const TiptapEditor = ({
   } | null>(null);
   const isContentInitialized = useRef(false);
 
-  const [isLinkInputOpen, setIsLinkInputOpen] = useState(false);
-  const [linkUrl, setLinkUrl] = useState("");
+  type UploadResult = string | { url?: string; data?: { url?: string } };
 
-  const extractUrl = (backendResult: any): string => {
+  const extractUrl = (backendResult: UploadResult): string => {
     if (!backendResult) return "";
     let url = "";
     if (typeof backendResult === "string") url = backendResult;
@@ -559,7 +567,8 @@ const TiptapEditor = ({
               const hasH1 = this.editor
                 .getJSON()
                 .content?.some(
-                  (n: any) => n.type === "heading" && n.attrs?.level === 1,
+                  (n: JSONContent) =>
+                    n.type === "heading" && n.attrs?.level === 1,
                 );
 
               const { state } = this.editor;
@@ -872,7 +881,7 @@ const TiptapEditor = ({
         }
         return false;
       },
-      handlePaste: function (view, event, slice) {
+      handlePaste: function (view, event) {
         const items = event.clipboardData?.items;
         if (items) {
           for (let i = 0; i < items.length; i++) {
@@ -952,7 +961,7 @@ const TiptapEditor = ({
 
     // Editör zaten kullanıcının yazdığı veriyle doluysa veya içerik aynıysa tekrar set etmiyoruz
     if (!isContentInitialized.current) {
-      editor.commands.setContent(initialContent, false); // false: geçmişe (undo-redo) yazmaz
+      editor.commands.setContent(initialContent, { emitUpdate: false }); // false: geçmişe (undo-redo) yazmaz
       isContentInitialized.current = true;
     }
   }, [editor, initialContent]);
@@ -961,16 +970,19 @@ const TiptapEditor = ({
     if (editor && !isContentInitialized.current) {
       if (content && Object.keys(content).length > 0) {
         // Eğer veritabanından dolu bir içerik geliyorsa onu yükle
-        editor.commands.setContent(content);
+        editor.commands.setContent(content, { emitUpdate: false });
       } else {
         // 🔥 KRİTİK ADIM: Eğer gelen içerik boşsa, şablonu buraya zorunlu enjekte ediyoruz!
-        editor.commands.setContent({
-          type: "doc",
-          content: [
-            { type: "heading", attrs: { level: 1 }, content: [] },
-            { type: "paragraph", content: [] },
-          ],
-        });
+        editor.commands.setContent(
+          {
+            type: "doc",
+            content: [
+              { type: "heading", attrs: { level: 1 }, content: [] },
+              { type: "paragraph", content: [] },
+            ],
+          },
+          { emitUpdate: false },
+        );
       }
 
       isContentInitialized.current = true;
@@ -995,31 +1007,16 @@ const TiptapEditor = ({
   useEffect(() => {
     if (!editor) return;
     const handler = () => openAltModal();
-    editor.on("openAltModal" as any, handler);
+    editor.on("openAltModal", handler);
     return () => {
-      editor.off("openAltModal" as any, handler);
+      editor.off("openAltModal", handler);
     };
-  }, [editor]);
+  });
 
   const saveAltText = (newAlt: string) => {
     if (!editor) return;
     editor.chain().focus().updateAttributes("image", { alt: newAlt }).run();
     setIsAltModalOpen(false);
-  };
-
-  const setImageSize = (sizePercentage: string) => {
-    if (!editor) return;
-    editor
-      .chain()
-      .focus()
-      .updateAttributes("image", { width: sizePercentage, height: "auto" })
-      .run();
-  };
-
-  const normalizeUrl = (url: string): string => {
-    if (!url) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    return `https://${url}`;
   };
 
   const handleImageUpload = () => {
@@ -1199,7 +1196,7 @@ const TiptapEditor = ({
     const updatePosition = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const { selection, doc } = editor.state;
+        const { selection } = editor.state;
         const isImage = editor.isActive("image");
         const isHRule = editor.isActive("horizontalRule");
         const isCodeBlock = editor.isActive("codeBlock");
@@ -1207,7 +1204,6 @@ const TiptapEditor = ({
 
         const linkInputEl =
           toolbar.querySelector<HTMLElement>(".bm-link-input");
-        const linkActive = linkInputEl?.style.display === "flex";
 
         if (isEmpty || isImage || isHRule || isCodeBlock) {
           // Link input açıksa kapat
@@ -1371,7 +1367,7 @@ const TiptapEditor = ({
         const hasH1 = editor
           .getJSON()
           .content?.some(
-            (n: any) => n.type === "heading" && n.attrs?.level === 1,
+            (n: JSONContent) => n.type === "heading" && n.attrs?.level === 1,
           );
         if (hasH1) editor.chain().focus().toggleHeading({ level: 2 }).run();
         else editor.chain().focus().toggleHeading({ level: 1 }).run();
@@ -1465,20 +1461,6 @@ const TiptapEditor = ({
   const currentAttrs = editor.getAttributes("image");
   const currentWidth = currentAttrs.width || "50%";
 
-  const rawAspectRatio = currentAttrs.aspectRatio;
-  const aspectRatio =
-    rawAspectRatio !== null &&
-    rawAspectRatio !== undefined &&
-    rawAspectRatio !== ""
-      ? parseFloat(rawAspectRatio)
-      : null;
-
-  const ratioKnown =
-    aspectRatio !== null && !isNaN(aspectRatio) && aspectRatio !== 0;
-
-  const canBeMedium = ratioKnown ? aspectRatio >= 0.85 : true;
-  const canBeFull = ratioKnown ? aspectRatio >= 1.2 : true;
-
   return (
     <div className="relative w-full group/editor playfair-display-400 bg-white">
       <style jsx global>{`
@@ -1536,9 +1518,9 @@ const TiptapEditor = ({
             <button
               onClick={() => {
                 if (editor.isActive("blockquote")) {
-                  editor.chain().focus().clearNodes().toggleCodeBlock().run;
+                  editor.chain().focus().clearNodes().toggleCodeBlock().run();
                 } else {
-                  editor.chain().focus().toggleCodeBlock().run;
+                  editor.chain().focus().toggleCodeBlock().run();
                 }
               }}
               className="flex items-center justify-center w-8 h-8 rounded-full text-blue-600 opacity-0 border border-blue-300 hover:border-blue-500 group-hover:opacity-100 transition-all cursor-pointer"
@@ -1586,6 +1568,7 @@ const TiptapEditor = ({
             <h3 className="text-2xl font-bold">
               Resim Alt Yazısı / Açıklaması
             </h3>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={editingImageAttrs.src}
               alt="Önizleme"
