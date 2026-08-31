@@ -52,7 +52,7 @@ const PostCard = ({
   const { deletePost } = useDeletePosts();
 
   // Post tipine göre dinamik ReactionType belirleme
-  const getShineType = (type?: string): ReactionType => {
+  const getShineReactionType = (type?: string): ReactionType => {
     switch (type) {
       case "SAHNE":
         return "SHINE_SAHNE";
@@ -67,7 +67,7 @@ const PostCard = ({
     }
   };
 
-  const currentShineType = getShineType(post?.postType);
+  const currentShineType = getShineReactionType(post?.postType);
 
   // Hook entegrasyonu (Eğer kullanıcı postun sahibiyse veya giriş yapmadıysa hook'u devre dışı bırakmak için koşullu çağırabilirsin veya hook içinde yönetebilirsin)
   const {

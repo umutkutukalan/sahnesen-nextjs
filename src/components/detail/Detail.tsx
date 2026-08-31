@@ -64,6 +64,24 @@ const Detail = ({ post }: DetailProps) => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const { formatRelativeTime } = useRelativeTime();
 
+  // Post tipine göre dinamik ReactionType belirleme
+  const getShineReactionType = (type?: string): ReactionType => {
+    switch (type) {
+      case "SAHNE":
+        return "SHINE_SAHNE";
+      case "MONOLOG":
+        return "SHINE_MONOLOG";
+      case "YANYANA":
+        return "SHINE_YANYANA";
+      case "TERSYUZ":
+        return "SHINE_TERSYUZ";
+      default:
+        return "SHINE_SAHNE";
+    }
+  };
+
+  const currentShineType = getShineReactionType(post?.postType);
+
   // YENİ POST ETKİLEŞİM HOOK'UMUZ
   const {
     status,
@@ -71,7 +89,7 @@ const Detail = ({ post }: DetailProps) => {
     toggleLike,
     toggleShine,
     toggleBookmark,
-  } = usePostInteraction(post.id);
+  } = usePostInteraction(post.id, currentShineType);
 
   // Sayı Formatlayıcı Helper (Örn: 1200 -> 1.2K)
   const formatCount = (count: number) => {
@@ -661,6 +679,7 @@ const Detail = ({ post }: DetailProps) => {
                         src={authorProfileImgUrl}
                         alt={authorFullName}
                         fill
+                        priority // <-- Yazar görseli yukarıda olduğu için eklendi
                         unoptimized
                         className="object-cover"
                       />
@@ -760,7 +779,7 @@ const Detail = ({ post }: DetailProps) => {
                       color: status.isShined ? config.color : undefined,
                     }}
                   >
-                    {status.shineCount > 0 && status.shineCount}
+                    {formatCount(status.shineCount)}
                   </span>
                 </button>
               </div>
