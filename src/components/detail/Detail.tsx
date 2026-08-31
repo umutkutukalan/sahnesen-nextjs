@@ -2,7 +2,7 @@
 
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { PostResponse } from "@/services/server/post.service";
-import { useEffect, useState } from "react";
+import { JSX, useEffect } from "react";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser } from "react-icons/fi";
 import {
@@ -10,9 +10,7 @@ import {
   TbBookmarkFilled,
   TbRosetteDiscountCheckFilled,
 } from "react-icons/tb";
-import { IoIosMore, IoMdHeart, IoIosBookmark } from "react-icons/io";
-import { CiHeart } from "react-icons/ci";
-import { HiSparkles, HiOutlineSparkles } from "react-icons/hi2";
+import { IoIosMore } from "react-icons/io";
 import Image from "next/image";
 
 // Syntax Highlighting için Gerekli Yapılar
@@ -25,25 +23,15 @@ import csharp from "highlight.js/lib/languages/csharp";
 import cpp from "highlight.js/lib/languages/cpp";
 import sql from "highlight.js/lib/languages/sql";
 import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
-import { GiCandleFlame } from "react-icons/gi";
-import {
-  RiCandleFill,
-  RiCupFill,
-  RiQuillPenFill,
-  RiUserSmileFill,
-  RiUserSmileLine,
-} from "react-icons/ri";
-import { FaHandsClapping } from "react-icons/fa6";
+import { RiCandleFill, RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
 import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
 import {
   PiFeather,
   PiFeatherFill,
-  PiHandsClappingBold,
   PiHandsClappingDuotone,
   PiHandsClappingFill,
-  PiHandsClappingLight,
-  PiHandsClappingThin,
 } from "react-icons/pi";
+import { ReactionType } from "@/services/client/interaction/interaction.service";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -60,8 +48,52 @@ interface DetailProps {
   post: PostResponse;
 }
 
+// Tiptap JSON Düğüm Yapıları İçin Türler
+interface TiptapMark {
+  type: string;
+  attrs?: {
+    href?: string;
+    target?: string;
+    rel?: string;
+    letter?: string;
+    [key: string]: unknown;
+  };
+}
+
+interface TiptapNode {
+  type: string;
+  attrs?: {
+    level?: number;
+    src?: string;
+    alt?: string;
+    width?: string;
+    height?: string;
+    aspectRatio?: string | number | null;
+    letter?: string;
+    language?: string;
+    [key: string]: unknown;
+  };
+  content?: TiptapNode[];
+  text?: string;
+  marks?: TiptapMark[];
+}
+
+interface TiptapDocument {
+  type?: string;
+  content?: TiptapNode[];
+}
+
+// Lowlight AST (Abstract Syntax Tree) Düğüm Yapısı İçin Türler
+interface LowlightNode {
+  type: string;
+  value?: string;
+  properties?: {
+    className?: string[];
+  };
+  children?: LowlightNode[];
+}
+
 const Detail = ({ post }: DetailProps) => {
-  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const { formatRelativeTime } = useRelativeTime();
 
   // Post tipine göre dinamik ReactionType belirleme
@@ -148,10 +180,10 @@ const Detail = ({ post }: DetailProps) => {
 
   // Lowlight AST (Abstract Syntax Tree) yapısını React elementlerine dönüştüren zırhlı render fonksiyonu
   const renderLowlightNodes = (
-    nodes: any[],
+    nodes: LowlightNode[],
     keyPrefix = "hl",
   ): React.ReactNode[] => {
-    return nodes.map((node, i) => {
+    return nodes.map((node: LowlightNode, i: number) => {
       const key = `${keyPrefix}-${i}`;
       if (node.type === "text") {
         return node.value;
@@ -160,7 +192,7 @@ const Detail = ({ post }: DetailProps) => {
         const className = node.properties?.className?.join(" ") || "";
         return (
           <span key={key} className={className}>
-            {renderLowlightNodes(node.children, key)}
+            {renderLowlightNodes(node.children || [], key)}
           </span>
         );
       }
@@ -170,19 +202,21 @@ const Detail = ({ post }: DetailProps) => {
 
   const extractSubtitle = (contentStr: string): string | null => {
     try {
-      const parsed = JSON.parse(contentStr);
+      const parsed: TiptapDocument = JSON.parse(contentStr);
       const nodes = parsed?.content;
       if (!nodes || !Array.isArray(nodes)) return null;
 
       const h1Index = nodes.findIndex(
-        (n: any) => n.type === "heading" && n.attrs?.level === 1,
+        (n: TiptapNode) => n.type === "heading" && n.attrs?.level === 1,
       );
 
       if (h1Index === -1) return null;
 
       const next = nodes[h1Index + 1];
       if (next?.type === "heading" && next.attrs?.level === 2) {
-        return next.content?.map((t: any) => t.text || "").join("") || null;
+        return (
+          next.content?.map((t: TiptapNode) => t.text || "").join("") || null
+        );
       }
 
       return null;
@@ -219,7 +253,7 @@ const Detail = ({ post }: DetailProps) => {
 
         let totalTextContent = "";
         if (node.content && Array.isArray(node.content)) {
-          node.content.forEach((child: any) => {
+          node.content.forEach((child: TiptapNode) => {
             if (child.type === "text" && child.text) {
               totalTextContent += child.text;
             }
@@ -240,10 +274,10 @@ const Detail = ({ post }: DetailProps) => {
 
       const cleanedContent = parsed.content.slice(firstMeaningfulIndex);
 
-      const renderTextNodes = (textNodes: any[]) => {
+      const renderTextNodes = (textNodes: TiptapNode[]) => {
         if (!textNodes || !Array.isArray(textNodes)) return "";
 
-        return textNodes.map((node: any, idx: number) => {
+        return textNodes.map((node: TiptapNode, idx: number) => {
           if (node.type === "hardBreak") {
             return <br key={idx} />;
           }
@@ -259,7 +293,7 @@ const Detail = ({ post }: DetailProps) => {
           let element: React.ReactNode = node.text || "";
 
           if (node.marks && Array.isArray(node.marks)) {
-            node.marks.forEach((mark: any) => {
+            node.marks.forEach((mark: TiptapMark) => {
               if (mark.type === "bold") {
                 element = (
                   <strong key={idx} className="font-bold">
@@ -307,7 +341,7 @@ const Detail = ({ post }: DetailProps) => {
         });
       };
 
-      return cleanedContent.map((node: any, index: number) => {
+      return cleanedContent.map((node: TiptapNode, index: number) => {
         const prevNode = index > 0 ? cleanedContent[index - 1] : null;
         const prevIsH2 =
           prevNode?.type === "heading" && prevNode.attrs?.level === 2;
@@ -319,8 +353,8 @@ const Detail = ({ post }: DetailProps) => {
             if (!node.content || node.content.length === 0) return null;
 
             const textContent = node.content
-              .filter((c: any) => c.type === "text")
-              .map((c: any) => c.text || "")
+              .filter((c: TiptapNode) => c.type === "text")
+              .map((c: TiptapNode) => c.text || "")
               .join("");
 
             const hasOnlyDropcap =
@@ -330,7 +364,7 @@ const Detail = ({ post }: DetailProps) => {
 
             if (node.content && Array.isArray(node.content)) {
               const hasInlineImage = node.content.find(
-                (c: any) => c.type === "image",
+                (c: TiptapNode) => c.type === "image",
               );
 
               if (hasInlineImage && hasInlineImage.attrs?.src) {
@@ -385,7 +419,8 @@ const Detail = ({ post }: DetailProps) => {
                     : contentStr;
 
                 const h1Index = parsedContent?.content?.findIndex(
-                  (n: any) => n.type === "heading" && n.attrs?.level === 1,
+                  (n: TiptapNode) =>
+                    n.type === "heading" && n.attrs?.level === 1,
                 );
 
                 const absoluteIndex = firstMeaningfulIndex + index;
@@ -403,7 +438,8 @@ const Detail = ({ post }: DetailProps) => {
                     : contentStr;
 
                 const firstH1Index = parsedContent?.content?.findIndex(
-                  (n: any) => n.type === "heading" && n.attrs?.level === 1,
+                  (n: TiptapNode) =>
+                    n.type === "heading" && n.attrs?.level === 1,
                 );
 
                 if (index === firstH1Index) {
@@ -429,7 +465,7 @@ const Detail = ({ post }: DetailProps) => {
                 }
               >
                 {node.content
-                  ? node.content.map((t: any) => t.text || "").join("")
+                  ? node.content.map((t: TiptapNode) => t.text || "").join("")
                   : ""}
               </HeadingTag>
             );
@@ -494,12 +530,12 @@ const Detail = ({ post }: DetailProps) => {
                 key={index}
                 className="list-disc pl-8 my-4 space-y-2 marker:text-black"
               >
-                {node.content?.map((item: any, i: number) => (
+                {node.content?.map((item: TiptapNode, i: number) => (
                   <li
                     key={i}
                     className="text-gray-800 text-[18px] md:text-[20px] leading-relaxed"
                   >
-                    {item.content?.map((child: any, j: number) =>
+                    {item.content?.map((child: TiptapNode, j: number) =>
                       child.type === "paragraph" ? (
                         <span key={j}>
                           {child.content ? renderTextNodes(child.content) : ""}
@@ -517,12 +553,12 @@ const Detail = ({ post }: DetailProps) => {
                 key={index}
                 className="list-decimal pl-8 my-4 space-y-2 marker:text-black"
               >
-                {node.content?.map((item: any, i: number) => (
+                {node.content?.map((item: TiptapNode, i: number) => (
                   <li
                     key={i}
                     className="text-gray-800 text-[18px] md:text-[20px] leading-relaxed"
                   >
-                    {item.content?.map((child: any, j: number) =>
+                    {item.content?.map((child: TiptapNode, j: number) =>
                       child.type === "paragraph" ? (
                         <span key={j}>
                           {child.content ? renderTextNodes(child.content) : ""}
@@ -537,7 +573,7 @@ const Detail = ({ post }: DetailProps) => {
           case "blockquote":
             return (
               <blockquote key={index} className="blockquote">
-                {node.content?.map((child: any, i: number) => {
+                {node.content?.map((child: TiptapNode, i: number) => {
                   if (child.type === "paragraph") {
                     return (
                       <p key={i}>
@@ -553,7 +589,7 @@ const Detail = ({ post }: DetailProps) => {
           case "codeBlock":
             const codeLang = node.attrs?.language || "auto";
             const rawContent = node.content
-              ? node.content.map((t: any) => t.text || "").join("")
+              ? node.content.map((t: TiptapNode) => t.text || "").join("")
               : "";
 
             let highlightedAst = null;
@@ -664,9 +700,7 @@ const Detail = ({ post }: DetailProps) => {
         }
       `}</style>
 
-      <div
-        className={`page-padding flex gap-5 relative ${!isCommentsOpen && "items-center justify-center"}`}
-      >
+      <div className={`page-padding flex gap-5 relative`}>
         <div className="flex flex-col w-full lg:w-[850px] gap-10 transition-all duration-300 relative px-2 md:px-15">
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col w-full">
