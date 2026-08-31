@@ -2,13 +2,19 @@
 
 import { FiUser, FiEdit3, FiTrash2 } from "react-icons/fi";
 import { LuImages, LuNotebookTabs } from "react-icons/lu";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import {
+  TbBookmark,
+  TbBookmarkFilled,
+  TbRosetteDiscountCheckFilled,
+} from "react-icons/tb";
+import {
+  PiFeather,
+  PiFeatherFill,
   PiHandsClappingFill,
   PiHandsClappingLight,
   PiNotebookFill,
 } from "react-icons/pi";
-import { GiCandleFlame } from "react-icons/gi";
+import { GiCandleFlame, GiPapers } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -338,22 +344,24 @@ const PostCard = ({
                       }}
                     />
                   ) : post.postType === "MONOLOG" ? (
-                    <RiQuillPenFill
-                      className={`text-base`}
-                      style={{
-                        color: interactionStatus.isShined ? "#66788a" : "",
-                      }}
-                    />
+                    <>
+                      {interactionStatus.isShined ? (
+                        <PiFeatherFill
+                          className="text-base"
+                          style={{ color: "#66788a" }}
+                        />
+                      ) : (
+                        <PiFeather className="text-base text-neutral-400 hover:text-neutral-600" />
+                      )}
+                    </>
                   ) : post.postType === "YANYANA" ? (
                     <>
                       {interactionStatus.isShined ? (
-                        // Basıldığında: DOLU İKON + Mod Rengi (Yeşil/Terracotta)
                         <MdCoffee
                           className="text-base"
                           style={{ color: "#789680" }}
                         />
                       ) : (
-                        // Basılmadığında: BOŞ İKON + Varsayılan Soluk Renk (Hover'da koyulaşır)
                         <MdOutlineCoffee className="text-base text-neutral-400 hover:text-neutral-600" />
                       )}
                     </>
@@ -378,11 +386,15 @@ const PostCard = ({
                   onClick={handleToggleBookmark}
                   className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
                     interactionStatus.isBookmarked
-                      ? "text-blue-600 font-semibold"
+                      ? "text-black font-semibold"
                       : ""
                   }`}
                 >
-                  <SiWikibooks className="text-base" />
+                  {interactionStatus.isBookmarked ? (
+                    <TbBookmarkFilled className="text-base" />
+                  ) : (
+                    <TbBookmark className="text-base" />
+                  )}
                 </li>
               </ul>
             )}

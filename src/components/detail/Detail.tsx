@@ -5,7 +5,11 @@ import { PostResponse } from "@/services/server/post.service";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser } from "react-icons/fi";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import {
+  TbBookmark,
+  TbBookmarkFilled,
+  TbRosetteDiscountCheckFilled,
+} from "react-icons/tb";
 import { IoIosMore, IoMdHeart, IoIosBookmark } from "react-icons/io";
 import { CiHeart } from "react-icons/ci";
 import { HiSparkles, HiOutlineSparkles } from "react-icons/hi2";
@@ -29,6 +33,8 @@ import {
   RiUserSmileFill,
 } from "react-icons/ri";
 import { FaHandsClapping } from "react-icons/fa6";
+import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
+import { PiFeather, PiFeatherFill } from "react-icons/pi";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -672,7 +678,7 @@ const Detail = ({ post }: DetailProps) => {
 
             {/* GÜNCELLENMİŞ BEĞENİ, PARLATMA VE KAYDETME BARI */}
             <div className="h-full w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
                 {/* Beğeni Butonu */}
                 <button
                   onClick={toggleLike}
@@ -684,11 +690,11 @@ const Detail = ({ post }: DetailProps) => {
                     className={`text-2xl ${status.isLiked ? "text-red-600" : ""}`}
                   />
 
-                  <span
+                  {/* <span
                     className={`text-xs font-medium ${status.isLiked ? "text-red-500 font-semibold" : ""}`}
                   >
                     {formatCount(status.likeCount)}
-                  </span>
+                  </span> */}
                 </button>
 
                 {/* Parlatma (Shine) Butonu */}
@@ -703,13 +709,27 @@ const Detail = ({ post }: DetailProps) => {
                       className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
                     />
                   ) : post.postType === "MONOLOG" ? (
-                    <RiQuillPenFill
-                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
-                    />
+                    <>
+                      {status.isShined ? (
+                        <PiFeatherFill
+                          className="text-2xl"
+                          style={{ color: "#66788a" }}
+                        />
+                      ) : (
+                        <PiFeather className="text-2xl text-neutral-400 hover:text-neutral-600" />
+                      )}
+                    </>
                   ) : post.postType === "YANYANA" ? (
-                    <RiCupFill
-                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
-                    />
+                    <>
+                      {status.isShined ? (
+                        <MdCoffee
+                          className={`text-2xl`}
+                          style={{ color: "#789680" }}
+                        />
+                      ) : (
+                        <MdOutlineCoffee className={`text-2xl`} />
+                      )}
+                    </>
                   ) : (
                     <RiUserSmileFill
                       className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
@@ -730,13 +750,13 @@ const Detail = ({ post }: DetailProps) => {
                 <button
                   onClick={() => toggleBookmark()}
                   disabled={isInteractionLoading}
-                  className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
+                  className="transition-colors cursor-pointer"
                   title={status.isBookmarked ? "Kaydedildi" : "Kaydet"}
                 >
                   {status.isBookmarked ? (
-                    <IoIosBookmark className="text-xl text-blue-600 scale-110 transition-transform" />
+                    <TbBookmarkFilled className="text-xl text-black scale-110 transition-transform" />
                   ) : (
-                    <IoIosBookmark className="text-xl hover:scale-110 transition-transform" />
+                    <TbBookmark className="text-xl hover:scale-110 transition-transform" />
                   )}
                 </button>
 
