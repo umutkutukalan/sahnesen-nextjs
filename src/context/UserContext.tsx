@@ -11,8 +11,8 @@ import {
 } from "react";
 
 interface UserContextType {
-  user: any;
-  setUser: Dispatch<React.SetStateAction<any>>;
+  user: User | null;
+  setUser: Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
   logout: () => Promise<void>;
 }
@@ -23,8 +23,35 @@ interface UserProviderProps {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+  surname: string;
+  slug: string;
+  profileImg: string;
+  coverImg: string;
+  role: string;
+}
+
+export interface PublicUser {
+  id: number;
+  username: string;
+  name: string;
+  surname: string;
+  slug: string;
+  profileImg: string;
+  coverImg: string;
+  bio: string;
+  motto: string;
+  city: string;
+  district: string;
+  role: string;
+}
+
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";

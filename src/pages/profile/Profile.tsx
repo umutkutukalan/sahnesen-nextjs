@@ -28,8 +28,6 @@ import { useFollow } from "@/hooks/follow/useFollow";
 import FollowersList from "@/components/follow/FollowersList";
 import FollowingList from "@/components/follow/FollowingList";
 import { useSocialAccount } from "@/hooks/social_accounts/useSocialAccounts";
-import { MdOutlineWorkspacePremium } from "react-icons/md";
-import { TiLocationArrow } from "react-icons/ti";
 import PageAbout from "@/components/PageAbout";
 
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
@@ -47,11 +45,11 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const { getUser, profileUser, isLoading } = useGetUser();
 
   const targetUsername = profileUser?.username;
+  const targetUserId = profileUser?.id;
   const isOwnProfile = usernameSlug === user?.username;
 
-  const { getPublicSocialAccounts, publicSocialAccounts } =
-    useSocialAccount(targetUsername);
-  const { isFollowing, followCounts, toggleFollow } = useFollow(targetUsername);
+  const { getPublicSocialAccounts, publicSocialAccounts } = useSocialAccount();
+  const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
   const { getFollowing, followings } = useGetFollowing();
   const { getFollowers, followers } = useGetFollowers();
 
