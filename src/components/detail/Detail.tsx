@@ -31,6 +31,7 @@ import {
   RiCupFill,
   RiQuillPenFill,
   RiUserSmileFill,
+  RiUserSmileLine,
 } from "react-icons/ri";
 import { FaHandsClapping } from "react-icons/fa6";
 import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
@@ -749,9 +750,13 @@ const Detail = ({ post }: DetailProps) => {
                       )}
                     </>
                   ) : (
-                    <RiUserSmileFill
-                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
-                    />
+                    <>
+                      {status.isShined ? (
+                        <RiUserSmileFill className={`text-2xl text-gray-700`} />
+                      ) : (
+                        <RiUserSmileLine className={`text-2xl`} />
+                      )}
+                    </>
                   )}
 
                   {/* <span

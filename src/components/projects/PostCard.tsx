@@ -45,7 +45,12 @@ import {
 import { IoHeart, IoSparkles } from "react-icons/io5";
 import { MdBookmarks, MdCoffee, MdOutlineCoffee } from "react-icons/md";
 import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
-import { RiCupFill, RiQuillPenFill, RiUserSmileFill } from "react-icons/ri";
+import {
+  RiCupFill,
+  RiQuillPenFill,
+  RiUserSmileFill,
+  RiUserSmileLine,
+} from "react-icons/ri";
 import { BsCupFill } from "react-icons/bs";
 import { SiWikibooks } from "react-icons/si";
 
@@ -373,12 +378,16 @@ const PostCard = ({
                       )}
                     </>
                   ) : (
-                    <RiUserSmileFill
-                      className={`text-base`}
-                      style={{
-                        color: interactionStatus.isShined ? "#fdfd96" : "",
-                      }}
-                    />
+                    <>
+                      {interactionStatus.isShined ? (
+                        <RiUserSmileFill
+                          className={`text-base`}
+                          style={{ color: "#fdfd96" }}
+                        />
+                      ) : (
+                        <RiUserSmileLine className={`text-base`} />
+                      )}
+                    </>
                   )}
 
                   {/* <span>
