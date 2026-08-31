@@ -36,22 +36,11 @@ const cards = [
     label: "Monolog",
     bg: "#f2c103",
     image: fineday,
-    side: "top",
+    side: "right",
     bottomOffset: "sm:-bottom-13 sm:left-5 w-60 h-60",
     options: ["Editöre Git"],
     sentence: "",
     description: "İç sesin, fikirlerin, tecrübelerin. Kendinle baş başa.",
-  },
-  {
-    id: "etut",
-    label: "Etüt",
-    bg: "#f79292ff",
-    image: etut,
-    side: "right",
-    bottomOffset: "sm:-bottom-10 sm:-left-2 w-60 h-60",
-    options: ["Editöre Git"],
-    sentence: "Herkesin hayran olduğu, bana delilik.",
-    description: "Mizahın, ironilerin, ters köşelerin. Kuralları baştan yaz.",
   },
   {
     id: "yanyana",
@@ -159,7 +148,7 @@ const CreateIntroTwo = () => {
 
         <div
           ref={containerRef}
-          className="flex flex-wrap content-center justify-center gap-10 w-full max-w-5xl mx-auto"
+          className="flex flex-wrap content-center justify-center gap-10 w-full max-w-3xl mx-auto"
         >
           {cards.map((card, i) => {
             const isSelected = selected === card.id;
