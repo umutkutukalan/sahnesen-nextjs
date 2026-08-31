@@ -10,8 +10,11 @@ import {
 import {
   PiFeather,
   PiFeatherFill,
+  PiHandsClappingBold,
+  PiHandsClappingDuotone,
   PiHandsClappingFill,
   PiHandsClappingLight,
+  PiHandsClappingThin,
   PiNotebookFill,
 } from "react-icons/pi";
 import { GiCandleFlame, GiPapers } from "react-icons/gi";
@@ -337,12 +340,16 @@ const PostCard = ({
                   className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition-all duration-300`}
                 >
                   {post.postType === "SAHNE" ? (
-                    <FaHandsClapping
-                      className={`text-base`}
-                      style={{
-                        color: interactionStatus.isShined ? "#c86b5a" : "",
-                      }}
-                    />
+                    <>
+                      {interactionStatus.isShined ? (
+                        <PiHandsClappingFill
+                          className={`text-base`}
+                          style={{ color: "#c86b5a" }}
+                        />
+                      ) : (
+                        <PiHandsClappingDuotone className={`text-base`} />
+                      )}
+                    </>
                   ) : post.postType === "MONOLOG" ? (
                     <>
                       {interactionStatus.isShined ? (
@@ -351,7 +358,7 @@ const PostCard = ({
                           style={{ color: "#66788a" }}
                         />
                       ) : (
-                        <PiFeather className="text-base text-neutral-400 hover:text-neutral-600" />
+                        <PiFeather className="text-base" />
                       )}
                     </>
                   ) : post.postType === "YANYANA" ? (
@@ -362,7 +369,7 @@ const PostCard = ({
                           style={{ color: "#789680" }}
                         />
                       ) : (
-                        <MdOutlineCoffee className="text-base text-neutral-400 hover:text-neutral-600" />
+                        <MdOutlineCoffee className="text-base" />
                       )}
                     </>
                   ) : (

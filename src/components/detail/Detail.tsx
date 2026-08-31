@@ -34,7 +34,15 @@ import {
 } from "react-icons/ri";
 import { FaHandsClapping } from "react-icons/fa6";
 import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
-import { PiFeather, PiFeatherFill } from "react-icons/pi";
+import {
+  PiFeather,
+  PiFeatherFill,
+  PiHandsClappingBold,
+  PiHandsClappingDuotone,
+  PiHandsClappingFill,
+  PiHandsClappingLight,
+  PiHandsClappingThin,
+} from "react-icons/pi";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -705,9 +713,19 @@ const Detail = ({ post }: DetailProps) => {
                   title="Parlat"
                 >
                   {post.postType === "SAHNE" ? (
-                    <FaHandsClapping
-                      className={`text-2xl ${status.isShined ? "text-amber-500" : ""}`}
-                    />
+                    <>
+                      {status.isShined ? (
+                        <PiHandsClappingFill
+                          className={`text-2xl`}
+                          style={{ color: "#c86b5a" }}
+                        />
+                      ) : (
+                        <PiHandsClappingDuotone
+                          className={`text-2xl`}
+                          style={{ color: "" }}
+                        />
+                      )}
+                    </>
                   ) : post.postType === "MONOLOG" ? (
                     <>
                       {status.isShined ? (
