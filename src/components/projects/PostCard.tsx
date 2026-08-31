@@ -106,7 +106,10 @@ const PostCard = ({
     <div className="w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
       {/* SOL GÖRSEL */}
       <div className="h-full flex flex-col justify-center">
-        <div className="w-45 h-35 hidden flex-shrink-0 sm:flex items-center justify-center">
+        <div
+          className="hidden flex-shrink-0 sm:flex items-center justify-center"
+          style={{ width: "160px", height: "160px" }}
+        >
           <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center border border-gray-100">
             {finalImageUrl ? (
               <Image
@@ -114,7 +117,7 @@ const PostCard = ({
                 alt={post.title}
                 fill
                 unoptimized
-                className="object-cover"
+                className="object-cover w-full h-full"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-50">
