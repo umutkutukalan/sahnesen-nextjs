@@ -7,7 +7,10 @@ import {
   PostInteractionStatus,
 } from "@/services/client/interaction/interaction.service";
 
-export const usePostInteraction = (postId: number) => {
+export const usePostInteraction = (
+  postId: number,
+  shineType: ReactionType = "SHINE_SAHNE",
+) => {
   const [status, setStatus] = useState<PostInteractionStatus>({
     isLiked: false,
     isShined: false,
@@ -16,7 +19,6 @@ export const usePostInteraction = (postId: number) => {
     shineCount: 0,
   });
 
-  // Başlangıç değerini postId durumuna göre belirliyoruz
   const [isLoading, setIsLoading] = useState<boolean>(!!postId);
 
   useEffect(() => {
@@ -24,20 +26,21 @@ export const usePostInteraction = (postId: number) => {
 
     let isMounted = true;
 
+    // Sayfa yüklenirken ilgili modun shine tipiyle durum sorgulanıyor
     interactionService
-      .getPostInteractionStatus(postId)
+      .getPostInteractionStatus(postId, shineType)
       .then((data) => {
         if (isMounted) setStatus(data);
       })
       .catch((err) => console.error("Post etkileşim durumu alınamadı:", err))
       .finally(() => {
-        if (isMounted) setIsLoading(false); // Asenkron işlem bittiğinde state güncellemek güvenlidir
+        if (isMounted) setIsLoading(false);
       });
 
     return () => {
       isMounted = false;
     };
-  }, [postId]);
+  }, [postId, shineType]);
 
   const toggleReaction = async (reactionType: ReactionType) => {
     const isLike = reactionType === "LIKE";
@@ -79,7 +82,8 @@ export const usePostInteraction = (postId: number) => {
     status,
     isLoading,
     toggleLike: () => toggleReaction("LIKE"),
-    toggleShine: () => toggleReaction("SHINE"),
+    // Artık dinamik gelen shine türünü (örn: SHINE_YANYANA) tetikliyor
+    toggleShine: () => toggleReaction(shineType),
     toggleBookmark,
   };
 };

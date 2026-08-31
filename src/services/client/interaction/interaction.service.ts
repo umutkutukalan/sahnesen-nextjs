@@ -1,6 +1,12 @@
 import api from "../config";
 
-export type ReactionType = "LIKE" | "SHINE";
+// Backend'deki ReactionType enum'ı ile birebir uyumlu hale getirildi
+export type ReactionType =
+  | "LIKE"
+  | "SHINE_SAHNE"
+  | "SHINE_MONOLOG"
+  | "SHINE_YANYANA"
+  | "SHINE_TERSYUZ";
 
 export interface BookmarkCollection {
   id: number;
@@ -18,7 +24,7 @@ export interface PostInteractionStatus {
 }
 
 export const interactionService = {
-  // Beğen veya Parlat Toggle
+  // Beğen veya Mod Bazlı Parlat Toggle
   toggleReaction: async (postId: number, reactionType: ReactionType) => {
     const res = await api.post(
       `/api/interaction/posts/${postId}/reactions/toggle`,
@@ -30,7 +36,7 @@ export const interactionService = {
     return res.data;
   },
 
-  // Kaydet / Kaydı Kaldır (collectionId opsiyoneldir, verilmezse varsayılan klasöre atar)
+  // Kaydet / Kaydı Kaldır
   toggleBookmark: async (postId: number, collectionId?: number) => {
     const res = await api.post(
       `/api/interaction/posts/${postId}/bookmarks/toggle`,
@@ -42,11 +48,14 @@ export const interactionService = {
     return res.data;
   },
 
-  // Post'un kullanıcının anlık etkileşim durumu ve sayıları
+  // Post'un durumunu çekerken hangi shine türünün kontrol edileceğini parametre olarak gönderiyoruz
   getPostInteractionStatus: async (
     postId: number,
+    targetShineType: ReactionType,
   ): Promise<PostInteractionStatus> => {
-    const res = await api.get(`/api/interaction/posts/${postId}/interactions`);
+    const res = await api.get(`/api/interaction/posts/${postId}/interactions`, {
+      params: { targetShineType },
+    });
     return res.data;
   },
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { FiUser, FiEdit3, FiTrash2 } from "react-icons/fi";
-import { LuImages, LuNotebookTabs } from "react-icons/lu";
+import { LuImages } from "react-icons/lu";
 import {
   TbBookmark,
   TbBookmarkFilled,
@@ -10,49 +10,23 @@ import {
 import {
   PiFeather,
   PiFeatherFill,
-  PiHandsClappingBold,
   PiHandsClappingDuotone,
   PiHandsClappingFill,
-  PiHandsClappingLight,
-  PiHandsClappingThin,
-  PiNotebookFill,
 } from "react-icons/pi";
-import { GiCandleFlame, GiPapers } from "react-icons/gi";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { useRelativeTime } from "../../hooks/useRelativeTime";
 import { useToProfile } from "@/utils/useToProfile";
 import { PostSummaryResponse } from "@/services/server/post.service";
-import {
-  FaBookBookmark,
-  FaHandsClapping,
-  FaTicketSimple,
-} from "react-icons/fa6";
-import { IoMdHeart } from "react-icons/io";
-import { CiHeart } from "react-icons/ci";
-import {
-  BiBookmarks as BiBookmarksIcon,
-  BiSolidUserRectangle,
-} from "react-icons/bi";
+import { FaTicketSimple } from "react-icons/fa6";
 import { useAuth } from "@/context/UserContext";
 import { useDeletePosts } from "@/hooks/posts/useDeletePost";
-import {
-  interactionService,
-  PostInteractionStatus,
-} from "@/services/client/interaction/interaction.service";
-import { IoHeart, IoSparkles } from "react-icons/io5";
-import { MdBookmarks, MdCoffee, MdOutlineCoffee } from "react-icons/md";
-import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
-import {
-  RiCupFill,
-  RiQuillPenFill,
-  RiUserSmileFill,
-  RiUserSmileLine,
-} from "react-icons/ri";
-import { BsCupFill } from "react-icons/bs";
-import { SiWikibooks } from "react-icons/si";
+import { ReactionType } from "@/services/client/interaction/interaction.service";
+import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
+import { RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
+import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
 
 interface PostCardProps {
   post: PostSummaryResponse;
@@ -77,73 +51,31 @@ const PostCard = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const { deletePost } = useDeletePosts();
 
-  // Etkileşim State'leri
-  const [interactionStatus, setInteractionStatus] =
-    useState<PostInteractionStatus>({
-      isLiked: false,
-      isShined: false,
-      isBookmarked: false,
-      likeCount: 0,
-      shineCount: 0,
-    });
-
-  // Post kartı yüklendiğinde kullanıcının bu post üzerindeki durumunu ve sayıları çek
-  useEffect(() => {
-    if (!isOwner && user) {
-      interactionService
-        .getPostInteractionStatus(post.id)
-        .then((res) => setInteractionStatus(res))
-        .catch((err) => console.error("Etkileşim durumu alınamadı:", err));
-    }
-  }, [post.id, isOwner, user]);
-
-  // Beğeni Toggle Aksiyonu
-  const handleToggleLike = async () => {
-    if (!user) return;
-    try {
-      const res = await interactionService.toggleReaction(post.id, "LIKE");
-      setInteractionStatus((prev) => ({
-        ...prev,
-        isLiked: res.reacted,
-        likeCount: res.reacted
-          ? prev.likeCount + 1
-          : Math.max(0, prev.likeCount - 1),
-      }));
-    } catch (error) {
-      console.error("Beğeni güncellenemedi:", error);
+  // Post tipine göre dinamik ReactionType belirleme
+  const getShineType = (type?: string): ReactionType => {
+    switch (type) {
+      case "SAHNE":
+        return "SHINE_SAHNE";
+      case "MONOLOG":
+        return "SHINE_MONOLOG";
+      case "YANYANA":
+        return "SHINE_YANYANA";
+      case "TERSYUZ":
+        return "SHINE_TERSYUZ";
+      default:
+        return "SHINE_SAHNE";
     }
   };
 
-  // Parlat (Shine/Clap) Toggle Aksiyonu
-  const handleToggleShine = async () => {
-    if (!user) return;
-    try {
-      const res = await interactionService.toggleReaction(post.id, "SHINE");
-      setInteractionStatus((prev) => ({
-        ...prev,
-        isShined: res.reacted,
-        shineCount: res.reacted
-          ? prev.shineCount + 1
-          : Math.max(0, prev.shineCount - 1),
-      }));
-    } catch (error) {
-      console.error("Parlatma güncellenemedi:", error);
-    }
-  };
+  const currentShineType = getShineType(post?.postType);
 
-  // Kaydet (Bookmark) Toggle Aksiyonu
-  const handleToggleBookmark = async () => {
-    if (!user) return;
-    try {
-      const res = await interactionService.toggleBookmark(post.id);
-      setInteractionStatus((prev) => ({
-        ...prev,
-        isBookmarked: res.bookmarked,
-      }));
-    } catch (error) {
-      console.error("Kaydetme güncellenemedi:", error);
-    }
-  };
+  // Hook entegrasyonu (Eğer kullanıcı postun sahibiyse veya giriş yapmadıysa hook'u devre dışı bırakmak için koşullu çağırabilirsin veya hook içinde yönetebilirsin)
+  const {
+    status: interactionStatus,
+    toggleLike,
+    toggleShine,
+    toggleBookmark,
+  } = usePostInteraction(!isOwner && user ? post.id : 0, currentShineType);
 
   const handleConfirmDelete = () => {
     deletePost(post?.id, () => {
@@ -290,7 +222,6 @@ const PostCard = ({
                 </span>
               </div>
 
-              {/* EĞER showReadButton true ise VEYA sahibi DEĞİLSE "Perdeyi Arala" gösterilir */}
               {(showReadButton || !isOwner) && (
                 <button
                   onClick={() =>
@@ -323,25 +254,9 @@ const PostCard = ({
               </div>
             ) : (
               <ul className="flex items-center gap-2">
-                {/* LIKE */}
-                {/* <li
-                  onClick={handleToggleLike}
-                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition`}
-                >
-                  <IoHeart
-                    className={`text-base ${interactionStatus.isLiked ? "text-red-600" : ""}`}
-                  />
-
-                  <span>
-                    {interactionStatus.likeCount >= 1000
-                      ? `${Math.floor(interactionStatus.likeCount / 100) / 10}K`
-                      : interactionStatus.likeCount}
-                  </span>
-                </li> */}
-
-                {/* SHINE (PARLAT) */}
+                {/* SHINE (PARLAT) - Mod Bazlı */}
                 <li
-                  onClick={handleToggleShine}
+                  onClick={toggleShine}
                   className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition-all duration-300`}
                 >
                   {post.postType === "SAHNE" ? (
@@ -389,17 +304,11 @@ const PostCard = ({
                       )}
                     </>
                   )}
-
-                  {/* <span>
-                    {interactionStatus.shineCount >= 1000
-                      ? `${Math.floor(interactionStatus.shineCount / 100) / 10}K`
-                      : interactionStatus.shineCount}
-                  </span> */}
                 </li>
 
                 {/* BOOKMARK (KAYDET) */}
                 <li
-                  onClick={handleToggleBookmark}
+                  onClick={() => toggleBookmark()}
                   className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
                     interactionStatus.isBookmarked
                       ? "text-black font-semibold"

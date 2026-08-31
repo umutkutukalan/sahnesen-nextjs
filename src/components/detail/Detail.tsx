@@ -85,6 +85,38 @@ const Detail = ({ post }: DetailProps) => {
     return count;
   };
 
+  // Post tipine göre aktif/pasif ikonları ve marka renklerini tanımlıyoruz
+  const SHINE_CONFIG = {
+    SAHNE: {
+      activeIcon: PiHandsClappingFill,
+      inactiveIcon: PiHandsClappingDuotone,
+      color: "#c86b5a",
+    },
+    MONOLOG: {
+      activeIcon: PiFeatherFill,
+      inactiveIcon: PiFeather,
+      color: "#66788a",
+    },
+    YANYANA: {
+      activeIcon: MdCoffee,
+      inactiveIcon: MdOutlineCoffee,
+      color: "#789680",
+    },
+    TERSYUZ: {
+      activeIcon: RiUserSmileFill,
+      inactiveIcon: RiUserSmileLine,
+      color: "#eab308", // #fdfd96 çok açık sarı olduğu için arayüzde görünmeyebilir, burayı istediğin bir tona ayarlayabilirsin
+    },
+  };
+
+  const postType = post.postType as keyof typeof SHINE_CONFIG;
+  const config = SHINE_CONFIG[postType] || SHINE_CONFIG.SAHNE; // Fallback
+
+  // Aktif veya pasif duruma göre ilgili ikon componentini seçiyoruz
+  const IconComponent = status.isShined
+    ? config.activeIcon
+    : config.inactiveIcon;
+
   useEffect(() => {
     // 1. Standart window scroll'unu en üste çek
     window.scrollTo(0, 0);
@@ -710,63 +742,26 @@ const Detail = ({ post }: DetailProps) => {
                 <button
                   onClick={toggleShine}
                   disabled={isInteractionLoading}
-                  className="flex items-center gap-1.5 text-gray-600 hover:text-amber-500 transition-colors group cursor-pointer"
+                  className="flex items-center gap-1.5 text-gray-600 hover:opacity-80 transition-all group cursor-pointer"
                   title="Parlat"
                 >
-                  {post.postType === "SAHNE" ? (
-                    <>
-                      {status.isShined ? (
-                        <PiHandsClappingFill
-                          className={`text-2xl`}
-                          style={{ color: "#c86b5a" }}
-                        />
-                      ) : (
-                        <PiHandsClappingDuotone
-                          className={`text-2xl`}
-                          style={{ color: "" }}
-                        />
-                      )}
-                    </>
-                  ) : post.postType === "MONOLOG" ? (
-                    <>
-                      {status.isShined ? (
-                        <PiFeatherFill
-                          className="text-2xl"
-                          style={{ color: "#66788a" }}
-                        />
-                      ) : (
-                        <PiFeather className="text-2xl text-neutral-400 hover:text-neutral-600" />
-                      )}
-                    </>
-                  ) : post.postType === "YANYANA" ? (
-                    <>
-                      {status.isShined ? (
-                        <MdCoffee
-                          className={`text-2xl`}
-                          style={{ color: "#789680" }}
-                        />
-                      ) : (
-                        <MdOutlineCoffee className={`text-2xl`} />
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {status.isShined ? (
-                        <RiUserSmileFill
-                          className={`text-2xl`}
-                          style={{ color: "#fdfd96" }}
-                        />
-                      ) : (
-                        <RiUserSmileLine className={`text-2xl`} />
-                      )}
-                    </>
-                  )}
+                  <IconComponent
+                    className="text-2xl transition-transform active:scale-110"
+                    style={{
+                      color: status.isShined ? config.color : undefined,
+                    }}
+                  />
 
-                  {/* <span
-                    className={`text-xs font-medium ${status.isShined ? "text-amber-500 font-semibold" : ""}`}
+                  <span
+                    className={`text-xs font-medium transition-colors ${
+                      status.isShined ? "font-semibold" : "text-gray-500"
+                    }`}
+                    style={{
+                      color: status.isShined ? config.color : undefined,
+                    }}
                   >
-                    {formatCount(status.shineCount)}
-                  </span> */}
+                    {status.shineCount > 0 && status.shineCount}
+                  </span>
                 </button>
               </div>
 
