@@ -1,6 +1,5 @@
 import api from "../config";
 
-// Backend'deki ReactionType enum'ı ile birebir uyumlu hale getirildi
 export type ReactionType =
   | "LIKE"
   | "SHINE_SAHNE"
@@ -72,5 +71,26 @@ export const interactionService = {
       description,
     });
     return res.data;
+  },
+
+  // BEĞENİLEN POSTLAR (Backend'de Controller tarafında karşılığı yazılacak veya PostReaction bazlı çekilecek)
+  // Not: Eğer backend'de beğenilenler için ayrı bir endpoint'in yoksa /api/interaction/posts/liked gibi bir rota eklemen gerekebilir.
+  getLikedPosts: async (page: number = 0, size: number = 5) => {
+    const res = await api.get(`/api/interaction/posts/liked`, {
+      params: { page, size },
+    });
+    return res.data; // Spring Page yapısı: { content, number, totalPages, ... }
+  },
+
+  // KAYDEDİLEN POSTLAR (Backend'deki BookmarkCollectionController -> /posts endpoint'ine bağlanır)
+  getBookmarkedPosts: async (
+    postType?: string,
+    page: number = 0,
+    size: number = 5,
+  ) => {
+    const res = await api.get(`/api/interaction/bookmark-collections/posts`, {
+      params: { postType, page, size },
+    });
+    return res.data; // Spring Page yapısı: { content, number, totalPages, ... }
   },
 };
