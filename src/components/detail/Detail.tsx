@@ -701,7 +701,7 @@ const Detail = ({ post }: DetailProps) => {
         }
       `}</style>
 
-      <div className={`page-padding flex gap-5 relative`}>
+      <div className={`page-padding flex justify-center gap-5 relative`}>
         <div className="flex flex-col w-full lg:w-[850px] gap-10 transition-all duration-300 relative px-2 md:px-15">
           {/* YAZAR ÜST BARI */}
           <div className="flex flex-col w-full">
