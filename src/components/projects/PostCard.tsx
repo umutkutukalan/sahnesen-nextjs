@@ -27,6 +27,7 @@ import { ReactionType } from "@/services/client/interaction/interaction.service"
 import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
 import { RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
 import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
+import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 
 interface PostCardProps {
   post: PostSummaryResponse;
@@ -256,11 +257,23 @@ const PostCard = ({
                 </button>
               </div>
             ) : (
-              <ul className="flex items-center gap-2">
+              <ul className="flex items-center gap-1.5">
+                {/* BEĞEN */}
+                <li
+                  onClick={toggleLike}
+                  className={`flex items-center gap-1 cursor-pointer transition-all duration-300`}
+                >
+                  {interactionStatus.isLiked ? (
+                    <IoHeartSharp className="text-base text-red-500" />
+                  ) : (
+                    <IoHeartOutline className="text-base" />
+                  )}
+                </li>
+
                 {/* SHINE (PARLAT) - Mod Bazlı */}
                 <li
                   onClick={toggleShine}
-                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition-all duration-300`}
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer transition-all duration-300`}
                 >
                   {post.postType === "SAHNE" ? (
                     <>
@@ -312,14 +325,10 @@ const PostCard = ({
                 {/* BOOKMARK (KAYDET) */}
                 <li
                   onClick={() => toggleBookmark()}
-                  className={`hidden sm:flex items-center gap-1 cursor-pointer hover:opacity-80 transition ${
-                    interactionStatus.isBookmarked
-                      ? "text-black font-semibold"
-                      : ""
-                  }`}
+                  className={`hidden sm:flex items-center gap-1 cursor-pointer transition-all duration-300`}
                 >
                   {interactionStatus.isBookmarked ? (
-                    <TbBookmarkFilled className="text-base" />
+                    <TbBookmarkFilled className="text-base text-black" />
                   ) : (
                     <TbBookmark className="text-base" />
                   )}

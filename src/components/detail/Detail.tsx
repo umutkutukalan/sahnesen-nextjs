@@ -32,6 +32,7 @@ import {
   PiHandsClappingFill,
 } from "react-icons/pi";
 import { ReactionType } from "@/services/client/interaction/interaction.service";
+import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -780,15 +781,17 @@ const Detail = ({ post }: DetailProps) => {
                   className="flex items-center gap-1.5 text-gray-600 hover:text-red-500 transition-colors group cursor-pointer"
                   title="Beğen"
                 >
-                  <RiCandleFill
-                    className={`text-2xl ${status.isLiked ? "text-red-600" : ""}`}
-                  />
+                  {status.isLiked ? (
+                    <IoHeartSharp className="text-2xl text-red-500" />
+                  ) : (
+                    <IoHeartOutline className="text-2xl" />
+                  )}
 
-                  {/* <span
+                  <span
                     className={`text-xs font-medium ${status.isLiked ? "text-red-500 font-semibold" : ""}`}
                   >
                     {formatCount(status.likeCount)}
-                  </span> */}
+                  </span>
                 </button>
 
                 {/* Parlatma (Shine) Butonu */}
