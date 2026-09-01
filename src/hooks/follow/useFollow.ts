@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../context/UserContext";
 import { followService } from "@/services/client/follow/follow.service";
 
-export const useFollow = (targetUserId: number) => {
+export const useFollow = (targetUsername: string) => {
   const { user } = useAuth();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followCounts, setFollowCounts] = useState({
@@ -16,16 +16,14 @@ export const useFollow = (targetUserId: number) => {
   useEffect(() => {
     const fetchFollowData = async () => {
       try {
-        // Takip sayılarını getir
-        const counts = await followService.getFollowCounts(targetUserId);
-        setFollowCounts(counts);
+        // Takip sayılarını getir (Public endpoint)
+        const stats = await followService.getFollowStats(targetUsername);
+        setFollowCounts(stats);
 
-        // Kullanıcı giriş yapmışsa takip durumunu kontrol et
-        if (user && user.id !== targetUserId) {
-          const following = await followService.checkIsFollowing({
-            followerId: user.id,
-            followingId: targetUserId,
-          });
+        // Kullanıcı giriş yapmışsa ve kendi profili değilse takip durumunu kontrol et
+        if (user && user.username !== targetUsername) {
+          const following =
+            await followService.checkIsFollowing(targetUsername);
           setIsFollowing(following);
         }
       } catch (err) {
@@ -34,10 +32,10 @@ export const useFollow = (targetUserId: number) => {
       }
     };
 
-    if (targetUserId) {
+    if (targetUsername) {
       fetchFollowData();
     }
-  }, [targetUserId, user]);
+  }, [targetUsername, user]);
 
   // Takip et/bırak toggle fonksiyonu
   const toggleFollow = async () => {
@@ -46,7 +44,7 @@ export const useFollow = (targetUserId: number) => {
       return;
     }
 
-    if (user.id === targetUserId) {
+    if (user.username === targetUsername) {
       console.warn("Kullanıcı kendini takip edemez");
       return;
     }
@@ -56,27 +54,19 @@ export const useFollow = (targetUserId: number) => {
 
     try {
       if (isFollowing) {
-        await followService.unfollowUser({
-          followerId: user.id,
-          followingId: targetUserId,
-        });
+        await followService.unfollowUser(targetUsername);
         setIsFollowing(false);
         setFollowCounts((prev) => ({
           ...prev,
-          followerCount: prev.followerCount - 1,
+          followerCount: Math.max(0, prev.followerCount - 1),
         }));
-        console.log("Takipten çıkıldı");
       } else {
-        await followService.followUser({
-          followerId: user.id,
-          followingId: targetUserId,
-        });
+        await followService.followUser(targetUsername);
         setIsFollowing(true);
         setFollowCounts((prev) => ({
           ...prev,
           followerCount: prev.followerCount + 1,
         }));
-        console.log("Takip edildi");
       }
     } catch (err) {
       console.error("Takip işlemi sırasında hata:", err);
@@ -92,6 +82,6 @@ export const useFollow = (targetUserId: number) => {
     isLoading,
     error,
     toggleFollow,
-    canFollow: user && user.id !== targetUserId,
+    canFollow: user && user.username !== targetUsername,
   };
 };

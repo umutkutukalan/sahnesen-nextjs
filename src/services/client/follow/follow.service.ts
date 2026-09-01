@@ -1,52 +1,34 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import api from "../config";
 
-export interface FollowId {
-    followerId: number;
-    followingId: number;
+export interface FollowDTO {
+  id: number;
+  followerUsername: string;
+  followingUsername: string;
+  followedAt: string;
 }
 
 export const followService = {
-  followUser: async ({followingId, followerId}: FollowId) => {
-    const response = await fetch(
-      `${BASE_URL}/follows/${followingId}?followerId=${followerId}`,
-      {
-        method: "POST",
-        credentials: "include",
-      }
-    );
-    return response.json();
+  // Kullanıcıyı takip et (Username ile)
+  followUser: async (followingUsername: string) => {
+    const res = await api.post(`/api/follows/${followingUsername}`);
+    return res.data;
   },
 
-  unfollowUser: async ({followingId, followerId}: FollowId) => {
-    const response = await fetch(
-      `${BASE_URL}/follows/${followingId}?followerId=${followerId}`,
-      {
-        method: "DELETE",
-        credentials: "include",
-      }
-    );
-    return response.json();
+  // Takipten çık (Username ile)
+  unfollowUser: async (followingUsername: string) => {
+    const res = await api.delete(`/api/follows/${followingUsername}`);
+    return res.data;
   },
 
-  getFollowCounts: async (userId: string | number) => {
-    const response = await fetch(`${BASE_URL}/follows/count/${userId}`);
-    return response.json();
+  // Takipçi ve takip edilen sayılarını getir (/api/follows/stats/{username})
+  getFollowStats: async (username: string) => {
+    const res = await api.get(`/api/follows/stats/${username}`);
+    return res.data; // { followerCount: number, followingCount: number }
   },
 
-  checkIsFollowing: async ({followerId, followingId}: FollowId) => {
-    const response = await fetch(
-      `${BASE_URL}/follows/check?followerId=${followerId}&followingId=${followingId}`
-    );
-    return response.json();
-  },
-
-  getFollowing: async (userId: string | number) => {
-    const response = await fetch(`${BASE_URL}/follows/following/${userId}`);
-    return response.json();
-  },
-
-  getFollowers: async (userId: string | number) => {
-    const response = await fetch(`${BASE_URL}/follows/followers/${userId}`);
-    return response.json();
+  // Giriş yapmış kullanıcı bu kişiyi takip ediyor mu?
+  checkIsFollowing: async (followingUsername: string) => {
+    const res = await api.get(`/api/follows/is-following/${followingUsername}`);
+    return res.data; // boolean
   },
 };
