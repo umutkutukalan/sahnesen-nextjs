@@ -1,17 +1,20 @@
 "use client";
 
 import { FiUser, FiEdit3, FiTrash2 } from "react-icons/fi";
-import { LuImages } from "react-icons/lu";
+import { LuImages, LuTheater } from "react-icons/lu";
 import {
   TbBookmark,
   TbBookmarkFilled,
   TbRosetteDiscountCheckFilled,
+  TbTheater,
 } from "react-icons/tb";
 import {
+  PiEyeLight,
   PiFeather,
   PiFeatherFill,
   PiHandsClappingDuotone,
   PiHandsClappingFill,
+  PiUsersLight,
 } from "react-icons/pi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -111,7 +114,7 @@ const PostCard = ({
           className="hidden flex-shrink-0 sm:flex items-center justify-center"
           style={{ width: "160px", height: "160px" }}
         >
-          <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center border border-gray-100">
+          <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center border border-gray-100 rounded-xl">
             {finalImageUrl ? (
               <Image
                 src={finalImageUrl}
@@ -226,6 +229,14 @@ const PostCard = ({
                 </span>
               </div>
 
+              <div className="relative pr-2 border-r border-gray-200 flex items-center gap-1">
+                <LuTheater className="text-xs text-gray-600" />
+                <div className="flex items-center gap-1 text-xs">
+                  <span className="text-gray-600">{post?.viewCount}</span>
+                  <p className="text-gray-600">defa aralandı</p>
+                </div>
+              </div>
+
               {(showReadButton || !isOwner) && (
                 <button
                   onClick={() =>
@@ -233,7 +244,7 @@ const PostCard = ({
                   }
                   className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
                 >
-                  <span className="text-[10px] font-medium">Perdeyi Arala</span>
+                  <span className="text-xs font-medium">Perdeyi Arala</span>
                 </button>
               )}
             </div>
