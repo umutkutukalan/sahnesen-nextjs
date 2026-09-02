@@ -15,40 +15,31 @@ interface PostsProps {
 }
 
 const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
+  // 🔑 Akış kaynağı state'i ("all" veya "following")
+  const [feedScope, setFeedScope] = useState<"all" | "following">("all");
+
   // Aktif filtrenin state'i (undefined = Tümü)
   const [selectedPostType, setSelectedPostType] = useState<string | undefined>(
     undefined,
   );
 
-  // useGetPosts hook'una seçili türü de aktarıyoruz
+  // useGetPosts hook'una feedScope ve postType'ı aktarıyoruz
   const { posts, isLoadingMore, hasMore, loadMorePosts, currentPage } =
-    useGetPosts(initialPosts, initialPage, totalPages, selectedPostType);
+    useGetPosts(
+      initialPosts,
+      initialPage,
+      totalPages,
+      selectedPostType,
+      feedScope,
+    );
 
   // Infinite scroll hook'u
   const loadMoreRef = useInfiniteScroll(loadMorePosts, hasMore, isLoadingMore);
-
-  // Seçilen tipe göre filtrelenmiş yayınlar
-  const displayedPosts = selectedPostType
-    ? posts.filter((post) => post.postType === selectedPostType)
-    : posts;
 
   return (
     <div className="page">
       <div className="relative flex w-full">
         <div className="relative w-full flex flex-col">
-          {/* Üst Bilgi / Duyuru Bandı */}
-          {/* <div className="w-full h-12 bg-yellow-500 border-y border-black flex items-center justify-center">
-            <p className="text-xs italic">
-              <span className="py-1 px-2 bg-white border border-white rounded-lg">
-                Welcome Offer
-              </span>{" "}
-              Access to everything. Now 30% off.{" "}
-              <span className="underline font-semibold not-italic">
-                Upgrade now
-              </span>
-            </p>
-          </div> */}
-
           <div className="relative flex w-full">
             {/* SOL ANA AKIŞ */}
             <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
@@ -57,6 +48,8 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
                   {/* Sekme Seçim Başlıkları (PageAbout) */}
                   <div className="w-full flex justify-center">
                     <PageAbout
+                      feedScope={feedScope}
+                      onSelectFeedScope={(scope) => setFeedScope(scope)}
                       selectedType={selectedPostType}
                       onSelectType={(postType) => setSelectedPostType(postType)}
                     />
@@ -64,15 +57,17 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
 
                   {/* PROJE / İÇERİK LİSTESİ */}
                   <div className="pt-5 space-y-4">
-                    {displayedPosts.length > 0 ? (
-                      displayedPosts.map((post) => (
+                    {posts.length > 0 ? (
+                      posts.map((post) => (
                         <PostCard key={post?.id} post={post} />
                       ))
                     ) : (
                       <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-                        {selectedPostType
-                          ? `${selectedPostType} türünde henüz bir içerik bulunmuyor.`
-                          : "Henüz yayınlanmış bir içerik bulunmuyor."}
+                        {feedScope === "following"
+                          ? "Takip ettiğiniz kişilerin henüz yayınlanmış bir içeriği bulunmuyor."
+                          : selectedPostType
+                            ? `${selectedPostType} türünde henüz bir içerik bulunmuyor.`
+                            : "Henüz yayınlanmış bir içerik bulunmuyor."}
                       </div>
                     )}
                   </div>

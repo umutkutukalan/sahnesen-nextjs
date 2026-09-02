@@ -24,15 +24,6 @@ const Sidebar = () => {
     setSelectedSideBarMenu(menu);
   };
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-  // Gelen string'in başında "/" yoksa, url birleştirirken çift slash olmaması için kontrol ediyoruz
-  const userProfileImg = user?.profileImg
-    ? user?.profileImg.startsWith("http")
-      ? user?.profileImg
-      : `${baseUrl}/${user?.profileImg}`
-    : null;
-
   return (
     <aside
       className={`hidden lg:flex h-[calc(100vh-64px)] sticky top-16 flex-col justify-between bg-white z-80 transition-all duration-500 ease-in-out overflow-hidden ${

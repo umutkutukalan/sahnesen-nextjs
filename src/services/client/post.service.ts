@@ -167,3 +167,27 @@ export const deletePostService = async (postId: number) => {
   const response = await api.delete(`/api/posts/me/${postId}`);
   return response.data;
 };
+
+export const getFollowingPostsClient = async (
+  postType?: string,
+  page = 0,
+  size = 10,
+) => {
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+
+    if (postType) {
+      params.append("postType", postType);
+    }
+
+    // Ham fetch yerine kimlik doğrulama çerezlerini/token'ını otomatik taşıyan api (Axios) kullanıyoruz
+    const response = await api.get(`/api/posts/following?${params.toString()}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Takip edilen gönderiler çekilirken hata:", error);
+    throw error;
+  }
+};

@@ -1,15 +1,22 @@
 "use client";
 
 import { FaTicketSimple } from "react-icons/fa6";
+import { FiGlobe, FiUsers } from "react-icons/fi";
 
 interface PageAboutProps {
+  feedScope: "all" | "following";
+  onSelectFeedScope: (scope: "all" | "following") => void;
   selectedType: string | undefined;
   onSelectType: (type: string | undefined) => void;
 }
 
-const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
-  const handleSelect = (type: string) => {
-    // Aynı butona tekrar basılırsa filtreyi kaldırır (Tüm Gönderileri Getirir)
+const PageAbout = ({
+  feedScope,
+  onSelectFeedScope,
+  selectedType,
+  onSelectType,
+}: PageAboutProps) => {
+  const handleSelectType = (type: string) => {
     if (selectedType === type) {
       onSelectType(undefined);
     } else {
@@ -18,9 +25,39 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
   };
 
   return (
-    <div className="w-full relative flex items-start">
-      <div className="w-full h-18 flex items-end justify-between sticky top-[64px] z-20 border-b border-gray-100">
-        <ul className="w-full flex items-end gap-8">
+    <div className="w-full relative flex flex-col border-b border-gray-100 sticky top-[64px] bg-white z-20">
+      {/* 1. ANA AKIŞ SEÇİCİ (Genel Akış / Takip Ettiklerin) */}
+      <div className="w-full flex items-center gap-6 pt-3 px-1 border-b border-gray-100">
+        <button
+          type="button"
+          className={`pb-2 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
+            feedScope === "all"
+              ? "border-b-2 border-black text-black"
+              : "text-gray-400 hover:text-black"
+          }`}
+          onClick={() => onSelectFeedScope("all")}
+        >
+          <FiGlobe className="text-sm" />
+          <span>Genel Akış</span>
+        </button>
+
+        <button
+          type="button"
+          className={`pb-2 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
+            feedScope === "following"
+              ? "border-b-2 border-black text-black"
+              : "text-gray-400 hover:text-black"
+          }`}
+          onClick={() => onSelectFeedScope("following")}
+        >
+          <FiUsers className="text-sm" />
+          <span>Takip Ettiklerin</span>
+        </button>
+      </div>
+
+      {/* 2. İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
+      <div className="w-full h-14 flex items-end justify-between">
+        <ul className="w-full flex items-end gap-6 overflow-x-auto scrollbar-hide">
           <button
             type="button"
             className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
@@ -41,9 +78,9 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             style={{
               borderColor: selectedType === "SAHNE" ? "#c86b5a" : undefined,
             }}
-            onClick={() => handleSelect("SAHNE")}
+            onClick={() => handleSelectType("SAHNE")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#c86b5a" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#c86b5a" }} />
             <span className="text-xs">Sahne</span>
           </button>
 
@@ -55,9 +92,9 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             style={{
               borderColor: selectedType === "MONOLOG" ? "#66788a" : undefined,
             }}
-            onClick={() => handleSelect("MONOLOG")}
+            onClick={() => handleSelectType("MONOLOG")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#66788a" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#66788a" }} />
             <span className="text-xs">Monolog</span>
           </button>
 
@@ -69,9 +106,9 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             style={{
               borderColor: selectedType === "YANYANA" ? "#789680" : undefined,
             }}
-            onClick={() => handleSelect("YANYANA")}
+            onClick={() => handleSelectType("YANYANA")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#789680" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#789680" }} />
             <span className="text-xs">Yan Yana</span>
           </button>
 
@@ -83,9 +120,9 @@ const PageAbout = ({ selectedType, onSelectType }: PageAboutProps) => {
             style={{
               borderColor: selectedType === "TERSYUZ" ? "#fdfd96" : undefined,
             }}
-            onClick={() => handleSelect("TERSYUZ")}
+            onClick={() => handleSelectType("TERSYUZ")}
           >
-            <FaTicketSimple className="text-xl" style={{ color: "#fdfd96" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#fdfd96" }} />
             <span className="text-xs">Tersyüz</span>
           </button>
         </ul>

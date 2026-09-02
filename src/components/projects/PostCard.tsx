@@ -6,15 +6,12 @@ import {
   TbBookmark,
   TbBookmarkFilled,
   TbRosetteDiscountCheckFilled,
-  TbTheater,
 } from "react-icons/tb";
 import {
-  PiEyeLight,
   PiFeather,
   PiFeatherFill,
   PiHandsClappingDuotone,
   PiHandsClappingFill,
-  PiUsersLight,
 } from "react-icons/pi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
