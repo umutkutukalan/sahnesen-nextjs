@@ -1,23 +1,43 @@
-import { followService } from "@/services/client/follow/follow.service";
+import {
+  FollowDTO,
+  followService,
+} from "@/services/client/follow/follow.service";
 import { useState, useCallback } from "react";
 
 export const useGetFollowers = () => {
-  const [followers, setFollowers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [followers, setFollowers] = useState<FollowDTO[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
-  // 💡 targetUserId yerine username alıyoruz
-  const getFollowers = useCallback(async (username: string) => {
-    try {
-      setIsLoading(true);
-      const response = await followService.getFollowers(username); // Serviste de username'e çevrilecek
-      setFollowers(response || []);
-    } catch (error) {
-      console.error("Error fetching followers data:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const getFollowers = useCallback(
+    async (username: string, reset = false) => {
+      try {
+        setIsLoading(true);
+        const currentPage = reset ? 0 : page;
+        const response = await followService.getFollowers(
+          username,
+          currentPage,
+          6,
+        );
 
-  return { followers, setFollowers, isLoading, getFollowers };
+        if (response.length < 6) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+
+        setFollowers((prev) => (reset ? response : [...prev, ...response]));
+        if (!reset) setPage((prev) => prev + 1);
+        if (reset) setPage(1);
+      } catch (error) {
+        console.error("Error fetching followers data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [page],
+  );
+
+  return { followers, setFollowers, isLoading, getFollowers, hasMore };
 };
