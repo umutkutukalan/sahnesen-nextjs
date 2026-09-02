@@ -47,14 +47,28 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const isOwnProfile = usernameSlug === user?.username;
 
   const { getPublicSocialAccounts, publicSocialAccounts } = useSocialAccount();
-  const { getFollowing, followings } = useGetFollowing();
-  const { getFollowers, followers } = useGetFollowers();
+
+  // Sayfalama parametreleri eklendi
+  const {
+    getFollowing,
+    followings,
+    hasMore: hasMoreFollowing,
+    isLoading: loadingFollowing,
+  } = useGetFollowing();
+
+  const {
+    getFollowers,
+    followers,
+    hasMore: hasMoreFollowers,
+    isLoading: loadingFollowers,
+  } = useGetFollowers();
+
   const { isFollowing, followCounts, toggleFollow } = useFollow(
     targetUsername,
     () => {
       if (targetUsername) {
-        getFollowing(targetUsername);
-        getFollowers(targetUsername);
+        getFollowing(targetUsername, true);
+        getFollowers(targetUsername, true);
       }
     },
   );
@@ -67,8 +81,8 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
 
   useEffect(() => {
     if (targetUsername) {
-      getFollowing(targetUsername);
-      getFollowers(targetUsername);
+      getFollowing(targetUsername, true); // İlk yükleme (reset=true)
+      getFollowers(targetUsername, true); // İlk yükleme (reset=true)
       getPublicSocialAccounts(targetUsername);
     }
   }, [targetUsername]);
@@ -295,6 +309,9 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             followings={followings}
             onClose={() => setFollowingList(false)}
             setFollowingList={setFollowingList}
+            onLoadMore={() => getFollowing(targetUsername, false)}
+            hasMore={hasMoreFollowing}
+            isLoading={loadingFollowing}
           />
         )}
         {followersList && (
@@ -302,6 +319,9 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             followers={followers}
             onClose={() => setFollowersList(false)}
             setFollowersList={setFollowersList}
+            onLoadMore={() => getFollowers(targetUsername, false)}
+            hasMore={hasMoreFollowers}
+            isLoading={loadingFollowers}
           />
         )}
       </div>

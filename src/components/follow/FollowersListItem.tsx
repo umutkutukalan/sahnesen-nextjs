@@ -5,9 +5,10 @@ import { useFollow } from "@/hooks/follow/useFollow";
 import { getOptimizedImageUrl } from "@/utils/ImageUtils";
 import { useToProfile } from "../../utils/useToProfile";
 import { useAuth } from "@/context/UserContext";
+import { FollowDTO } from "@/services/client/follow/follow.service";
 
 interface FollowersListItemProps {
-  follower: any;
+  follower: FollowDTO;
   setFollowersList: (isOpen: boolean) => void;
 }
 
@@ -32,7 +33,7 @@ const FollowersListItem = ({
     <li className="flex items-center gap-2 px-5 py-3">
       <div
         onClick={() => {
-          ToProfile(follower, targetUsername);
+          ToProfile(targetUsername);
           setFollowersList(false);
         }}
         className="w-10 h-10 border border-gray-300 rounded-full overflow-hidden flex items-end justify-center cursor-pointer flex-shrink-0 relative"
@@ -57,7 +58,7 @@ const FollowersListItem = ({
           <span
             className="text-sm cursor-pointer"
             onClick={() => {
-              ToProfile(follower, targetUsername);
+              ToProfile(targetUsername);
               setFollowersList(false);
             }}
           >
