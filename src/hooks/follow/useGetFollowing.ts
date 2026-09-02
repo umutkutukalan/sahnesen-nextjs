@@ -4,15 +4,18 @@ import { useState, useCallback } from "react";
 export const useGetFollowing = () => {
   const [followings, setFollowing] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  const getFollowing = useCallback(async (targetUserId: string | number) => {
+
+  // 💡 targetUserId yerine username alıyoruz
+  const getFollowing = useCallback(async (username: string) => {
     try {
-      const response = await followService.getFollowing(targetUserId);
+      setIsLoading(true);
+      const response = await followService.getFollowing(username); // Serviste de username'e çevrilecek
       setFollowing(response || []);
-      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching following data:", error);
-      throw error; // Hata durumunda hatayı fırlat
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 

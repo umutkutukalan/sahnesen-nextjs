@@ -1,29 +1,45 @@
-
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
 import Image from "next/image";
-import { useToProfile } from "@/utils/useToProfile";
-import { getOptimizedImageUrl } from "@/utils/ImageUtils";
 import { useFollow } from "@/hooks/follow/useFollow";
+import { getOptimizedImageUrl } from "@/utils/ImageUtils";
+import { useToProfile } from "../../utils/useToProfile";
+import { useAuth } from "@/context/UserContext";
 
-const FollowersListItem = ({ follower, currentUserId, setFollowersList }) => {
+interface FollowersListItemProps {
+  follower: any;
+  setFollowersList: (isOpen: boolean) => void;
+}
+
+const FollowersListItem = ({
+  follower,
+  setFollowersList,
+}: FollowersListItemProps) => {
+  const { user } = useAuth();
   const { ToProfile } = useToProfile();
-  const { isFollowing, isLoading, toggleFollow } = useFollow(
-    follower.follower.id
-  );
+
+  const targetUsername = follower?.username;
+  const { isFollowing, isLoading, toggleFollow } = useFollow(targetUsername);
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const targetProfileImgUrl = follower?.profileImg
+    ? follower?.profileImg.startsWith("http")
+      ? follower?.profileImg
+      : `${baseUrl}/${follower?.profileImg}`
+    : null;
 
   return (
     <li className="flex items-center gap-2 px-5 py-3">
       <div
         onClick={() => {
-          ToProfile(follower?.follower, follower?.follower?.username);
+          ToProfile(follower, targetUsername);
           setFollowersList(false);
         }}
         className="w-10 h-10 border border-gray-300 rounded-full overflow-hidden flex items-end justify-center cursor-pointer flex-shrink-0 relative"
       >
-        {follower.follower.profileImg ? (
+        {targetProfileImgUrl ? (
           <Image
-            src={getOptimizedImageUrl(follower.follower.profileImg)}
+            src={getOptimizedImageUrl(targetProfileImgUrl)}
             alt=""
             fill
             unoptimized
@@ -36,24 +52,27 @@ const FollowersListItem = ({ follower, currentUserId, setFollowersList }) => {
       <div className="w-full flex items-center justify-between">
         <div className="flex flex-col">
           <p className="text-gray-500" style={{ fontSize: "0.650rem" }}>
-            @{follower.follower.username}
+            @{targetUsername}
           </p>
-          <span className="text-sm cursor-pointer" onClick={() => {
-            ToProfile(follower?.follower, follower?.follower?.username);
-            setFollowersList(false);
-          }}>
-            {follower.follower.name} {follower.follower.surname}
+          <span
+            className="text-sm cursor-pointer"
+            onClick={() => {
+              ToProfile(follower, targetUsername);
+              setFollowersList(false);
+            }}
+          >
+            {follower?.name} {follower?.surname}
           </span>
         </div>
-        {/* Sadece takip butonu - kendi kendini takip edemez */}
-        {follower.follower.id !== currentUserId && (
+        {user?.username !== targetUsername && (
           <button
             onClick={toggleFollow}
             disabled={isLoading}
-            className={`px-3 py-1 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${isFollowing
+            className={`px-3 py-1 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${
+              isFollowing
                 ? "bg-blue-50 text-blue-700 border-blue-200"
                 : "bg-white text-green-700 border-gray-300"
-              }`}
+            }`}
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

@@ -1,10 +1,18 @@
 import { IoClose } from "react-icons/io5";
 import FollowingItem from "./FollowingListItem";
 
+interface FollowingListProps {
+  followings: any[];
+  onClose: () => void;
+  setFollowingList: (isOpen: boolean) => void;
+}
 
-const FollowingList = ({ followings, currentUserId, onClose, setFollowingList }) => {
-
-  console.log("FollowingList followings:", followings);
+const FollowingList = ({
+  followings,
+  onClose,
+  setFollowingList,
+}: FollowingListProps) => {
+  console.log("following list:", followings);
 
   return (
     <div
@@ -29,8 +37,7 @@ const FollowingList = ({ followings, currentUserId, onClose, setFollowingList })
             <FollowingItem
               key={following.id}
               following={following}
-              currentUserId={currentUserId}
-              setFollowingList={setFollowingList} 
+              setFollowingList={setFollowingList}
             />
           ))}
         </ul>

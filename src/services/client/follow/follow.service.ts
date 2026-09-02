@@ -2,9 +2,10 @@ import api from "../config";
 
 export interface FollowDTO {
   id: number;
-  followerUsername: string;
-  followingUsername: string;
-  followedAt: string;
+  username: string;
+  name: string;
+  surname: string;
+  profileImg: string;
 }
 
 export const followService = {
@@ -30,5 +31,17 @@ export const followService = {
   checkIsFollowing: async (followingUsername: string) => {
     const res = await api.get(`/api/follows/is-following/${followingUsername}`);
     return res.data; // boolean
+  },
+
+  // Takip edilenleri getir (Username ile)
+  getFollowing: async (username: string) => {
+    const res = await api.get(`/api/follows/following/${username}`);
+    return res.data;
+  },
+
+  // Takipçileri getir (Username ile)
+  getFollowers: async (username: string) => {
+    const res = await api.get(`/api/follows/followers/${username}`);
+    return res.data;
   },
 };

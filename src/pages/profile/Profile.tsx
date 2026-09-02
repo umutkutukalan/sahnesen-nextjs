@@ -33,7 +33,6 @@ import PageAbout from "@/components/PageAbout";
 const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
   const { user } = useAuth();
   const router = useRouter();
-  const currentUserId = user?.id;
 
   const [selectedPostType, setSelectedPostType] = useState<string | undefined>(
     undefined,
@@ -44,14 +43,21 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
 
   const { getUser, profileUser, isLoading } = useGetUser();
 
-  const targetUsername = profileUser?.username;
-  const targetUserId = profileUser?.id;
+  const targetUsername = profileUser?.username as string;
   const isOwnProfile = usernameSlug === user?.username;
 
   const { getPublicSocialAccounts, publicSocialAccounts } = useSocialAccount();
-  const { isFollowing, followCounts, toggleFollow } = useFollow(targetUserId);
   const { getFollowing, followings } = useGetFollowing();
   const { getFollowers, followers } = useGetFollowers();
+  const { isFollowing, followCounts, toggleFollow } = useFollow(
+    targetUsername,
+    () => {
+      if (targetUsername) {
+        getFollowing(targetUsername);
+        getFollowers(targetUsername);
+      }
+    },
+  );
 
   useEffect(() => {
     if (usernameSlug) {
@@ -208,7 +214,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                   <div className="flex items-center gap-2 text-xs">
                     <div
                       className="flex items-center gap-1 cursor-pointer"
-                      onClick={() => setFollowersList(!followersList)}
+                      onClick={() => setFollowersList(true)}
                     >
                       <span>{followCounts?.followerCount || 0}</span>
                       <span className="text-gray-700">Takipçi</span>
@@ -216,27 +222,13 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                     <span className="text-gray-600">•</span>
                     <div
                       className="flex items-center gap-1 cursor-pointer"
-                      onClick={() => setFollowingList(!followingList)}
+                      onClick={() => setFollowingList(true)}
                     >
                       <span>{followCounts?.followingCount || 0}</span>
                       <span className="text-gray-700">Takip</span>
                     </div>
                   </div>
                 </div>
-
-                {/* <div
-                  className="flex flex-col gap-1 mt-5 text-gray-600"
-                  style={{ fontSize: "0.7rem" }}
-                >
-                  <div className="flex items-center gap-1">
-                    <MdOutlineWorkspacePremium className="text-xl" />
-                    <span>Klinik Psikolog</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <TiLocationArrow className="text-xl" />
-                    <span>Eskişehir, Türkiye</span>
-                  </div>
-                </div> */}
 
                 <div
                   className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
@@ -301,7 +293,6 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
         {followingList && (
           <FollowingList
             followings={followings}
-            currentUserId={currentUserId}
             onClose={() => setFollowingList(false)}
             setFollowingList={setFollowingList}
           />
@@ -309,7 +300,6 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
         {followersList && (
           <FollowersList
             followers={followers}
-            currentUserId={currentUserId}
             onClose={() => setFollowersList(false)}
             setFollowersList={setFollowersList}
           />

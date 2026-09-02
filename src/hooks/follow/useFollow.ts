@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../context/UserContext";
 import { followService } from "@/services/client/follow/follow.service";
 
-export const useFollow = (targetUsername: string) => {
+export const useFollow = (
+  targetUsername: string,
+  onFollowChange?: () => void,
+) => {
   const { user } = useAuth();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followCounts, setFollowCounts] = useState({
@@ -12,15 +15,12 @@ export const useFollow = (targetUsername: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Takip durumunu ve sayıları getir
   useEffect(() => {
     const fetchFollowData = async () => {
       try {
-        // Takip sayılarını getir (Public endpoint)
         const stats = await followService.getFollowStats(targetUsername);
         setFollowCounts(stats);
 
-        // Kullanıcı giriş yapmışsa ve kendi profili değilse takip durumunu kontrol et
         if (user && user.username !== targetUsername) {
           const following =
             await followService.checkIsFollowing(targetUsername);
@@ -37,17 +37,9 @@ export const useFollow = (targetUsername: string) => {
     }
   }, [targetUsername, user]);
 
-  // Takip et/bırak toggle fonksiyonu
   const toggleFollow = async () => {
-    if (!user) {
-      console.warn("Kullanıcı giriş yapmamış");
-      return;
-    }
-
-    if (user.username === targetUsername) {
-      console.warn("Kullanıcı kendini takip edemez");
-      return;
-    }
+    if (!user) return;
+    if (user.username === targetUsername) return;
 
     setIsLoading(true);
     setError(null);
@@ -67,6 +59,11 @@ export const useFollow = (targetUsername: string) => {
           ...prev,
           followerCount: prev.followerCount + 1,
         }));
+      }
+
+      // 💡 İşlem başarılı olunca dışarıdaki fonksiyonu tetikle (listeleri güncellemek için)
+      if (onFollowChange) {
+        onFollowChange();
       }
     } catch (err) {
       console.error("Takip işlemi sırasında hata:", err);

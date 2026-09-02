@@ -5,14 +5,17 @@ export const useGetFollowers = () => {
   const [followers, setFollowers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getFollowers = useCallback(async (targetUserId: string | number) => {
+  // 💡 targetUserId yerine username alıyoruz
+  const getFollowers = useCallback(async (username: string) => {
     try {
-      const response = await followService.getFollowers(targetUserId);
+      setIsLoading(true);
+      const response = await followService.getFollowers(username); // Serviste de username'e çevrilecek
       setFollowers(response || []);
-      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching followers data:", error);
-      throw error; // Hata durumunda hatayı fırlat
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
