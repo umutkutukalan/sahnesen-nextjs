@@ -186,6 +186,13 @@ export const searchTagsClient = async (query: string) => {
   return response.data; // List<Tag>
 };
 
+export const getPostsByTagClient = async (tagName: string) => {
+  const response = await api.get(
+    `/api/posts/tag/${encodeURIComponent(tagName)}`,
+  );
+  return response.data;
+};
+
 export const getFollowingPostsClient = async (
   postType?: string,
   page = 0,
