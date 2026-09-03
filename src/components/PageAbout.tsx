@@ -1,7 +1,8 @@
 "use client";
 
 import { FaTicketSimple } from "react-icons/fa6";
-import { FiGlobe, FiUsers } from "react-icons/fi";
+import { LiaTheaterMasksSolid } from "react-icons/lia";
+import { TbTheater } from "react-icons/tb";
 
 interface PageAboutProps {
   feedScope: "all" | "following";
@@ -35,28 +36,26 @@ const PageAbout = ({
       <div className="w-full flex items-center gap-6 pt-3 px-1">
         <button
           type="button"
-          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
-            feedScope === "all"
-              ? "border-b-2 border-black text-black"
-              : "text-gray-400 hover:text-black"
+          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
+            feedScope === "all" ? "border-b-2 border-black text-black" : ""
           }`}
           onClick={() => onSelectFeedScope("all")}
         >
-          <FiGlobe className="text-sm" />
-          <span>Genel Akış</span>
+          <TbTheater className="text-xl" />
+          <span className="text-xs">Fuaye</span>
         </button>
 
         <button
           type="button"
-          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
+          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
             feedScope === "following"
               ? "border-b-2 border-black text-black"
-              : "text-gray-400 hover:text-black"
+              : ""
           }`}
           onClick={() => onSelectFeedScope("following")}
         >
-          <FiUsers className="text-sm" />
-          <span>Takip Ettiklerin</span>
+          <LiaTheaterMasksSolid className="text-xl" />
+          <span className="text-xs">Sahnemdekiler</span>
         </button>
       </div>
 
@@ -68,7 +67,7 @@ const PageAbout = ({
             className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === undefined
                 ? "border-b-2 border-black font-medium"
-                : "opacity-70 hover:opacity-100"
+                : ""
             }`}
             onClick={() => onSelectType(undefined)}
           >
