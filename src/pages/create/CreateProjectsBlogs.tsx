@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
+import PublishModal from "@/components/editor/PublishModal";
 import {
   createPostClient,
   updatePostClient,
@@ -21,6 +22,23 @@ const extractTitle = (json: any): string => {
   const first = json?.content?.[0];
   if (first?.type === "heading" && first?.attrs?.level === 1) {
     return first.content?.map((n: any) => n.text || "").join("") || "";
+  }
+  return "";
+};
+
+const extractSubtitleFromJSON = (json: any): string => {
+  if (!json?.content) return "";
+  for (let i = 1; i < json.content.length; i++) {
+    const node = json.content[i];
+    if (node?.type === "paragraph" && node.content) {
+      const text = node.content
+        .map((n: any) => n.text || "")
+        .join("")
+        .trim();
+      if (text.length > 0) {
+        return text.length > 250 ? text.substring(0, 247) + "..." : text;
+      }
+    }
   }
   return "";
 };
@@ -56,6 +74,10 @@ const CreateProjectsBlog = () => {
   const [initialContent, setInitialContent] = useState<any>(null);
   const [isLoadingPost, setIsLoadingPost] = useState<boolean>(false);
 
+  // Modal State'leri
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState<boolean>(false);
+  const [currentSubtitle, setCurrentSubtitle] = useState<string>("");
+
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -80,7 +102,6 @@ const CreateProjectsBlog = () => {
               setPostType(postData.postType);
             }
 
-            // Backend'den gelen yayınlanma durumunu tutuyoruz
             if (typeof postData.isPublished === "boolean") {
               setIsPublished(postData.isPublished);
               isPublishedRef.current = postData.isPublished;
@@ -112,7 +133,7 @@ const CreateProjectsBlog = () => {
     postTypeRef.current = postType;
   }, [postType]);
 
-  // Sayfadan çıkarken (kaydedilmemiş canlı içerik değişikliği varsa) uyarı çıkar
+  // Sayfadan çıkarken uyarı
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isPublishedRef.current && saveStatus === "IDLE") {
@@ -125,7 +146,7 @@ const CreateProjectsBlog = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [saveStatus]);
 
-  // İlk Taslak Oluşturma (Sadece yeni sıfır yazılarda çalışır)
+  // İlk Taslak Oluşturma
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
     if (
       activePostIdRef.current ||
@@ -166,7 +187,7 @@ const CreateProjectsBlog = () => {
     }
   });
 
-  // Otomatik Kaydetme (Sadece TASLAK durumundaki içeriklerde çalışır)
+  // Otomatik Kaydetme
   const autoSaveContentRef = useRef(async (currentJson: any) => {
     if (!activePostIdRef.current || isPublishedRef.current) return;
 
@@ -198,7 +219,6 @@ const CreateProjectsBlog = () => {
   const handleEditorUpdate = useCallback((json: any) => {
     setEditorJSON(json);
 
-    // Yayınlanmış içerik düzenleniyorsa auto-save tetikleme!
     if (isPublishedRef.current) {
       setSaveStatus("IDLE");
       return;
@@ -222,8 +242,8 @@ const CreateProjectsBlog = () => {
     };
   }, []);
 
-  // Yayınlama / Güncelleme İşlemi (Manuel Trigger)
-  const handleSave = async () => {
+  // Modalı Açma Kontrolü
+  const handleOpenPublishModal = () => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
@@ -234,11 +254,21 @@ const CreateProjectsBlog = () => {
       return;
     }
 
+    const extractedSubtitle = extractSubtitleFromJSON(editorJSONRef.current);
+    setCurrentSubtitle(extractedSubtitle);
+    setIsPublishModalOpen(true);
+  };
+
+  // Modaldan Gelen Verilerle Kesin Yayınlama/Güncelleme İşlemi
+  const handlePublishFinal = async (tags: string[], finalSubtitle: string) => {
+    const currentTitle = extractTitle(editorJSONRef.current);
     setSaveStatus("SAVING");
 
     const payload = {
       postType: postTypeRef.current,
       title: currentTitle,
+      subtitle: finalSubtitle,
+      tags: tags,
       content: editorJSONRef.current,
       isPublished: true,
     };
@@ -254,17 +284,14 @@ const CreateProjectsBlog = () => {
       }
 
       setSaveStatus("SAVED");
+      setIsPublishModalOpen(false);
 
-      // 🔑 3. EN KRİTİK ADIM: Profil sayfasındaki React Query cache'ini temizle/sıfırla!
       await queryClient.invalidateQueries({ queryKey: ["userPosts"] });
-
-      // Yayınlama/Güncelleme sonrası Next.js cache'ini tazeliyoruz
       router.refresh();
 
       const username = savedPost?.authorUsername || user?.username;
       const slug = savedPost?.slug;
 
-      // Güncel adrese yönlendiriyoruz
       if (username && slug) {
         router.push(`/${username}/${slug}`);
       } else {
@@ -282,7 +309,7 @@ const CreateProjectsBlog = () => {
         transparent={false}
         contentStatus={saveStatus}
         activePostId={activePostId}
-        handleSave={handleSave}
+        onOpenPublishModal={handleOpenPublishModal}
       />
 
       <div className="w-full lg:w-[760px] mx-auto px-6 pt-6">
@@ -296,6 +323,13 @@ const CreateProjectsBlog = () => {
           />
         )}
       </div>
+
+      <PublishModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        onPublish={handlePublishFinal}
+        initialSubtitle={currentSubtitle}
+      />
     </main>
   );
 };

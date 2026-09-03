@@ -17,14 +17,14 @@ interface EditorNavbarProps {
   transparent: boolean;
   contentStatus: string;
   activePostId: number | null;
-  handleSave: () => void;
+  onOpenPublishModal: () => void;
 }
 
 const EditorNavbar = ({
   transparent,
   contentStatus,
   activePostId,
-  handleSave,
+  onOpenPublishModal,
 }: EditorNavbarProps) => {
   const { user, setUser } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -147,7 +147,7 @@ const EditorNavbar = ({
                 : "hover:bg-green-700 cursor-pointer shadow-sm"
             }`}
             disabled={!activePostId || contentStatus === "SAVING"}
-            onClick={handleSave}
+            onClick={onOpenPublishModal}
           >
             Sahnele
           </button>

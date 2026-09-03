@@ -137,6 +137,7 @@ export const createPostClient = async (payload: any) => {
     subtitle: payload.subtitle || null,
     content: ensureValidContent(payload.content),
     coverImage: payload.coverImage || null,
+    tags: payload.tags || [],
     isPublished: Boolean(payload.isPublished),
   };
 
@@ -155,6 +156,7 @@ export const updatePostClient = async (postId: number, payload: any) => {
     subtitle: payload.subtitle || null,
     content: ensureValidContent(payload.content),
     coverImage: payload.coverImage || null,
+    tags: payload.tags || [],
     isPublished: Boolean(payload.isPublished),
   };
 
