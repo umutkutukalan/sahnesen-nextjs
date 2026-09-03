@@ -25,12 +25,17 @@ const PageAbout = ({
   };
 
   return (
-    <div className="w-full relative flex flex-col border-b border-gray-100 sticky top-[64px] bg-white z-20">
+    <div
+      className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
+      style={{
+        height: "64px",
+      }}
+    >
       {/* 1. ANA AKIŞ SEÇİCİ (Genel Akış / Takip Ettiklerin) */}
-      <div className="w-full flex items-center gap-6 pt-3 px-1 border-b border-gray-100">
+      <div className="w-full flex items-center gap-6 pt-3 px-1">
         <button
           type="button"
-          className={`pb-2 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
+          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
             feedScope === "all"
               ? "border-b-2 border-black text-black"
               : "text-gray-400 hover:text-black"
@@ -43,7 +48,7 @@ const PageAbout = ({
 
         <button
           type="button"
-          className={`pb-2 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
+          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all text-xs font-semibold ${
             feedScope === "following"
               ? "border-b-2 border-black text-black"
               : "text-gray-400 hover:text-black"
@@ -56,11 +61,11 @@ const PageAbout = ({
       </div>
 
       {/* 2. İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
-      <div className="w-full h-14 flex items-end justify-between">
-        <ul className="w-full flex items-end gap-6 overflow-x-auto scrollbar-hide">
+      <div className="w-full relative h-14 flex items-end justify-between">
+        <ul className="w-full relative z-50 flex items-end justify-end gap-6 overflow-x-auto scrollbar-hide">
           <button
             type="button"
-            className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === undefined
                 ? "border-b-2 border-black font-medium"
                 : "opacity-70 hover:opacity-100"
@@ -72,7 +77,7 @@ const PageAbout = ({
 
           <button
             type="button"
-            className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === "SAHNE" ? "border-b-2 font-medium" : ""
             }`}
             style={{
@@ -86,7 +91,7 @@ const PageAbout = ({
 
           <button
             type="button"
-            className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === "MONOLOG" ? "border-b-2 font-medium" : ""
             }`}
             style={{
@@ -100,7 +105,7 @@ const PageAbout = ({
 
           <button
             type="button"
-            className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === "YANYANA" ? "border-b-2 font-medium" : ""
             }`}
             style={{
@@ -114,7 +119,7 @@ const PageAbout = ({
 
           <button
             type="button"
-            className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               selectedType === "TERSYUZ" ? "border-b-2 font-medium" : ""
             }`}
             style={{

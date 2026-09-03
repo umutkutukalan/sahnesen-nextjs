@@ -108,7 +108,7 @@ const PostCard = ({
       {/* SOL GÖRSEL */}
       <div className="h-full flex flex-col justify-center">
         <div
-          className="hidden flex-shrink-0 sm:flex items-center justify-center"
+          className="hidden flex-shrink-0 sm:flex relative items-center justify-center"
           style={{ width: "160px", height: "160px" }}
         >
           <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center border border-gray-100 rounded-xl">
