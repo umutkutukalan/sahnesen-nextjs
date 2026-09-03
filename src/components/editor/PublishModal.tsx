@@ -28,6 +28,8 @@ export default function PublishModal({
     setSubtitle(initialSubtitle || "");
   }, [initialSubtitle]);
 
+  console.log("suggestion", suggestions);
+
   // Etiket auto-complete sorgusu
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -100,57 +102,67 @@ export default function PublishModal({
         </div>
 
         {/* Etiket Ekleme Alanı */}
-        <div className="mb-6 relative">
+        <div className="mb-6">
           <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
             Etiketler (En fazla 5 adet)
           </label>
-          <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-200 rounded-xl min-h-[48px] bg-white focus-within:border-green-800 transition-colors">
-            {tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="bg-green-50 text-green-800 text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 font-medium"
-              >
-                #{tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(idx)}
-                  className="hover:text-red-600"
+
+          {/* Kutuyu kapsayan ana div'den 'relative' kaldırıldı veya esnek hale getirildi */}
+          <div className="relative">
+            <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-200 rounded-xl min-h-[48px] bg-white focus-within:border-green-800 transition-colors">
+              {tags.map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="bg-green-50 text-green-800 text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 font-medium"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
-            {tags.length < 5 && (
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={
-                  tags.length === 0 ? "Etiket ekle (Enter veya virgül)..." : ""
-                }
-                className="flex-1 text-sm outline-none bg-transparent min-w-[120px] px-1"
-              />
+                  #{tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(idx)}
+                    className="hover:text-red-600"
+                  >
+                    &times;
+                  </button>
+                </span>
+              ))}
+              {tags.length < 5 && (
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={
+                    tags.length === 0
+                      ? "Etiket ekle (Enter veya virgül)..."
+                      : ""
+                  }
+                  className="flex-1 text-sm outline-none bg-transparent min-w-[120px] px-1"
+                />
+              )}
+            </div>
+
+            {/* Öneriler Kutusu - Konumlandırması kesinleştirildi */}
+            {suggestions.length > 0 && (
+              <div
+                ref={suggestionRef}
+                className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto"
+              >
+                {suggestions.map((sug, idx) => (
+                  <div
+                    key={idx}
+                    onMouseDown={(e) => {
+                      // Inputun odak kaybını önlemek için click yerine mousedown kullanıyoruz
+                      e.preventDefault();
+                      handleAddTag(sug);
+                    }}
+                    className="px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-900 cursor-pointer transition-colors"
+                  >
+                    #{sug}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-
-          {/* Öneriler Kutusu */}
-          {suggestions.length > 0 && (
-            <div
-              ref={suggestionRef}
-              className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-100 rounded-xl shadow-lg z-10 max-h-40 overflow-y-auto"
-            >
-              {suggestions.map((sug, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => handleAddTag(sug)}
-                  className="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  #{sug}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Eylem Butonları */}

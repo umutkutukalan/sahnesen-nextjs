@@ -1,14 +1,21 @@
-import api from "../config";
-
 export const searchTagsClient = async (query: string): Promise<string[]> => {
   try {
-    const response = await api.get(`/api/posts/tags/autocomplete`, {
-      params: { query },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/posts/tags/autocomplete?query=${encodeURIComponent(query)}`,
+      { cache: "no-store" },
+    );
 
-    const data = response.data;
+    if (!res.ok) {
+      console.error("Etiket arama HTTP hatası:", res.status);
+      return [];
+    }
+
+    const data = await res.json();
+
     if (Array.isArray(data)) {
-      return data.map((tag: any) => (typeof tag === "string" ? tag : tag.name));
+      return data.map((item: any) =>
+        typeof item === "object" && item !== null ? item.name : item,
+      );
     }
 
     return [];
