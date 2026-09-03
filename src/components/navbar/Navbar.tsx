@@ -16,8 +16,12 @@ import NavLinks from "./NavbarLinks";
 import { getProfileAccountWithUser } from "@/constants/index";
 import Link from "next/link";
 import LoginPage from "@/pages/LoginPage";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ImPencil2 } from "react-icons/im";
+import {
+  searchPostsClient,
+  searchTagsClient,
+} from "@/services/client/post.service";
 
 const Navbar = ({
   transparent,
@@ -32,6 +36,13 @@ const Navbar = ({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notification, setNotification] = useState(false);
 
+  // Arama state'leri
+  const [searchQuery, setSearchQuery] = useState("");
+  const [postsResults, setPostsResults] = useState([]);
+  const [tagsResults, setTagsResults] = useState([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const router = useRouter();
+
   const iconMap = {
     FiUser: FiUser,
     RiComputerFill: RiComputerFill,
@@ -42,6 +53,39 @@ const Navbar = ({
   const renderIcon = (iconName: keyof typeof iconMap) => {
     const IconComponent = iconMap[iconName];
     return IconComponent ? <IconComponent /> : <FiUser />;
+  };
+
+  // Kullanıcı yazdıkça tetiklenen arama efekti (Debounce ile)
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.trim().length > 1) {
+        try {
+          const [posts, tags] = await Promise.all([
+            searchPostsClient(searchQuery),
+            searchTagsClient(searchQuery),
+          ]);
+          setPostsResults(posts);
+          setTagsResults(tags);
+          setIsSearchOpen(true);
+        } catch (err) {
+          console.error("Arama hatası:", err);
+        }
+      } else {
+        setPostsResults([]);
+        setTagsResults([]);
+        setIsSearchOpen(false);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Enter tuşuna basıldığında arama sonuç sayfasına yönlendirme
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      setIsSearchOpen(false);
+      router.push(`/arama/posts?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   useEffect(() => {
@@ -140,17 +184,79 @@ const Navbar = ({
             </li>
           </div>
 
-          <div className="flex items-center gap-2 border-gray-200 border rounded-lg overflow-hidden lg:block hidden">
-            <div className="relative rounded-2xl overflow-hidden">
+          <div className="relative flex items-center gap-2 border-gray-200 border rounded-lg overflow-visible lg:block hidden">
+            <div className="relative rounded-2xl">
               <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">
-                <FiSearch className="text-xl" />
+                <FiSearch className="text-xl text-gray-400" />
               </div>
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Ara..."
-                className="xl:w-180 lg:w-120 focus:outline-none pl-12 pr-5 py-1 text-sm relative z-10 text-lg select-none"
+                className="xl:w-180 lg:w-120 focus:outline-none pl-12 pr-5 py-1 text-sm relative z-10 text-lg select-none bg-transparent"
               />
             </div>
+
+            {/* AÇILIR DROPDOWN (Görseldeki Stil) */}
+            {isSearchOpen &&
+              (postsResults.length > 0 || tagsResults.length > 0) && (
+                <div className="absolute top-12 left-0 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto">
+                  {/* PUBLICATIONS (Yazılar) */}
+                  {postsResults.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                        Publications
+                      </h3>
+                      {postsResults.map((post: any) => (
+                        <Link
+                          key={post.id}
+                          href={`/${post.authorUsername}/${post.slug}`}
+                          onClick={() => setIsSearchOpen(false)}
+                          className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0">
+                            <IoIosPaper className="text-gray-500" />
+                          </div>
+                          <div className="overflow-hidden">
+                            <p className="text-sm font-medium text-gray-800 truncate">
+                              {post.title}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate">
+                              @{post.authorUsername}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* TOPICS (Etiketler) */}
+                  {tagsResults.length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                        Topics
+                      </h3>
+                      {tagsResults.map((tag: any) => (
+                        <Link
+                          key={tag.id}
+                          href={`/tag/${tag.name}`}
+                          onClick={() => setIsSearchOpen(false)}
+                          className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-500 text-sm font-serif">
+                            #
+                          </div>
+                          <p className="text-sm font-medium text-gray-800">
+                            {tag.name}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
           </div>
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (

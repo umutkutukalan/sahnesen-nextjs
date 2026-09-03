@@ -170,6 +170,22 @@ export const deletePostService = async (postId: number) => {
   return response.data;
 };
 
+// Yazı arama (Ağırlıklı arama)
+export const searchPostsClient = async (keyword: string) => {
+  const response = await api.get(
+    `/api/posts/search?keyword=${encodeURIComponent(keyword)}&size=5`,
+  );
+  return response.data.content; // Page yapısından içeriği (List<PostSummaryResponse>) alıyoruz
+};
+
+// Etiket (Topic) auto-complete arama
+export const searchTagsClient = async (query: string) => {
+  const response = await api.get(
+    `/api/posts/tags/autocomplete?query=${encodeURIComponent(query)}`,
+  );
+  return response.data; // List<Tag>
+};
+
 export const getFollowingPostsClient = async (
   postType?: string,
   page = 0,
