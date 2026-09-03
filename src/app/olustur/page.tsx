@@ -1,7 +1,23 @@
 "use client";
 
-import CreateProjectsBlogs from "@/pages/create/CreateProjectsBlogs";
+import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import CreateIntroTwo from "@/pages/create/CreateIntroTwo";
+import CreateProjectsBlogs from "@/pages/create/CreateProjectsBlogs";
+
+function CreateContent() {
+  const searchParams = useSearchParams();
+  const type = searchParams?.get("type");
+  const slug = searchParams?.get("slug");
+
+  // Eğer URL'de bir type veya slug varsa, doğrudan editör bileşenini göster
+  if (type || slug) {
+    return <CreateProjectsBlogs />;
+  }
+
+  // Yoksa kartların bulunduğu giriş ekranını göster
+  return <CreateIntroTwo />;
+}
 
 export default function CreatePage() {
   return (
@@ -12,7 +28,7 @@ export default function CreatePage() {
         </div>
       }
     >
-      <CreateProjectsBlogs />
+      <CreateContent />
     </Suspense>
   );
 }

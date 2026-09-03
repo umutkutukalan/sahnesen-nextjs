@@ -5,7 +5,7 @@ import { FiUser } from "react-icons/fi";
 import { RiComputerFill } from "react-icons/ri";
 import { IoIosPaper } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getProfileAccountWithUser } from "@/constants";
@@ -17,17 +17,17 @@ interface EditorNavbarProps {
   transparent: boolean;
   contentStatus: string;
   activePostId: number | null;
-  onOpenPublishModal: () => void;
+  postSlug: string | null;
 }
 
 const EditorNavbar = ({
   transparent,
   contentStatus,
   activePostId,
-  onOpenPublishModal,
+  postSlug,
 }: EditorNavbarProps) => {
   const { user, setUser } = useAuth();
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notification, setNotification] = useState(false);
 
@@ -142,12 +142,16 @@ const EditorNavbar = ({
         <div className="flex items-center gap-4">
           <button
             className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
-              !activePostId
+              !activePostId || !postSlug
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-green-700 cursor-pointer shadow-sm"
             }`}
-            disabled={!activePostId || contentStatus === "SAVING"}
-            onClick={onOpenPublishModal}
+            disabled={!activePostId || !postSlug || contentStatus === "SAVING"}
+            onClick={() => {
+              if (postSlug) {
+                router.push(`/olustur/publish/${postSlug}`);
+              }
+            }}
           >
             Sahnele
           </button>

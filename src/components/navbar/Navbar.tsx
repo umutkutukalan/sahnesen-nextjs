@@ -155,7 +155,7 @@ const Navbar = ({
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
               <div className="text-xl">
-                <NavLinks href="/create" logo={<ImPencil2 />} />
+                <NavLinks href="/olustur" logo={<ImPencil2 />} />
               </div>
             )}
             <div className="text-xl">

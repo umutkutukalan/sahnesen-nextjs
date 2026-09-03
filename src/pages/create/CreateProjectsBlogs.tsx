@@ -58,6 +58,7 @@ const CreateProjectsBlog = () => {
   }, [editorJSON]);
 
   const [postType, setPostType] = useState<string>("SAHNE");
+  const [postSlug, setPostSlug] = useState<string | null>(null);
   const postTypeRef = useRef(postType);
   const isCreatingRef = useRef<boolean>(false);
 
@@ -90,6 +91,7 @@ const CreateProjectsBlog = () => {
     }
 
     if (slugParam && !activePostIdRef.current) {
+      setPostSlug(slugParam);
       setIsLoadingPost(true);
 
       getPostBySlugClient(slugParam)
@@ -176,6 +178,7 @@ const CreateProjectsBlog = () => {
         setSaveStatus("SAVED");
 
         if (data.slug) {
+          setPostSlug(data.slug);
           router.replace(`/olustur?slug=${data.slug}`, { scroll: false });
         }
       }
@@ -309,7 +312,7 @@ const CreateProjectsBlog = () => {
         transparent={false}
         contentStatus={saveStatus}
         activePostId={activePostId}
-        onOpenPublishModal={handleOpenPublishModal}
+        postSlug={postSlug}
       />
 
       <div className="w-full lg:w-[760px] mx-auto px-6 pt-6">
