@@ -22,6 +22,7 @@ import {
   searchPostsClient,
   searchTagsClient,
 } from "@/services/client/post.service";
+import { searchUsersClient } from "@/services/client/user/user.service";
 
 const Navbar = ({
   transparent,
@@ -40,6 +41,7 @@ const Navbar = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [postsResults, setPostsResults] = useState([]);
   const [tagsResults, setTagsResults] = useState([]);
+  const [usersResults, setUsersResults] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
 
@@ -60,12 +62,14 @@ const Navbar = ({
     const timer = setTimeout(async () => {
       if (searchQuery.trim().length > 1) {
         try {
-          const [posts, tags] = await Promise.all([
+          const [posts, tags, users] = await Promise.all([
             searchPostsClient(searchQuery),
             searchTagsClient(searchQuery),
+            searchUsersClient(searchQuery),
           ]);
           setPostsResults(posts);
           setTagsResults(tags);
+          setUsersResults(users);
           setIsSearchOpen(true);
         } catch (err) {
           console.error("Arama hatası:", err);
@@ -73,6 +77,7 @@ const Navbar = ({
       } else {
         setPostsResults([]);
         setTagsResults([]);
+        setUsersResults([]);
         setIsSearchOpen(false);
       }
     }, 300); // 300ms debounce
@@ -201,8 +206,57 @@ const Navbar = ({
 
             {/* AÇILIR DROPDOWN (Görseldeki Stil) */}
             {isSearchOpen &&
-              (postsResults.length > 0 || tagsResults.length > 0) && (
+              (postsResults.length > 0 ||
+                tagsResults.length > 0 ||
+                usersResults.length > 0) && (
                 <div className="absolute top-12 left-0 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto">
+                  {/* USERS (Kullanıcılar / Yazarlar) */}
+                  {usersResults.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                        Users
+                      </h3>
+                      {usersResults.map((u: any) => {
+                        const userProfileImgUrl = u.profileImg
+                          ? u.profileImg.startsWith("http")
+                            ? u.profileImg
+                            : `${baseUrl}/${u.profileImg}`
+                          : null;
+
+                        return (
+                          <Link
+                            key={u.id}
+                            href={`/@${u.username}`}
+                            onClick={() => setIsSearchOpen(false)}
+                            className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                              {userProfileImgUrl ? (
+                                <Image
+                                  src={userProfileImgUrl}
+                                  alt={u.username}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              ) : (
+                                <FaRegUser className="text-gray-500 text-sm" />
+                              )}
+                            </div>
+                            <div className="overflow-hidden">
+                              <p className="text-sm font-medium text-gray-800 truncate">
+                                {u.name} {u.surname}
+                              </p>
+                              <p className="text-xs text-gray-400 truncate">
+                                @{u.username}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   {/* PUBLICATIONS (Yazılar) */}
                   {postsResults.length > 0 && (
                     <div className="mb-4">

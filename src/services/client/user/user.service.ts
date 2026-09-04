@@ -1,5 +1,7 @@
 // services/client/user/user.service.ts
 
+import api from "../config";
+
 export interface UpdateUserData {
   name?: string;
   surname?: string;
@@ -132,6 +134,13 @@ export const updateCoverImg = async (img: File) => {
     );
     throw error;
   }
+};
+
+export const searchUsersClient = async (query: string) => {
+  const response = await api.get(
+    `/api/users/search?query=${encodeURIComponent(query)}`,
+  );
+  return response.data;
 };
 
 export const userService = {
