@@ -36,7 +36,6 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Projendeki mevcut post service üzerinden postu slug ile çekiyoruz
         const postData = await getPostBySlugClient(slug);
         setPost(postData);
 
@@ -45,9 +44,14 @@ export default function FoyerPage({ params }: FoyerPageProps) {
           setComments(commentsRes);
         }
 
-        // Süre kontrolü
+        // Süre kontrolü (UTC garantili parse için sonuna 'Z' ekliyoruz)
         if (postData?.discussionEndsAt) {
-          const endsAt = new Date(postData.discussionEndsAt).getTime();
+          const rawDateStr = postData.discussionEndsAt;
+          const endsAtString = rawDateStr.endsWith("Z")
+            ? rawDateStr
+            : rawDateStr + "Z";
+
+          const endsAt = new Date(endsAtString).getTime();
           const now = new Date().getTime();
           if (now > endsAt) {
             setIsFoyerOpen(false);
@@ -63,12 +67,17 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     fetchData();
   }, [slug]);
 
-  // Sayaç Mantığı
+  // Sayaç Mantığı (Her saniye kalan süreyi hesaplar)
   useEffect(() => {
     if (!post?.discussionEndsAt) return;
 
     const updateCountdown = () => {
-      const endsAt = new Date(post.discussionEndsAt!).getTime();
+      const rawDateStr = post.discussionEndsAt!;
+      const endsAtString = rawDateStr.endsWith("Z")
+        ? rawDateStr
+        : rawDateStr + "Z";
+
+      const endsAt = new Date(endsAtString).getTime();
       const now = new Date().getTime();
       const distance = endsAt - now;
 
@@ -77,12 +86,14 @@ export default function FoyerPage({ params }: FoyerPageProps) {
         setTimeLeft("Fuaye Kapandı");
         clearInterval(timer);
       } else {
-        const hours = Math.floor(
-          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
+        const hours = Math.floor(distance / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        setTimeLeft(`${hours}s ${minutes}d ${seconds}s`);
+
+        // Şık bir görünüm için 2 haneli formatlayabilirsin (Opsiyonel ama şık durur)
+        setTimeLeft(
+          `${String(hours).padStart(2, "0")}s ${String(minutes).padStart(2, "0")}d ${String(seconds).padStart(2, "0")}s`,
+        );
       }
     };
 
