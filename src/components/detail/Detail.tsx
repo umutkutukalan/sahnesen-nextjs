@@ -33,6 +33,7 @@ import {
 } from "react-icons/pi";
 import { ReactionType } from "@/services/client/interaction/interaction.service";
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
+import Link from "next/link";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -853,6 +854,28 @@ const Detail = ({ post }: DetailProps) => {
           {/* REAL TIPTAP İÇERİK ALANI */}
           <div className="prose max-w-none antialiased playfair-display-400">
             {renderTiptapContent(post.content)}
+          </div>
+
+          <div className="mt-16 pt-8 border-t border-gray-200 flex flex-col items-center justify-center text-center gap-4 bg-gray-50/50 p-8 rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
+              <MdCoffee />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-xl font-bold text-gray-900 font-sans">
+                Sahnenin Arkası: Fuaye
+              </h3>
+              <p className="text-sm text-gray-500 max-w-md">
+                Bu içeriğe özel açılan kulis alanında mektubunu bırakabilir veya
+                erken saatlerde yazılmış anıların altına yanıt verebilirsin.
+              </p>
+            </div>
+
+            <Link
+              href={`/posts/${post.slug}/foyer`}
+              className="mt-2 px-6 py-3 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors flex items-center gap-2 cursor-pointer"
+            >
+              Fuayeye Gir
+            </Link>
           </div>
         </div>
       </div>

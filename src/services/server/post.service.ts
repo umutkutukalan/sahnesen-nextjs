@@ -9,6 +9,8 @@ export interface PostResponse {
   coverImage?: string;
   postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
   isPublished: boolean;
+  discussionDurationHours?: number;
+  discussionEndsAt?: string;
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
   authorName: string;
@@ -24,6 +26,8 @@ export interface PostSummaryResponse {
   slug: string;
   coverImage?: string;
   postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
+  discussionDurationHours?: number;
+  discussionEndsAt?: string;
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
   authorName: string;
