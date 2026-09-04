@@ -10,8 +10,8 @@ import { FiArrowLeft, FiSend, FiMessageSquare } from "react-icons/fi";
 import { MdCoffee } from "react-icons/md";
 import Link from "next/link";
 import { PostResponse } from "@/services/server/post.service";
-import api from "@/services/client/config";
 import { getPostBySlugClient } from "@/services/client/post.service";
+import { getFullImageUrl } from "@/utils/image";
 
 interface FoyerPageProps {
   params: Promise<{ slug: string }>;
@@ -251,7 +251,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                     <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 overflow-hidden">
                       {comment.authorProfileImg ? (
                         <img
-                          src={comment.authorProfileImg}
+                          src={getFullImageUrl(comment.authorProfileImg)!}
                           alt={comment.authorUsername}
                           className="w-full h-full object-cover"
                         />
