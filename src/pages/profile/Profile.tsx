@@ -19,7 +19,7 @@ import { CiSettings } from "react-icons/ci";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { getOptimizedImageUrl } from "../../utils/ImageUtils";
 import Image from "next/image";
-import { profilebg } from "@/utils";
+import { kurucusahne, profilebg } from "@/utils";
 import ProfileUserPosts from "./ProfileUserPosts";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
@@ -185,9 +185,13 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                     <h1 className="text-xl font-semibold">
                       {profileUser?.name} {profileUser?.surname}
                     </h1>
-                    <TbRosetteDiscountCheckFilled
-                      className="text-blue-500 text-xl"
-                      title="Onaylı Yazar"
+                    <Image
+                      src={kurucusahne}
+                      width={16}
+                      height={16}
+                      alt="Kurucu"
+                      className="object-contain"
+                      title="Kurucu"
                     />
                   </div>
                 </div>

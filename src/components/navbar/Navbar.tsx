@@ -189,7 +189,7 @@ const Navbar = ({
                 </Link>
               </li>
 
-              <li className="relative flex items-center gap-2 border-gray-200 border rounded-2xl overflow-visible lg:block hidden">
+              <li className="relative flex items-center gap-2 border-gray-200 border rounded-lg overflow-visible lg:block hidden">
                 <div className="relative rounded-2xl">
                   <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">
                     <FiSearch className="text-xl text-gray-400" />

@@ -36,6 +36,7 @@ import profilebordertwo from "../../public/images/profilebordertwo.png";
 import profilebg from "../../public/images/profilebg.jpg";
 
 import tire from "../../public/images/tire.png";
+import kurucusahne from "../../public/images/sahnesen_rozet.png";
 
 export {
   tire,
@@ -51,6 +52,7 @@ export {
   solperde,
   profilebordertwo,
   profilebg,
+  kurucusahne,
 };
 
 export { ressam, runner, walker, loginpageimg, profileborder };
