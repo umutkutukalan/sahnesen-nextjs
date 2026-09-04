@@ -172,146 +172,144 @@ const Navbar = ({
               className="text-2xl cursor-pointer"
               onClick={handleMenuClick}
             />
-            <li className={`list-none`}>
-              <Link
-                href={"/"}
-                className={`text-black transition-all duration-100`}
-              >
-                <span className="text-3xl merriweather-sans font-semibold tracking-tighter select-none">
-                  <span className="inline-block italic -rotate-6 transform transition-transform duration-300 origin-bottom">
-                    S
+            <ul className="flex items-center gap-6">
+              <li className={`list-none`}>
+                <Link
+                  href={"/"}
+                  className={`text-black transition-all duration-100`}
+                >
+                  <span className="text-3xl merriweather-sans font-semibold tracking-tighter select-none">
+                    <span className="inline-block italic -rotate-6 transform transition-transform duration-300 origin-bottom">
+                      S
+                    </span>
+                    ahne
+                    <span className="">s</span>
+                    en
                   </span>
-                  ahne
-                  <span className="">s</span>
-                  en
-                </span>
-              </Link>
-            </li>
-          </div>
+                </Link>
+              </li>
 
-          <div className="relative flex items-center gap-2 border-gray-200 border rounded-lg overflow-visible lg:block hidden">
-            <div className="relative rounded-2xl">
-              <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">
-                <FiSearch className="text-xl text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ara..."
-                className="xl:w-180 lg:w-120 focus:outline-none pl-12 pr-5 py-1 text-sm relative z-10 text-lg select-none bg-transparent"
-              />
-            </div>
-
-            {/* AÇILIR DROPDOWN (Görseldeki Stil) */}
-            {isSearchOpen &&
-              (postsResults.length > 0 ||
-                tagsResults.length > 0 ||
-                usersResults.length > 0) && (
-                <div className="absolute top-12 left-0 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto">
-                  {/* USERS (Kullanıcılar / Yazarlar) */}
-                  {usersResults.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                        Users
-                      </h3>
-                      {usersResults.map((u: any) => {
-                        const userProfileImgUrl = u.profileImg
-                          ? u.profileImg.startsWith("http")
-                            ? u.profileImg
-                            : `${baseUrl}/${u.profileImg}`
-                          : null;
-
-                        return (
-                          <Link
-                            key={u.id}
-                            href={`/profil/${u.username}`}
-                            onClick={() => setIsSearchOpen(false)}
-                            className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-                              {userProfileImgUrl ? (
-                                <Image
-                                  src={userProfileImgUrl}
-                                  alt={u.username}
-                                  fill
-                                  className="object-cover"
-                                  unoptimized
-                                />
-                              ) : (
-                                <FaRegUser className="text-gray-500 text-sm" />
-                              )}
-                            </div>
-                            <div className="overflow-hidden">
-                              <p className="text-sm font-medium text-gray-800 truncate">
-                                {u.name} {u.surname}
-                              </p>
-                              <p className="text-xs text-gray-400 truncate">
-                                @{u.username}
-                              </p>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* PUBLICATIONS (Yazılar) */}
-                  {postsResults.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                        Publications
-                      </h3>
-                      {postsResults.map((post: any) => (
-                        <Link
-                          key={post.id}
-                          href={`/${post.authorUsername}/${post.slug}`}
-                          onClick={() => setIsSearchOpen(false)}
-                          className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0">
-                            <IoIosPaper className="text-gray-500" />
-                          </div>
-                          <div className="overflow-hidden">
-                            <p className="text-sm font-medium text-gray-800 truncate">
-                              {post.title}
-                            </p>
-                            <p className="text-xs text-gray-400 truncate">
-                              @{post.authorUsername}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* TOPICS (Etiketler) */}
-                  {tagsResults.length > 0 && (
-                    <div>
-                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                        Topics
-                      </h3>
-                      {tagsResults.map((tag: any) => (
-                        <Link
-                          key={tag.id}
-                          href={`/tag/${tag.name}`}
-                          onClick={() => setIsSearchOpen(false)}
-                          className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-500 text-sm font-serif">
-                            #
-                          </div>
-                          <p className="text-sm font-medium text-gray-800">
-                            {tag.name}
-                          </p>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+              <li className="relative flex items-center gap-2 border-gray-200 border rounded-2xl overflow-visible lg:block hidden">
+                <div className="relative rounded-2xl">
+                  <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">
+                    <FiSearch className="text-xl text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ara..."
+                    className="focus:outline-none pl-12 pr-5 py-1.5 text-sm relative z-10 text-lg select-none bg-transparent"
+                    style={{ width: 300 }}
+                  />
                 </div>
-              )}
+
+                {/* AÇILIR DROPDOWN (Görseldeki Stil) */}
+                {isSearchOpen &&
+                  (postsResults.length > 0 ||
+                    tagsResults.length > 0 ||
+                    usersResults.length > 0) && (
+                    <div className="absolute top-12 left-0 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto">
+                      {/* USERS (Kullanıcılar / Yazarlar) */}
+                      {usersResults.length > 0 && (
+                        <div className="mb-4">
+                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                            Kişiler
+                          </h3>
+                          {usersResults.map((u: any) => {
+                            return (
+                              <Link
+                                key={u.id}
+                                href={`/profil/${u.username}`}
+                                onClick={() => setIsSearchOpen(false)}
+                                className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                              >
+                                <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                                  {u.profileImg ? (
+                                    <Image
+                                      src={getFullImageUrl(u.profileImg)!}
+                                      alt={u.username}
+                                      fill
+                                      className="object-cover"
+                                      unoptimized
+                                    />
+                                  ) : (
+                                    <FaRegUser className="text-gray-500 text-sm" />
+                                  )}
+                                </div>
+                                <div className="overflow-hidden">
+                                  <p className="text-sm font-medium text-gray-800 truncate">
+                                    {u.name} {u.surname}
+                                  </p>
+                                  <p className="text-xs text-gray-400 truncate">
+                                    @{u.username}
+                                  </p>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* PUBLICATIONS (Yazılar) */}
+                      {postsResults.length > 0 && (
+                        <div className="mb-4">
+                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                            Publications
+                          </h3>
+                          {postsResults.map((post: any) => (
+                            <Link
+                              key={post.id}
+                              href={`/${post.authorUsername}/${post.slug}`}
+                              onClick={() => setIsSearchOpen(false)}
+                              className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0">
+                                <IoIosPaper className="text-gray-500" />
+                              </div>
+                              <div className="overflow-hidden">
+                                <p className="text-sm font-medium text-gray-800 truncate">
+                                  {post.title}
+                                </p>
+                                <p className="text-xs text-gray-400 truncate">
+                                  @{post.authorUsername}
+                                </p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* TOPICS (Etiketler) */}
+                      {tagsResults.length > 0 && (
+                        <div>
+                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                            Topics
+                          </h3>
+                          {tagsResults.map((tag: any) => (
+                            <Link
+                              key={tag.id}
+                              href={`/tag/${tag.name}`}
+                              onClick={() => setIsSearchOpen(false)}
+                              className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-500 text-sm font-serif">
+                                #
+                              </div>
+                              <p className="text-sm font-medium text-gray-800">
+                                {tag.name}
+                              </p>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+              </li>
+            </ul>
           </div>
+
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
               <div className="text-xl">
