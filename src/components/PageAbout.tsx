@@ -38,7 +38,7 @@ const PageAbout = ({
         height: "64px",
       }}
     >
-      {!isProfilePage ? (
+      {!isProfilePage && (
         <div className="w-full flex items-center gap-6 pt-3 px-1">
           <button
             type="button"
@@ -64,14 +64,11 @@ const PageAbout = ({
             <span className="text-xs">Sahnemdekiler</span>
           </button>
         </div>
-      ) : (
-        // Profil sayfasında değilse boş bir alan bırakabiliriz ki sağdaki filtreler bozulmasın
-        <div />
       )}
 
       {/* 2. İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
       <div className="w-full relative h-14 flex items-end justify-between">
-        <ul className="w-full relative z-50 flex items-end justify-end gap-6 overflow-x-auto scrollbar-hide">
+        <ul className="w-full relative z-50 flex items-end justify-start gap-6 overflow-x-auto scrollbar-hide">
           <button
             type="button"
             className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${

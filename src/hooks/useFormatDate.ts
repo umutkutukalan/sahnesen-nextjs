@@ -1,11 +1,8 @@
-export const useFormatDate = () => {
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.toLocaleDateString("tr-TR", { day: "2-digit" });
-    const month = date.toLocaleDateString("tr-TR", { month: "short" });
-    const year = date.toLocaleDateString("tr-TR", { year: "numeric" });
+import { formatToIstanbul } from "@/utils/dateFormatter";
 
-    return `${month} ${day}, ${year}`;
+export const useFormatDate = () => {
+  const formatDate = (dateString: string) => {
+    return formatToIstanbul(dateString);
   };
 
   return { formatDate };

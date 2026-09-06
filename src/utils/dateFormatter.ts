@@ -4,12 +4,18 @@ export function formatToIstanbul(dateString: string) {
   const isoString = dateString.endsWith("Z") ? dateString : dateString + "Z";
   const date = new Date(isoString);
 
-  return new Intl.DateTimeFormat("tr-TR", {
+  if (isNaN(date.getTime())) return "";
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const targetYear = date.getFullYear();
+
+  const options: Intl.DateTimeFormatOptions = {
     timeZone: "Europe/Istanbul",
     day: "numeric",
     month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+    ...(targetYear !== currentYear && { year: "numeric" }),
+  };
+
+  return new Intl.DateTimeFormat("tr-TR", options).format(date);
 }
