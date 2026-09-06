@@ -23,6 +23,7 @@ import {
   searchTagsClient,
 } from "@/services/client/post.service";
 import { searchUsersClient } from "@/services/client/user/user.service";
+import { getFullImageUrl } from "@/utils/image";
 
 const Navbar = ({
   transparent,

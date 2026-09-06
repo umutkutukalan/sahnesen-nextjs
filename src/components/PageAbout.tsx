@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { FaTicketSimple } from "react-icons/fa6";
 import { LiaTheaterMasksSolid } from "react-icons/lia";
 import { TbTheater } from "react-icons/tb";
@@ -17,6 +18,11 @@ const PageAbout = ({
   selectedType,
   onSelectType,
 }: PageAboutProps) => {
+  const pathname = usePathname();
+
+  // (/profil, /username/profil veya içinde "profil" geçiyorsa)
+  const isProfilePage = pathname?.includes("profil");
+
   const handleSelectType = (type: string) => {
     if (selectedType === type) {
       onSelectType(undefined);
@@ -32,32 +38,36 @@ const PageAbout = ({
         height: "64px",
       }}
     >
-      {/* 1. ANA AKIŞ SEÇİCİ (Genel Akış / Takip Ettiklerin) */}
-      <div className="w-full flex items-center gap-6 pt-3 px-1">
-        <button
-          type="button"
-          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
-            feedScope === "all" ? "border-b-2 border-black text-black" : ""
-          }`}
-          onClick={() => onSelectFeedScope("all")}
-        >
-          <TbTheater className="text-xl" />
-          <span className="text-xs">Fuaye</span>
-        </button>
+      {!isProfilePage ? (
+        <div className="w-full flex items-center gap-6 pt-3 px-1">
+          <button
+            type="button"
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
+              feedScope === "all" ? "border-b-2 border-black text-black" : ""
+            }`}
+            onClick={() => onSelectFeedScope("all")}
+          >
+            <TbTheater className="text-xl" />
+            <span className="text-xs">Fuaye</span>
+          </button>
 
-        <button
-          type="button"
-          className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
-            feedScope === "following"
-              ? "border-b-2 border-black text-black"
-              : ""
-          }`}
-          onClick={() => onSelectFeedScope("following")}
-        >
-          <LiaTheaterMasksSolid className="text-xl" />
-          <span className="text-xs">Sahnemdekiler</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
+              feedScope === "following"
+                ? "border-b-2 border-black text-black"
+                : ""
+            }`}
+            onClick={() => onSelectFeedScope("following")}
+          >
+            <LiaTheaterMasksSolid className="text-xl" />
+            <span className="text-xs">Sahnemdekiler</span>
+          </button>
+        </div>
+      ) : (
+        // Profil sayfasında değilse boş bir alan bırakabiliriz ki sağdaki filtreler bozulmasın
+        <div />
+      )}
 
       {/* 2. İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
       <div className="w-full relative h-14 flex items-end justify-between">

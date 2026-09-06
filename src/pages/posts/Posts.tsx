@@ -45,7 +45,7 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
             <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
               <div className="w-full flex flex-col items-center">
                 <div className="w-full h-12 flex items-center justify-center bg-yellow-500 text-xs">
-                  <span>Lorem ipsum dolor sit amet.</span>
+                  {/* <span>Lorem ipsum dolor sit amet.</span> */}
                 </div>
 
                 <div className="max-w-[1000px] px-6 w-full">
