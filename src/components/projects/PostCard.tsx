@@ -1,6 +1,6 @@
 "use client";
 
-import { FiUser, FiEdit3, FiTrash2 } from "react-icons/fi";
+import { FiUser, FiMoreHorizontal } from "react-icons/fi";
 import { LuImages, LuTheater } from "react-icons/lu";
 import {
   TbBookmark,
@@ -13,7 +13,7 @@ import {
   PiHandsClappingDuotone,
   PiHandsClappingFill,
 } from "react-icons/pi";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -50,7 +50,23 @@ const PostCard = ({
   const { ToProfile } = useToProfile();
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // 1. Üç nokta menü state'i
+  const menuRef = useRef<HTMLDivElement>(null); // 2. Dışarı tıklama kontrolü için ref
+
   const { deletePost } = useDeletePosts();
+
+  // Dışarı tıklandığında üç nokta menüsünü kapat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Post tipine göre dinamik ReactionType belirleme
   const getShineReactionType = (type?: string): ReactionType => {
@@ -70,7 +86,6 @@ const PostCard = ({
 
   const currentShineType = getShineReactionType(post?.postType);
 
-  // Hook entegrasyonu (Eğer kullanıcı postun sahibiyse veya giriş yapmadıysa hook'u devre dışı bırakmak için koşullu çağırabilirsin veya hook içinde yönetebilirsin)
   const {
     status: interactionStatus,
     toggleLike,
@@ -83,6 +98,7 @@ const PostCard = ({
       onDelete?.();
     });
     setShowConfirm(false);
+    setIsMenuOpen(false);
   };
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
@@ -104,7 +120,11 @@ const PostCard = ({
     : null;
 
   return (
-    <div className="w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex overflow-hidden select-none transition-all duration-300 ease-in-out gap-10">
+    <div
+      className={`w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex select-none transition-all duration-300 ease-in-out gap-10 ${
+        isOwner ? "overflow-visible" : "overflow-hidden"
+      }`}
+    >
       {/* SOL GÖRSEL */}
       <div className="h-full flex flex-col justify-center">
         <div
@@ -154,7 +174,9 @@ const PostCard = ({
             <div className="truncate flex items-center gap-1">
               <div className="flex flex-col">
                 <div className="flex items-center gap-1 text-xs text-gray-600">
-                  <span className="truncate">{authorName || "Yazar"}</span>
+                  <span className="truncate hover:underline">
+                    {authorName || "Yazar"}
+                  </span>
                   <TbRosetteDiscountCheckFilled
                     className="text-blue-500 shrink-0 text-xs"
                     title="Onaylı Yazar"
@@ -169,17 +191,17 @@ const PostCard = ({
           </div>
 
           {/* BAŞLIK & SUBTITLE */}
-          <div className="flex flex-col gap-2">
-            <h2
-              onClick={() => {
-                if (isOwner) {
-                  router.push(`/olustur?slug=${post?.slug}`);
-                } else {
-                  router.push(`/${post?.authorUsername}/${post?.slug}`);
-                }
-              }}
-              className="text-base sm:text-[22px] line-clamp-2 font-semibold cursor-pointer hover:underline tracking-tight leading-snug"
-            >
+          <div
+            onClick={() => {
+              if (isOwner) {
+                router.push(`/olustur?slug=${post?.slug}`);
+              } else {
+                router.push(`/${post?.authorUsername}/${post?.slug}`);
+              }
+            }}
+            className="flex flex-col gap-2 cursor-pointer"
+          >
+            <h2 className="text-base sm:text-[22px] line-clamp-2 font-semibold tracking-tight leading-snug">
               {post?.title}
             </h2>
 
@@ -246,23 +268,50 @@ const PostCard = ({
               )}
             </div>
 
-            {/* SAHİBİ İSE DÜZENLE/SİL, DEĞİLSE ETKİLEŞİMLERİ GÖSTER */}
+            {/* SAHİBİ İSE ÜÇ NOKTA DROPDOWN, DEĞİLSE ETKİLEŞİMLERİ GÖSTER */}
             {isOwner ? (
-              <div className="flex items-center gap-3">
+              <div className="relative" ref={menuRef}>
                 <button
-                  onClick={() => router.push(`/olustur?slug=${post.slug}`)}
-                  className="flex items-center gap-1 text-gray-600 hover:text-black transition cursor-pointer"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="p-1 text-gray-500 hover:text-black rounded-full hover:bg-gray-100 transition cursor-pointer"
                 >
-                  <FiEdit3 className="text-sm" />
-                  <span className="text-xs">Düzenle</span>
+                  <FiMoreHorizontal className="text-lg" />
                 </button>
-                <button
-                  onClick={() => setShowConfirm(true)}
-                  className="flex items-center gap-1 text-red-500 hover:text-red-700 transition cursor-pointer"
-                >
-                  <FiTrash2 className="text-sm" />
-                  <span className="text-xs">Sil</span>
-                </button>
+
+                {/* AÇILIR MENÜ */}
+                {isMenuOpen && (
+                  <div
+                    className="absolute right-0 bottom-full w-48 flex flex-col bg-white rounded-sm z-50 px-4 py-2"
+                    style={{
+                      boxShadow: "0px 0px 5px 1px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        router.push(`/olustur?slug=${post.slug}`);
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
+                    >
+                      <span>Sahneyi Düzenle</span>
+                    </button>
+
+                    <div className="h-[1px] bg-gray-100 my-1" />
+
+                    <button
+                      onClick={() => {
+                        setShowConfirm(true);
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center text-xs hover:bg-red-900 transition text-left cursor-pointer"
+                      style={{
+                        color: "#b94445",
+                      }}
+                    >
+                      <span>Sahneyi Sil</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <ul className="flex items-center gap-1.5">

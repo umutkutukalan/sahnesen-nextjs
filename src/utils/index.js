@@ -26,6 +26,7 @@ import camasir from "../../public/images/camasir.png";
 import fineday from "../../public/images/monolog2.png";
 import sahne from "../../public/images/sahne1.png";
 import etut from "../../public/images/etut.png";
+import sahnelerim from "../../public/images/sahnelerim.png";
 
 import arkaplan from "../../public/images/arkaplan.png";
 import bird from "../../public/images/bird.png";
@@ -46,6 +47,7 @@ export {
   yanyana,
   camasir,
   etut,
+  sahnelerim,
   arkaplan,
   bird,
   sagperde,
