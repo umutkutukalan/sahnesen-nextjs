@@ -834,7 +834,7 @@ const Detail = ({ post }: DetailProps) => {
               </div>
               <div className="relative flex items-center gap-1">
                 <div
-                  className="absolute left-0 top-0 w-8 h-8 bg-black"
+                  className="absolute left-0 top-0 w-7 h-7 bg-black"
                   style={{
                     maskImage: `url(${solperde.src})`,
                     WebkitMaskImage: `url(${solperde.src})`,
@@ -860,7 +860,7 @@ const Detail = ({ post }: DetailProps) => {
                   {post.viewCount !== undefined && post.viewCount !== null && (
                     <>
                       <div className="relative flex items-center gap-2">
-                        <LuTheater className="text-base text-black" />
+                        <LuTheater className="text-sm text-black" />
                         <div className="flex items-center gap-1 text-xs">
                           <span className="text-black">
                             {formatCount(post.viewCount || 0)}
