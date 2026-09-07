@@ -1,47 +1,69 @@
+// MyStagesClient.tsx (Arşiv Sekmesi, Sayımları ve İşlemleri Tam Entegre Edilmiş Hali)
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/UserContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import Home from "@/pages/Home";
-import { getMyPostsClient } from "@/services/client/post.service";
+import {
+  getMyPostsClient,
+  toggleArchivePostClient,
+} from "@/services/client/post.service";
 import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import Image from "next/image";
 import { sahnelerim } from "@/utils";
-import { FaTicketSimple } from "react-icons/fa6"; // Tür ikonları için gerekli
+import { FaTicketSimple } from "react-icons/fa6";
 import api from "@/services/client/config";
 
 export default function MyStagesClient() {
   const { user, loading: authLoading } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<"PUBLISHED" | "DRAFT">(
+  const [activeTab, setActiveTab] = useState<"PUBLISHED" | "DRAFT" | "ARCHIVE">(
     "PUBLISHED",
   );
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
-  ); // 1. Tür filtresi state'i
+  );
   const [posts, setPosts] = useState<PostResponse[]>([]);
   const [page, setPage] = useState<number>(0);
-  const [counts, setCounts] = useState<{ published: number; draft: number }>({
+  const [counts, setCounts] = useState<{
+    published: number;
+    draft: number;
+    archive: number;
+  }>({
     published: 0,
     draft: 0,
+    archive: 0,
   });
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchMyPosts = useCallback(
     async (
-      selectedTab: "PUBLISHED" | "DRAFT",
+      selectedTab: "PUBLISHED" | "DRAFT" | "ARCHIVE",
       pageNum: number,
       postType?: string,
     ) => {
       setLoading(true);
       try {
-        const isPublished = selectedTab === "PUBLISHED";
-        // 2. İstek atarken seçilen türü (varsa) gönderiyoruz, yoksa "ALL" gidiyor
+        let isPublished: boolean | undefined = undefined;
+        let isArchived = false;
+
+        if (selectedTab === "PUBLISHED") {
+          isPublished = true;
+          isArchived = false;
+        } else if (selectedTab === "DRAFT") {
+          isPublished = false;
+          isArchived = false;
+        } else if (selectedTab === "ARCHIVE") {
+          isArchived = true;
+        }
+
         const response = await getMyPostsClient({
           isPublished,
+          isArchived,
           postType: postType || "ALL",
           page: pageNum,
           size: 10,
@@ -69,7 +91,6 @@ export default function MyStagesClient() {
     }
   }, []);
 
-  // Tab veya Tür değiştiğinde postları yeniden çekiyoruz
   useEffect(() => {
     if (user) {
       fetchCounts(selectedType);
@@ -82,6 +103,16 @@ export default function MyStagesClient() {
       setSelectedType(undefined);
     } else {
       setSelectedType(type);
+    }
+  };
+
+  const handleArchiveToggle = async (postId: number) => {
+    try {
+      await toggleArchivePostClient(postId);
+      fetchCounts(selectedType);
+      fetchMyPosts(activeTab, page, selectedType);
+    } catch (error) {
+      console.error("Arşiv durumu değiştirilirken hata oluştu:", error);
     }
   };
 
@@ -123,17 +154,22 @@ export default function MyStagesClient() {
               <span className="text-xs text-gray-800">{counts.draft}</span>
               <span className="text-xs text-gray-500">Taslak</span>
             </div>
+            <span className="text-xs text-gray-500">•</span>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-gray-800">{counts.archive}</span>
+              <span className="text-xs text-gray-500">Arşiv</span>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* Üst Sekmeler (Yayınlananlar / Taslaklar) ve Tür Filtreleri */}
+        {/* Üst Sekmeler ve Tür Filtreleri */}
         <div
           className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
           style={{ height: "48px" }}
         >
-          {/* Sol taraf: Yayınlananlar / Taslaklar */}
+          {/* Sol taraf: Sekmeler */}
           <div className="flex space-x-6">
             <button
               onClick={() => setActiveTab("PUBLISHED")}
@@ -155,9 +191,19 @@ export default function MyStagesClient() {
             >
               Taslaklar
             </button>
+            <button
+              onClick={() => setActiveTab("ARCHIVE")}
+              className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+                activeTab === "ARCHIVE"
+                  ? "text-black border-b-2 border-black"
+                  : "text-gray-400 hover:text-gray-700"
+              }`}
+            >
+              Arşiv
+            </button>
           </div>
 
-          {/* Sağ taraf: İçerik Türü Filtreleri (Tümü, Sahne, Monolog vb.) */}
+          {/* Sağ taraf: İçerik Türü Filtreleri */}
           <div className="relative h-12 flex items-end justify-end">
             <ul className="relative z-50 flex items-end justify-end gap-5 overflow-x-auto scrollbar-hide">
               <button
@@ -269,7 +315,9 @@ export default function MyStagesClient() {
             <p className="text-gray-500 text-sm">
               {activeTab === "PUBLISHED"
                 ? "Bu türde yayınlanmış bir sahnen bulunmuyor."
-                : "Bu türde kaydedilmiş bir taslağın yok."}
+                : activeTab === "DRAFT"
+                  ? "Bu türde kaydedilmiş bir taslağın yok."
+                  : "Arşivinde bu türde bir sahne bulunmuyor."}
             </p>
           </div>
         ) : (
