@@ -43,9 +43,15 @@ const extractSubtitleFromJSON = (json: any): string => {
   return "";
 };
 
+interface CreateProjectsBlogProps {
+  isArchived?: boolean;
+}
+
 type SaveStatus = "IDLE" | "SAVING" | "SAVED" | "ERROR";
 
-const CreateProjectsBlog = () => {
+const CreateProjectsBlog = ({
+  isArchived = false,
+}: CreateProjectsBlogProps) => {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -313,6 +319,7 @@ const CreateProjectsBlog = () => {
         contentStatus={saveStatus}
         activePostId={activePostId}
         postSlug={postSlug}
+        isArchived={isArchived}
       />
 
       <div className="w-full lg:w-[760px] mx-auto px-6 pt-6">

@@ -10,9 +10,11 @@ function CreateContent() {
   const type = searchParams?.get("type");
   const slug = searchParams?.get("slug");
 
+  const isArchivedParam = searchParams?.get("isArchived") === "true";
+
   // Eğer URL'de bir type veya slug varsa, doğrudan editör bileşenini göster
   if (type || slug) {
-    return <CreateProjectsBlogs />;
+    return <CreateProjectsBlogs isArchived={isArchivedParam} />;
   }
 
   // Yoksa kartların bulunduğu giriş ekranını göster

@@ -329,6 +329,7 @@ export default function MyStagesClient() {
                 isOwner={true}
                 showReadButton={activeTab === "PUBLISHED"}
                 onDelete={() => fetchMyPosts(activeTab, page, selectedType)}
+                onArchive={() => handleArchiveToggle(post.id)}
               />
             ))}
           </div>

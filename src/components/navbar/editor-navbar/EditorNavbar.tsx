@@ -18,6 +18,7 @@ interface EditorNavbarProps {
   contentStatus: string;
   activePostId: number | null;
   postSlug: string | null;
+  isArchived?: boolean;
 }
 
 const EditorNavbar = ({
@@ -25,11 +26,14 @@ const EditorNavbar = ({
   contentStatus,
   activePostId,
   postSlug,
+  isArchived = false,
 }: EditorNavbarProps) => {
   const { user, setUser } = useAuth();
   const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notification, setNotification] = useState(false);
+
+  console.log("isArchived", isArchived);
 
   const iconMap = {
     FiUser: FiUser,
@@ -80,7 +84,7 @@ const EditorNavbar = ({
 
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const isProfilePage = pathname.startsWith("/profil");
+  const isProfilePage = pathname?.startsWith("/profil");
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   const profileImgUrl = user?.profileImg
@@ -140,21 +144,25 @@ const EditorNavbar = ({
         </div>
 
         <div className="flex items-center gap-4">
-          <button
-            className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
-              !activePostId || !postSlug
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-green-700 cursor-pointer shadow-sm"
-            }`}
-            disabled={!activePostId || !postSlug || contentStatus === "SAVING"}
-            onClick={() => {
-              if (postSlug) {
-                router.push(`/olustur/publish/${postSlug}`);
+          {!isArchived && (
+            <button
+              className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
+                !activePostId || !postSlug
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-700 cursor-pointer shadow-sm"
+              }`}
+              disabled={
+                !activePostId || !postSlug || contentStatus === "SAVING"
               }
-            }}
-          >
-            Sahnele
-          </button>
+              onClick={() => {
+                if (postSlug) {
+                  router.push(`/olustur/publish/${postSlug}`);
+                }
+              }}
+            >
+              Sahnele
+            </button>
+          )}
 
           <ul className="navbar-links flex items-center">
             {!user && (
@@ -202,7 +210,7 @@ const EditorNavbar = ({
                         onClick={() => setShowProfileMenu(false)}
                       >
                         <span className="text-base">
-                          {renderIcon(item.icon)}
+                          {renderIcon(item.icon as keyof typeof iconMap)}
                         </span>
                         <p>{item.title}</p>
                       </Link>

@@ -30,11 +30,12 @@ import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 
 interface PostCardProps {
-  post: PostSummaryResponse;
+  post: PostSummaryResponse & { isArchived?: boolean; archived?: boolean };
   isOwner?: boolean;
   showReadButton?: boolean;
   showActions?: boolean;
   onDelete?: () => void;
+  onArchive?: () => void;
 }
 
 const PostCard = ({
@@ -43,6 +44,7 @@ const PostCard = ({
   showReadButton = true,
   showActions = false,
   onDelete,
+  onArchive,
 }: PostCardProps) => {
   const { user } = useAuth();
   const { formatRelativeTime } = useRelativeTime();
@@ -50,12 +52,11 @@ const PostCard = ({
   const { ToProfile } = useToProfile();
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // 1. Üç nokta menü state'i
-  const menuRef = useRef<HTMLDivElement>(null); // 2. Dışarı tıklama kontrolü için ref
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const { deletePost } = useDeletePosts();
 
-  // Dışarı tıklandığında üç nokta menüsünü kapat
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -68,7 +69,6 @@ const PostCard = ({
     };
   }, []);
 
-  // Post tipine göre dinamik ReactionType belirleme
   const getShineReactionType = (type?: string): ReactionType => {
     switch (type) {
       case "SAHNE":
@@ -194,7 +194,10 @@ const PostCard = ({
           <div
             onClick={() => {
               if (isOwner) {
-                router.push(`/olustur?slug=${post?.slug}`);
+                const archivedFlag = post.isArchived ?? post.archived ?? false;
+                router.push(
+                  `/olustur?slug=${post?.slug}&isArchived=${archivedFlag}`,
+                );
               } else {
                 router.push(`/${post?.authorUsername}/${post?.slug}`);
               }
@@ -281,7 +284,7 @@ const PostCard = ({
                 {/* AÇILIR MENÜ */}
                 {isMenuOpen && (
                   <div
-                    className="absolute right-0 bottom-full w-48 flex flex-col bg-white rounded-sm z-50 px-4 py-2"
+                    className="absolute right-0 bottom-full w-48 flex flex-col bg-white rounded-sm z-50 px-4 py-3 gap-2"
                     style={{
                       boxShadow: "0px 0px 5px 1px rgba(0, 0, 0, 0.1)",
                     }}
@@ -296,14 +299,29 @@ const PostCard = ({
                       <span>Sahneyi Düzenle</span>
                     </button>
 
-                    <div className="h-[1px] bg-gray-100 my-1" />
+                    <div className="h-[1px] bg-gray-100" />
+
+                    {/* ARŞİVE AL / ARŞİVDEN ÇIKAR SEÇENEĞİ */}
+                    <button
+                      onClick={() => {
+                        onArchive?.();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
+                    >
+                      <span>
+                        {post.isArchived ? "Arşivden Çıkar" : "Arşive Al"}
+                      </span>
+                    </button>
+
+                    <div className="h-[1px] bg-gray-100" />
 
                     <button
                       onClick={() => {
                         setShowConfirm(true);
                         setIsMenuOpen(false);
                       }}
-                      className="flex items-center text-xs hover:bg-red-900 transition text-left cursor-pointer"
+                      className="flex items-center text-xs transition text-left cursor-pointer"
                       style={{
                         color: "#b94445",
                       }}

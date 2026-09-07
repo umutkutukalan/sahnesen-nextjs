@@ -9,6 +9,7 @@ export interface PostResponse {
   coverImage?: string;
   postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
   isPublished: boolean;
+  isArchived: boolean;
   discussionDurationHours?: number;
   discussionEndsAt?: string;
   createdAt: string;
