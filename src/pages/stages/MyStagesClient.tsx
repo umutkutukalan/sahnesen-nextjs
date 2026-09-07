@@ -10,6 +10,7 @@ import PostCard from "@/components/projects/PostCard";
 import Image from "next/image";
 import { sahnelerim } from "@/utils";
 import { FaTicketSimple } from "react-icons/fa6"; // Tür ikonları için gerekli
+import api from "@/services/client/config";
 
 export default function MyStagesClient() {
   const { user, loading: authLoading } = useAuth();
@@ -22,6 +23,10 @@ export default function MyStagesClient() {
   ); // 1. Tür filtresi state'i
   const [posts, setPosts] = useState<PostResponse[]>([]);
   const [page, setPage] = useState<number>(0);
+  const [counts, setCounts] = useState<{ published: number; draft: number }>({
+    published: 0,
+    draft: 0,
+  });
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -54,12 +59,23 @@ export default function MyStagesClient() {
     [],
   );
 
+  const fetchCounts = useCallback(async (postType?: string) => {
+    try {
+      const queryParam = postType ? `?postType=${postType}` : "";
+      const res = await api.get(`/api/posts/me/counts${queryParam}`);
+      setCounts(res.data);
+    } catch (error) {
+      console.error("Sayılar alınamadı:", error);
+    }
+  }, []);
+
   // Tab veya Tür değiştiğinde postları yeniden çekiyoruz
   useEffect(() => {
     if (user) {
+      fetchCounts(selectedType);
       fetchMyPosts(activeTab, 0, selectedType);
     }
-  }, [user, activeTab, selectedType, fetchMyPosts]);
+  }, [user, activeTab, selectedType, fetchMyPosts, fetchCounts]);
 
   const handleSelectType = (type: string) => {
     if (selectedType === type) {
@@ -82,14 +98,32 @@ export default function MyStagesClient() {
             className="w-34 h-28 object-cover"
           />
         </div>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Sahnelerim
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Yayınladığın veya henüz tamamlamadığın sahnelerine buradan
-            ulaşabilirsin.
-          </p>
+        <div className="flex flex-col gap-2">
+          <div
+            className="flex flex-col gap-1 border-b border-gray-200"
+            style={{
+              paddingBottom: "6px",
+            }}
+          >
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Sahnelerim
+            </h1>
+            <p className="text-xs text-gray-500">
+              Yayınladığın, henüz tamamlamadığın ve arşivinde sakladığın
+              sahneler
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-gray-800">{counts.published}</span>
+              <span className="text-xs text-gray-500">Sahnelenen</span>
+            </div>
+            <span className="text-xs text-gray-500">•</span>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-gray-800">{counts.draft}</span>
+              <span className="text-xs text-gray-500">Taslak</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -109,7 +143,7 @@ export default function MyStagesClient() {
                   : "text-gray-400 hover:text-gray-700"
               }`}
             >
-              Yayınlananlar
+              Sahnede
             </button>
             <button
               onClick={() => setActiveTab("DRAFT")}
