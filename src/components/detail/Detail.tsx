@@ -5,11 +5,7 @@ import { PostResponse } from "@/services/server/post.service";
 import { JSX, useEffect } from "react";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser, FiUserCheck } from "react-icons/fi";
-import {
-  TbBookmark,
-  TbBookmarkFilled,
-  TbRosetteDiscountCheckFilled,
-} from "react-icons/tb";
+import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
 import { IoIosArrowDown, IoIosMore } from "react-icons/io";
 import Image from "next/image";
 
@@ -665,8 +661,7 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
-  const { isFollowing, followCounts, toggleFollow, isLoading } =
-    useFollow(usernameSlug);
+  const { isFollowing, toggleFollow, isLoading } = useFollow(usernameSlug);
 
   const authorFullName =
     `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
@@ -812,39 +807,64 @@ const Detail = ({ post }: DetailProps) => {
             </div>
 
             {/* BAŞLIK VE METADATA */}
-            <div className="relative flex flex-col gap-3 border-b py-4 border-gray-200">
-              <h1
-                className="text-[32px] md:text-[42px] merriweather-sans font-semibold z-10"
-                style={{ lineHeight: "48px", letterSpacing: "-0.03em" }}
-              >
-                {post.title}
-              </h1>
-              {subtitle && (
-                <p className="text-[18px] md:text-[22px] text-gray-500 font-normal leading-snug tracking-tight">
-                  {subtitle}
-                </p>
-              )}
-              <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
-                {/* <p>5 min read</p>
-                <span>•</span> */}
-                <span className="text-black pr-2 border-r border-gray-200">
-                  {formatRelativeTime(post.createdAt)}
-                </span>
-                {post.viewCount !== undefined && post.viewCount !== null && (
-                  <>
-                    <div className="relative flex items-center gap-1">
-                      <LuTheater className="text-sm text-gray-600" />
-                      <div className="flex items-center gap-1 text-xs">
-                        <span className="text-black">{post?.viewCount}</span>
-                      </div>
-                    </div>
-                  </>
+            <div className="relative flex flex-col gap-6 border-b py-4 border-gray-200">
+              <div className="flex flex-col gap-3">
+                <h1
+                  className="text-[32px] md:text-[42px] merriweather-sans font-semibold z-10"
+                  style={{ lineHeight: "48px", letterSpacing: "-0.03em" }}
+                >
+                  {post.title}
+                </h1>
+                {subtitle && (
+                  <p className="text-[18px] md:text-[22px] text-gray-500 font-normal leading-snug tracking-tight">
+                    {subtitle}
+                  </p>
                 )}
+              </div>
+              <div className="relative flex items-center gap-1">
+                <div
+                  className="absolute left-0 top-0 w-8 h-8 bg-black"
+                  style={{
+                    maskImage: `url(${solperde.src})`,
+                    WebkitMaskImage: `url(${solperde.src})`,
+                    maskSize: "contain",
+                    WebkitMaskSize: "contain",
+                    maskRepeat: "no-repeat",
+                    WebkitMaskRepeat: "no-repeat",
+                    maskPosition: "center",
+                    WebkitMaskPosition: "center",
+                  }}
+                />
+                <div
+                  className="flex items-center gap-2 text-xs text-gray-500 select-none"
+                  style={{
+                    paddingLeft: "16px",
+                  }}
+                >
+                  {/* <p>5 min read</p>
+                <span>•</span> */}
+                  <span className="text-black pr-2 border-r border-gray-200">
+                    {formatRelativeTime(post.createdAt)}
+                  </span>
+                  {post.viewCount !== undefined && post.viewCount !== null && (
+                    <>
+                      <div className="relative flex items-center gap-2">
+                        <LuTheater className="text-base text-black" />
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className="text-black">
+                            {formatCount(post.viewCount || 0)}
+                          </span>
+                          <span>gösterim</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* GÜNCELLENMİŞ BEĞENİ, PARLATMA VE KAYDETME BARI */}
-            <div className="h-16 w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
+            <div className="h-14 w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
               <div className="flex items-center gap-3">
                 {/* Beğeni Butonu */}
                 <button
