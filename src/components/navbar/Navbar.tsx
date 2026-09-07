@@ -148,13 +148,6 @@ const Navbar = ({
   const isHome = pathname === "/";
   const isProfilePage = pathname.startsWith("/profil");
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-  const profileImgUrl = user?.profileImg
-    ? user.profileImg.startsWith("http")
-      ? user.profileImg
-      : `${baseUrl}/${user.profileImg}`
-    : null;
-
   return (
     <>
       <nav
@@ -211,22 +204,27 @@ const Navbar = ({
                   (postsResults.length > 0 ||
                     tagsResults.length > 0 ||
                     usersResults.length > 0) && (
-                    <div className="absolute top-12 left-0 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto">
+                    <div
+                      className="absolute top-12 left-0 bg-white border border-gray-100 rounded-lg shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto"
+                      style={{ width: 400 }}
+                    >
                       {/* USERS (Kullanıcılar / Yazarlar) */}
                       {usersResults.length > 0 && (
                         <div className="mb-4">
-                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                            Kişiler
-                          </h3>
+                          <div className="border-b border-gray-100 mb-2 mb-2">
+                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                              Kişiler
+                            </h3>
+                          </div>
                           {usersResults.map((u: any) => {
                             return (
                               <Link
                                 key={u.id}
                                 href={`/profil/${u.username}`}
                                 onClick={() => setIsSearchOpen(false)}
-                                className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                                className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                               >
-                                <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                                <div className="relative w-6 h-6 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-gray-200">
                                   {u.profileImg ? (
                                     <Image
                                       src={getFullImageUrl(u.profileImg)!}
@@ -236,15 +234,14 @@ const Navbar = ({
                                       unoptimized
                                     />
                                   ) : (
-                                    <FaRegUser className="text-gray-500 text-sm" />
+                                    <div className="w-full h-full flex items-end justify-center">
+                                      <FaRegUser className="text-gray-500 text-sm" />
+                                    </div>
                                   )}
                                 </div>
                                 <div className="overflow-hidden">
-                                  <p className="text-sm font-medium text-gray-800 truncate">
+                                  <p className="text-xs font-medium text-gray-800 truncate">
                                     {u.name} {u.surname}
-                                  </p>
-                                  <p className="text-xs text-gray-400 truncate">
-                                    @{u.username}
                                   </p>
                                 </div>
                               </Link>
@@ -256,9 +253,11 @@ const Navbar = ({
                       {/* PUBLICATIONS (Yazılar) */}
                       {postsResults.length > 0 && (
                         <div className="mb-4">
-                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                            Publications
-                          </h3>
+                          <div className="border-b border-gray-100 mb-2">
+                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                              İçerikler
+                            </h3>
+                          </div>
                           {postsResults.map((post: any) => (
                             <Link
                               key={post.id}
@@ -266,15 +265,22 @@ const Navbar = ({
                               onClick={() => setIsSearchOpen(false)}
                               className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                             >
-                              <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0">
-                                <IoIosPaper className="text-gray-500" />
+                              <div className="w-8 h-8 relative rounded-md flex items-center justify-center shrink-0">
+                                {post.coverImage ? (
+                                  <Image
+                                    src={getFullImageUrl(post.coverImage)!}
+                                    alt={post.title}
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                  />
+                                ) : (
+                                  <IoIosPaper className="text-gray-500" />
+                                )}
                               </div>
                               <div className="overflow-hidden">
-                                <p className="text-sm font-medium text-gray-800 truncate">
+                                <p className="text-xs text-gray-800 line-clamp-2">
                                   {post.title}
-                                </p>
-                                <p className="text-xs text-gray-400 truncate">
-                                  @{post.authorUsername}
                                 </p>
                               </div>
                             </Link>
@@ -285,9 +291,11 @@ const Navbar = ({
                       {/* TOPICS (Etiketler) */}
                       {tagsResults.length > 0 && (
                         <div>
-                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                            Topics
-                          </h3>
+                          <div className="border-b border-gray-100 mb-2">
+                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                              Etiketler
+                            </h3>
+                          </div>
                           {tagsResults.map((tag: any) => (
                             <Link
                               key={tag.id}
@@ -342,7 +350,7 @@ const Navbar = ({
                 >
                   {user.profileImg ? (
                     <Image
-                      src={profileImgUrl}
+                      src={getFullImageUrl(user.profileImg)!}
                       alt="profile-img"
                       fill
                       className="object-cover"

@@ -34,7 +34,6 @@ import {
 import { ReactionType } from "@/services/client/interaction/interaction.service";
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 import Link from "next/link";
-import { formatToIstanbul } from "@/utils/dateFormatter";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -761,7 +760,7 @@ const Detail = ({ post }: DetailProps) => {
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
                 <p>5 min read</p>
                 <span>•</span>
-                <p>{formatToIstanbul(post.createdAt)}</p>
+                <p>{formatRelativeTime(post.createdAt)}</p>
                 {post.viewCount !== undefined && post.viewCount !== null && (
                   <>
                     <span>•</span>
