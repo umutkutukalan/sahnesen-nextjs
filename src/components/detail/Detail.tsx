@@ -4,13 +4,13 @@ import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { PostResponse } from "@/services/server/post.service";
 import { JSX, useEffect } from "react";
 import LoadingScreen from "../LoadingScreen";
-import { FiUser } from "react-icons/fi";
+import { FiUser, FiUserCheck } from "react-icons/fi";
 import {
   TbBookmark,
   TbBookmarkFilled,
   TbRosetteDiscountCheckFilled,
 } from "react-icons/tb";
-import { IoIosMore } from "react-icons/io";
+import { IoIosArrowDown, IoIosMore } from "react-icons/io";
 import Image from "next/image";
 
 // Syntax Highlighting için Gerekli Yapılar
@@ -23,7 +23,7 @@ import csharp from "highlight.js/lib/languages/csharp";
 import cpp from "highlight.js/lib/languages/cpp";
 import sql from "highlight.js/lib/languages/sql";
 import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
-import { RiCandleFill, RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
+import { RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
 import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
 import {
   PiFeather,
@@ -34,6 +34,12 @@ import {
 import { ReactionType } from "@/services/client/interaction/interaction.service";
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 import Link from "next/link";
+import { LuTheater } from "react-icons/lu";
+import { kurucusahne, solperde } from "@/utils";
+import { useAuth } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import { CiSettings } from "react-icons/ci";
+import { useFollow } from "@/hooks/follow/useFollow";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -97,6 +103,11 @@ interface LowlightNode {
 
 const Detail = ({ post }: DetailProps) => {
   const { formatRelativeTime } = useRelativeTime();
+  const { user } = useAuth();
+  const usernameSlug = post.authorUsername;
+  const router = useRouter();
+
+  const isOwnProfile = usernameSlug === user?.username;
 
   // Post tipine göre dinamik ReactionType belirleme
   const getShineReactionType = (type?: string): ReactionType => {
@@ -654,6 +665,9 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
+  const { isFollowing, followCounts, toggleFollow, isLoading } =
+    useFollow(usernameSlug);
+
   const authorFullName =
     `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
 
@@ -664,6 +678,8 @@ const Detail = ({ post }: DetailProps) => {
       ? post.authorProfileImg
       : `${baseUrl}/${post.authorProfileImg}`
     : null;
+
+  console.log("post", post);
 
   return (
     <div className="page pt-5 bg-private text-black min-h-screen">
@@ -703,52 +719,103 @@ const Detail = ({ post }: DetailProps) => {
       `}</style>
 
       <div className={`page-padding flex justify-center gap-5 relative`}>
-        <div className="flex flex-col w-full lg:w-[850px] gap-10 transition-all duration-300 relative px-2 md:px-15">
+        <div className="h-full flex flex-col w-full lg:w-[850px] gap-10 transition-all duration-300 relative px-2">
           {/* YAZAR ÜST BARI */}
-          <div className="flex flex-col w-full">
-            <div className="w-full flex items-center justify-between border-b pb-5 border-gray-200">
-              <div className="w-full flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 cursor-pointer flex items-end justify-center">
-                    {authorProfileImgUrl ? (
-                      <Image
-                        src={authorProfileImgUrl}
-                        alt={authorFullName}
-                        fill
-                        priority // <-- Yazar görseli yukarıda olduğu için eklendi
-                        unoptimized
-                        className="object-cover"
-                      />
-                    ) : (
-                      <FiUser className="text-2xl text-gray-500" />
-                    )}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-700 cursor-pointer font-medium">
-                        {authorFullName || "Yazar"}
-                      </span>
-                      <TbRosetteDiscountCheckFilled
-                        className="text-blue-500"
-                        title="Onaylı Yazar"
-                      />
+          <div className="h-full flex flex-col w-full">
+            <div className="relative w-full flex items-center justify-between overflow-hidden h-20">
+              <div className="absolute top-0 left-0">
+                <Image
+                  src={solperde}
+                  alt=""
+                  width={100}
+                  height={100}
+                  unoptimized
+                  className="w-30 h-30"
+                />
+              </div>
+              <div className="w-full h-full flex items-start justify-between">
+                <div
+                  className="flex flex-col gap-1.5"
+                  style={{ paddingLeft: "50px", paddingTop: "6px" }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 cursor-pointer flex items-end justify-center">
+                      {authorProfileImgUrl ? (
+                        <Image
+                          src={authorProfileImgUrl}
+                          alt={authorFullName}
+                          fill
+                          priority // <-- Yazar görseli yukarıda olduğu için eklendi
+                          unoptimized
+                          className="object-cover"
+                        />
+                      ) : (
+                        <FiUser className="text-2xl text-gray-500" />
+                      )}
                     </div>
-                    <span className="text-[10px] text-gray-400">
-                      @{post.authorUsername}
-                    </span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-gray-700 cursor-pointer font-medium">
+                          {authorFullName || "Yazar"}
+                        </span>
+                        <Image
+                          src={kurucusahne}
+                          alt="Kurucu Sahne"
+                          width={10}
+                          height={10}
+                          unoptimized
+                          className="select-none"
+                        />
+                      </div>
+                      <span className="text-[10px] text-gray-400">
+                        @{post.authorUsername}
+                      </span>
+                    </div>
                   </div>
+                  {isOwnProfile ? (
+                    <button
+                      onClick={() => router.push("/profil/me/settings")}
+                      className="px-2 py-0.5 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-200"
+                    >
+                      <CiSettings className="text-sm" />
+                      <span>Sahneni Düzenle</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={toggleFollow}
+                      disabled={isLoading}
+                      className={`px-2 py-0.5 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-[10px] cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${
+                        isFollowing
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-white text-green-700 border-gray-300"
+                      }`}
+                    >
+                      {isFollowing ? (
+                        <div className="flex items-center gap-1">
+                          <FiUserCheck />
+                          <span className="text-blue-700">Takiptesin</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <IoIosArrowDown className="text-green-700" />
+                          <span className="text-green-700">Takip Et</span>
+                        </div>
+                      )}
+                    </button>
+                  )}
+                  {/* <span className="text-xs">•</span>
+                    <span className="text-[10px] ">
+                      {followCounts?.followerCount || 0} Takipçi
+                    </span> */}
                 </div>
               </div>
             </div>
 
             {/* BAŞLIK VE METADATA */}
-            <div className="flex flex-col gap-3 border-b py-4 border-gray-200">
-              <span className="text-xs font-bold text-blue-600 tracking-wider uppercase">
-                {post.postType}
-              </span>
+            <div className="relative flex flex-col gap-3 border-b py-4 border-gray-200">
               <h1
-                className="text-[32px] md:text-[42px] font-extrabold tracking-tight text-gray-900 font-sans"
-                style={{ lineHeight: "48px", letterSpacing: "-0.011em" }}
+                className="text-[32px] md:text-[42px] merriweather-sans font-semibold z-10"
+                style={{ lineHeight: "48px", letterSpacing: "-0.03em" }}
               >
                 {post.title}
               </h1>
@@ -758,22 +825,26 @@ const Detail = ({ post }: DetailProps) => {
                 </p>
               )}
               <div className="flex items-center gap-2 text-xs text-gray-500 select-none">
-                <p>5 min read</p>
-                <span>•</span>
-                <p>{formatRelativeTime(post.createdAt)}</p>
+                {/* <p>5 min read</p>
+                <span>•</span> */}
+                <span className="text-black pr-2 border-r border-gray-200">
+                  {formatRelativeTime(post.createdAt)}
+                </span>
                 {post.viewCount !== undefined && post.viewCount !== null && (
                   <>
-                    <span>•</span>
-                    <p className="text-blue-600 font-medium">
-                      {post.viewCount} görüntülenme
-                    </p>
+                    <div className="relative flex items-center gap-1">
+                      <LuTheater className="text-sm text-gray-600" />
+                      <div className="flex items-center gap-1 text-xs">
+                        <span className="text-black">{post?.viewCount}</span>
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
             </div>
 
             {/* GÜNCELLENMİŞ BEĞENİ, PARLATMA VE KAYDETME BARI */}
-            <div className="h-full w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
+            <div className="h-16 w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
               <div className="flex items-center gap-3">
                 {/* Beğeni Butonu */}
                 <button
@@ -839,9 +910,15 @@ const Detail = ({ post }: DetailProps) => {
                 </button>
 
                 {/* Post Tipi Etiketi */}
-                <div className="px-3 py-1 rounded-md border border-gray-200 flex items-center justify-center text-xs text-gray-500">
-                  #{post.postType.toLowerCase()}
-                </div>
+                {post.tags?.map((tag, index) => (
+                  <Link
+                    key={index}
+                    href={`/tag/${tag}`}
+                    className="px-2 py-1 rounded-sm border border-gray-200 flex items-center justify-center text-xs text-gray-500 list-none"
+                  >
+                    <li>{tag}</li>
+                  </Link>
+                ))}
 
                 {/* Diğer Seçenekler */}
                 <button className="text-2xl text-gray-400 hover:text-gray-700 transition-colors cursor-pointer">

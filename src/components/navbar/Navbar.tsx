@@ -95,11 +95,12 @@ const Navbar = ({
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showProfileMenu && !event.target.closest(".profile-menu-container")) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (showProfileMenu && !target?.closest(".profile-menu-container")) {
         setShowProfileMenu(false);
       }
-      if (notification && !event.target.closest(".notification-container")) {
+      if (notification && !target?.closest(".notification-container")) {
         setNotification(false);
       }
     };
@@ -146,7 +147,7 @@ const Navbar = ({
 
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const isProfilePage = pathname.startsWith("/profil");
+  const isProfilePage = pathname?.startsWith("/profil") ?? false;
 
   return (
     <>
@@ -301,12 +302,12 @@ const Navbar = ({
                               key={tag.id}
                               href={`/tag/${tag.name}`}
                               onClick={() => setIsSearchOpen(false)}
-                              className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                              className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                             >
-                              <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-500 text-sm font-serif">
+                              <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 text-gray-500 text-sm font-serif">
                                 #
                               </div>
-                              <p className="text-sm font-medium text-gray-800">
+                              <p className="text-xs font-medium text-gray-800">
                                 {tag.name}
                               </p>
                             </Link>

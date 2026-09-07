@@ -13,6 +13,7 @@ export interface PostResponse {
   discussionEndsAt?: string;
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
+  tags?: string[];
   authorName: string;
   authorSurname: string;
   authorUsername: string;
@@ -30,6 +31,7 @@ export interface PostSummaryResponse {
   discussionEndsAt?: string;
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
+  tags?: string[];
   authorName: string;
   authorSurname: string;
   authorUsername: string;
