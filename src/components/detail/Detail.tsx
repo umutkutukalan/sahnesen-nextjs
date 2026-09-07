@@ -36,6 +36,7 @@ import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { CiSettings } from "react-icons/ci";
 import { useFollow } from "@/hooks/follow/useFollow";
+import { useToProfile } from "@/utils/useToProfile";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -102,6 +103,7 @@ const Detail = ({ post }: DetailProps) => {
   const { user } = useAuth();
   const usernameSlug = post.authorUsername;
   const router = useRouter();
+  const { ToProfile } = useToProfile();
 
   const isOwnProfile = usernameSlug === user?.username;
 
@@ -734,7 +736,10 @@ const Detail = ({ post }: DetailProps) => {
                   style={{ paddingLeft: "50px", paddingTop: "6px" }}
                 >
                   <div className="flex items-center gap-2">
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 cursor-pointer flex items-end justify-center">
+                    <div
+                      className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 cursor-pointer flex items-end justify-center"
+                      onClick={() => ToProfile(post.authorUsername)}
+                    >
                       {authorProfileImgUrl ? (
                         <Image
                           src={authorProfileImgUrl}
@@ -750,7 +755,10 @@ const Detail = ({ post }: DetailProps) => {
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-gray-700 cursor-pointer font-medium">
+                        <span
+                          className="text-xs text-gray-700 cursor-pointer"
+                          onClick={() => ToProfile(post.authorUsername)}
+                        >
                           {authorFullName || "Yazar"}
                         </span>
                         <Image
@@ -762,7 +770,10 @@ const Detail = ({ post }: DetailProps) => {
                           className="select-none"
                         />
                       </div>
-                      <span className="text-[10px] text-gray-400">
+                      <span
+                        className="text-[10px] text-gray-400 cursor-pointer"
+                        onClick={() => ToProfile(post.authorUsername)}
+                      >
                         @{post.authorUsername}
                       </span>
                     </div>
