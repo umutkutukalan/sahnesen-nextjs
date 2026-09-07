@@ -129,11 +129,11 @@ const PageAbout = ({
               selectedType === "TERSYUZ" ? "border-b-2 font-medium" : ""
             }`}
             style={{
-              borderColor: selectedType === "TERSYUZ" ? "#fdfd96" : undefined,
+              borderColor: selectedType === "TERSYUZ" ? "#f4d45f" : undefined,
             }}
             onClick={() => handleSelectType("TERSYUZ")}
           >
-            <FaTicketSimple className="text-lg" style={{ color: "#fdfd96" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#f4d45f" }} />
             <span className="text-xs">Tersyüz</span>
           </button>
         </ul>

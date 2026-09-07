@@ -203,7 +203,7 @@ const PostCard = ({
                             : post?.postType === "YANYANA"
                               ? "#789680"
                               : post?.postType === "TERSYUZ"
-                                ? "#fdfd96"
+                                ? "#f4d45f"
                                 : "#000000",
                     }}
                   />
@@ -219,7 +219,7 @@ const PostCard = ({
                             : post?.postType === "YANYANA"
                               ? "#789680"
                               : post?.postType === "TERSYUZ"
-                                ? "#fdfd96"
+                                ? "#f4d45f"
                                 : "#000000",
                     }}
                   />
@@ -321,7 +321,7 @@ const PostCard = ({
                       {interactionStatus.isShined ? (
                         <RiUserSmileFill
                           className={`text-base`}
-                          style={{ color: "#fdfd96" }}
+                          style={{ color: "#f4d45f" }}
                         />
                       ) : (
                         <RiUserSmileLine className={`text-base`} />
