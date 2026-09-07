@@ -94,11 +94,13 @@ export const getUserPostsService = async (
 // 3. AUTH (ME): Kullanıcının kendi postları
 export const getMyPostsClient = async ({
   isPublished,
+  isArchived = false,
   postType,
   page = 0,
   size = 10,
 }: {
   isPublished?: boolean;
+  isArchived?: boolean;
   postType?: string;
   page?: number;
   size?: number;
@@ -106,6 +108,7 @@ export const getMyPostsClient = async ({
   const params = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
+    isArchived: isArchived.toString(),
   });
 
   if (isPublished !== undefined) {
@@ -167,6 +170,11 @@ export const updatePostClient = async (postId: number, payload: any) => {
 // 6. AUTH: Gönderi Silme
 export const deletePostService = async (postId: number) => {
   const response = await api.delete(`/api/posts/me/${postId}`);
+  return response.data;
+};
+
+export const toggleArchivePostClient = async (postId: number) => {
+  const response = await api.put(`/api/posts/me/${postId}/archive`);
   return response.data;
 };
 
