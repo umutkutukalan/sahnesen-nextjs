@@ -10,7 +10,7 @@ import axios from "axios";
 import { useAuth } from "../../context/UserContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { FiSearch } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import NavLinks from "./NavbarLinks";
 import { getProfileAccountWithUser } from "@/constants/index";
@@ -24,6 +24,8 @@ import {
 } from "@/services/client/post.service";
 import { searchUsersClient } from "@/services/client/user/user.service";
 import { getFullImageUrl } from "@/utils/image";
+import { PostSummaryResponse } from "@/services/server/post.service";
+import { TagResponse } from "@/services/client/tags/tag.service";
 
 const Navbar = ({
   transparent,
@@ -45,6 +47,24 @@ const Navbar = ({
   const [usersResults, setUsersResults] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
+
+  const searchRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const iconMap = {
     FiUser: FiUser,
@@ -184,7 +204,10 @@ const Navbar = ({
                 </Link>
               </li>
 
-              <li className="relative flex items-center gap-2 border-gray-200 border rounded-lg overflow-visible lg:block hidden">
+              <li
+                ref={searchRef}
+                className="relative flex items-center gap-2 border-gray-200 border rounded-lg overflow-visible lg:block hidden"
+              >
                 <div className="relative rounded-2xl">
                   <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">
                     <FiSearch className="text-xl text-gray-400" />
@@ -192,7 +215,21 @@ const Navbar = ({
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      if (!isSearchOpen) setIsSearchOpen(true);
+                      setSearchQuery(e.target.value);
+                    }}
+                    onFocus={() => {
+                      // Tekrar input'a odaklanıldığında, eğer sonuç varsa dropdown'ı geri aç
+                      if (
+                        searchQuery.trim().length > 0 &&
+                        (postsResults.length > 0 ||
+                          tagsResults.length > 0 ||
+                          usersResults.length > 0)
+                      ) {
+                        setIsSearchOpen(true);
+                      }
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder="Ara..."
                     className="focus:outline-none pl-12 pr-5 py-1.5 text-sm relative z-10 text-lg select-none bg-transparent"
@@ -206,12 +243,12 @@ const Navbar = ({
                     tagsResults.length > 0 ||
                     usersResults.length > 0) && (
                     <div
-                      className="absolute top-12 left-0 bg-white border border-gray-100 rounded-lg shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto"
-                      style={{ width: 400 }}
+                      className="absolute top-12 left-0 flex flex-col gap-4 bg-white border border-gray-100 rounded-lg shadow-xl z-50 p-4 max-h-[480px] overflow-y-auto"
+                      style={{ width: 300 }}
                     >
                       {/* USERS (Kullanıcılar / Yazarlar) */}
                       {usersResults.length > 0 && (
-                        <div className="mb-4">
+                        <div className="">
                           <div className="border-b border-gray-100 mb-2 mb-2">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
                               Kişiler
@@ -225,7 +262,7 @@ const Navbar = ({
                                 onClick={() => setIsSearchOpen(false)}
                                 className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                               >
-                                <div className="relative w-6 h-6 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-gray-200">
+                                <div className="relative w-7 h-7 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-gray-200">
                                   {u.profileImg ? (
                                     <Image
                                       src={getFullImageUrl(u.profileImg)!}
@@ -253,13 +290,13 @@ const Navbar = ({
 
                       {/* PUBLICATIONS (Yazılar) */}
                       {postsResults.length > 0 && (
-                        <div className="mb-4">
+                        <div className="">
                           <div className="border-b border-gray-100 mb-2">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
                               İçerikler
                             </h3>
                           </div>
-                          {postsResults.map((post: any) => (
+                          {postsResults.map((post: PostSummaryResponse) => (
                             <Link
                               key={post.id}
                               href={`/${post.authorUsername}/${post.slug}`}
@@ -291,13 +328,13 @@ const Navbar = ({
 
                       {/* TOPICS (Etiketler) */}
                       {tagsResults.length > 0 && (
-                        <div>
+                        <div className="">
                           <div className="border-b border-gray-100 mb-2">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">
                               Etiketler
                             </h3>
                           </div>
-                          {tagsResults.map((tag: any) => (
+                          {tagsResults.map((tag: TagResponse) => (
                             <Link
                               key={tag.id}
                               href={`/tag/${tag.name}`}
@@ -374,7 +411,9 @@ const Navbar = ({
                         className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
                         onClick={() => setShowProfileMenu(false)}
                       >
-                        <span className="text-lg">{renderIcon(item.icon)}</span>
+                        <span className="text-lg">
+                          {renderIcon(item.icon as keyof typeof iconMap)}
+                        </span>
                         <p className="">{item.title}</p>
                       </Link>
                     ))}
@@ -400,7 +439,7 @@ const Navbar = ({
                             onClick={() => setShowProfileMenu(false)}
                           >
                             <span className="text-lg">
-                              {renderIcon(item.icon)}
+                              {renderIcon(item.icon as keyof typeof iconMap)}
                             </span>
                             <p className="">{item.title}</p>
                           </Link>
