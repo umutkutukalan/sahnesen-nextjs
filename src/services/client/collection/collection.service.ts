@@ -36,3 +36,14 @@ export const addPostToCollectionClient = async (
   );
   return response.data;
 };
+
+export const getCollectionPostsClient = async (
+  collectionId: number,
+  page = 0,
+  size = 10,
+) => {
+  const response = await api.get(
+    `/api/interaction/bookmark-collections/${collectionId}/posts?page=${page}&size=${size}`,
+  );
+  return response.data; // Page<PostSummaryResponse> yapısı döner
+};
