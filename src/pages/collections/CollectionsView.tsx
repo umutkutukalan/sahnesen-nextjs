@@ -30,7 +30,7 @@ import {
 import { getFullImageUrl } from "@/utils/image";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useAuth } from "@/context/UserContext";
-import { FiUser } from "react-icons/fi";
+import { FiMoreHorizontal, FiUser } from "react-icons/fi";
 import { useToProfile } from "@/utils/useToProfile";
 
 interface CollectionsViewProps {
@@ -51,6 +51,7 @@ export default function CollectionsView({
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
   );
+  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
 
@@ -377,15 +378,13 @@ export default function CollectionsView({
                       </div>
                       {/* Sol Taraf: 2x2 Kare Önizleme Alanı */}
                       <div
-                        className="shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center"
+                        className="h-full w-34 shrink-0 overflow-hidden bg-white flex items-center justify-center"
                         style={{
                           display: count > 0 ? "grid" : "flex", // ✨ Boşken flex, doluyken grid yapıyoruz
                           gridTemplateColumns:
                             count === 1 ? "1fr" : "repeat(2, minmax(0, 1fr))",
                           gridTemplateRows:
                             count <= 2 ? "1fr" : "repeat(2, minmax(0, 1fr))",
-                          width: "136px",
-                          height: "136px",
                           gap: "2px",
                         }}
                       >
@@ -455,7 +454,7 @@ export default function CollectionsView({
                             />
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5">
                           <h3 className="text-xl font-extrabold tracking-tight merriweather-sans">
                             {col.name}
                           </h3>
@@ -465,35 +464,81 @@ export default function CollectionsView({
                             </span>
                           )}
                           {col.description && (
-                            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                            <p className="text-[10px] text-gray-500 line-clamp-2 leading-relaxed">
                               {col.description}
                             </p>
                           )}
                         </div>
-                        <div className="relative">
-                          <div
-                            className="absolute left-0 top-0 w-4 h-4 bg-green-600"
-                            style={{
-                              maskImage: `url(${solperde.src})`,
-                              WebkitMaskImage: `url(${solperde.src})`,
-                              maskSize: "contain",
-                              WebkitMaskSize: "contain",
-                              maskRepeat: "no-repeat",
-                              WebkitMaskRepeat: "no-repeat",
-                              maskPosition: "center",
-                              WebkitMaskPosition: "center",
-                            }}
-                          />
-                          <div
-                            className="flex items-center gap-1"
-                            style={{ paddingLeft: "10px" }}
-                          >
-                            <span className="text-[10px] text-gray-800">
-                              {col.contents?.length || 0}
-                            </span>
-                            <span className="text-[10px] text-gray-500">
-                              Sahne
-                            </span>
+                        <div className="flex items-center justify-between relative">
+                          <div className="relative flex items-center">
+                            <div
+                              className="absolute left-0 top-0 w-4 h-4 bg-green-600"
+                              style={{
+                                maskImage: `url(${solperde.src})`,
+                                WebkitMaskImage: `url(${solperde.src})`,
+                                maskSize: "contain",
+                                WebkitMaskSize: "contain",
+                                maskRepeat: "no-repeat",
+                                WebkitMaskRepeat: "no-repeat",
+                                maskPosition: "center",
+                                WebkitMaskPosition: "center",
+                              }}
+                            />
+                            <div
+                              className="flex items-center gap-1"
+                              style={{ paddingLeft: "10px" }}
+                            >
+                              <span className="text-[10px] text-gray-800">
+                                {col.contents?.length || 0}
+                              </span>
+                              <span className="text-[10px] text-gray-500">
+                                Sahne
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Üç Nokta Butonu ve Açılır Menü */}
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveMenuId(
+                                  activeMenuId === col.id ? null : col.id,
+                                );
+                              }}
+                              className="py-1 px-2 text-gray-400 hover:text-black transition-colors cursor-pointer"
+                              title="Seçenekler"
+                            >
+                              <FiMoreHorizontal className="text-lg" />
+                            </button>
+
+                            {activeMenuId === col.id && (
+                              <div
+                                className="absolute right-0 bottom-full mb-1 w-28 bg-white border border-gray-200 rounded-xl shadow-md py-1 z-30"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <button
+                                  onClick={() => {
+                                    setActiveMenuId(null);
+                                    // TODO: Düzenleme modalını açma fonksiyonunu buraya bağlayabilirsin
+                                    console.log("Düzenle:", col.id);
+                                  }}
+                                  className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                                >
+                                  Düzenle
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveMenuId(null);
+                                    // TODO: Silme fonksiyonunu buraya bağlayabilirsin
+                                    console.log("Sil:", col.id);
+                                  }}
+                                  className="w-full text-left px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                >
+                                  Sil
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -306,7 +306,7 @@ const PostCard = ({
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="p-1 text-gray-500 hover:text-black rounded-full hover:bg-gray-100 transition cursor-pointer"
+                  className="py-1 px-2 text-gray-400 hover:text-black transition-colors cursor-pointer"
                 >
                   <FiMoreHorizontal className="text-lg" />
                 </button>
