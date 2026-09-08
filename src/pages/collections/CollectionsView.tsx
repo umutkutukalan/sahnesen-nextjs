@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
@@ -26,6 +26,7 @@ import {
   getUserCollectionsClient,
   getCollectionPostsClient,
   BookmarkCollection,
+  deleteCollectionClient,
 } from "@/services/client/collection/collection.service";
 import { getFullImageUrl } from "@/utils/image";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
@@ -52,6 +53,11 @@ export default function CollectionsView({
     undefined,
   );
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const [editingCollection, setEditingCollection] =
+    useState<BookmarkCollection | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
 
@@ -75,6 +81,23 @@ export default function CollectionsView({
     currentPage,
     fetchPostsByType,
   } = useGetCollectionsPosts(initialPosts, initialPage, totalPages);
+
+  // Dışarı tıklandığında üç nokta menüsünü kapat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+
+    if (activeMenuId !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeMenuId]);
 
   // Kaydedilenler sekmesindeyken ve bir koleksiyona girilmemişse koleksiyonları çek
   useEffect(() => {
@@ -106,6 +129,18 @@ export default function CollectionsView({
       console.error("Koleksiyon içerikleri yüklenemedi:", error);
     } finally {
       setCollectionPostsLoading(false);
+    }
+  };
+
+  const handleDeleteCollection = async (collectionId: number) => {
+    if (!confirm("Bu koleksiyonu silmek istediğinize emin misiniz?")) return;
+    try {
+      await deleteCollectionClient(collectionId);
+      setUserCollections((prev) =>
+        prev.filter((col) => col.id !== collectionId),
+      );
+    } catch (error) {
+      console.error("Koleksiyon silinemedi:", error);
     }
   };
 
@@ -197,10 +232,13 @@ export default function CollectionsView({
           </div>
         </div>
 
-        {/* Yeni Koleksiyon Oluştur Butonu (Sadece Kaydedilenler sekmesinde/koleksiyon görünümündeyken gösterilebilir) */}
+        {/* Yeni Koleksiyon Oluştur Butonu */}
         {activeTab === "bookmarked" && (
           <button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => {
+              setEditingCollection(null);
+              setIsCreateModalOpen(true);
+            }}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-black text-white rounded-xl hover:bg-gray-800 cursor-pointer transition-colors shadow-xs"
           >
             <FaPlus className="text-[10px]" />
@@ -215,7 +253,7 @@ export default function CollectionsView({
           className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
           style={{ height: "48px" }}
         >
-          {/* Sol taraf: Sekmeler (Beğenilenler / Kaydedilenler) */}
+          {/* Sol taraf: Sekmeler (Beğenilenler / Koleksiyonlar) */}
           <div className="flex space-x-6">
             <button
               onClick={() => handleTabChange("liked")}
@@ -239,7 +277,7 @@ export default function CollectionsView({
             </button>
           </div>
 
-          {/* Sağ taraf: İçerik Türü Filtreleri (Beğenilenler sekmesinde VEYA bir koleksiyonun içine girilmişse görünür) */}
+          {/* Sağ taraf: İçerik Türü Filtreleri */}
           {(activeTab === "liked" || selectedCollection) && (
             <div className="relative h-12 flex items-end justify-end">
               <ul className="relative z-50 flex items-end justify-end gap-5 overflow-x-auto scrollbar-hide">
@@ -342,7 +380,6 @@ export default function CollectionsView({
         {/* LİSTELEME ALANI */}
         <div className="pt-2">
           {activeTab === "bookmarked" && !selectedCollection ? (
-            /* Kaydedilenler sekmesindeyken gösterilecek Özel Koleksiyonlar Listesi */
             collectionsLoading ? (
               <div className="py-12 text-center text-xs text-gray-400">
                 Koleksiyonlar yükleniyor...
@@ -351,17 +388,7 @@ export default function CollectionsView({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {userCollections.map((col) => {
                   const previewContents = col.contents?.slice(0, 4) || [];
-
                   const count = previewContents.length;
-                  // İçerik sayısına göre dinamik grid sınıfları
-                  let gridClasses = "grid-cols-1 grid-rows-1"; // 1 tane ise (full)
-                  if (count === 2) {
-                    gridClasses = "grid-cols-2 grid-rows-1"; // Yan yana 2
-                  } else if (count === 3) {
-                    gridClasses = "grid-cols-2 grid-rows-2"; // 3 tanede üstte 2, altta 1 yerleşim için
-                  } else if (count >= 4) {
-                    gridClasses = "grid-cols-2 grid-rows-2"; // 2x2 tam kare
-                  }
 
                   return (
                     <div
@@ -374,13 +401,12 @@ export default function CollectionsView({
                           src={sagperde}
                           alt="sağ perde"
                           className="w-20 object-cover"
-                        ></Image>
+                        />
                       </div>
-                      {/* Sol Taraf: 2x2 Kare Önizleme Alanı */}
                       <div
                         className="h-full w-34 shrink-0 overflow-hidden bg-white flex items-center justify-center"
                         style={{
-                          display: count > 0 ? "grid" : "flex", // ✨ Boşken flex, doluyken grid yapıyoruz
+                          display: count > 0 ? "grid" : "flex",
                           gridTemplateColumns:
                             count === 1 ? "1fr" : "repeat(2, minmax(0, 1fr))",
                           gridTemplateRows:
@@ -422,7 +448,6 @@ export default function CollectionsView({
                         )}
                       </div>
 
-                      {/* Sağ Taraf: Koleksiyon Bilgileri */}
                       <div className="h-full flex flex-col justify-between gap-2 min-w-0 flex-1 py-3">
                         <div
                           onClick={(e) => {
@@ -514,28 +539,35 @@ export default function CollectionsView({
 
                             {activeMenuId === col.id && (
                               <div
-                                className="absolute right-0 bottom-full mb-1 w-28 bg-white border border-gray-200 rounded-xl shadow-md py-1 z-30"
+                                ref={menuRef}
+                                className="absolute right-0 bottom-full w-48 flex flex-col bg-white rounded-sm z-50 px-4 py-3 gap-2"
+                                style={{
+                                  boxShadow:
+                                    "0px 0px 5px 1px rgba(0, 0, 0, 0.1)",
+                                }}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <button
                                   onClick={() => {
                                     setActiveMenuId(null);
-                                    // TODO: Düzenleme modalını açma fonksiyonunu buraya bağlayabilirsin
-                                    console.log("Düzenle:", col.id);
+                                    setEditingCollection(col);
+                                    setIsEditModalOpen(true);
                                   }}
-                                  className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                                  className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
                                 >
-                                  Düzenle
+                                  Koleksiyonu Düzenle
                                 </button>
                                 <button
                                   onClick={() => {
                                     setActiveMenuId(null);
-                                    // TODO: Silme fonksiyonunu buraya bağlayabilirsin
-                                    console.log("Sil:", col.id);
+                                    handleDeleteCollection(col.id);
                                   }}
-                                  className="w-full text-left px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                  className="flex items-center text-xs transition text-left cursor-pointer"
+                                  style={{
+                                    color: "#b94445",
+                                  }}
                                 >
-                                  Sil
+                                  Koleksiyonu Sil
                                 </button>
                               </div>
                             )}
@@ -552,7 +584,6 @@ export default function CollectionsView({
               </div>
             )
           ) : selectedCollection ? (
-            /* Seçilen bir koleksiyonun içerisindeki post listesi */
             collectionPostsLoading ? (
               <div className="py-12 text-center text-xs text-gray-400">
                 İçerikler yükleniyor...
@@ -568,8 +599,7 @@ export default function CollectionsView({
                 Bu koleksiyonda henüz hiç sahne bulunmuyor.
               </p>
             )
-          ) : /* Beğenilenler Post Listesi */
-          posts.length > 0 ? (
+          ) : posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
               {posts.map((post) => (
                 <div key={post?.id} className="relative group">
@@ -593,13 +623,18 @@ export default function CollectionsView({
       </div>
 
       <CreateCollectionModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        isOpen={isCreateModalOpen || isEditModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setIsEditModalOpen(false);
+          setEditingCollection(null);
+        }}
         onSuccess={() => {
           if (activeTab === "bookmarked" && !selectedCollection) {
             fetchUserCollections();
           }
         }}
+        editingCollection={editingCollection}
       />
 
       {savingPostId !== null && (

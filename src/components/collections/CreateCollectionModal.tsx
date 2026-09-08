@@ -1,22 +1,40 @@
 "use client";
 
-import { createCollectionClient } from "@/services/client/collection/collection.service";
-import { useState } from "react";
+import {
+  createCollectionClient,
+  updateCollectionClient,
+} from "@/services/client/collection/collection.service";
+import { BookmarkCollection } from "@/services/client/interaction/interaction.service";
+import { useEffect, useState } from "react";
 
 interface CreateCollectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  editingCollection?: BookmarkCollection | null;
 }
 
 export default function CreateCollectionModal({
   isOpen,
   onClose,
   onSuccess,
+  editingCollection = null,
 }: CreateCollectionModalProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState(editingCollection?.name || "");
+  const [description, setDescription] = useState(
+    editingCollection?.description || "",
+  );
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (editingCollection) {
+      setName(editingCollection.name || "");
+      setDescription(editingCollection.description || "");
+    } else {
+      setName("");
+      setDescription("");
+    }
+  }, [editingCollection, isOpen]);
 
   if (!isOpen) return null;
 
@@ -26,28 +44,41 @@ export default function CreateCollectionModal({
 
     setLoading(true);
     try {
-      await createCollectionClient({ name, description });
+      if (editingCollection) {
+        // Düzenleme İsteği
+        await updateCollectionClient(editingCollection.id, {
+          name,
+          description,
+        });
+      } else {
+        // Yeni Oluşturma İsteği
+        await createCollectionClient({ name, description });
+      }
+
       setName("");
       setDescription("");
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("Koleksiyon oluşturulamadı:", error);
+      console.error("Koleksiyon kaydedilemedi:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  const isEditMode = !!editingCollection;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs px-4">
       <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100 flex flex-col gap-5">
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold text-gray-900 tracking-tight">
-            Yeni Koleksiyon Oluştur
+            {isEditMode ? "Koleksiyonu Düzenle" : "Yeni Koleksiyon Oluştur"}
           </h2>
           <p className="text-xs text-gray-500">
-            Beğendiğin ve kaydettiğin sahneleri gruplamak için bir koleksiyon
-            oluştur.
+            {isEditMode
+              ? "Koleksiyon adını ve açıklamasını güncelleyebilirsin."
+              : "Beğendiğin ve kaydettiğin sahneleri gruplamak için bir koleksiyon oluştur."}
           </p>
         </div>
 
@@ -92,7 +123,13 @@ export default function CreateCollectionModal({
               disabled={loading || !name.trim()}
               className="px-4 py-2 text-xs font-medium bg-black text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 cursor-pointer transition-colors"
             >
-              {loading ? "Oluşturuluyor..." : "Oluştur"}
+              {loading
+                ? isEditMode
+                  ? "Kaydediliyor..."
+                  : "Oluşturuluyor..."
+                : isEditMode
+                  ? "Kaydet"
+                  : "Oluştur"}
             </button>
           </div>
         </form>

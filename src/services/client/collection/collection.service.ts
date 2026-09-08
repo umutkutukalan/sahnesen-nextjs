@@ -54,3 +54,21 @@ export const getCollectionPostsClient = async (
   );
   return response.data; // Page<PostSummaryResponse> yapısı döner
 };
+
+export const updateCollectionClient = async (
+  collectionId: number,
+  data: CreateCollectionRequest,
+) => {
+  const response = await api.put(
+    `/api/interaction/bookmark-collections/${collectionId}`,
+    data,
+  );
+  return response.data;
+};
+
+export const deleteCollectionClient = async (collectionId: number) => {
+  const response = await api.delete(
+    `/api/interaction/bookmark-collections/${collectionId}`,
+  );
+  return response.data;
+};
