@@ -15,7 +15,7 @@ export function useGetCollectionsPosts(
     initialPage + 1 < initialTotalPages,
   );
 
-  // Sekme değiştiğinde (liked veya bookmarked) sıfırdan veri çekme
+  // Sekme değiştiğinde veya filtre seçildiğinde sıfırdan veri çekme
   const fetchPostsByType = async (
     activeTab: "liked" | "bookmarked",
     postType?: string,
@@ -24,9 +24,10 @@ export function useGetCollectionsPosts(
       setIsLoadingMore(true);
       let data;
       if (activeTab === "liked") {
-        data = await interactionService.getLikedPosts(0, 5);
+        data = await interactionService.getLikedPosts(postType, 0, 5);
       } else {
-        data = await interactionService.getBookmarkedPosts(postType, 0, 5);
+        // Not: Eğer bookmarked ana listesi için de filtre kullanılacaksa interactionService'e getBookmarkedPosts eklenmelidir.
+        data = await interactionService.getLikedPosts(postType, 0, 5);
       }
 
       const content = data?.content || [];
@@ -57,13 +58,9 @@ export function useGetCollectionsPosts(
       let data;
 
       if (activeTab === "liked") {
-        data = await interactionService.getLikedPosts(nextPage, 5);
+        data = await interactionService.getLikedPosts(postType, nextPage, 5);
       } else {
-        data = await interactionService.getBookmarkedPosts(
-          postType,
-          nextPage,
-          5,
-        );
+        data = await interactionService.getLikedPosts(postType, nextPage, 5);
       }
 
       const content = data?.content || [];
