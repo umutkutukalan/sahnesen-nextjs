@@ -134,7 +134,7 @@ export default function CollectionsView({
             <Image
               src={koleksiyonlar}
               alt="Koleksiyonlar"
-              className="w-34 h-28 object-cover"
+              className="w-32 h-32 object-cover"
             />
           </div>
           <div className="flex flex-col gap-4">
@@ -163,8 +163,8 @@ export default function CollectionsView({
               <p className="text-xs text-gray-500">
                 {selectedCollection
                   ? selectedCollection.description ||
-                    "Bu koleksiyondaki kaydedilen içerikler"
-                  : "Beğendiğin ve kaydettiğin özel koleksiyonların"}
+                    "Bu koleksiyona kaydettiğin sahneler"
+                  : "Beğendiğin ve kaydettiğin özel koleksiyonlar"}
               </p>
             </div>
             <div className="flex items-center gap-2 select-none">
@@ -470,9 +470,9 @@ export default function CollectionsView({
                 ))}
               </div>
             ) : (
-              <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-                Bu koleksiyonda henüz hiç içerik bulunmuyor.
-              </div>
+              <p className="text-xs text-gray-500">
+                Bu koleksiyonda henüz hiç sahne bulunmuyor.
+              </p>
             )
           ) : /* Beğenilenler Post Listesi */
           posts.length > 0 ? (
@@ -492,7 +492,7 @@ export default function CollectionsView({
             </div>
           ) : (
             <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-              Henüz beğendiğin bir içerik bulunmuyor.
+              Henüz beğendiğin bir sahne bulunmuyor.
             </div>
           )}
         </div>

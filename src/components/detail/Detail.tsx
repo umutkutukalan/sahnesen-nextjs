@@ -834,7 +834,7 @@ const Detail = ({ post }: DetailProps) => {
               </div>
               <div className="relative flex items-center gap-1">
                 <div
-                  className="absolute left-0 top-0 w-7 h-7 bg-black"
+                  className="absolute left-0 top-0 w-5 h-5 bg-black"
                   style={{
                     maskImage: `url(${solperde.src})`,
                     WebkitMaskImage: `url(${solperde.src})`,
@@ -849,7 +849,7 @@ const Detail = ({ post }: DetailProps) => {
                 <div
                   className="flex items-center gap-2 text-xs text-gray-500 select-none"
                   style={{
-                    paddingLeft: "16px",
+                    paddingLeft: "12px",
                   }}
                 >
                   {/* <p>5 min read</p>

@@ -128,7 +128,7 @@ export default function MyStagesClient() {
           <Image
             src={sahnelerim}
             alt="Sahnelerim"
-            className="w-34 h-28 object-cover"
+            className="w-32 h-32 object-cover"
           />
         </div>
         <div className="flex flex-col gap-4">

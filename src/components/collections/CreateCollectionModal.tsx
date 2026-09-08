@@ -46,7 +46,7 @@ export default function CreateCollectionModal({
             Yeni Koleksiyon Oluştur
           </h2>
           <p className="text-xs text-gray-500">
-            Beğendiğin ve kaydettiğin içerikleri gruplamak için bir koleksiyon
+            Beğendiğin ve kaydettiğin sahneleri gruplamak için bir koleksiyon
             oluştur.
           </p>
         </div>
