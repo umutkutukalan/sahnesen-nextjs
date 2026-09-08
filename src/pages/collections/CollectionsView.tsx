@@ -7,12 +7,7 @@ import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
 import { collectiondefault, koleksiyonlar, sagperde, solperde } from "@/utils";
-import {
-  FaTicketSimple,
-  FaPlus,
-  FaBookmark,
-  FaArrowLeft,
-} from "react-icons/fa6";
+import { FaTicketSimple, FaPlus, FaArrowLeft } from "react-icons/fa6";
 import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
 import SaveToCollectionModal from "@/components/collections/SaveToCollectionModal";
 import {
@@ -22,7 +17,7 @@ import {
   deleteCollectionClient,
 } from "@/services/client/collection/collection.service";
 import { getFullImageUrl } from "@/utils/image";
-import { TbBookmarkFilled, TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useAuth } from "@/context/UserContext";
 import { FiMoreHorizontal, FiUser } from "react-icons/fi";
 import { useToProfile } from "@/utils/useToProfile";
@@ -58,6 +53,11 @@ export default function CollectionsView({
     useState<BookmarkCollection | null>(null);
   const [collectionPosts, setCollectionPosts] = useState<PostResponse[]>([]);
   const [collectionPostsLoading, setCollectionPostsLoading] = useState(false);
+
+  // Koleksiyon içi sayfalama state'leri
+  const [collectionPage, setCollectionPage] = useState(0);
+  const [hasMoreCollectionPosts, setHasMoreCollectionPosts] = useState(true);
+  const [isCollectionLoadingMore, setIsCollectionLoadingMore] = useState(false);
 
   // Kullanıcının özel koleksiyonları
   const [userCollections, setUserCollections] = useState<BookmarkCollection[]>(
@@ -107,37 +107,51 @@ export default function CollectionsView({
     }
   };
 
-  // Bir koleksiyona tıklandığında veya tür değiştiğinde içerikleri backend'den çek
+  // Koleksiyon içeriklerini sayfalı ve filtreli çekme
   const fetchCollectionPosts = useCallback(
-    async (collectionId: number, postType?: string) => {
-      setCollectionPostsLoading(true);
+    async (
+      collectionId: number,
+      postType?: string,
+      page = 0,
+      append = false,
+    ) => {
+      if (append) {
+        setIsCollectionLoadingMore(true);
+      } else {
+        setCollectionPostsLoading(true);
+      }
       try {
         const data = await getCollectionPostsClient(
           collectionId,
-          0,
+          page,
           10,
           postType,
         );
-        setCollectionPosts(data.content || []);
+        setCollectionPosts((prev) =>
+          append ? [...prev, ...(data.content || [])] : data.content || [],
+        );
+        setHasMoreCollectionPosts(!data.last);
+        setCollectionPage(page);
       } catch (error) {
         console.error("Koleksiyon içerikleri yüklenemedi:", error);
       } finally {
         setCollectionPostsLoading(false);
+        setIsCollectionLoadingMore(false);
       }
     },
     [],
   );
 
-  // Koleksiyon seçildiğinde veya filtre değiştiğinde çalışır
+  // Koleksiyon seçildiğinde veya tür filtresi değiştiğinde sıfırdan yükle
   useEffect(() => {
     if (selectedCollection) {
-      fetchCollectionPosts(selectedCollection.id, selectedType);
+      fetchCollectionPosts(selectedCollection.id, selectedType, 0, false);
     }
   }, [selectedCollection, selectedType, fetchCollectionPosts]);
 
   const handleSelectCollection = (collection: BookmarkCollection) => {
     setSelectedCollection(collection);
-    setSelectedType(undefined); // Başka koleksiyona girerken filtreyi sıfırla
+    setSelectedType(undefined);
   };
 
   const handleDeleteCollection = async (collectionId: number) => {
@@ -171,17 +185,24 @@ export default function CollectionsView({
     }
   };
 
+  // Sonsuz kaydırma hook'u (Hem beğenilenler hem koleksiyon içi detay için)
   const loadMoreRef = useInfiniteScroll(
     () => {
-      if (
-        activeTab === "liked" ||
-        (activeTab === "bookmarked" && selectedCollection)
-      ) {
-        loadMorePosts(activeTab);
+      if (activeTab === "liked") {
+        loadMorePosts("liked");
+      } else if (activeTab === "bookmarked" && selectedCollection) {
+        if (!isCollectionLoadingMore && hasMoreCollectionPosts) {
+          fetchCollectionPosts(
+            selectedCollection.id,
+            selectedType,
+            collectionPage + 1,
+            true,
+          );
+        }
       }
     },
-    hasMore,
-    isLoadingMore,
+    selectedCollection ? hasMoreCollectionPosts : hasMore,
+    selectedCollection ? isCollectionLoadingMore : isLoadingMore,
   );
 
   return (
@@ -610,18 +631,20 @@ export default function CollectionsView({
                   <PostCard key={post?.id} post={post} />
                 ))}
                 <div ref={loadMoreRef} className="h-4 w-full" />
-                {isLoadingMore && (
+                {isCollectionLoadingMore && (
                   <div className="py-4 text-center text-xs text-gray-400">
                     Daha fazla yükleniyor...
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-xs text-gray-500 py-12 text-center border border-dashed border-gray-200 rounded-xl">
-                {selectedType
-                  ? `Bu koleksiyonda '${selectedType}' türünde sahne bulunmuyor.`
-                  : "Bu koleksiyonda henüz hiç sahne bulunmuyor."}
-              </p>
+              <div className="">
+                <p className="text-gray-500 text-xs">
+                  {selectedType
+                    ? `Bu koleksiyonda '${selectedType}' türünde sahne bulunmuyor.`
+                    : "Bu koleksiyonda henüz hiç sahne bulunmuyor."}
+                </p>
+              </div>
             )
           ) : posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">

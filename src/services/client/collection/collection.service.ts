@@ -47,7 +47,7 @@ export const addPostToCollectionClient = async (
 export const getCollectionPostsClient = async (
   collectionId: number,
   page = 0,
-  size = 10,
+  size = 6,
   postType?: string,
 ) => {
   const typeQuery = postType ? `&postType=${postType}` : "";
