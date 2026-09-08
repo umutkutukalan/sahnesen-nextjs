@@ -6,7 +6,7 @@ import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import { koleksiyonlar, sahnelerim, solperde } from "@/utils";
+import { koleksiyonlar, sagperde, sahnelerim, solperde } from "@/utils";
 import {
   FaTicketSimple,
   FaPlus,
@@ -20,10 +20,12 @@ import {
   getUserCollectionsClient,
   getCollectionPostsClient,
   BookmarkCollection,
-  PostPreviewDTO,
 } from "@/services/client/collection/collection.service";
-import { BsCollection } from "react-icons/bs";
 import { getFullImageUrl } from "@/utils/image";
+import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { useAuth } from "@/context/UserContext";
+import { FiUser } from "react-icons/fi";
+import { useToProfile } from "@/utils/useToProfile";
 
 interface CollectionsViewProps {
   initialPosts: PostResponse[];
@@ -36,7 +38,9 @@ export default function CollectionsView({
   initialPage,
   totalPages,
 }: CollectionsViewProps) {
-  // ✨ Ana sekmeler sadece Beğenilenler ve Kaydedilenler
+  // Ana sekmeler sadece Beğenilenler ve Kaydedilenler
+  const { user } = useAuth();
+  const { ToProfile } = useToProfile();
   const [activeTab, setActiveTab] = useState<"liked" | "bookmarked">("liked");
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
@@ -44,13 +48,13 @@ export default function CollectionsView({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
 
-  // ✨ Kaydedilenler sekmesindeyken seçilen özel koleksiyon (Null ise koleksiyon kartları listelenir)
+  // Kaydedilenler sekmesindeyken seçilen özel koleksiyon (Null ise koleksiyon kartları listelenir)
   const [selectedCollection, setSelectedCollection] =
     useState<BookmarkCollection | null>(null);
   const [collectionPosts, setCollectionPosts] = useState<PostResponse[]>([]);
   const [collectionPostsLoading, setCollectionPostsLoading] = useState(false);
 
-  // ✨ Kullanıcının özel koleksiyonları
+  // Kullanıcının özel koleksiyonları
   const [userCollections, setUserCollections] = useState<BookmarkCollection[]>(
     [],
   );
@@ -356,8 +360,15 @@ export default function CollectionsView({
                     <div
                       key={col.id}
                       onClick={() => handleSelectCollection(col)}
-                      className="flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden"
+                      className="relative flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden"
                     >
+                      <div className="absolute right-0 top-0 z-10">
+                        <Image
+                          src={sagperde}
+                          alt="sağ perde"
+                          className="w-20 object-cover"
+                        ></Image>
+                      </div>
                       {/* Sol Taraf: 2x2 Kare Önizleme Alanı */}
                       <div
                         className="shrink-0 overflow-hidden"
@@ -403,23 +414,51 @@ export default function CollectionsView({
                       </div>
 
                       {/* Sağ Taraf: Koleksiyon Bilgileri */}
-                      <div className="flex flex-col gap-2 min-w-0 flex-1 pb-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <h3 className="text-lg font-semibold tracking-tight merriweather-sans">
-                              {col.name}
-                            </h3>
-                            {col.isDefault && (
-                              <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium shrink-0">
-                                Varsayılan
-                              </span>
-                            )}
-                            {col.description && (
-                              <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                                {col.description}
-                              </p>
+                      <div className="h-full flex flex-col justify-between gap-2 min-w-0 flex-1 py-3">
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            ToProfile(user?.username || "");
+                          }}
+                          className="flex items-center gap-2 cursor-pointer w-max"
+                        >
+                          <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
+                            {user?.profileImg ? (
+                              <Image
+                                src={getFullImageUrl(user?.profileImg)!}
+                                alt="avatar"
+                                fill
+                                unoptimized
+                                className="object-cover"
+                              />
+                            ) : (
+                              <FiUser className="w-full h-full p-1 text-gray-400" />
                             )}
                           </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                            <span className="truncate hover:underline">
+                              {user?.username || "Yazar"}
+                            </span>
+                            <TbRosetteDiscountCheckFilled
+                              className="text-blue-500 shrink-0 text-xs"
+                              title="Onaylı Yazar"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <h3 className="text-xl font-extrabold tracking-tight merriweather-sans">
+                            {col.name}
+                          </h3>
+                          {col.isDefault && (
+                            <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium shrink-0">
+                              Varsayılan
+                            </span>
+                          )}
+                          {col.description && (
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                              {col.description}
+                            </p>
+                          )}
                         </div>
                         <div className="relative">
                           <div
