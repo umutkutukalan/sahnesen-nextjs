@@ -37,12 +37,12 @@ export default function Page() {
   if (!user) return <Home />;
 
   return (
-    <div className="min-h-screen flex w-full">
+    <main className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">
       <CollectionsView
         initialPosts={initialPosts}
         initialPage={initialPage}
         totalPages={totalPages}
       />
-    </div>
+    </main>
   );
 }
