@@ -6,8 +6,9 @@ import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import { koleksiyonlar, sahnelerim } from "@/utils";
-import { FaTicketSimple } from "react-icons/fa6";
+import { sahnelerim } from "@/utils";
+import { FaTicketSimple, FaPlus } from "react-icons/fa6";
+import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
 
 interface CollectionsViewProps {
   initialPosts: PostResponse[];
@@ -20,11 +21,11 @@ export default function CollectionsView({
   initialPage,
   totalPages,
 }: CollectionsViewProps) {
-  // Aktif sekme state'i: "liked" veya "bookmarked"
   const [activeTab, setActiveTab] = useState<"liked" | "bookmarked">("liked");
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     posts,
@@ -35,7 +36,6 @@ export default function CollectionsView({
     fetchPostsByType,
   } = useGetCollectionsPosts(initialPosts, initialPage, totalPages);
 
-  // Sekme değiştirme fonksiyonu
   const handleTabChange = (tab: "liked" | "bookmarked") => {
     if (activeTab === tab) return;
     setActiveTab(tab);
@@ -43,15 +43,9 @@ export default function CollectionsView({
   };
 
   const handleSelectType = (type: string) => {
-    if (selectedType === type) {
-      setSelectedType(undefined);
-    } else {
-      setSelectedType(type);
-    }
-    // Not: Eğer filtrelenmiş istek atma fonksiyonun varsa burada tetikleyebilirsin
+    setSelectedType(selectedType === type ? undefined : type);
   };
 
-  // Sonsuz kaydırma tetikleyicisi için aktif sekmeyi hook'a argüman olarak geçiyoruz
   const loadMoreRef = useInfiniteScroll(
     () => loadMorePosts(activeTab),
     hasMore,
@@ -61,33 +55,46 @@ export default function CollectionsView({
   return (
     <div className="flex flex-col gap-5 w-full">
       {/* ÜST BAŞLIK ALANI */}
-      <div className="flex items-end gap-4">
-        <div className="relative">
-          <Image
-            src={koleksiyonlar}
-            alt="Koleksiyonlar"
-            className="w-34 h-28 object-cover"
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          <div
-            className="flex flex-col gap-2 border-b border-gray-200"
-            style={{ paddingBottom: "8px" }}
-          >
-            <h1 className="text-3xl font-semibold tracking-tight merriweather-sans text-gray-900">
-              Koleksiyonlar
-            </h1>
-            <p className="text-xs text-gray-500">
-              Beğendiğin ve sonradan incelemek üzere kaydettiğin sahneler
-            </p>
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex items-end gap-4">
+          <div className="relative">
+            <Image
+              src={sahnelerim}
+              alt="Koleksiyonlar"
+              className="w-34 h-28 object-cover"
+            />
           </div>
-          <div className="flex items-center gap-2 select-none">
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-gray-800">{posts.length}</span>
-              <span className="text-xs text-gray-500">sahne listeleniyor</span>
+          <div className="flex flex-col gap-4">
+            <div
+              className="flex flex-col gap-2 border-b border-gray-200"
+              style={{ paddingBottom: "8px" }}
+            >
+              <h1 className="text-3xl font-semibold tracking-tight merriweather-sans text-gray-900">
+                Koleksiyonlar
+              </h1>
+              <p className="text-xs text-gray-500">
+                Beğendiğin ve sonradan incelemek üzere kaydettiğin sahneler
+              </p>
+            </div>
+            <div className="flex items-center gap-2 select-none">
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-800">{posts.length}</span>
+                <span className="text-xs text-gray-500">
+                  İçerik listeleniyor
+                </span>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Yeni Koleksiyon Oluştur Butonu */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-black text-white rounded-xl hover:bg-gray-800 cursor-pointer transition-colors shadow-xs"
+        >
+          <FaPlus className="text-[10px]" />
+          <span>Yeni Koleksiyon</span>
+        </button>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -226,43 +233,47 @@ export default function CollectionsView({
               ))}
             </div>
           ) : (
-            <div className="">
-              <p className="text-gray-500 text-xs">
-                {activeTab === "liked"
-                  ? "Henüz beğendiğin bir sahne bulunmuyor."
-                  : "Henüz kaydettiğin bir sahne bulunmuyor."}
-              </p>
+            <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
+              {activeTab === "liked"
+                ? "Henüz beğendiğin bir içerik bulunmuyor."
+                : "Henüz kaydettiğin bir içerik bulunmuyor."}
             </div>
           )}
         </div>
 
-        {/* Infinite Scroll Tetikleyici Ref */}
         {hasMore && <div ref={loadMoreRef}></div>}
 
-        {/* YÜKLENİYOR İNDİKATÖRÜ */}
         {isLoadingMore && (
           <div className="flex items-center justify-center py-8">
             <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
             <span className="ml-3 text-gray-600 text-xs">
-              Sahneler yükleniyor...
+              İçerikler yükleniyor...
             </span>
           </div>
         )}
 
-        {/* TÜM İÇERİKLER YÜKLENDİ MESAJI */}
         {!hasMore && posts.length > 0 && (
           <div className="py-8 text-center text-xs text-gray-500">
-            Tüm sahneler yüklendi.
+            Tüm içerikler yüklendi.
           </div>
         )}
 
-        {/* SAYFA BİLGİSİ */}
         {totalPages > 1 && (
           <div className="py-4 text-center text-sm text-gray-400">
-            Sayfa {currentPage + 1} / {totalPages} • {posts.length} sahne
+            Sayfa {currentPage + 1} / {totalPages} • {posts.length} içerik
           </div>
         )}
       </div>
+
+      {/* Koleksiyon Oluşturma Modalı */}
+      <CreateCollectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          // Başarılı olduğunda listeyi güncelleyebilir veya toast çıkarabilirsin
+          console.log("Koleksiyon başarıyla oluşturuldu.");
+        }}
+      />
     </div>
   );
 }
