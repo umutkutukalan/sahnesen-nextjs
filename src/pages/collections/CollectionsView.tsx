@@ -609,6 +609,12 @@ export default function CollectionsView({
                 {collectionPosts.map((post) => (
                   <PostCard key={post?.id} post={post} />
                 ))}
+                <div ref={loadMoreRef} className="h-4 w-full" />
+                {isLoadingMore && (
+                  <div className="py-4 text-center text-xs text-gray-400">
+                    Daha fazla yükleniyor...
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-xs text-gray-500 py-12 text-center border border-dashed border-gray-200 rounded-xl">
@@ -626,6 +632,12 @@ export default function CollectionsView({
                   </div>
                 );
               })}
+              <div ref={loadMoreRef} className="h-4 w-full" />
+              {isLoadingMore && (
+                <div className="py-4 text-center text-xs text-gray-400">
+                  Daha fazla yükleniyor...
+                </div>
+              )}
             </div>
           ) : (
             <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
