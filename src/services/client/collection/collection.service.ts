@@ -5,11 +5,18 @@ export interface CreateCollectionRequest {
   description?: string;
 }
 
+export interface PostPreviewDTO {
+  id: number;
+  title: string;
+  coverImage: string;
+}
+
 export interface BookmarkCollection {
   id: number;
   name: string;
   description: string;
   isDefault: boolean;
+  contents: PostPreviewDTO[];
 }
 
 export const getUserCollectionsClient = async (): Promise<

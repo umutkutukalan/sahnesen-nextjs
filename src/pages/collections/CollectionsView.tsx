@@ -6,7 +6,7 @@ import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import { sahnelerim } from "@/utils";
+import { koleksiyonlar, sahnelerim } from "@/utils";
 import {
   FaTicketSimple,
   FaPlus,
@@ -20,7 +20,10 @@ import {
   getUserCollectionsClient,
   getCollectionPostsClient,
   BookmarkCollection,
+  PostPreviewDTO,
 } from "@/services/client/collection/collection.service";
+import { BsCollection } from "react-icons/bs";
+import { getFullImageUrl } from "@/utils/image";
 
 interface CollectionsViewProps {
   initialPosts: PostResponse[];
@@ -33,21 +36,21 @@ export default function CollectionsView({
   initialPage,
   totalPages,
 }: CollectionsViewProps) {
-  const [activeTab, setActiveTab] = useState<
-    "liked" | "bookmarked" | "collections"
-  >("liked");
+  // ✨ Ana sekmeler sadece Beğenilenler ve Kaydedilenler
+  const [activeTab, setActiveTab] = useState<"liked" | "bookmarked">("liked");
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
   );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
 
-  // ✨ Tıklanan özel koleksiyonu tutan state (Null ise ana koleksiyon ekranındayız)
+  // ✨ Kaydedilenler sekmesindeyken seçilen özel koleksiyon (Null ise koleksiyon kartları listelenir)
   const [selectedCollection, setSelectedCollection] =
     useState<BookmarkCollection | null>(null);
   const [collectionPosts, setCollectionPosts] = useState<PostResponse[]>([]);
   const [collectionPostsLoading, setCollectionPostsLoading] = useState(false);
 
+  // ✨ Kullanıcının özel koleksiyonları
   const [userCollections, setUserCollections] = useState<BookmarkCollection[]>(
     [],
   );
@@ -62,25 +65,12 @@ export default function CollectionsView({
     fetchPostsByType,
   } = useGetCollectionsPosts(initialPosts, initialPage, totalPages);
 
+  // Kaydedilenler sekmesindeyken ve bir koleksiyona girilmemişse koleksiyonları çek
   useEffect(() => {
-    if (activeTab === "collections" && !selectedCollection) {
+    if (activeTab === "bookmarked" && !selectedCollection) {
       fetchUserCollections();
     }
   }, [activeTab, selectedCollection]);
-
-  // ✨ Bir koleksiyona tıklandığında içeriklerini çek
-  const handleSelectCollection = async (collection: BookmarkCollection) => {
-    setSelectedCollection(collection);
-    setCollectionPostsLoading(true);
-    try {
-      const data = await getCollectionPostsClient(collection.id);
-      setCollectionPosts(data.content || []);
-    } catch (error) {
-      console.error("Koleksiyon içerikleri yüklenemedi:", error);
-    } finally {
-      setCollectionPostsLoading(false);
-    }
-  };
 
   const fetchUserCollections = async () => {
     setCollectionsLoading(true);
@@ -94,19 +84,41 @@ export default function CollectionsView({
     }
   };
 
-  const handleTabChange = (tab: "liked" | "bookmarked" | "collections") => {
+  // Bir koleksiyona tıklandığında içeriklerini çek
+  const handleSelectCollection = async (collection: BookmarkCollection) => {
+    setSelectedCollection(collection);
+    setCollectionPostsLoading(true);
+    try {
+      const data = await getCollectionPostsClient(collection.id);
+      setCollectionPosts(data.content || []);
+    } catch (error) {
+      console.error("Koleksiyon içerikleri yüklenemedi:", error);
+    } finally {
+      setCollectionPostsLoading(false);
+    }
+  };
+
+  const handleTabChange = (tab: "liked" | "bookmarked") => {
     if (activeTab === tab && !selectedCollection) return;
     setActiveTab(tab);
-    setSelectedCollection(null); // Sekme değiştirince detay görünümünden çık
-    if (tab !== "collections") {
-      fetchPostsByType(tab as "liked" | "bookmarked");
+    setSelectedCollection(null); // Sekme değişince koleksiyon detayından çık
+    setSelectedType(undefined); // Filtreyi sıfırla
+    if (tab === "liked") {
+      fetchPostsByType("liked");
     }
+  };
+
+  const handleSelectType = (type: string) => {
+    setSelectedType(selectedType === type ? undefined : type);
   };
 
   const loadMoreRef = useInfiniteScroll(
     () => {
-      if (activeTab !== "collections" && !selectedCollection) {
-        loadMorePosts(activeTab as "liked" | "bookmarked");
+      if (
+        activeTab === "liked" ||
+        (activeTab === "bookmarked" && selectedCollection)
+      ) {
+        loadMorePosts(activeTab);
       }
     },
     hasMore,
@@ -120,7 +132,7 @@ export default function CollectionsView({
         <div className="flex items-end gap-4">
           <div className="relative">
             <Image
-              src={sahnelerim}
+              src={koleksiyonlar}
               alt="Koleksiyonlar"
               className="w-34 h-28 object-cover"
             />
@@ -152,7 +164,7 @@ export default function CollectionsView({
                 {selectedCollection
                   ? selectedCollection.description ||
                     "Bu koleksiyondaki kaydedilen içerikler"
-                  : "Beğendiğin, kaydettiğin sahneler ve özel koleksiyonların"}
+                  : "Beğendiğin ve kaydettiğin özel koleksiyonların"}
               </p>
             </div>
             <div className="flex items-center gap-2 select-none">
@@ -160,19 +172,22 @@ export default function CollectionsView({
                 <span className="text-xs text-gray-800">
                   {selectedCollection
                     ? collectionPosts.length
-                    : activeTab === "collections"
+                    : activeTab === "bookmarked" && !selectedCollection
                       ? userCollections.length
                       : posts.length}
                 </span>
                 <span className="text-xs text-gray-500">
-                  İçerik listeleniyor
+                  {activeTab === "bookmarked" && !selectedCollection
+                    ? "Koleksiyon listeleniyor"
+                    : "Sahne listeleniyor"}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {!selectedCollection && (
+        {/* Yeni Koleksiyon Oluştur Butonu (Sadece Kaydedilenler sekmesinde/koleksiyon görünümündeyken gösterilebilir) */}
+        {activeTab === "bookmarked" && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-black text-white rounded-xl hover:bg-gray-800 cursor-pointer transition-colors shadow-xs"
@@ -184,51 +199,241 @@ export default function CollectionsView({
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* Üst Sekmeler (Eğer bir koleksiyonun içine girilmediyse görünür) */}
-        {!selectedCollection && (
-          <div
-            className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
-            style={{ height: "48px" }}
-          >
-            <div className="flex space-x-6">
-              <button
-                onClick={() => handleTabChange("liked")}
-                className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
-                  activeTab === "liked"
-                    ? "text-black border-b-2 border-black"
-                    : "text-gray-500"
-                }`}
-              >
-                Beğenilenler
-              </button>
-              <button
-                onClick={() => handleTabChange("bookmarked")}
-                className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
-                  activeTab === "bookmarked"
-                    ? "text-black border-b-2 border-black"
-                    : "text-gray-500"
-                }`}
-              >
-                Kaydedilenler
-              </button>
-              <button
-                onClick={() => handleTabChange("collections")}
-                className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
-                  activeTab === "collections"
-                    ? "text-black border-b-2 border-black"
-                    : "text-gray-500"
-                }`}
-              >
-                Özel Koleksiyonlarım
-              </button>
-            </div>
+        {/* Üst Sekmeler ve Tür Filtreleri */}
+        <div
+          className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
+          style={{ height: "48px" }}
+        >
+          {/* Sol taraf: Sekmeler (Beğenilenler / Kaydedilenler) */}
+          <div className="flex space-x-6">
+            <button
+              onClick={() => handleTabChange("liked")}
+              className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
+                activeTab === "liked"
+                  ? "text-black border-b-2 border-black"
+                  : "text-gray-500"
+              }`}
+            >
+              Beğenilenler
+            </button>
+            <button
+              onClick={() => handleTabChange("bookmarked")}
+              className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
+                activeTab === "bookmarked"
+                  ? "text-black border-b-2 border-black"
+                  : "text-gray-500"
+              }`}
+            >
+              Koleksiyonlar
+            </button>
           </div>
-        )}
+
+          {/* Sağ taraf: İçerik Türü Filtreleri (Beğenilenler sekmesinde VEYA bir koleksiyonun içine girilmişse görünür) */}
+          {(activeTab === "liked" || selectedCollection) && (
+            <div className="relative h-12 flex items-end justify-end">
+              <ul className="relative z-50 flex items-end justify-end gap-5 overflow-x-auto scrollbar-hide">
+                <button
+                  type="button"
+                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+                    selectedType === undefined
+                      ? "border-b-2 border-black font-medium"
+                      : "text-gray-400 hover:text-gray-700"
+                  }`}
+                  onClick={() => setSelectedType(undefined)}
+                >
+                  <span className="text-xs">Tümü</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+                    selectedType === "SAHNE"
+                      ? "border-b-2 font-medium"
+                      : "text-gray-400 hover:text-gray-700"
+                  }`}
+                  style={{
+                    borderColor:
+                      selectedType === "SAHNE" ? "#c86b5a" : undefined,
+                  }}
+                  onClick={() => handleSelectType("SAHNE")}
+                >
+                  <FaTicketSimple
+                    className="text-base"
+                    style={{ color: "#c86b5a" }}
+                  />
+                  <span className="text-xs">Sahne</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+                    selectedType === "MONOLOG"
+                      ? "border-b-2 font-medium"
+                      : "text-gray-400 hover:text-gray-700"
+                  }`}
+                  style={{
+                    borderColor:
+                      selectedType === "MONOLOG" ? "#66788a" : undefined,
+                  }}
+                  onClick={() => handleSelectType("MONOLOG")}
+                >
+                  <FaTicketSimple
+                    className="text-base"
+                    style={{ color: "#66788a" }}
+                  />
+                  <span className="text-xs">Monolog</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+                    selectedType === "YANYANA"
+                      ? "border-b-2 font-medium"
+                      : "text-gray-400 hover:text-gray-700"
+                  }`}
+                  style={{
+                    borderColor:
+                      selectedType === "YANYANA" ? "#789680" : undefined,
+                  }}
+                  onClick={() => handleSelectType("YANYANA")}
+                >
+                  <FaTicketSimple
+                    className="text-base"
+                    style={{ color: "#789680" }}
+                  />
+                  <span className="text-xs">Yan Yana</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
+                    selectedType === "TERSYUZ"
+                      ? "border-b-2 font-medium"
+                      : "text-gray-400 hover:text-gray-700"
+                  }`}
+                  style={{
+                    borderColor:
+                      selectedType === "TERSYUZ" ? "#f4d45f" : undefined,
+                  }}
+                  onClick={() => handleSelectType("TERSYUZ")}
+                >
+                  <FaTicketSimple
+                    className="text-base"
+                    style={{ color: "#f4d45f" }}
+                  />
+                  <span className="text-xs">Tersyüz</span>
+                </button>
+              </ul>
+            </div>
+          )}
+        </div>
 
         {/* LİSTELEME ALANI */}
         <div className="pt-2">
-          {selectedCollection ? (
-            /* ✨ Seçilen Koleksiyonun İçerisindeki Postlar */
+          {activeTab === "bookmarked" && !selectedCollection ? (
+            /* Kaydedilenler sekmesindeyken gösterilecek Özel Koleksiyonlar Listesi */
+            collectionsLoading ? (
+              <div className="py-12 text-center text-xs text-gray-400">
+                Koleksiyonlar yükleniyor...
+              </div>
+            ) : userCollections.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {userCollections.map((col) => {
+                  const previewContents = col.contents?.slice(0, 4) || [];
+
+                  const count = previewContents.length;
+                  // İçerik sayısına göre dinamik grid sınıfları
+                  let gridClasses = "grid-cols-1 grid-rows-1"; // 1 tane ise (full)
+                  if (count === 2) {
+                    gridClasses = "grid-cols-2 grid-rows-1"; // Yan yana 2
+                  } else if (count === 3) {
+                    gridClasses = "grid-cols-2 grid-rows-2"; // 3 tanede üstte 2, altta 1 yerleşim için
+                  } else if (count >= 4) {
+                    gridClasses = "grid-cols-2 grid-rows-2"; // 2x2 tam kare
+                  }
+
+                  return (
+                    <div
+                      key={col.id}
+                      onClick={() => handleSelectCollection(col)}
+                      className="flex items-center rounded-lg border border-gray-200 hover:border-black transition-all bg-white shadow-xs gap-3 group cursor-pointer overflow-hidden"
+                    >
+                      {/* Sol Taraf: 2x2 Kare Önizleme Alanı */}
+                      <div
+                        className="shrink-0 bg-gray-100 overflow-hidden"
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns:
+                            count === 1 ? "1fr" : "repeat(2, minmax(0, 1fr))",
+                          gridTemplateRows:
+                            count <= 2 ? "1fr" : "repeat(2, minmax(0, 1fr))",
+                          width: "136px",
+                          height: "136px",
+                          gap: "2px",
+                        }}
+                      >
+                        {count > 0 ? (
+                          previewContents.map((content, index) => {
+                            // Eğer 3 içerik varsa ve bu 3. elemense altta tüm alanı kaplasın (col-span-2)
+                            const isSpecialSpan = count === 3 && index === 2;
+
+                            return (
+                              <div
+                                key={index}
+                                className={`relative w-full h-full bg-gray-200 overflow-hidden ${
+                                  isSpecialSpan ? "col-span-2" : ""
+                                }`}
+                              >
+                                <Image
+                                  src={
+                                    content?.coverImage || "/placeholder.png"
+                                  }
+                                  alt={content?.title || "Koleksiyon Görseli"}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="flex items-center justify-center text-gray-400 text-xs w-full h-full">
+                            Boş
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Sağ Taraf: Koleksiyon Bilgileri */}
+                      <div className="flex flex-col gap-1 min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xs font-semibold text-gray-900 truncate group-hover:underline">
+                            {col.name}
+                          </h3>
+                          {col.isDefault && (
+                            <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium shrink-0">
+                              Varsayılan
+                            </span>
+                          )}
+                        </div>
+                        {col.description && (
+                          <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
+                            {col.description}
+                          </p>
+                        )}
+                        <span className="text-[10px] text-gray-400 mt-0.5">
+                          {col.contents?.length || 0} içerik
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
+                Henüz özel bir koleksiyon oluşturmadın.
+              </div>
+            )
+          ) : selectedCollection ? (
+            /* Seçilen bir koleksiyonun içerisindeki post listesi */
             collectionPostsLoading ? (
               <div className="py-12 text-center text-xs text-gray-400">
                 İçerikler yükleniyor...
@@ -244,49 +449,7 @@ export default function CollectionsView({
                 Bu koleksiyonda henüz hiç içerik bulunmuyor.
               </div>
             )
-          ) : activeTab === "collections" ? (
-            /* Özel Koleksiyonlar Listesi */
-            collectionsLoading ? (
-              <div className="py-12 text-center text-xs text-gray-400">
-                Koleksiyonlar yükleniyor...
-              </div>
-            ) : userCollections.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {userCollections.map((col) => (
-                  <div
-                    key={col.id}
-                    onClick={() => handleSelectCollection(col)}
-                    className="flex flex-col justify-between p-5 rounded-2xl border border-gray-100 hover:border-black transition-all bg-white shadow-xs gap-4 group cursor-pointer"
-                  >
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between">
-                        <div className="p-2.5 rounded-xl bg-gray-50 text-gray-800 group-hover:bg-black group-hover:text-white transition-colors">
-                          <FaFolder className="text-sm" />
-                        </div>
-                        {col.isDefault && (
-                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
-                            Varsayılan
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-sm font-semibold text-gray-900 mt-1">
-                        {col.name}
-                      </h3>
-                      {col.description && (
-                        <p className="text-xs text-gray-500 line-clamp-2">
-                          {col.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-                Henüz özel bir koleksiyon oluşturmadın.
-              </div>
-            )
-          ) : /* Beğenilenler ve Kaydedilenler Post Listesi */
+          ) : /* Beğenilenler Post Listesi */
           posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
               {posts.map((post) => (
@@ -304,9 +467,7 @@ export default function CollectionsView({
             </div>
           ) : (
             <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-              {activeTab === "liked"
-                ? "Henüz beğendiğin bir içerik bulunmuyor."
-                : "Henüz kaydettiğin bir içerik bulunmuyor."}
+              Henüz beğendiğin bir içerik bulunmuyor.
             </div>
           )}
         </div>
@@ -316,7 +477,7 @@ export default function CollectionsView({
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={() => {
-          if (activeTab === "collections") {
+          if (activeTab === "bookmarked" && !selectedCollection) {
             fetchUserCollections();
           }
         }}
