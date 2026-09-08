@@ -121,7 +121,7 @@ export default function MyStagesClient() {
 
   return (
     <main className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">
-      <div className="flex items-center gap-4">
+      <div className="flex items-end gap-4">
         <div className="relative">
           <Image
             src={sahnelerim}
@@ -129,14 +129,14 @@ export default function MyStagesClient() {
             className="w-34 h-28 object-cover"
           />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <div
-            className="flex flex-col gap-1 border-b border-gray-200"
+            className="flex flex-col gap-2 border-b border-gray-200"
             style={{
-              paddingBottom: "6px",
+              paddingBottom: "8px",
             }}
           >
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-3xl font-semibold tracking-tight merriweather-sans text-gray-900">
               Sahnelerim
             </h1>
             <p className="text-xs text-gray-500">
@@ -144,7 +144,7 @@ export default function MyStagesClient() {
               sahneler
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 select-none">
             <div className="flex items-center gap-1">
               <span className="text-xs text-gray-800">{counts.published}</span>
               <span className="text-xs text-gray-500">Sahnelenen</span>
@@ -173,30 +173,30 @@ export default function MyStagesClient() {
           <div className="flex space-x-6">
             <button
               onClick={() => setActiveTab("PUBLISHED")}
-              className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+              className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "PUBLISHED"
                   ? "text-black border-b-2 border-black"
-                  : "text-gray-400 hover:text-gray-700"
+                  : "text-gray-500"
               }`}
             >
               Sahnede
             </button>
             <button
               onClick={() => setActiveTab("DRAFT")}
-              className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+              className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "DRAFT"
                   ? "text-black border-b-2 border-black"
-                  : "text-gray-400 hover:text-gray-700"
+                  : "text-gray-500"
               }`}
             >
               Taslaklar
             </button>
             <button
               onClick={() => setActiveTab("ARCHIVE")}
-              className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+              className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "ARCHIVE"
                   ? "text-black border-b-2 border-black"
-                  : "text-gray-400 hover:text-gray-700"
+                  : "text-gray-500"
               }`}
             >
               Arşiv
@@ -311,13 +311,13 @@ export default function MyStagesClient() {
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-            <p className="text-gray-500 text-sm">
+          <div className="">
+            <p className="text-gray-500 text-xs">
               {activeTab === "PUBLISHED"
-                ? "Bu türde yayınlanmış bir sahnen bulunmuyor."
+                ? "Henüz yayınladığın bir sahnen yok."
                 : activeTab === "DRAFT"
-                  ? "Bu türde kaydedilmiş bir taslağın yok."
-                  : "Arşivinde bu türde bir sahne bulunmuyor."}
+                  ? "Henüz kaydedilmiş bir taslağın yok."
+                  : "Henüz arşivlediğin bir sahnen yok."}
             </p>
           </div>
         ) : (
