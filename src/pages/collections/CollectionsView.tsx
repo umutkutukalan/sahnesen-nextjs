@@ -6,7 +6,7 @@ import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import { sahnelerim } from "@/utils";
+import { koleksiyonlar, sahnelerim } from "@/utils";
 import { FaTicketSimple } from "react-icons/fa6";
 
 interface CollectionsViewProps {
@@ -64,7 +64,7 @@ export default function CollectionsView({
       <div className="flex items-end gap-4">
         <div className="relative">
           <Image
-            src={sahnelerim}
+            src={koleksiyonlar}
             alt="Koleksiyonlar"
             className="w-34 h-28 object-cover"
           />
@@ -84,7 +84,7 @@ export default function CollectionsView({
           <div className="flex items-center gap-2 select-none">
             <div className="flex items-center gap-1">
               <span className="text-xs text-gray-800">{posts.length}</span>
-              <span className="text-xs text-gray-500">İçerik listeleniyor</span>
+              <span className="text-xs text-gray-500">sahne listeleniyor</span>
             </div>
           </div>
         </div>
