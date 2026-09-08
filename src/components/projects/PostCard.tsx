@@ -28,6 +28,7 @@ import { MdCoffee, MdOutlineCoffee } from "react-icons/md";
 import { RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
 import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
+import SaveToCollectionModal from "../collections/SaveToCollectionModal";
 
 interface PostCardProps {
   post: PostSummaryResponse & { isArchived?: boolean; archived?: boolean };
@@ -53,6 +54,7 @@ const PostCard = ({
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [savingPostId, setSavingPostId] = useState<number | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { deletePost } = useDeletePosts();
@@ -435,7 +437,10 @@ const PostCard = ({
                   {interactionStatus.isBookmarked ? (
                     <TbBookmarkFilled className="text-base text-black" />
                   ) : (
-                    <TbBookmark className="text-base" />
+                    <TbBookmark
+                      onClick={() => setSavingPostId(post.id)}
+                      className="text-base"
+                    />
                   )}
                 </li>
               </ul>
@@ -465,6 +470,13 @@ const PostCard = ({
                 </div>
               </div>
             </div>
+          )}
+          {savingPostId !== null && (
+            <SaveToCollectionModal
+              postId={savingPostId}
+              isOpen={savingPostId !== null}
+              onClose={() => setSavingPostId(null)}
+            />
           )}
         </div>
       </div>

@@ -252,10 +252,10 @@ export default function CollectionsView({
               setEditingCollection(null);
               setIsCreateModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-black text-white rounded-xl hover:bg-gray-800 cursor-pointer transition-colors shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-black text-white rounded-sm hover:bg-gray-800 cursor-pointer transition-colors shadow-xs"
           >
             <FaPlus className="text-[10px]" />
-            <span>Yeni Koleksiyon</span>
+            <span>Koleksiyon</span>
           </button>
         )}
       </div>
