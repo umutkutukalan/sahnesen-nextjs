@@ -1,7 +1,7 @@
 "use client";
 
 import { FiUser, FiMoreHorizontal } from "react-icons/fi";
-import { LuImages, LuTheater } from "react-icons/lu";
+import { LuImages, LuPenLine, LuTheater } from "react-icons/lu";
 import {
   TbBookmark,
   TbBookmarkFilled,
@@ -118,6 +118,11 @@ const PostCard = ({
       ? post?.authorProfileImg
       : `${baseUrl}/${post?.authorProfileImg}`
     : null;
+
+  console.log("showReadButton ", showReadButton);
+  console.log("isOwner", isOwner);
+  console.log("post.viewCount ", post.viewCount);
+  console.log("post", post);
 
   return (
     <div
@@ -251,15 +256,40 @@ const PostCard = ({
                 </span>
               </div>
 
-              <div className="relative pr-2 border-r border-gray-200 flex items-center gap-1">
-                <LuTheater className="text-xs text-gray-600" />
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="text-gray-600">{post?.viewCount}</span>
-                  <p className="text-gray-600">defa aralandı</p>
+              {/* GÖRÜNTÜLENME SAYISI: Taslak değilse (Yayınlanmış veya Arşivlenmişse) görünür */}
+              {(!isOwner ||
+                showReadButton ||
+                (isOwner && (post.isArchived || post.archived))) && (
+                <div className="relative pr-2 border-r border-gray-200 flex items-center gap-1">
+                  <LuTheater className="text-xs text-gray-600" />
+                  <div className="flex items-center gap-1 text-xs">
+                    <span className="text-gray-600">
+                      {post?.viewCount ?? 0}
+                    </span>
+                    <span className="text-gray-600">defa aralandı</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {(showReadButton || !isOwner) && (
+              {/* KENDİ YAZISI VE TASLAK/ARŞİVSE: Taslağa Devam Et */}
+              {isOwner && !showReadButton && (
+                <div
+                  className="relative flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-black transition"
+                  onClick={() => {
+                    const archivedFlag =
+                      post.isArchived ?? post.archived ?? false;
+                    router.push(
+                      `/olustur?slug=${post.slug}&isArchived=${archivedFlag}`,
+                    );
+                  }}
+                >
+                  <LuPenLine className="text-xs" />
+                  <span className="text-xs">Taslağa Devam Et</span>
+                </div>
+              )}
+
+              {/* YAYINLANDIYSA VEYA BAŞKASININSA: Perdeyi Arala (Yazıya Git) */}
+              {showReadButton && (
                 <button
                   onClick={() =>
                     router.push(`/${post?.authorUsername}/${post?.slug}`)

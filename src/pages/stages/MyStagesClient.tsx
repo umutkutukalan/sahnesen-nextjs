@@ -116,6 +116,8 @@ export default function MyStagesClient() {
     }
   };
 
+  console.log("posts", posts);
+
   if (authLoading) return <LoadingScreen />;
   if (!user) return <Home />;
 
@@ -324,12 +326,12 @@ export default function MyStagesClient() {
           <div className="grid grid-cols-1 gap-6">
             {posts.map((post) => (
               <PostCard
-                key={post.id}
+                key={post?.id}
                 post={post}
                 isOwner={true}
                 showReadButton={activeTab === "PUBLISHED"}
                 onDelete={() => fetchMyPosts(activeTab, page, selectedType)}
-                onArchive={() => handleArchiveToggle(post.id)}
+                onArchive={() => handleArchiveToggle(post?.id)}
               />
             ))}
           </div>
