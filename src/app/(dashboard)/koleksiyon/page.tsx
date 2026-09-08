@@ -18,7 +18,7 @@ export default function Page() {
   useEffect(() => {
     if (user) {
       interactionService
-        .getLikedPosts(0, 5)
+        .getLikedPosts(undefined, 0, 5) // (postType, page, size) sırasına dikkat!
         .then((data) => {
           setInitialPosts(data?.content || []);
           setInitialPage(data?.number || 0);

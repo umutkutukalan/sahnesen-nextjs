@@ -48,9 +48,11 @@ export const getCollectionPostsClient = async (
   collectionId: number,
   page = 0,
   size = 10,
+  postType?: string,
 ) => {
+  const typeQuery = postType ? `&postType=${postType}` : "";
   const response = await api.get(
-    `/api/interaction/bookmark-collections/${collectionId}/posts?page=${page}&size=${size}`,
+    `/api/interaction/bookmark-collections/${collectionId}/posts?page=${page}&size=${size}${typeQuery}`,
   );
   return response.data; // Page<PostSummaryResponse> yapısı döner
 };

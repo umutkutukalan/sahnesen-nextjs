@@ -1,23 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import {
-  collectiondefault,
-  koleksiyonlar,
-  sagperde,
-  sahnelerim,
-  solperde,
-} from "@/utils";
+import { collectiondefault, koleksiyonlar, sagperde, solperde } from "@/utils";
 import {
   FaTicketSimple,
   FaPlus,
   FaBookmark,
-  FaFolder,
   FaArrowLeft,
 } from "react-icons/fa6";
 import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
@@ -45,7 +38,6 @@ export default function CollectionsView({
   initialPage,
   totalPages,
 }: CollectionsViewProps) {
-  // Ana sekmeler sadece Beğenilenler ve Kaydedilenler
   const { user } = useAuth();
   const { ToProfile } = useToProfile();
   const [activeTab, setActiveTab] = useState<"liked" | "bookmarked">("liked");
@@ -61,7 +53,7 @@ export default function CollectionsView({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
 
-  // Kaydedilenler sekmesindeyken seçilen özel koleksiyon (Null ise koleksiyon kartları listelenir)
+  // Kaydedilenler sekmesindeyken seçilen özel koleksiyon
   const [selectedCollection, setSelectedCollection] =
     useState<BookmarkCollection | null>(null);
   const [collectionPosts, setCollectionPosts] = useState<PostResponse[]>([]);
@@ -73,14 +65,8 @@ export default function CollectionsView({
   );
   const [collectionsLoading, setCollectionsLoading] = useState(false);
 
-  const {
-    posts,
-    isLoadingMore,
-    hasMore,
-    loadMorePosts,
-    currentPage,
-    fetchPostsByType,
-  } = useGetCollectionsPosts(initialPosts, initialPage, totalPages);
+  const { posts, isLoadingMore, hasMore, loadMorePosts, fetchPostsByType } =
+    useGetCollectionsPosts(initialPosts, initialPage, totalPages);
 
   // Dışarı tıklandığında üç nokta menüsünü kapat
   useEffect(() => {
@@ -118,18 +104,37 @@ export default function CollectionsView({
     }
   };
 
-  // Bir koleksiyona tıklandığında içeriklerini çek
-  const handleSelectCollection = async (collection: BookmarkCollection) => {
-    setSelectedCollection(collection);
-    setCollectionPostsLoading(true);
-    try {
-      const data = await getCollectionPostsClient(collection.id);
-      setCollectionPosts(data.content || []);
-    } catch (error) {
-      console.error("Koleksiyon içerikleri yüklenemedi:", error);
-    } finally {
-      setCollectionPostsLoading(false);
+  // Bir koleksiyona tıklandığında veya tür değiştiğinde içerikleri backend'den çek
+  const fetchCollectionPosts = useCallback(
+    async (collectionId: number, postType?: string) => {
+      setCollectionPostsLoading(true);
+      try {
+        const data = await getCollectionPostsClient(
+          collectionId,
+          0,
+          10,
+          postType,
+        );
+        setCollectionPosts(data.content || []);
+      } catch (error) {
+        console.error("Koleksiyon içerikleri yüklenemedi:", error);
+      } finally {
+        setCollectionPostsLoading(false);
+      }
+    },
+    [],
+  );
+
+  // Koleksiyon seçildiğinde veya filtre değiştiğinde çalışır
+  useEffect(() => {
+    if (selectedCollection) {
+      fetchCollectionPosts(selectedCollection.id, selectedType);
     }
+  }, [selectedCollection, selectedType, fetchCollectionPosts]);
+
+  const handleSelectCollection = (collection: BookmarkCollection) => {
+    setSelectedCollection(collection);
+    setSelectedType(undefined); // Başka koleksiyona girerken filtreyi sıfırla
   };
 
   const handleDeleteCollection = async (collectionId: number) => {
@@ -147,15 +152,20 @@ export default function CollectionsView({
   const handleTabChange = (tab: "liked" | "bookmarked") => {
     if (activeTab === tab && !selectedCollection) return;
     setActiveTab(tab);
-    setSelectedCollection(null); // Sekme değişince koleksiyon detayından çık
-    setSelectedType(undefined); // Filtreyi sıfırla
+    setSelectedCollection(null);
+    setSelectedType(undefined);
     if (tab === "liked") {
-      fetchPostsByType("liked");
+      fetchPostsByType("liked", undefined);
     }
   };
 
-  const handleSelectType = (type: string) => {
-    setSelectedType(selectedType === type ? undefined : type);
+  const handleSelectType = (type: string | undefined) => {
+    const newType = selectedType === type ? undefined : type;
+    setSelectedType(newType);
+
+    if (activeTab === "liked") {
+      fetchPostsByType("liked", newType);
+    }
   };
 
   const loadMoreRef = useInfiniteScroll(
@@ -191,7 +201,10 @@ export default function CollectionsView({
               {selectedCollection ? (
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setSelectedCollection(null)}
+                    onClick={() => {
+                      setSelectedCollection(null);
+                      setSelectedType(undefined);
+                    }}
                     className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer text-gray-600"
                     title="Geri Dön"
                   >
@@ -233,7 +246,7 @@ export default function CollectionsView({
         </div>
 
         {/* Yeni Koleksiyon Oluştur Butonu */}
-        {activeTab === "bookmarked" && (
+        {activeTab === "bookmarked" && !selectedCollection && (
           <button
             onClick={() => {
               setEditingCollection(null);
@@ -253,7 +266,7 @@ export default function CollectionsView({
           className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
           style={{ height: "48px" }}
         >
-          {/* Sol taraf: Sekmeler (Beğenilenler / Koleksiyonlar) */}
+          {/* Sol taraf: Sekmeler */}
           <div className="flex space-x-6">
             <button
               onClick={() => handleTabChange("liked")}
@@ -288,7 +301,7 @@ export default function CollectionsView({
                       ? "border-b-2 border-black font-medium"
                       : "text-gray-400 hover:text-gray-700"
                   }`}
-                  onClick={() => setSelectedType(undefined)}
+                  onClick={() => handleSelectType(undefined)}
                 >
                   <span className="text-xs">Tümü</span>
                 </button>
@@ -595,8 +608,10 @@ export default function CollectionsView({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-gray-500">
-                Bu koleksiyonda henüz hiç sahne bulunmuyor.
+              <p className="text-xs text-gray-500 py-12 text-center border border-dashed border-gray-200 rounded-xl">
+                {selectedType
+                  ? `Bu koleksiyonda '${selectedType}' türünde sahne bulunmuyor.`
+                  : "Bu koleksiyonda henüz hiç sahne bulunmuyor."}
               </p>
             )
           ) : posts.length > 0 ? (

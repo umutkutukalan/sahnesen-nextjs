@@ -73,24 +73,29 @@ export const interactionService = {
     return res.data;
   },
 
-  // BEĞENİLEN POSTLAR (Backend'de Controller tarafında karşılığı yazılacak veya PostReaction bazlı çekilecek)
-  // Not: Eğer backend'de beğenilenler için ayrı bir endpoint'in yoksa /api/interaction/posts/liked gibi bir rota eklemen gerekebilir.
-  getLikedPosts: async (page: number = 0, size: number = 5) => {
-    const res = await api.get(`/api/interaction/posts/liked`, {
-      params: { page, size },
-    });
-    return res.data; // Spring Page yapısı: { content, number, totalPages, ... }
-  },
-
-  // KAYDEDİLEN POSTLAR (Backend'deki BookmarkCollectionController -> /posts endpoint'ine bağlanır)
-  getBookmarkedPosts: async (
-    postType?: string,
-    page: number = 0,
+  // BEĞENİLEN POSTLAR (PostType filtresi eklendi)
+  getLikedPosts: async (
+    postTypeOrPage?: string | number,
+    pageOrSize: number = 0,
     size: number = 5,
   ) => {
-    const res = await api.get(`/api/interaction/bookmark-collections/posts`, {
-      params: { postType, page, size },
+    let postType: string | undefined = undefined;
+    let page = pageOrSize;
+    let actualSize = size;
+
+    // Eğer ilk parametre sayı geldiyse, bu aslında 'page' parametresidir (eski kullanımlar için güvenlik önlemi)
+    if (typeof postTypeOrPage === "number") {
+      page = postTypeOrPage;
+      actualSize = pageOrSize; // ikinci parametre size olur
+    } else if (typeof postTypeOrPage === "string" && postTypeOrPage !== "0") {
+      postType = postTypeOrPage;
+    }
+
+    const cleanPostType = !postType || postType === "0" ? undefined : postType;
+
+    const res = await api.get(`/api/interaction/posts/liked`, {
+      params: { postType: cleanPostType, page, size: actualSize },
     });
-    return res.data; // Spring Page yapısı: { content, number, totalPages, ... }
+    return res.data;
   },
 };
