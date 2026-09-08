@@ -431,7 +431,15 @@ const PostCard = ({
 
                 {/* BOOKMARK (KAYDET) */}
                 <li
-                  onClick={() => toggleBookmark()}
+                  onClick={() => {
+                    if (interactionStatus.isBookmarked) {
+                      // Zaten kayıtlıysa direkt genel toggle ile kayıttan çıkar
+                      toggleBookmark();
+                    } else {
+                      // Kayıtlı değilse direkt koleksiyon seçim modalını aç
+                      setSavingPostId(post.id);
+                    }
+                  }}
                   className={`hidden sm:flex items-center gap-1 cursor-pointer transition-all duration-300`}
                 >
                   {interactionStatus.isBookmarked ? (
