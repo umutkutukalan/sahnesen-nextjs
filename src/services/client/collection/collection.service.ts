@@ -6,6 +6,9 @@ export interface CreateCollectionRequest {
 }
 
 export const createCollectionClient = async (data: CreateCollectionRequest) => {
-  const response = await api.post("/api/collections", data);
+  const response = await api.post(
+    "/api/interaction/bookmark-collections",
+    data,
+  );
   return response.data;
 };
