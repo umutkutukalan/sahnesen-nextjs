@@ -22,7 +22,7 @@ import {
   deleteCollectionClient,
 } from "@/services/client/collection/collection.service";
 import { getFullImageUrl } from "@/utils/image";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { TbBookmarkFilled, TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useAuth } from "@/context/UserContext";
 import { FiMoreHorizontal, FiUser } from "react-icons/fi";
 import { useToProfile } from "@/utils/useToProfile";
@@ -64,6 +64,9 @@ export default function CollectionsView({
     [],
   );
   const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [bookmarkedPostIds, setBookmarkedPostIds] = useState<Set<number>>(
+    new Set(),
+  );
 
   const { posts, isLoadingMore, hasMore, loadMorePosts, fetchPostsByType } =
     useGetCollectionsPosts(initialPosts, initialPage, totalPages);
@@ -616,18 +619,13 @@ export default function CollectionsView({
             )
           ) : posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
-              {posts.map((post) => (
-                <div key={post?.id} className="relative group">
-                  <PostCard post={post} />
-                  <button
-                    onClick={() => setSavingPostId(post.id)}
-                    className="absolute top-4 right-4 z-10 p-2 bg-white/90 backdrop-blur-xs border border-gray-200 text-gray-700 rounded-xl shadow-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black hover:text-white hover:border-black cursor-pointer"
-                    title="Koleksiyona Ekle"
-                  >
-                    <FaBookmark className="text-xs" />
-                  </button>
-                </div>
-              ))}
+              {posts.map((post) => {
+                return (
+                  <div key={post?.id} className="relative group">
+                    <PostCard post={post} />
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
@@ -657,6 +655,9 @@ export default function CollectionsView({
           postId={savingPostId}
           isOpen={savingPostId !== null}
           onClose={() => setSavingPostId(null)}
+          onSaved={() => {
+            setBookmarkedPostIds((prev) => new Set(prev).add(savingPostId));
+          }}
         />
       )}
     </div>

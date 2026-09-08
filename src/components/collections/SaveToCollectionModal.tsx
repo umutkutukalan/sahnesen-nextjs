@@ -12,12 +12,14 @@ interface SaveToCollectionModalProps {
   postId: number;
   isOpen: boolean;
   onClose: () => void;
+  onSaved?: () => void;
 }
 
 export default function SaveToCollectionModal({
   postId,
   isOpen,
   onClose,
+  onSaved,
 }: SaveToCollectionModalProps) {
   const [collections, setCollections] = useState<BookmarkCollection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,7 @@ export default function SaveToCollectionModal({
     setAddingId(collectionId);
     try {
       await addPostToCollectionClient(collectionId, postId);
+      onSaved?.();
       onClose();
     } catch (error) {
       console.error("İçerik koleksiyona eklenemedi:", error);

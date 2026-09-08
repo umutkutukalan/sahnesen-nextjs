@@ -42,6 +42,10 @@ export const usePostInteraction = (
     };
   }, [postId, shineType]);
 
+  const markBookmarked = (value: boolean) => {
+    setStatus((prev) => ({ ...prev, isBookmarked: value }));
+  };
+
   const toggleReaction = async (reactionType: ReactionType) => {
     const isLike = reactionType === "LIKE";
     const key = isLike ? "isLiked" : "isShined";
@@ -82,8 +86,8 @@ export const usePostInteraction = (
     status,
     isLoading,
     toggleLike: () => toggleReaction("LIKE"),
-    // Artık dinamik gelen shine türünü (örn: SHINE_YANYANA) tetikliyor
     toggleShine: () => toggleReaction(shineType),
     toggleBookmark,
+    markBookmarked,
   };
 };

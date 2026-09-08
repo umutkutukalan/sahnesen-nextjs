@@ -93,6 +93,7 @@ const PostCard = ({
     toggleLike,
     toggleShine,
     toggleBookmark,
+    markBookmarked,
   } = usePostInteraction(!isOwner && user ? post.id : 0, currentShineType);
 
   const handleConfirmDelete = () => {
@@ -484,6 +485,7 @@ const PostCard = ({
               postId={savingPostId}
               isOpen={savingPostId !== null}
               onClose={() => setSavingPostId(null)}
+              onSaved={() => markBookmarked(true)}
             />
           )}
         </div>
