@@ -6,7 +6,7 @@ import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import { koleksiyonlar, sahnelerim } from "@/utils";
+import { koleksiyonlar, sahnelerim, solperde } from "@/utils";
 import {
   FaTicketSimple,
   FaPlus,
@@ -337,7 +337,7 @@ export default function CollectionsView({
                 Koleksiyonlar yükleniyor...
               </div>
             ) : userCollections.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {userCollections.map((col) => {
                   const previewContents = col.contents?.slice(0, 4) || [];
 
@@ -356,11 +356,11 @@ export default function CollectionsView({
                     <div
                       key={col.id}
                       onClick={() => handleSelectCollection(col)}
-                      className="flex items-center rounded-lg border border-gray-200 hover:border-black transition-all bg-white shadow-xs gap-3 group cursor-pointer overflow-hidden"
+                      className="flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden"
                     >
                       {/* Sol Taraf: 2x2 Kare Önizleme Alanı */}
                       <div
-                        className="shrink-0 bg-gray-100 overflow-hidden"
+                        className="shrink-0 overflow-hidden"
                         style={{
                           display: "grid",
                           gridTemplateColumns:
@@ -403,25 +403,50 @@ export default function CollectionsView({
                       </div>
 
                       {/* Sağ Taraf: Koleksiyon Bilgileri */}
-                      <div className="flex flex-col gap-1 min-w-0 flex-1">
+                      <div className="flex flex-col gap-2 min-w-0 flex-1 pb-3">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-xs font-semibold text-gray-900 truncate group-hover:underline">
-                            {col.name}
-                          </h3>
-                          {col.isDefault && (
-                            <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium shrink-0">
-                              Varsayılan
-                            </span>
-                          )}
+                          <div className="flex flex-col">
+                            <h3 className="text-lg font-semibold tracking-tight merriweather-sans">
+                              {col.name}
+                            </h3>
+                            {col.isDefault && (
+                              <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium shrink-0">
+                                Varsayılan
+                              </span>
+                            )}
+                            {col.description && (
+                              <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                                {col.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        {col.description && (
-                          <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
-                            {col.description}
-                          </p>
-                        )}
-                        <span className="text-[10px] text-gray-400 mt-0.5">
-                          {col.contents?.length || 0} içerik
-                        </span>
+                        <div className="relative">
+                          <div
+                            className="absolute left-0 top-0 w-4 h-4 bg-green-600"
+                            style={{
+                              maskImage: `url(${solperde.src})`,
+                              WebkitMaskImage: `url(${solperde.src})`,
+                              maskSize: "contain",
+                              WebkitMaskSize: "contain",
+                              maskRepeat: "no-repeat",
+                              WebkitMaskRepeat: "no-repeat",
+                              maskPosition: "center",
+                              WebkitMaskPosition: "center",
+                            }}
+                          />
+                          <div
+                            className="flex items-center gap-1"
+                            style={{ paddingLeft: "10px" }}
+                          >
+                            <span className="text-[10px] text-gray-800">
+                              {col.contents?.length || 0}
+                            </span>
+                            <span className="text-[10px] text-gray-500">
+                              Sahne
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
