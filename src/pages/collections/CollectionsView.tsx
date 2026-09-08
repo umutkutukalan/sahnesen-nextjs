@@ -6,7 +6,13 @@ import { PostResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { useGetCollectionsPosts } from "@/hooks/posts/useGetCollectionsPosts";
 import Image from "next/image";
-import { koleksiyonlar, sagperde, sahnelerim, solperde } from "@/utils";
+import {
+  collectiondefault,
+  koleksiyonlar,
+  sagperde,
+  sahnelerim,
+  solperde,
+} from "@/utils";
 import {
   FaTicketSimple,
   FaPlus,
@@ -371,9 +377,9 @@ export default function CollectionsView({
                       </div>
                       {/* Sol Taraf: 2x2 Kare Önizleme Alanı */}
                       <div
-                        className="shrink-0 overflow-hidden"
+                        className="shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center"
                         style={{
-                          display: "grid",
+                          display: count > 0 ? "grid" : "flex", // ✨ Boşken flex, doluyken grid yapıyoruz
                           gridTemplateColumns:
                             count === 1 ? "1fr" : "repeat(2, minmax(0, 1fr))",
                           gridTemplateRows:
@@ -385,7 +391,6 @@ export default function CollectionsView({
                       >
                         {count > 0 ? (
                           previewContents.map((content, index) => {
-                            // Eğer 3 içerik varsa ve bu 3. elemense altta tüm alanı kaplasın (col-span-2)
                             const isSpecialSpan = count === 3 && index === 2;
 
                             return (
@@ -407,8 +412,13 @@ export default function CollectionsView({
                             );
                           })
                         ) : (
-                          <div className="flex items-center justify-center text-gray-400 text-xs w-full h-full">
-                            Boş
+                          <div className="w-full h-full flex items-center justify-center bg-white">
+                            <Image
+                              src={collectiondefault}
+                              alt="Collection Default"
+                              unoptimized
+                              className="object-cover w-20 h-20"
+                            />
                           </div>
                         )}
                       </div>

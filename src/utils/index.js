@@ -28,6 +28,7 @@ import sahne from "../../public/images/sahne1.png";
 import etut from "../../public/images/etut.png";
 import sahnelerim from "../../public/images/sahnelerim.png";
 import koleksiyonlar from "../../public/images/koleksiyonlar.png";
+import collectiondefault from "../../public/images/collectiondefault.png";
 
 import arkaplan from "../../public/images/arkaplan.png";
 import bird from "../../public/images/bird.png";
@@ -50,6 +51,7 @@ export {
   etut,
   sahnelerim,
   koleksiyonlar,
+  collectiondefault,
   arkaplan,
   bird,
   sagperde,
