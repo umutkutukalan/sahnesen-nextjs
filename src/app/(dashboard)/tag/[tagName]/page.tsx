@@ -34,8 +34,8 @@ export default function TagDetailPage() {
   }, [tagName]);
 
   return (
-    <div className="min-h-screen bg-white text-black pt-32 px-6 lg:px-40 max-w-5xl mx-auto">
-      <div className="flex items-center gap-3 mb-8">
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">
+      <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-700 text-xl font-serif">
           #
         </div>
