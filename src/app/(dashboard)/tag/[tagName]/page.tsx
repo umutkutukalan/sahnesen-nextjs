@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { IoIosPaper } from "react-icons/io";
 import api from "@/services/client/config"; // veya axios kullanıyorsan import yolunu kendi yapılandırna göre ayarlayabilirsin
+import { PostSummaryResponse } from "@/services/server/post.service";
 
 export default function TagDetailPage() {
   const params = useParams();
@@ -57,7 +58,7 @@ export default function TagDetailPage() {
         </p>
       ) : (
         <div className="flex flex-col gap-4">
-          {posts.map((post: any) => (
+          {posts.map((post: PostSummaryResponse) => (
             <Link
               key={post.id}
               href={`/${post.authorUsername}/${post.slug}`}

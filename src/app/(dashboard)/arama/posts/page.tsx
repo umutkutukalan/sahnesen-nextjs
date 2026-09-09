@@ -8,18 +8,20 @@ import {
 } from "@/services/client/post.service";
 import { searchUsersClient } from "@/services/client/user/user.service";
 import Link from "next/link";
-import { IoIosPaper } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa6";
 import Image from "next/image";
 import PostCard from "@/components/projects/PostCard";
+import { PostSummaryResponse } from "@/services/server/post.service";
+import { TagResponse } from "@/services/client/tags/tag.service";
+import { PublicUser } from "@/context/UserContext";
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams();
   const query = searchParams?.get("q") || "";
 
-  const [posts, setPosts] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [posts, setPosts] = useState<PostSummaryResponse[]>([]);
+  const [tags, setTags] = useState<TagResponse[]>([]);
+  const [users, setUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"posts" | "tags" | "users">(
     "posts",
@@ -102,7 +104,7 @@ export default function SearchResultsPage() {
               </p>
             ) : (
               <div className="flex flex-col gap-4">
-                {posts.map((post: any) => (
+                {posts.map((post: PostSummaryResponse) => (
                   <PostCard key={post.id} post={post} />
                 ))}
               </div>
@@ -116,7 +118,7 @@ export default function SearchResultsPage() {
               </p>
             ) : (
               <div className="flex items-center flex-wrap gap-4">
-                {tags.map((tag: any) => (
+                {tags.map((tag: TagResponse) => (
                   <Link key={tag.id} href={`/tag/${tag.name}`}>
                     <div className="flex items-center gap-1 bg-gray-300 px-4 py-2 rounded-full">
                       <div className="text-gray-600 font-serif text-lg">#</div>
@@ -135,7 +137,7 @@ export default function SearchResultsPage() {
               </p>
             ) : (
               <div className="flex flex-col gap-4">
-                {users.map((u: any) => {
+                {users.map((u: PublicUser) => {
                   const userProfileImgUrl = u.profileImg
                     ? u.profileImg.startsWith("http")
                       ? u.profileImg
@@ -146,7 +148,7 @@ export default function SearchResultsPage() {
                     <Link
                       key={u.id}
                       href={`/profil/${u.username}`}
-                      className="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors flex items-center gap-4"
+                      className="p-4 border-b border-gray-100 transition-colors flex items-center gap-5"
                     >
                       <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
                         {userProfileImgUrl ? (
@@ -161,14 +163,13 @@ export default function SearchResultsPage() {
                           <FaRegUser className="text-gray-500 text-lg" />
                         )}
                       </div>
-                      <div>
+                      <div className="flex flex-col">
                         <h2 className="text-base font-semibold text-gray-900">
                           {u.name} {u.surname}
                         </h2>
-                        <p className="text-sm text-gray-500">@{u.username}</p>
-                        {u.motto && (
+                        {u.bio && (
                           <p className="text-xs text-gray-400 mt-1 line-clamp-1">
-                            {u.motto}
+                            {u.bio}
                           </p>
                         )}
                       </div>
