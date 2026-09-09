@@ -11,6 +11,7 @@ import Link from "next/link";
 import { IoIosPaper } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa6";
 import Image from "next/image";
+import PostCard from "@/components/projects/PostCard";
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams();
@@ -56,7 +57,7 @@ export default function SearchResultsPage() {
       </h1>
 
       {/* SEKME BUTONLARI (TABS) */}
-      <div className="flex border-b border-gray-200 mb-8 gap-8">
+      <div className="flex border-b border-gray-200 gap-8">
         <button
           onClick={() => setActiveTab("posts")}
           className={`pb-3 text-sm font-medium transition-colors border-b-2 cursor-pointer ${
@@ -102,26 +103,7 @@ export default function SearchResultsPage() {
             ) : (
               <div className="flex flex-col gap-4">
                 {posts.map((post: any) => (
-                  <Link
-                    key={post.id}
-                    href={`/${post.authorUsername}/${post.slug}`}
-                    className="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors flex items-start gap-4"
-                  >
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 mt-1">
-                      <IoIosPaper className="text-gray-500 text-lg" />
-                    </div>
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900">
-                        {post.title}
-                      </h2>
-                      <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-                        {post.subtitle}
-                      </p>
-                      <span className="text-xs text-gray-400 mt-2 block">
-                        @{post.authorUsername}
-                      </span>
-                    </div>
-                  </Link>
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
             ))}
@@ -133,23 +115,12 @@ export default function SearchResultsPage() {
                 Bu kriterde etiket bulunamadı.
               </p>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="flex items-center flex-wrap gap-4">
                 {tags.map((tag: any) => (
-                  <Link
-                    key={tag.id}
-                    href={`/tag/${tag.name}`}
-                    className="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors flex items-center gap-4"
-                  >
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 text-gray-600 font-serif text-lg">
-                      #
-                    </div>
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900">
-                        {tag.name}
-                      </h2>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        Konu / Etiket
-                      </p>
+                  <Link key={tag.id} href={`/tag/${tag.name}`}>
+                    <div className="flex items-center gap-1 bg-gray-300 px-4 py-2 rounded-full">
+                      <div className="text-gray-600 font-serif text-lg">#</div>
+                      <div className="text-gray-900 text-sm">{tag.name}</div>
                     </div>
                   </Link>
                 ))}
