@@ -50,9 +50,9 @@ export default function SearchResultsPage() {
   }, [query]);
 
   return (
-    <div className="min-h-screen bg-white text-black pt-32 px-6 lg:px-40 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-serif font-bold mb-6">
-        &quot;{query}&quot; için arama sonuçları
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">
+      <h1 className="text-4xl text-[#7c7c7c] merriweather-sans font-bold mb-6">
+        Arama Sonuçları <span className="text-black">{query}</span>
       </h1>
 
       {/* SEKME BUTONLARI (TABS) */}

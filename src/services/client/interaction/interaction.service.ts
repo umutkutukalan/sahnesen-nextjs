@@ -77,7 +77,7 @@ export const interactionService = {
   getLikedPosts: async (
     postTypeOrPage?: string | number,
     pageOrSize: number = 0,
-    size: number = 5,
+    size: number = 6,
   ) => {
     let postType: string | undefined = undefined;
     let page = pageOrSize;
