@@ -247,28 +247,39 @@ export default function FoyerPage({ params }: FoyerPageProps) {
           <Image src={sahnekoltuklaridevami} alt="" className="w-100"></Image>
         </div>
 
-        <div className="absolute top-25 left-25 -rotate-12 pointer-events-auto">
-          <ul className="flex items-center">
-            {comments.slice(0, 8).map((comment, index) => (
-              <Link
-                key={index}
-                href={`/profil/${comment.authorUsername}`}
-                className="w-7 h-7 rounded-full overflow-hidden -ml-2 first:ml-0 border-2 border-white shadow-sm transition-transform hover:scale-110 hover:z-20 relative"
-                style={{ zIndex: 8 - index }}
-              >
-                <img
-                  src={getFullImageUrl(comment.authorProfileImg)!}
-                  alt={comment.authorUsername}
-                  className="object-cover w-full h-full"
-                />
-              </Link>
-            ))}
-            {comments.length > 8 && (
-              <div className="text-stone-700 text-[10px] font-bold flex items-center justify-center ml-1 z-0">
-                +{comments.length - 8}
-              </div>
-            )}
-          </ul>
+        <div className="absolute top-25 left-35 -rotate-15 pointer-events-auto">
+          {/* Benzersiz yazarları filtreleme */}
+          {(() => {
+            const uniqueAuthors = Array.from(
+              new Map(
+                comments.map((comment) => [comment.authorUsername, comment]),
+              ).values(),
+            );
+
+            return (
+              <ul className="flex items-center">
+                {uniqueAuthors.slice(0, 8).map((comment, index) => (
+                  <Link
+                    key={comment.id || index}
+                    href={`/profil/${comment.authorUsername}`}
+                    className="w-7 h-7 rounded-full overflow-hidden -ml-2 first:ml-0 border-2 border-white shadow-sm transition-transform hover:scale-110 hover:z-20 relative"
+                    style={{ zIndex: 8 - index }}
+                  >
+                    <img
+                      src={getFullImageUrl(comment.authorProfileImg)!}
+                      alt={comment.authorUsername}
+                      className="object-cover w-full h-full"
+                    />
+                  </Link>
+                ))}
+                {uniqueAuthors.length > 8 && (
+                  <div className="text-stone-700 text-[10px] font-bold flex items-center justify-center ml-1 z-0">
+                    +{uniqueAuthors.length - 8}
+                  </div>
+                )}
+              </ul>
+            );
+          })()}
         </div>
       </div>
       {/* Kaydırılabilir İçerik Alanı */}
@@ -345,7 +356,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                 rows={1}
                 value={content}
                 onChange={handleInput}
-                placeholder="Yorum ekle..."
+                placeholder="Sahneye bir not bırak"
                 className="w-full py-2.5 pl-4 pr-16 border-b border-gray-200 text-sm focus:outline-none resize-none overflow-hidden leading-relaxed placeholder:text-gray-400"
               />
             </div>
