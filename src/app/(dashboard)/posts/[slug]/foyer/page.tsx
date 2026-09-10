@@ -6,7 +6,7 @@ import {
   CommentResponse,
 } from "@/services/client/comment/comment.service";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
-import { FiArrowLeft, FiSend, FiMessageSquare } from "react-icons/fi";
+import { FiArrowLeft, FiSend, FiMessageSquare, FiUser } from "react-icons/fi";
 import { MdCoffee } from "react-icons/md";
 import Link from "next/link";
 import { PostResponse } from "@/services/server/post.service";
@@ -19,6 +19,8 @@ import {
   sahnekoltuklaridevami,
   sahnemikrofonu,
 } from "@/utils";
+import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
+import { useToProfile } from "@/utils/useToProfile";
 
 interface FoyerPageProps {
   params: Promise<{ slug: string }>;
@@ -38,6 +40,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   const [isFoyerOpen, setIsFoyerOpen] = useState(true);
 
   const { formatRelativeTime } = useRelativeTime();
+  const { ToProfile } = useToProfile();
 
   // Yazıyı ve yorumları çekme
   useEffect(() => {
@@ -51,7 +54,6 @@ export default function FoyerPage({ params }: FoyerPageProps) {
           setComments(commentsRes);
         }
 
-        // Süre kontrolü (UTC garantili parse için sonuna 'Z' ekliyoruz)
         if (postData?.discussionEndsAt) {
           const rawDateStr = postData.discussionEndsAt;
           const endsAtString = rawDateStr.endsWith("Z")
@@ -74,7 +76,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     fetchData();
   }, [slug]);
 
-  // Sayaç Mantığı (Her saniye kalan süreyi hesaplar)
+  // Sayaç Mantığı
   useEffect(() => {
     if (!post?.discussionEndsAt) return;
 
@@ -140,7 +142,6 @@ export default function FoyerPage({ params }: FoyerPageProps) {
         parentId: parentId,
       });
 
-      // State içindeki ilgili ana mektubun replies dizisine ekle
       setComments((prev) =>
         prev.map((c) => {
           if (c.id === parentId) {
@@ -160,57 +161,42 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     }
   };
 
+  const authorName =
+    `${post?.authorName || ""} ${post?.authorSurname || ""}`.trim();
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-private text-black">
+      <div className="h-[calc(100vh-64px)] w-full flex items-center justify-center bg-private text-black">
         <p className="text-sm text-gray-500">Fuaye kapıları aralanıyor...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-private text-black py-10 px-4 md:px-0 flex justify-center">
-      <div className="absolute top-0 left-0 rotate-[-15deg]">
-        <Image
-          src={sahnekoltuklari}
-          alt=""
-          className="w-100 rounded-2xl"
-        ></Image>
+    <div className="relative w-full mx-auto lg:w-[800px] mix-h-screen bg-private text-black flex flex-col justify-center">
+      <div className="relative">
+        <div className="absolute top-8 right-0 -rotate-6 pointer-events-none">
+          <Image src={sahnemikrofonu} alt="" className="w-45"></Image>
+        </div>
+
+        <div className="absolute top-0 -left-0 rotate-[-15deg] pointer-events-none">
+          <Image src={sahnekoltuklari} alt="" className="w-100"></Image>
+        </div>
+
+        <div className="absolute -top-1 -left-8 rotate-[-15deg] pointer-events-none">
+          <Image src={sahnekoltuklaridevami} alt="" className="w-100"></Image>
+        </div>
+
+        <div className="absolute -top-4 -left-8 rotate-[-15deg] pointer-events-none">
+          <Image src={sahnekoltuklaridevami} alt="" className="w-100"></Image>
+        </div>
+
+        <div className="absolute -top-8 -left-8 rotate-[-15deg] pointer-events-none">
+          <Image src={sahnekoltuklaridevami} alt="" className="w-100"></Image>
+        </div>
       </div>
-
-      <div className="absolute -top-3 -left-2 rotate-[-15deg]">
-        <Image
-          src={sahnekoltuklaridevami}
-          alt=""
-          className="w-100 rounded-2xl"
-        ></Image>
-      </div>
-
-      <div className="absolute -top-6 -left-4 rotate-[-15deg]">
-        <Image
-          src={sahnekoltuklaridevami}
-          alt=""
-          className="w-100 rounded-2xl"
-        ></Image>
-      </div>
-
-      <div className="absolute -top-9 -left-6 rotate-[-15deg]">
-        <Image
-          src={sahnekoltuklaridevami}
-          alt=""
-          className="w-100 rounded-2xl"
-        ></Image>
-      </div>
-
-      {/* <div className="absolute top-0 left-2">
-        <Image src={sahneisiklari} alt="" className="w-30"></Image>
-      </div> */}
-
-      <div className="absolute bottom-0 right-0">
-        <Image src={sahnemikrofonu} alt="" className="w-60"></Image>
-      </div>
-
-      <div className="w-full lg:w-[800px] flex flex-col gap-8">
+      {/* Kaydırılabilir İçerik Alanı */}
+      <div className="relative w-full h-full overflow-y-auto pt-40 pb-10 px-4 md:px-0 flex flex-col gap-8 z-10 custom-scrollbar">
         {/* ÜST NAVİGASYON VE BAŞLIK */}
         <div className="flex flex-col gap-4 border-b border-gray-200 pb-6">
           <Link
@@ -221,17 +207,51 @@ export default function FoyerPage({ params }: FoyerPageProps) {
           </Link>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                <MdCoffee />
+            <div className="flex flex-col gap-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer w-max"
+                onClick={() => ToProfile(post?.authorUsername || "")}
+              >
+                <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
+                  {post?.authorProfileImg ? (
+                    <Image
+                      src={getFullImageUrl(post?.authorProfileImg)!}
+                      alt="avatar"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-full h-full p-1 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="truncate flex items-center gap-1">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <span className="truncate hover:underline">
+                        {authorName || "Yazar"}
+                      </span>
+                      <TbRosetteDiscountCheckFilled
+                        className="text-blue-500 shrink-0 text-xs"
+                        title="Onaylı Yazar"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold font-sans">
-                  Sahne Arkası Fuaye
-                </h1>
-                <p className="text-xs text-gray-500 truncate max-w-[400px]">
+              <div className="flex flex-col gap-3">
+                <h1
+                  className="text-[32px] md:text-[42px] merriweather-sans font-semibold z-10"
+                  style={{ lineHeight: "48px", letterSpacing: "-0.03em" }}
+                >
                   {post?.title}
-                </p>
+                </h1>
+                {post?.subtitle && (
+                  <p className="text-[18px] md:text-[22px] text-gray-500 font-normal leading-snug tracking-tight">
+                    {post?.subtitle}
+                  </p>
+                )}
               </div>
             </div>
 
