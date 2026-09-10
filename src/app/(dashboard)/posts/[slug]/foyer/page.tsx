@@ -20,12 +20,14 @@ import {
 } from "@/utils";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useToProfile } from "@/utils/useToProfile";
+import { useAuth } from "@/context/UserContext";
 
 interface FoyerPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export default function FoyerPage({ params }: FoyerPageProps) {
+  const { user } = useAuth();
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
@@ -346,29 +348,56 @@ export default function FoyerPage({ params }: FoyerPageProps) {
 
         {/* MEKTUP / YAZMA ALANI */}
         {isFoyerOpen ? (
-          <form
-            onSubmit={handleSubmit}
-            className="relative flex items-end w-full gap-2"
-          >
-            <div className="relative flex-1">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <div className="relative w-6 h-6 rounded-full overflow-hidden border border-gray-200">
+                {user?.profileImg ? (
+                  <Image
+                    src={getFullImageUrl(user?.profileImg)!}
+                    alt="avatar"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                ) : (
+                  <FiUser className="w-full h-full p-1 text-gray-400" />
+                )}
+              </div>
+              <div className="truncate flex items-center gap-1">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1 text-xs text-gray-600">
+                    <span className="truncate hover:underline">
+                      {authorName || "Yazar"}
+                    </span>
+                    <TbRosetteDiscountCheckFilled
+                      className="text-blue-500 shrink-0 text-xs"
+                      title="Onaylı Yazar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <form
+              onSubmit={handleSubmit}
+              className="relative flex items-end border-b border-gray-200 w-full gap-2"
+            >
               <textarea
                 ref={textareaRef}
                 rows={1}
                 value={content}
                 onChange={handleInput}
                 placeholder="Sahneye bir not bırak"
-                className="w-full py-2.5 pl-4 pr-16 border-b border-gray-200 text-sm focus:outline-none resize-none overflow-hidden leading-relaxed placeholder:text-gray-400"
+                className="w-full pr-16 text-sm focus:outline-none resize-none overflow-hidden leading-relaxed placeholder:text-gray-400"
               />
-            </div>
-
-            <button
-              type="submit"
-              disabled={content.trim().length === 0}
-              className={`absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-600 font-medium mr-4 ${content.trim().length === 0 ? "opacity-50" : "opacity-100 cursor-pointer"}`}
-            >
-              Paylaş
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={content.trim().length === 0}
+                className={`absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-600 font-medium mr-4 ${content.trim().length === 0 ? "opacity-50" : "opacity-100 cursor-pointer"}`}
+              >
+                Paylaş
+              </button>
+            </form>
+          </div>
         ) : (
           <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
             <span>⚠️</span>
