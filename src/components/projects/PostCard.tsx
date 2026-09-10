@@ -230,13 +230,13 @@ const PostCard = ({
                     style={{
                       color:
                         post?.postType === "SAHNE"
-                          ? "#c86b5a"
+                          ? "#f18fa0"
                           : post?.postType === "MONOLOG"
-                            ? "#66788a"
+                            ? "#9dce9d"
                             : post?.postType === "YANYANA"
-                              ? "#789680"
+                              ? "#91c5e5"
                               : post?.postType === "TERSYUZ"
-                                ? "#f4d45f"
+                                ? "#f5d35e"
                                 : "#000000",
                     }}
                   />
@@ -246,13 +246,13 @@ const PostCard = ({
                     style={{
                       color:
                         post?.postType === "SAHNE"
-                          ? "#c86b5a"
+                          ? "#f18fa0"
                           : post?.postType === "MONOLOG"
-                            ? "#66788a"
+                            ? "#9dce9d"
                             : post?.postType === "YANYANA"
-                              ? "#789680"
+                              ? "#91c5e5"
                               : post?.postType === "TERSYUZ"
-                                ? "#f4d45f"
+                                ? "#f5d35e"
                                 : "#000000",
                     }}
                   />
@@ -388,7 +388,7 @@ const PostCard = ({
                       {interactionStatus.isShined ? (
                         <PiHandsClappingFill
                           className={`text-base`}
-                          style={{ color: "#c86b5a" }}
+                          style={{ color: "#f18fa0" }}
                         />
                       ) : (
                         <PiHandsClappingDuotone className={`text-base`} />
@@ -399,7 +399,7 @@ const PostCard = ({
                       {interactionStatus.isShined ? (
                         <PiFeatherFill
                           className="text-base"
-                          style={{ color: "#66788a" }}
+                          style={{ color: "#9dce9d" }}
                         />
                       ) : (
                         <PiFeather className="text-base" />
@@ -410,7 +410,7 @@ const PostCard = ({
                       {interactionStatus.isShined ? (
                         <MdCoffee
                           className="text-base"
-                          style={{ color: "#789680" }}
+                          style={{ color: "#91c5e5" }}
                         />
                       ) : (
                         <MdOutlineCoffee className="text-base" />
@@ -421,7 +421,7 @@ const PostCard = ({
                       {interactionStatus.isShined ? (
                         <RiUserSmileFill
                           className={`text-base`}
-                          style={{ color: "#f4d45f" }}
+                          style={{ color: "#f5d35e" }}
                         />
                       ) : (
                         <RiUserSmileLine className={`text-base`} />

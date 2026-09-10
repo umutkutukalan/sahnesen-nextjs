@@ -87,11 +87,11 @@ const PageAbout = ({
               selectedType === "SAHNE" ? "border-b-2 font-medium" : ""
             }`}
             style={{
-              borderColor: selectedType === "SAHNE" ? "#c86b5a" : undefined,
+              borderColor: selectedType === "SAHNE" ? "#f18fa0" : undefined,
             }}
             onClick={() => handleSelectType("SAHNE")}
           >
-            <FaTicketSimple className="text-lg" style={{ color: "#c86b5a" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#f18fa0" }} />
             <span className="text-xs">Sahne</span>
           </button>
 
@@ -101,11 +101,11 @@ const PageAbout = ({
               selectedType === "MONOLOG" ? "border-b-2 font-medium" : ""
             }`}
             style={{
-              borderColor: selectedType === "MONOLOG" ? "#66788a" : undefined,
+              borderColor: selectedType === "MONOLOG" ? "#9dce9d" : undefined,
             }}
             onClick={() => handleSelectType("MONOLOG")}
           >
-            <FaTicketSimple className="text-lg" style={{ color: "#66788a" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#9dce9d" }} />
             <span className="text-xs">Monolog</span>
           </button>
 
@@ -115,11 +115,11 @@ const PageAbout = ({
               selectedType === "YANYANA" ? "border-b-2 font-medium" : ""
             }`}
             style={{
-              borderColor: selectedType === "YANYANA" ? "#789680" : undefined,
+              borderColor: selectedType === "YANYANA" ? "#91c5e5" : undefined,
             }}
             onClick={() => handleSelectType("YANYANA")}
           >
-            <FaTicketSimple className="text-lg" style={{ color: "#789680" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#91c5e5" }} />
             <span className="text-xs">Yan Yana</span>
           </button>
 
@@ -129,11 +129,11 @@ const PageAbout = ({
               selectedType === "TERSYUZ" ? "border-b-2 font-medium" : ""
             }`}
             style={{
-              borderColor: selectedType === "TERSYUZ" ? "#f4d45f" : undefined,
+              borderColor: selectedType === "TERSYUZ" ? "#f5d35e" : undefined,
             }}
             onClick={() => handleSelectType("TERSYUZ")}
           >
-            <FaTicketSimple className="text-lg" style={{ color: "#f4d45f" }} />
+            <FaTicketSimple className="text-lg" style={{ color: "#f5d35e" }} />
             <span className="text-xs">Tersyüz</span>
           </button>
         </ul>
