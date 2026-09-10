@@ -1,14 +1,17 @@
 "use client";
 
 import React from "react";
-import { UserProvider, useAuth } from "@/context/UserContext";
-import { SidebarProvider } from "@/context/SidebarContext";
+import { useAuth } from "@/context/UserContext";
 import Sidebar from "@/components/sidebar/Sidebar";
-import ProfileSidebar from "@/components/sidebar/ProfileSidebar"; // Yolu kontrol et
+import ProfileSidebar from "@/components/sidebar/ProfileSidebar";
 import Navbar from "@/components/navbar/Navbar";
 import { usePathname } from "next/navigation";
 
-function AppContent({ children }: { children: React.ReactNode }) {
+export default function AppProviders({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
 
@@ -32,38 +35,25 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const isProfilePage = pathname?.startsWith("/profil");
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Sabit Navbar */}
       <Navbar transparent={false} isProfile={isProfilePage} />
-      <div className="flex min-h-screen">
-        {/* 
-          1. Masaüstünde (lg ve üzeri): Profil sayfasında değilsek Ana Sidebar görünür.
-          2. Mobilde (lg altı): CSS/Tailwind ile gizlenip ProfileSidebar drawer yapısı devreye sokulabilir.
-        */}
+
+      {/* Alt Alan (Sidebar + Sayfa İçeriği) */}
+      <div className="flex flex-1 min-h-[calc(100vh-64px)]">
+        {/* Masaüstü Sabit Sidebar */}
         <div className="hidden lg:block">
           {isProfilePage ? <ProfileSidebar /> : <Sidebar />}
         </div>
 
-        {/* Mobil Ekranlar İçin Ortak Drawer Olarak ProfileSidebar */}
+        {/* Mobil Drawer Sidebar */}
         <div className="block lg:hidden">
           <ProfileSidebar />
         </div>
 
-        <main className="flex-1 min-w-0">{children}</main>
+        {/* Sayfa Değiştikçe Sadece Burası Yenilenir, Navbar ve Sidebar Sabit Kalır */}
+        <main className="flex-1 min-w-0 bg-white">{children}</main>
       </div>
-    </>
-  );
-}
-
-export default function AppProviders({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <UserProvider>
-      <SidebarProvider>
-        <AppContent>{children}</AppContent>
-      </SidebarProvider>
-    </UserProvider>
+    </div>
   );
 }
