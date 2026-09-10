@@ -33,6 +33,7 @@ import sahnekoltuklari from "../../public/images/sahnekoltuklari.png";
 import sahnekoltuklaridevami from "../../public/images/sahnekoltuklaridevami.png";
 import sahneisiklari from "../../public/images/sahneisiklari.png";
 import sahnemikrofonu from "../../public/images/sahnemikrofonu.png";
+import hali from "../../public/images/hali.png";
 
 import arkaplan from "../../public/images/arkaplan.png";
 import bird from "../../public/images/bird.png";
@@ -60,6 +61,7 @@ export {
   sahnekoltuklaridevami,
   sahneisiklari,
   sahnemikrofonu,
+  hali,
   arkaplan,
   bird,
   sagperde,

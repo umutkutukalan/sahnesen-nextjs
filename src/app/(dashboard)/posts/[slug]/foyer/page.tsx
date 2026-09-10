@@ -1,20 +1,19 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useRef } from "react";
 import {
   commentService,
   CommentResponse,
 } from "@/services/client/comment/comment.service";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
-import { FiArrowLeft, FiSend, FiMessageSquare, FiUser } from "react-icons/fi";
-import { MdCoffee } from "react-icons/md";
+import { FiSend, FiMessageSquare, FiUser, FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { PostResponse } from "@/services/server/post.service";
 import { getPostBySlugClient } from "@/services/client/post.service";
 import { getFullImageUrl } from "@/utils/image";
 import Image from "next/image";
 import {
-  sahneisiklari,
+  hali,
   sahnekoltuklari,
   sahnekoltuklaridevami,
   sahnemikrofonu,
@@ -38,6 +37,10 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   const [replyContent, setReplyContent] = useState("");
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isFoyerOpen, setIsFoyerOpen] = useState(true);
+
+  const [content, setContent] = useState("");
+  const maxLength = 400; // Maksimum karakter sınırı
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { formatRelativeTime } = useRelativeTime();
   const { ToProfile } = useToProfile();
@@ -132,6 +135,30 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     }
   };
 
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    if (value.length <= maxLength) {
+      setContent(value);
+
+      // Yüksekliği içeriğe göre otomatik ayarla
+      const textarea = textareaRef.current;
+      if (textarea) {
+        textarea.style.height = "auto"; // Önce sıfırla ki içeriğe göre yeniden hesaplasın
+        textarea.style.height = `${textarea.scrollHeight}px`; // Yeni yüksekliği ata
+      }
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim()) return;
+    console.log("Gönderilen:", content);
+    setContent("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Gönderildikten sonra yüksekliği ilk haline döndür
+    }
+  };
+
   // Alt Yanıt (Reply) Gönderme
   const handleAddReply = async (parentId: number) => {
     if (!replyContent.trim() || !post) return;
@@ -175,8 +202,12 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   return (
     <div className="relative w-full mx-auto px-6 lg:px-0 lg:w-[800px] mix-h-screen bg-private text-black flex flex-col justify-center">
       <div className="relative">
-        <div className="absolute top-8 right-0 -rotate-6 pointer-events-none">
+        <div className="absolute top-8 right-10  pointer-events-none z-10">
           <Image src={sahnemikrofonu} alt="" className="w-45"></Image>
+        </div>
+
+        <div className="absolute -top-1 right-0 pointer-events-none">
+          <Image src={hali} alt="" className="w-80"></Image>
         </div>
 
         <div className="absolute top-0 -left-0 rotate-[-15deg] pointer-events-none">
@@ -198,14 +229,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
       {/* Kaydırılabilir İçerik Alanı */}
       <div className="relative w-full h-full overflow-y-auto pt-40 pb-10 px-4 md:px-0 flex flex-col gap-8 z-10 custom-scrollbar">
         {/* ÜST NAVİGASYON VE BAŞLIK */}
-        <div className="flex flex-col gap-4 border-b border-gray-200 pb-6">
-          <Link
-            href={`/${post?.authorUsername}/${slug}`}
-            className="flex items-center gap-2 text-xs text-gray-500 hover:text-black transition-colors w-fit cursor-pointer"
-          >
-            <FiArrowLeft /> Yazıya Geri Dön
-          </Link>
-
+        <div className="flex flex-col gap-4 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-2">
               <div
@@ -252,17 +276,14 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                     {post?.subtitle}
                   </p>
                 )}
+                {/* SAYAÇ ROZETİ */}
+                <div className="w-fit flex items-center gap-2 border border-gray-900 bg-gray-200 px-2 py-1 rounded-sm merriweather-sans">
+                  <span className="text-[12px] font-semibold text-gray-800">
+                    {isFoyerOpen ? "Fuaye Kapanış:" : "Fuaye Kapandı"}
+                  </span>
+                  <span className="text-[12px] font-semibold">{timeLeft}</span>
+                </div>
               </div>
-            </div>
-
-            {/* SAYAÇ ROZETİ */}
-            <div className="px-4 py-2 bg-gray-100 rounded-xl flex flex-col items-end">
-              <span className="text-[10px] uppercase font-semibold text-gray-400">
-                {isFoyerOpen ? "Kapanışa Kalan" : "Fuaye Kapandı"}
-              </span>
-              <span className="text-xs font-bold text-gray-800 font-mono">
-                {timeLeft}
-              </span>
             </div>
           </div>
         </div>
@@ -270,27 +291,27 @@ export default function FoyerPage({ params }: FoyerPageProps) {
         {/* MEKTUP / YAZMA ALANI */}
         {isFoyerOpen ? (
           <form
-            onSubmit={handleAddComment}
-            className="flex flex-col gap-3 bg-gray-50 p-5 rounded-2xl border border-gray-200"
+            onSubmit={handleSubmit}
+            className="relative flex items-end w-full gap-2"
           >
-            <label className="text-xs font-semibold text-gray-700">
-              Fuayeye Mektubunu Bırak (Bu anın tanığı ol)
-            </label>
-            <textarea
-              rows={3}
-              value={newCommentContent}
-              onChange={(e) => setNewCommentContent(e.target.value)}
-              placeholder="Düşüncelerini, hissettiklerini veya ilk izlenimlerini paylaş..."
-              className="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors resize-none"
-            />
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-black text-white text-xs font-medium rounded-xl hover:bg-gray-800 transition-colors flex items-center gap-2 cursor-pointer"
-              >
-                <FiSend /> Mektubu Gönder
-              </button>
+            <div className="relative flex-1">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                value={content}
+                onChange={handleInput}
+                placeholder="Yorum ekle..."
+                className="w-full py-2.5 pl-4 pr-16 border-b border-gray-200 text-sm focus:outline-none resize-none overflow-hidden leading-relaxed placeholder:text-gray-400"
+              />
             </div>
+
+            <button
+              type="submit"
+              disabled={content.trim().length === 0}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-600 font-medium mr-4 ${content.trim().length === 0 ? "opacity-50" : "opacity-100 cursor-pointer"}`}
+            >
+              Paylaş
+            </button>
           </form>
         ) : (
           <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
