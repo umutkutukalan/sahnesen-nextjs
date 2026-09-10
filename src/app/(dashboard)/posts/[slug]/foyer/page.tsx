@@ -213,8 +213,18 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   return (
     <div className="relative w-full mx-auto px-6 lg:px-0 lg:w-[800px] mix-h-screen bg-private text-black flex flex-col justify-center">
       <div className="relative">
-        <div className="absolute top-8 right-10  pointer-events-none z-10">
-          <Image src={sahnemikrofonu} alt="" className="w-45"></Image>
+        <div className="relative">
+          <div className="absolute top-8 right-10  pointer-events-none z-10">
+            <Image src={sahnemikrofonu} alt="" className="w-45"></Image>
+
+            <div className="absolute top-5 right-10 w-7 h-7 rounded-full overflow-hidden">
+              <img
+                src={getFullImageUrl(post?.authorProfileImg)!}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="absolute -top-1 right-0 pointer-events-none">
@@ -237,13 +247,14 @@ export default function FoyerPage({ params }: FoyerPageProps) {
           <Image src={sahnekoltuklaridevami} alt="" className="w-100"></Image>
         </div>
 
-        <div className="absolute top-0 left-1/2 bg-red-500">
-          <ul className="flex items-center gap-2">
-            {comments.map((comment, index) => (
+        <div className="absolute top-25 left-25 -rotate-12 pointer-events-auto">
+          <ul className="flex items-center">
+            {comments.slice(0, 8).map((comment, index) => (
               <Link
                 key={index}
                 href={`/profil/${comment.authorUsername}`}
-                className="w-6 h-6 rounded-full overflow-hidden"
+                className="w-7 h-7 rounded-full overflow-hidden -ml-2 first:ml-0 border-2 border-white shadow-sm transition-transform hover:scale-110 hover:z-20 relative"
+                style={{ zIndex: 8 - index }}
               >
                 <img
                   src={getFullImageUrl(comment.authorProfileImg)!}
@@ -252,13 +263,18 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                 />
               </Link>
             ))}
+            {comments.length > 8 && (
+              <div className="text-stone-700 text-[10px] font-bold flex items-center justify-center ml-1 z-0">
+                +{comments.length - 8}
+              </div>
+            )}
           </ul>
         </div>
       </div>
       {/* Kaydırılabilir İçerik Alanı */}
-      <div className="relative w-full h-full overflow-y-auto pt-40 pb-10 px-4 md:px-0 flex flex-col gap-8 z-10 custom-scrollbar">
+      <div className="relative w-full h-full overflow-y-auto pt-45 pb-10 px-4 md:px-0 flex flex-col gap-8 z-10 custom-scrollbar">
         {/* ÜST NAVİGASYON VE BAŞLIK */}
-        <div className="flex flex-col gap-4 pb-6">
+        <div className="flex flex-col gap-4 pb-2">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-2">
               <div
@@ -306,8 +322,8 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                   </p>
                 )}
                 {/* SAYAÇ ROZETİ */}
-                <div className="w-fit flex items-center gap-2 border border-gray-900 bg-gray-200 px-2 py-1 rounded-sm merriweather-sans">
-                  <span className="text-[12px] font-semibold text-gray-800">
+                <div className="w-fit flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-sm merriweather-sans">
+                  <span className="text-[12px] text-gray-800">
                     {isFoyerOpen ? "Fuaye Kapanış:" : "Fuaye Kapandı"}
                   </span>
                   <span className="text-[12px] font-semibold">{timeLeft}</span>
