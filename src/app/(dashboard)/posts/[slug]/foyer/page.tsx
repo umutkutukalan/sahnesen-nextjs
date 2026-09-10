@@ -135,6 +135,27 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || !post) return;
+
+    try {
+      const newComment = await commentService.addComment(post.id, {
+        content: content,
+        parentId: null,
+      });
+      setComments((prev) => [...prev, newComment]);
+      setContent("");
+
+      // Gönderildikten sonra textarea yüksekliğini ilk haline sıfırla
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Mektup gönderilemedi.");
+    }
+  };
+
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= maxLength) {
@@ -143,19 +164,9 @@ export default function FoyerPage({ params }: FoyerPageProps) {
       // Yüksekliği içeriğe göre otomatik ayarla
       const textarea = textareaRef.current;
       if (textarea) {
-        textarea.style.height = "auto"; // Önce sıfırla ki içeriğe göre yeniden hesaplasın
-        textarea.style.height = `${textarea.scrollHeight}px`; // Yeni yüksekliği ata
+        textarea.style.height = "auto";
+        textarea.style.height = `${textarea.scrollHeight}px`;
       }
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-    console.log("Gönderilen:", content);
-    setContent("");
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Gönderildikten sonra yüksekliği ilk haline döndür
     }
   };
 
@@ -224,6 +235,24 @@ export default function FoyerPage({ params }: FoyerPageProps) {
 
         <div className="absolute -top-8 -left-8 rotate-[-15deg] pointer-events-none">
           <Image src={sahnekoltuklaridevami} alt="" className="w-100"></Image>
+        </div>
+
+        <div className="absolute top-0 left-1/2 bg-red-500">
+          <ul className="flex items-center gap-2">
+            {comments.map((comment, index) => (
+              <Link
+                key={index}
+                href={`/profil/${comment.authorUsername}`}
+                className="w-6 h-6 rounded-full overflow-hidden"
+              >
+                <img
+                  src={getFullImageUrl(comment.authorProfileImg)!}
+                  alt={comment.authorUsername}
+                  className="object-cover w-full h-full"
+                />
+              </Link>
+            ))}
+          </ul>
         </div>
       </div>
       {/* Kaydırılabilir İçerik Alanı */}
