@@ -29,6 +29,10 @@ import etut from "../../public/images/etut.png";
 import sahnelerim from "../../public/images/sahnelerim.png";
 import koleksiyonlar from "../../public/images/koleksiyonlar.png";
 import collectiondefault from "../../public/images/collectiondefault.png";
+import sahnekoltuklari from "../../public/images/sahnekoltuklari.png";
+import sahnekoltuklaridevami from "../../public/images/sahnekoltuklaridevami.png";
+import sahneisiklari from "../../public/images/sahneisiklari.png";
+import sahnemikrofonu from "../../public/images/sahnemikrofonu.png";
 
 import arkaplan from "../../public/images/arkaplan.png";
 import bird from "../../public/images/bird.png";
@@ -52,6 +56,10 @@ export {
   sahnelerim,
   koleksiyonlar,
   collectiondefault,
+  sahnekoltuklari,
+  sahnekoltuklaridevami,
+  sahneisiklari,
+  sahnemikrofonu,
   arkaplan,
   bird,
   sagperde,

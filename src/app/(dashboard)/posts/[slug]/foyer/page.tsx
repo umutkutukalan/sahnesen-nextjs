@@ -12,6 +12,13 @@ import Link from "next/link";
 import { PostResponse } from "@/services/server/post.service";
 import { getPostBySlugClient } from "@/services/client/post.service";
 import { getFullImageUrl } from "@/utils/image";
+import Image from "next/image";
+import {
+  sahneisiklari,
+  sahnekoltuklari,
+  sahnekoltuklaridevami,
+  sahnemikrofonu,
+} from "@/utils";
 
 interface FoyerPageProps {
   params: Promise<{ slug: string }>;
@@ -71,6 +78,8 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   useEffect(() => {
     if (!post?.discussionEndsAt) return;
 
+    let timer: NodeJS.Timeout;
+
     const updateCountdown = () => {
       const rawDateStr = post.discussionEndsAt!;
       const endsAtString = rawDateStr.endsWith("Z")
@@ -84,13 +93,12 @@ export default function FoyerPage({ params }: FoyerPageProps) {
       if (distance < 0) {
         setIsFoyerOpen(false);
         setTimeLeft("Fuaye Kapandı");
-        clearInterval(timer);
+        if (timer) clearInterval(timer);
       } else {
         const hours = Math.floor(distance / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // Şık bir görünüm için 2 haneli formatlayabilirsin (Opsiyonel ama şık durur)
         setTimeLeft(
           `${String(hours).padStart(2, "0")}s ${String(minutes).padStart(2, "0")}d ${String(seconds).padStart(2, "0")}s`,
         );
@@ -98,8 +106,11 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     };
 
     updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-    return () => clearInterval(timer);
+    timer = setInterval(updateCountdown, 1000);
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [post?.discussionEndsAt]);
 
   // Ana Mektup Gönderme
@@ -158,12 +169,52 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-private text-black py-10 px-4 md:px-0 flex justify-center">
+    <div className="relative min-h-screen bg-private text-black py-10 px-4 md:px-0 flex justify-center">
+      <div className="absolute top-0 left-0 rotate-[-15deg]">
+        <Image
+          src={sahnekoltuklari}
+          alt=""
+          className="w-100 rounded-2xl"
+        ></Image>
+      </div>
+
+      <div className="absolute -top-3 -left-2 rotate-[-15deg]">
+        <Image
+          src={sahnekoltuklaridevami}
+          alt=""
+          className="w-100 rounded-2xl"
+        ></Image>
+      </div>
+
+      <div className="absolute -top-6 -left-4 rotate-[-15deg]">
+        <Image
+          src={sahnekoltuklaridevami}
+          alt=""
+          className="w-100 rounded-2xl"
+        ></Image>
+      </div>
+
+      <div className="absolute -top-9 -left-6 rotate-[-15deg]">
+        <Image
+          src={sahnekoltuklaridevami}
+          alt=""
+          className="w-100 rounded-2xl"
+        ></Image>
+      </div>
+
+      {/* <div className="absolute top-0 left-2">
+        <Image src={sahneisiklari} alt="" className="w-30"></Image>
+      </div> */}
+
+      <div className="absolute bottom-0 right-0">
+        <Image src={sahnemikrofonu} alt="" className="w-60"></Image>
+      </div>
+
       <div className="w-full lg:w-[800px] flex flex-col gap-8">
         {/* ÜST NAVİGASYON VE BAŞLIK */}
         <div className="flex flex-col gap-4 border-b border-gray-200 pb-6">
           <Link
-            href={`/posts/${slug}`}
+            href={`/${post?.authorUsername}/${slug}`}
             className="flex items-center gap-2 text-xs text-gray-500 hover:text-black transition-colors w-fit cursor-pointer"
           >
             <FiArrowLeft /> Yazıya Geri Dön
