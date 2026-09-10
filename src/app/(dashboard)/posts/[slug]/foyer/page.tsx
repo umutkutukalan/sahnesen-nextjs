@@ -173,7 +173,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   }
 
   return (
-    <div className="relative w-full mx-auto lg:w-[800px] mix-h-screen bg-private text-black flex flex-col justify-center">
+    <div className="relative w-full mx-auto px-6 lg:px-0 lg:w-[800px] mix-h-screen bg-private text-black flex flex-col justify-center">
       <div className="relative">
         <div className="absolute top-8 right-0 -rotate-6 pointer-events-none">
           <Image src={sahnemikrofonu} alt="" className="w-45"></Image>
