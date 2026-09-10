@@ -335,9 +335,13 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                   </p>
                 )}
                 {/* SAYAÇ ROZETİ */}
-                <div className="w-fit flex items-center gap-2 border border-gray-300 px-2 py-1 rounded-sm merriweather-sans">
+                <div
+                  className={`w-fit flex items-center ${
+                    isFoyerOpen ? "gap-2" : ""
+                  } border border-gray-300 px-2 py-1 rounded-sm merriweather-sans`}
+                >
                   <span className="text-[12px] text-gray-800">
-                    {isFoyerOpen ? "Fuaye Kapanış:" : "Fuaye Kapandı"}
+                    {isFoyerOpen && "Fuaye Kapanış:"}
                   </span>
                   <span className="text-[12px] font-semibold">{timeLeft}</span>
                 </div>
@@ -440,18 +444,15 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                       <span className="text-xs font-medium text-gray-800">
                         {comment.authorName} {comment.authorSurname}
                       </span>
-                      <span className="text-[10px] text-gray-400">
-                        @{comment.authorUsername}
+                      <span className="text-[10px] text-gray-500">
+                        {formatRelativeTime(comment.createdAt)}
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-gray-400">
-                    {formatRelativeTime(comment.createdAt)}
-                  </span>
                 </div>
 
                 {/* Mektup İçeriği */}
-                <p className="text-sm text-gray-800 leading-relaxed font-normal pl-9">
+                <p className="text-sm text-gray-800 leading-relaxed font-normal">
                   {comment.content}
                 </p>
 
@@ -471,24 +472,35 @@ export default function FoyerPage({ params }: FoyerPageProps) {
 
                 {/* Alt Yanıtlar Listesi */}
                 {comment.replies && comment.replies.length > 0 && (
-                  <div className="ml-9 mt-3 flex flex-col gap-3 border-l-2 border-gray-100 pl-4">
+                  <div className="ml-4 mt-3 flex flex-col gap-3 border-l-2 border-gray-100 pl-4">
                     {comment.replies.map((reply) => (
-                      <div
-                        key={reply.id}
-                        className="flex flex-col gap-1.5 py-2"
-                      >
+                      <div key={reply.id} className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-gray-800">
-                            {reply.authorName} {reply.authorSurname}{" "}
-                            <span className="text-[10px] text-gray-400 font-normal">
-                              @{reply.authorUsername}
-                            </span>
-                          </span>
-                          <span className="text-[10px] text-gray-400">
-                            {formatRelativeTime(reply.createdAt)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 overflow-hidden">
+                              {reply.authorProfileImg ? (
+                                <img
+                                  src={getFullImageUrl(reply.authorProfileImg)!}
+                                  alt={reply.authorUsername}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                reply.authorName?.[0] || "U"
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-gray-800">
+                                {reply.authorName} {reply.authorSurname}
+                              </span>
+                              <span className="text-[10px] text-gray-500">
+                                {formatRelativeTime(reply.createdAt)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-xs text-gray-700">{reply.content}</p>
+                        <p className="text-sm text-gray-800 leading-relaxed font-normal">
+                          {reply.content}
+                        </p>
                       </div>
                     ))}
                   </div>
