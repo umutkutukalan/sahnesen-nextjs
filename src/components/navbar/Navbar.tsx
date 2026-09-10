@@ -26,6 +26,7 @@ import { searchUsersClient } from "@/services/client/user/user.service";
 import { getFullImageUrl } from "@/utils/image";
 import { PostSummaryResponse } from "@/services/server/post.service";
 import { TagResponse } from "@/services/client/tags/tag.service";
+import { LuImages } from "react-icons/lu";
 
 const Navbar = ({
   transparent,
@@ -313,7 +314,9 @@ const Navbar = ({
                                     unoptimized
                                   />
                                 ) : (
-                                  <IoIosPaper className="text-gray-500" />
+                                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                    <LuImages className="text-lg text-gray-300" />
+                                  </div>
                                 )}
                               </div>
                               <div className="overflow-hidden">

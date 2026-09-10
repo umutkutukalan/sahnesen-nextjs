@@ -1,185 +1,35 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import {
-  searchPostsClient,
-  searchTagsClient,
-} from "@/services/client/post.service";
-import { searchUsersClient } from "@/services/client/user/user.service";
-import Link from "next/link";
-import { FaRegUser } from "react-icons/fa6";
-import Image from "next/image";
+import { searchPostsClient } from "@/services/client/post.service";
 import PostCard from "@/components/projects/PostCard";
 import { PostSummaryResponse } from "@/services/server/post.service";
-import { TagResponse } from "@/services/client/tags/tag.service";
-import { PublicUser } from "@/context/UserContext";
 
-export default function SearchResultsPage() {
-  const searchParams = useSearchParams();
-  const query = searchParams?.get("q") || "";
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
 
-  const [posts, setPosts] = useState<PostSummaryResponse[]>([]);
-  const [tags, setTags] = useState<TagResponse[]>([]);
-  const [users, setUsers] = useState<PublicUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"posts" | "tags" | "users">(
-    "posts",
-  );
+export default async function SearchPostsPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+  const query = resolvedParams.q || "";
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  let posts: PostSummaryResponse[] = [];
+  try {
+    if (query) {
+      posts = await searchPostsClient(query);
+    }
+  } catch (error) {
+    console.error("Yazılar aranamadı:", error);
+  }
 
-  useEffect(() => {
-    const fetchAllResults = async () => {
-      if (!query) return;
-      try {
-        setLoading(true);
-        const [postsData, tagsData, usersData] = await Promise.all([
-          searchPostsClient(query),
-          searchTagsClient(query),
-          searchUsersClient(query),
-        ]);
-        setPosts(postsData || []);
-        setTags(tagsData || []);
-        setUsers(usersData || []);
-      } catch (error) {
-        console.error("Arama sonuçları getirilemedi:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllResults();
-  }, [query]);
+  if (!posts || posts.length === 0) {
+    return (
+      <p className="text-gray-500 text-sm">Bu kriterde yazı bulunamadı.</p>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">
-      <h1 className="text-4xl text-[#7c7c7c] merriweather-sans font-bold mb-6">
-        Arama Sonuçları <span className="text-black">{query}</span>
-      </h1>
-
-      {/* SEKME BUTONLARI (TABS) */}
-      <div className="flex border-b border-gray-200 gap-8">
-        <button
-          onClick={() => setActiveTab("posts")}
-          className={`pb-3 text-sm font-medium transition-colors border-b-2 cursor-pointer ${
-            activeTab === "posts"
-              ? "border-black text-black"
-              : "border-transparent text-gray-400 hover:text-gray-600"
-          }`}
-        >
-          Yazılar ({posts.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("tags")}
-          className={`pb-3 text-sm font-medium transition-colors border-b-2 cursor-pointer ${
-            activeTab === "tags"
-              ? "border-black text-black"
-              : "border-transparent text-gray-400 hover:text-gray-600"
-          }`}
-        >
-          Etiketler ({tags.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("users")}
-          className={`pb-3 text-sm font-medium transition-colors border-b-2 cursor-pointer ${
-            activeTab === "users"
-              ? "border-black text-black"
-              : "border-transparent text-gray-400 hover:text-gray-600"
-          }`}
-        >
-          Kişiler ({users.length})
-        </button>
-      </div>
-
-      {loading ? (
-        <p className="text-gray-400 text-sm">Aranıyor...</p>
-      ) : (
-        <div>
-          {/* YAZILAR SEKMESİ */}
-          {activeTab === "posts" &&
-            (posts.length === 0 ? (
-              <p className="text-gray-500 text-sm">
-                Bu kriterde yazı bulunamadı.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {posts.map((post: PostSummaryResponse) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-              </div>
-            ))}
-
-          {/* ETİKETLER SEKMESİ */}
-          {activeTab === "tags" &&
-            (tags.length === 0 ? (
-              <p className="text-gray-500 text-sm">
-                Bu kriterde etiket bulunamadı.
-              </p>
-            ) : (
-              <div className="flex items-center flex-wrap gap-4">
-                {tags.map((tag: TagResponse) => (
-                  <Link key={tag.id} href={`/tag/${tag.name}`}>
-                    <div className="flex items-center gap-1 bg-gray-300 px-4 py-2 rounded-full">
-                      <div className="text-gray-600 font-serif text-lg">#</div>
-                      <div className="text-gray-900 text-sm">{tag.name}</div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ))}
-
-          {/* KİŞİLER SEKMESİ */}
-          {activeTab === "users" &&
-            (users.length === 0 ? (
-              <p className="text-gray-500 text-sm">
-                Bu kriterde kişi bulunamadı.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {users.map((u: PublicUser) => {
-                  const userProfileImgUrl = u.profileImg
-                    ? u.profileImg.startsWith("http")
-                      ? u.profileImg
-                      : `${baseUrl}/${u.profileImg}`
-                    : null;
-
-                  return (
-                    <Link
-                      key={u.id}
-                      href={`/profil/${u.username}`}
-                      className="p-4 border-b border-gray-100 transition-colors flex items-center gap-5"
-                    >
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-                        {userProfileImgUrl ? (
-                          <Image
-                            src={userProfileImgUrl}
-                            alt={u.username}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <FaRegUser className="text-gray-500 text-lg" />
-                        )}
-                      </div>
-                      <div className="flex flex-col">
-                        <h2 className="text-base font-semibold text-gray-900">
-                          {u.name} {u.surname}
-                        </h2>
-                        {u.bio && (
-                          <p className="text-xs text-gray-400 mt-1 line-clamp-1">
-                            {u.bio}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            ))}
-        </div>
-      )}
+    <div className="flex flex-col gap-4">
+      {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
+      ))}
     </div>
   );
 }

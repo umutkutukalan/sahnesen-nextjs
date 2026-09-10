@@ -127,6 +127,8 @@ const CreateIntroTwo = () => {
         transparent={true}
         contentStatus="IDLE"
         activePostId={null}
+        postSlug={null}
+        isArchived={false}
       />
       <div
         className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden transition-colors duration-500 ease-in-out"

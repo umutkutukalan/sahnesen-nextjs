@@ -781,9 +781,9 @@ const Detail = ({ post }: DetailProps) => {
                   {isOwnProfile ? (
                     <button
                       onClick={() => router.push("/profil/me/settings")}
-                      className="px-2 py-0.5 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-200"
+                      className="px-2 py-0.5 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-[10px] cursor-pointer transition-colors hover:bg-gray-200"
                     >
-                      <CiSettings className="text-sm" />
+                      <CiSettings />
                       <span>Sahneni Düzenle</span>
                     </button>
                   ) : (

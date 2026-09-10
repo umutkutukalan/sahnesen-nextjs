@@ -6,6 +6,7 @@ import Link from "next/link";
 import { IoIosPaper } from "react-icons/io";
 import api from "@/services/client/config"; // veya axios kullanıyorsan import yolunu kendi yapılandırna göre ayarlayabilirsin
 import { PostSummaryResponse } from "@/services/server/post.service";
+import PostCard from "@/components/projects/PostCard";
 
 export default function TagDetailPage() {
   const params = useParams();
@@ -59,26 +60,7 @@ export default function TagDetailPage() {
       ) : (
         <div className="flex flex-col gap-4">
           {posts.map((post: PostSummaryResponse) => (
-            <Link
-              key={post.id}
-              href={`/${post.authorUsername}/${post.slug}`}
-              className="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors flex items-start gap-4"
-            >
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 mt-1">
-                <IoIosPaper className="text-gray-500 text-lg" />
-              </div>
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">
-                  {post.title}
-                </h2>
-                <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-                  {post.subtitle}
-                </p>
-                <span className="text-xs text-gray-400 mt-2 block">
-                  @{post.authorUsername}
-                </span>
-              </div>
-            </Link>
+            <PostCard key={post.id} post={post} />
           ))}
         </div>
       )}
