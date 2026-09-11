@@ -68,7 +68,9 @@ const PageAbout = ({
 
       {/* 2. İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
       <div className="w-full relative h-14 flex items-end justify-between">
-        <ul className="w-full relative z-50 flex items-end justify-start gap-6 overflow-x-auto scrollbar-hide">
+        <ul
+          className={`w-full relative z-50 flex ${isProfilePage ? "justify-start" : "justify-end"} gap-6 overflow-x-auto scrollbar-hide`}
+        >
           <button
             type="button"
             className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
