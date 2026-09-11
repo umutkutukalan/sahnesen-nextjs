@@ -7,6 +7,7 @@ import profileborder from "../../public/images/profileborder.webp";
 
 import undrawloveit from "../../public/svg/undrawloveit.svg";
 import undrawaddfiles from "../../public/svg/undrawaddfiles.svg";
+import kurucusahne from "../../public/svg/kurucusahne.svg";
 
 import yanyana from "../../public/images/yanyana.png";
 import monolog from "../../public/images/monolog.png";
@@ -52,4 +53,4 @@ export {
 };
 
 export { ressam, runner, walker, loginpageimg, profileborder };
-export { undrawloveit, undrawaddfiles };
+export { undrawloveit, undrawaddfiles, kurucusahne };

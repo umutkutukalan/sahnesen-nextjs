@@ -29,6 +29,7 @@ import { RiUserSmileFill, RiUserSmileLine } from "react-icons/ri";
 import { usePostInteraction } from "@/hooks/interaction/usePostInteraction";
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 import SaveToCollectionModal from "../collections/SaveToCollectionModal";
+import { kurucusahne } from "@/utils";
 
 interface PostCardProps {
   post: PostSummaryResponse & { isArchived?: boolean; archived?: boolean };
@@ -185,10 +186,12 @@ const PostCard = ({
                   <span className="truncate hover:underline">
                     {authorName || "Yazar"}
                   </span>
-                  <TbRosetteDiscountCheckFilled
-                    className="text-blue-500 shrink-0 text-xs"
-                    title="Onaylı Yazar"
-                  />
+                  <Image
+                    src={kurucusahne}
+                    alt="Kurucu Sahne"
+                    width={10}
+                    height={10}
+                  ></Image>
                 </div>
               </div>
               <span className="text-[8px]">•</span>

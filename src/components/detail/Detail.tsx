@@ -31,7 +31,7 @@ import { ReactionType } from "@/services/client/interaction/interaction.service"
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 import Link from "next/link";
 import { LuTheater } from "react-icons/lu";
-import { kurucusahne, solperde } from "@/utils";
+import { solperde } from "@/utils";
 import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { CiSettings } from "react-icons/ci";
@@ -761,14 +761,14 @@ const Detail = ({ post }: DetailProps) => {
                         >
                           {authorFullName || "Yazar"}
                         </span>
-                        <Image
-                          src={kurucusahne}
+                        {/* <Image
+                          src=""
                           alt="Kurucu Sahne"
                           width={10}
                           height={10}
                           unoptimized
                           className="select-none"
-                        />
+                        /> */}
                       </div>
                       <span
                         className="text-[10px] text-gray-400 cursor-pointer"
@@ -832,6 +832,7 @@ const Detail = ({ post }: DetailProps) => {
                   </p>
                 )}
               </div>
+
               <div className="relative flex items-center gap-1">
                 <div
                   className="absolute left-0 top-0 w-5 h-5 bg-black"
