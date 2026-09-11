@@ -616,8 +616,10 @@ export default function CollectionsView({
                 })}
               </div>
             ) : (
-              <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-                Henüz özel bir koleksiyon oluşturmadın.
+              <div className="">
+                <p className="text-gray-500 text-xs">
+                  Henüz beğendiğin bir sahne bulunmuyor.
+                </p>
               </div>
             )
           ) : selectedCollection ? (
@@ -663,8 +665,10 @@ export default function CollectionsView({
               )}
             </div>
           ) : (
-            <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
-              Henüz beğendiğin bir sahne bulunmuyor.
+            <div className="">
+              <p className="text-gray-500 text-xs">
+                Henüz beğendiğin bir sahne bulunmuyor.
+              </p>
             </div>
           )}
         </div>

@@ -21,11 +21,11 @@ import penguinandgirl from "../../public/images/penguinandgirl.png";
 import rabbit from "../../public/images/rabbit.png";
 
 import card1 from "../../public/images/card1.png";
-import yanyana from "../../public/images/yanyana2.png";
-import camasir from "../../public/images/camasir.png";
-import fineday from "../../public/images/monolog2.png";
-import sahne from "../../public/images/sahne1.png";
+import yanyana from "../../public/images/yanyana.png";
+import monolog from "../../public/images/monolog.png";
+import sahne from "../../public/images/sahne.png";
 import etut from "../../public/images/etut.png";
+import tersyuz from "../../public/images/tersyuz.png";
 import sahnelerim from "../../public/images/sahnelerim.png";
 import koleksiyonlar from "../../public/images/koleksiyonlar.png";
 import collectiondefault from "../../public/images/collectiondefault.png";
@@ -48,12 +48,13 @@ import kurucusahne from "../../public/images/sahnesen_rozet.png";
 
 export {
   tire,
-  fineday,
+  monolog,
   sahne,
   card1,
   yanyana,
   camasir,
   etut,
+  tersyuz,
   sahnelerim,
   koleksiyonlar,
   collectiondefault,

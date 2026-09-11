@@ -6,7 +6,9 @@ import {
   bird,
   camasir,
   fineday,
+  monolog,
   sahne,
+  tersyuz,
   tire,
   yanyana,
 } from "@/utils";
@@ -20,7 +22,7 @@ const cards = [
   {
     id: "sahne",
     label: "Sahne",
-    bg: "#ffb3ba",
+    bg: "#f18fa0",
     image: sahne,
     side: "left",
     route: "/olustur",
@@ -32,8 +34,8 @@ const cards = [
   {
     id: "monolog",
     label: "Monolog",
-    bg: "#bbffc9",
-    image: fineday,
+    bg: "#9dce9d",
+    image: monolog,
     side: "right",
     bottomOffset: "top-0 left-0 w-full h-full",
     options: ["Editöre Git"],
@@ -43,7 +45,7 @@ const cards = [
   {
     id: "yanyana",
     label: "Yan Yana",
-    bg: "#bae1ff",
+    bg: "#91c5e5",
     image: yanyana,
     side: "left",
     bottomOffset: "top-0 left-0 w-full h-full",
@@ -54,10 +56,10 @@ const cards = [
   {
     id: "tersyuz",
     label: "Tersyüz",
-    bg: "#fdfd96",
-    image: camasir,
+    bg: "#f5d35e",
+    image: tersyuz,
     side: "right",
-    bottomOffset: "sm:-bottom-10 sm:-left-10 w-90 h-90",
+    bottomOffset: "top-0 left-0 w-full h-full",
     options: ["Editöre Git"],
     sentence: "Herkesin hayran olduğu, bana delilik.",
     description: "Mizahın, ironilerin, ters köşelerin. Kuralları baştan yaz.",

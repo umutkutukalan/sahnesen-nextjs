@@ -41,7 +41,7 @@ export default async function SearchUsersPage({ searchParams }: PageProps) {
           <Link
             key={u.id}
             href={`/profil/${u.username}`}
-            className="p-4 border-b border-gray-100 transition-colors flex items-center gap-5 hover:bg-gray-50 rounded-lg"
+            className="p-4 border-b border-gray-100 transition-colors flex items-center gap-5"
           >
             <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
               {userProfileImgUrl ? (
