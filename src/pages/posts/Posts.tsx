@@ -67,8 +67,8 @@ const Posts = ({
                   {/* PROJE / İÇERİK LİSTESİ */}
                   <div className="pt-5 space-y-4">
                     {posts.length > 0 ? (
-                      posts.map((post) => (
-                        <PostCard key={post?.id} post={post} />
+                      posts.map((post, index) => (
+                        <PostCard key={post?.id || index} post={post} />
                       ))
                     ) : (
                       <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">

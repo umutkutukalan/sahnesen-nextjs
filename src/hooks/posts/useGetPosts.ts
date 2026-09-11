@@ -3,14 +3,14 @@ import {
   getFollowingPostsClient,
 } from "@/services/client/post.service";
 import { PostResponse } from "@/services/server/post.service";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export const useGetPosts = (
   initialPosts: PostResponse[],
   initialPage: number,
   initialTotalPages: number,
   postType?: string,
-  feedScope: "all" | "following" = "all", // 🔑 Akış kapsamı eklendi
+  feedScope: "all" | "following" = "all",
 ) => {
   const [posts, setPosts] = useState<PostResponse[]>(initialPosts);
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -18,8 +18,17 @@ export const useGetPosts = (
   const [hasMore, setHasMore] = useState(initialPage + 1 < initialTotalPages);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // İlk render'da useEffect'in gereksiz yere tekrar fetch atmasını engellemek için flag
+  const isFirstRender = useRef(true);
+
   // 🔑 feedScope veya postType değiştiğinde verileri baştan çek
   useEffect(() => {
+    // İlk mount anında sunucudan (SSR) gelen initialPosts verisini koru, tekrar istek atma
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const fetchFilteredPosts = async () => {
       setIsLoadingMore(true);
       try {
