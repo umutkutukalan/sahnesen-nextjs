@@ -1,26 +1,23 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { FaTicketSimple } from "react-icons/fa6";
 import { LiaTheaterMasksSolid } from "react-icons/lia";
 import { TbTheater } from "react-icons/tb";
 
 interface PageAboutProps {
   feedScope: "all" | "following";
-  onSelectFeedScope: (scope: "all" | "following") => void;
   selectedType: string | undefined;
   onSelectType: (type: string | undefined) => void;
 }
 
 const PageAbout = ({
   feedScope,
-  onSelectFeedScope,
   selectedType,
   onSelectType,
 }: PageAboutProps) => {
   const pathname = usePathname();
-
-  // (/profil, /username/profil veya içinde "profil" geçiyorsa)
   const isProfilePage = pathname?.includes("profil");
 
   const handleSelectType = (type: string) => {
@@ -34,39 +31,39 @@ const PageAbout = ({
   return (
     <div
       className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
-      style={{
-        height: "64px",
-      }}
+      style={{ height: "64px" }}
     >
       {!isProfilePage && (
         <div className="w-full flex items-center gap-6 pt-3 px-1">
-          <button
-            type="button"
+          {/* Fuaye Sekmesi */}
+          <Link
+            href="/"
             className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
-              feedScope === "all" ? "border-b-2 border-black text-black" : ""
+              feedScope === "all"
+                ? "border-b-2 border-black text-black"
+                : "text-gray-500 hover:text-black"
             }`}
-            onClick={() => onSelectFeedScope("all")}
           >
             <TbTheater className="text-xl" />
             <span className="text-xs">Fuaye</span>
-          </button>
+          </Link>
 
-          <button
-            type="button"
+          {/* Sahnemdekiler Sekmesi */}
+          <Link
+            href="/sahnemdekiler"
             className={`pb-4 flex items-center gap-1.5 cursor-pointer transition-all ${
               feedScope === "following"
                 ? "border-b-2 border-black text-black"
-                : ""
+                : "text-gray-500 hover:text-black"
             }`}
-            onClick={() => onSelectFeedScope("following")}
           >
             <LiaTheaterMasksSolid className="text-xl" />
             <span className="text-xs">Sahnemdekiler</span>
-          </button>
+          </Link>
         </div>
       )}
 
-      {/* 2. İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
+      {/* İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
       <div className="w-full relative h-14 flex items-end justify-between">
         <ul
           className={`w-full relative z-50 flex ${isProfilePage ? "justify-start" : "justify-end"} gap-6 overflow-x-auto scrollbar-hide`}

@@ -11,19 +11,15 @@ interface Props {
   initialPosts: PostResponse[];
   initialPage: number;
   totalPages: number;
+  feedScope?: "all" | "following"; // Prop eklendi
 }
 
 export default function PostsClient({
   initialPosts,
   initialPage,
   totalPages,
+  feedScope = "all",
 }: Props) {
-  console.log("PostsClient rendered with props:", {
-    initialPosts,
-    initialPage,
-    totalPages,
-  });
-
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
@@ -36,6 +32,7 @@ export default function PostsClient({
           initialPosts={initialPosts}
           initialPage={initialPage}
           totalPages={totalPages}
+          feedScope={feedScope}
         />
       </div>
     </>

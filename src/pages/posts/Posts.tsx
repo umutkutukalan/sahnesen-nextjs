@@ -12,18 +12,21 @@ interface PostsProps {
   initialPosts: PostResponse[];
   initialPage: number;
   totalPages: number;
+  feedScope: "all" | "following";
 }
 
-const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
-  // 🔑 Akış kaynağı state'i ("all" veya "following")
-  const [feedScope, setFeedScope] = useState<"all" | "following">("all");
-
+const Posts = ({
+  initialPosts,
+  initialPage,
+  totalPages,
+  feedScope,
+}: PostsProps) => {
   // Aktif filtrenin state'i (undefined = Tümü)
   const [selectedPostType, setSelectedPostType] = useState<string | undefined>(
     undefined,
   );
 
-  // useGetPosts hook'una feedScope ve postType'ı aktarıyoruz
+  // useGetPosts hook'una dışarıdan gelen feedScope'u aktarıyoruz
   const { posts, isLoadingMore, hasMore, loadMorePosts, currentPage } =
     useGetPosts(
       initialPosts,
@@ -56,7 +59,6 @@ const Posts = ({ initialPosts, initialPage, totalPages }: PostsProps) => {
                   >
                     <PageAbout
                       feedScope={feedScope}
-                      onSelectFeedScope={(scope) => setFeedScope(scope)}
                       selectedType={selectedPostType}
                       onSelectType={(postType) => setSelectedPostType(postType)}
                     />
