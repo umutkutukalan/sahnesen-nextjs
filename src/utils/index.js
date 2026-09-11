@@ -8,30 +8,15 @@ import profileborder from "../../public/images/profileborder.webp";
 import undrawloveit from "../../public/svg/undrawloveit.svg";
 import undrawaddfiles from "../../public/svg/undrawaddfiles.svg";
 
-import quickdraw from "../../public/images/quickdraw.png";
-import pullshark from "../../public/images/pullshark.png";
-import yolo from "../../public/images/yolo.png";
-import duck2 from "../../public/images/duck2.jpg";
-import duck3 from "../../public/images/duck3.jpg";
-import duck4 from "../../public/images/duck4.jpg";
-import duck5 from "../../public/images/duck5.jpg";
-import duck7 from "../../public/images/duck7.jpg";
-
-import penguinandgirl from "../../public/images/penguinandgirl.png";
-import rabbit from "../../public/images/rabbit.png";
-
-import card1 from "../../public/images/card1.png";
 import yanyana from "../../public/images/yanyana.png";
 import monolog from "../../public/images/monolog.png";
 import sahne from "../../public/images/sahne.png";
-import etut from "../../public/images/etut.png";
 import tersyuz from "../../public/images/tersyuz.png";
 import sahnelerim from "../../public/images/sahnelerim.png";
 import koleksiyonlar from "../../public/images/koleksiyonlar.png";
 import collectiondefault from "../../public/images/collectiondefault.png";
 import sahnekoltuklari from "../../public/images/sahnekoltuklari.png";
 import sahnekoltuklaridevami from "../../public/images/sahnekoltuklaridevami.png";
-import sahneisiklari from "../../public/images/sahneisiklari.png";
 import sahnemikrofonu from "../../public/images/sahnemikrofonu.png";
 import hali from "../../public/images/hali.png";
 
@@ -44,23 +29,18 @@ import profilebordertwo from "../../public/images/profilebordertwo.png";
 import profilebg from "../../public/images/profilebg.jpg";
 
 import tire from "../../public/images/tire.png";
-import kurucusahne from "../../public/images/sahnesen_rozet.png";
 
 export {
   tire,
   monolog,
   sahne,
-  card1,
   yanyana,
-  camasir,
-  etut,
   tersyuz,
   sahnelerim,
   koleksiyonlar,
   collectiondefault,
   sahnekoltuklari,
   sahnekoltuklaridevami,
-  sahneisiklari,
   sahnemikrofonu,
   hali,
   arkaplan,
@@ -69,12 +49,7 @@ export {
   solperde,
   profilebordertwo,
   profilebg,
-  kurucusahne,
 };
 
 export { ressam, runner, walker, loginpageimg, profileborder };
 export { undrawloveit, undrawaddfiles };
-export { quickdraw, pullshark, yolo };
-export { duck2, duck3, duck4, duck5, duck7 };
-
-export { penguinandgirl, rabbit };
