@@ -273,6 +273,8 @@ export default function FoyerPage({ params }: FoyerPageProps) {
     }
   };
 
+  const userName = `${user?.name || ""} ${user?.surname || ""}`.trim();
+
   const authorName =
     `${post?.authorName || ""} ${post?.authorSurname || ""}`.trim();
 
@@ -384,7 +386,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1 text-xs text-gray-600">
                       <span className="truncate hover:underline">
-                        {authorName || "Yazar"}
+                        {userName || "Yazar"}
                       </span>
                       <TbRosetteDiscountCheckFilled
                         className="text-blue-500 shrink-0 text-xs"
@@ -443,7 +445,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1 text-xs text-gray-600">
                     <span className="truncate hover:underline">
-                      {authorName || "Yazar"}
+                      {userName || "Yazar"}
                     </span>
                     <TbRosetteDiscountCheckFilled
                       className="text-blue-500 shrink-0 text-xs"
@@ -488,7 +490,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
         <div className="flex flex-col gap-6">
           {comments.length === 0 ? (
             <p className="text-xs text-gray-400 italic py-6 text-center">
-              Henüz bu fuayeye bir mektup bırakılmamış. İlk mektubu sen yaz!
+              Henüz bu fuayeye bir not bırakılmamış.
             </p>
           ) : (
             comments.map((comment) => {
