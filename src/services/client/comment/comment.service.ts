@@ -1,4 +1,3 @@
-import axios from "axios";
 import api from "../config";
 
 export interface CommentRequest {
@@ -22,7 +21,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 export const commentService = {
   // Bir yazıya ait tüm fuaye mektuplarını getir
   async getComments(postId: number): Promise<CommentResponse[]> {
-    const response = await axios.get<CommentResponse[]>(
+    const response = await api.get<CommentResponse[]>(
       `${API_URL}/api/posts/${postId}/comments`,
       { withCredentials: true },
     );
@@ -34,7 +33,7 @@ export const commentService = {
     postId: number,
     data: CommentRequest,
   ): Promise<CommentResponse> {
-    const response = await axios.post<CommentResponse>(
+    const response = await api.post<CommentResponse>(
       `${API_URL}/api/posts/${postId}/comments`,
       data,
       { withCredentials: true },

@@ -1,7 +1,6 @@
 "use client";
 
 import api from "@/services/client/config";
-import axios from "axios";
 import {
   createContext,
   Dispatch,
