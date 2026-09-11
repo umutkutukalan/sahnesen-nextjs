@@ -6,8 +6,7 @@ import { RiComputerFill, RiMenu4Line } from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
 import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
-import axios from "axios";
-import { useAuth } from "../../context/UserContext";
+import { PublicUser, useAuth } from "../../context/UserContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { FiSearch } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
@@ -35,7 +34,7 @@ const Navbar = ({
   transparent: boolean;
   isProfile?: boolean;
 }) => {
-  const { user, setUser } = useAuth();
+  const { user, logout } = useAuth();
   const { toggleSidebar, toggleProfileSidebar } = useSidebar();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -146,26 +145,6 @@ const Navbar = ({
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post(
-        "http://localhost:8080/auth/logout",
-        {},
-        { withCredentials: true },
-      );
-      setUser(null);
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
-    } catch (error) {
-      console.error("Logout failed:", error);
-      localStorage.removeItem("user");
-      localStorage.clear();
-      setUser(null);
-      window.location.href = "/";
-    }
-  };
-
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isProfilePage = pathname?.startsWith("/profil") ?? false;
@@ -255,7 +234,7 @@ const Navbar = ({
                               Kişiler
                             </h3>
                           </div>
-                          {usersResults.map((u: any) => {
+                          {usersResults.map((u: PublicUser) => {
                             return (
                               <Link
                                 key={u.id}
@@ -422,7 +401,7 @@ const Navbar = ({
                     ))}
                     <button
                       className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                      onClick={handleLogout}
+                      onClick={logout}
                     >
                       <CiLogout />
                       Çıkış Yap
@@ -449,7 +428,7 @@ const Navbar = ({
                         ))}
                         <button
                           className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                          onClick={handleLogout}
+                          onClick={logout}
                         >
                           <CiLogout />
                           Çıkış Yap
