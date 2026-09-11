@@ -14,6 +14,7 @@ import { getFullImageUrl } from "@/utils/image";
 import Image from "next/image";
 import {
   hali,
+  kurucusahne,
   sahnekoltuklari,
   sahnekoltuklaridevami,
   sahnemikrofonu,
@@ -57,7 +58,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   const [loadingRepliesId, setLoadingRepliesId] = useState<number | null>(null);
 
   const [content, setContent] = useState("");
-  const maxLength = 400; // Maksimum karakter sınırı
+  const maxLength = 1000; // Maksimum karakter sınırı
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { formatRelativeTime } = useRelativeTime();
@@ -359,7 +360,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
       </div>
 
       {/* Kaydırılabilir İçerik Alanı */}
-      <div className="relative w-full h-full pt-45 pb-10 px-4 md:px-0 flex flex-col gap-4 z-10">
+      <div className="relative w-full h-full pt-45 pb-10 px-4 md:px-0 flex flex-col gap-6 z-10">
         {/* ÜST NAVİGASYON VE BAŞLIK */}
         <div className="flex flex-col gap-4 pb-2">
           <div className="flex items-center justify-between">
@@ -386,11 +387,13 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1 text-xs text-gray-600">
                       <span className="truncate hover:underline">
-                        {userName || "Yazar"}
+                        {authorName || "Yazar"}
                       </span>
-                      <TbRosetteDiscountCheckFilled
-                        className="text-blue-500 shrink-0 text-xs"
-                        title="Onaylı Yazar"
+                      <Image
+                        src={kurucusahne}
+                        alt="Kurucu Sahne"
+                        width={10}
+                        height={10}
                       />
                     </div>
                   </div>
@@ -447,9 +450,11 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                     <span className="truncate hover:underline">
                       {userName || "Yazar"}
                     </span>
-                    <TbRosetteDiscountCheckFilled
-                      className="text-blue-500 shrink-0 text-xs"
-                      title="Onaylı Yazar"
+                    <Image
+                      src={kurucusahne}
+                      alt="Kurucu Sahne"
+                      width={10}
+                      height={10}
                     />
                   </div>
                 </div>
@@ -487,7 +492,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
         )}
 
         {/* MEKTUPLAR VE YANITLAR LİSTESİ */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 mt-4">
           {comments.length === 0 ? (
             <p className="text-xs text-gray-400 italic py-6 text-center">
               Henüz bu fuayeye bir not bırakılmamış.
@@ -519,9 +524,17 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                         )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-800">
-                          {comment.authorName} {comment.authorSurname}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-medium text-gray-800">
+                            {comment.authorName} {comment.authorSurname}
+                          </span>
+                          <Image
+                            src={kurucusahne}
+                            alt="Kurucu Sahne"
+                            width={10}
+                            height={10}
+                          />
+                        </div>
                         <span className="text-[10px] text-gray-500">
                           {formatRelativeTime(comment.createdAt)}
                         </span>
