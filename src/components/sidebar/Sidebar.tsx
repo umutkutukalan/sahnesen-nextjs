@@ -7,12 +7,12 @@ import { RiUser6Line } from "react-icons/ri";
 import { SiWikibooks } from "react-icons/si";
 import { BiBookmarkAlt } from "react-icons/bi";
 import { IoSparklesOutline } from "react-icons/io5";
-import { FiUsers } from "react-icons/fi";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import StickySiteRules from "../PageStickyExtra/StickySiteRules";
 import Notebook from "../PageStickyExtra/Notebook";
-import LikedPost from "../PageStickyExtra/LikedPost";
+import CommunityFollows from "./CommunityFollows";
+import { LiaTheaterMasksSolid } from "react-icons/lia";
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -28,7 +28,7 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`hidden lg:flex h-[calc(100vh-64px)] sticky top-16 flex-col justify-between bg-white z-40 transition-all duration-300 ease-in-out overflow-hidden shrink-0 ${
+      className={`hidden lg:flex h-[calc(100vh-64px)] sticky top-16 flex-col justify-between bg-white z-40 transition-all duration-500 ease-in-out overflow-hidden shrink-0 ${
         isSidebarOpen
           ? "w-60 opacity-100 border-r border-gray-100 px-6 py-8"
           : "w-0 opacity-0 border-r-0 px-0 py-8 pointer-events-none"
@@ -36,7 +36,7 @@ const Sidebar = () => {
     >
       <div className="w-48 h-full flex flex-col justify-between gap-4 flex-shrink-0">
         <div className="flex flex-col gap-5">
-          <div className="border-b border-gray-100 pb-10">
+          <div className="border-b border-gray-100 pb-6">
             {user ? (
               <ul className="flex flex-col gap-5">
                 <Link
@@ -83,6 +83,7 @@ const Sidebar = () => {
                   <BiBookmarkAlt className="text-[22px]" />
                   <span className="text-[15px]">Koleksiyon</span>
                 </Link>
+                <Notebook />
                 <Link
                   href={`/etki`}
                   className={`flex items-center gap-4 cursor-pointer transition-colors ${
@@ -109,19 +110,12 @@ const Sidebar = () => {
                   : "text-gray-500 hover:text-black"
               }`}
             >
-              <FiUsers className="text-[22px]" />
-              <span className="text-[15px]">Topluluk</span>
+              <LiaTheaterMasksSolid className="text-[22px]" />
+              <span className="text-[15px]">Sahnemdekiler</span>
             </li>
+            {user && <CommunityFollows username={user.username} />}
           </ul>
         </div>
-        <ul className="flex flex-col gap-4 pt-5">
-          <li>
-            <Notebook />
-          </li>
-          <li>
-            <LikedPost type="projects" />
-          </li>
-        </ul>
       </div>
     </aside>
   );
