@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../config";
 
 export interface CommentRequest {
   content: string;
@@ -37,6 +38,17 @@ export const commentService = {
       `${API_URL}/api/posts/${postId}/comments`,
       data,
       { withCredentials: true },
+    );
+    return response.data;
+  },
+
+  async getReplies(
+    commentId: number,
+    page: number = 0,
+    size: number = 5,
+  ): Promise<CommentResponse[]> {
+    const response = await api.get(
+      `/api/posts/comments/${commentId}/replies?page=${page}&size=${size}`,
     );
     return response.data;
   },
