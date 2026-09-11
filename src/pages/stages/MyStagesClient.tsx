@@ -1,4 +1,4 @@
-// MyStagesClient.tsx (Arşiv Sekmesi, Sayımları ve İşlemleri Tam Entegre Edilmiş Hali)
+// MyStagesClient.tsx
 
 "use client";
 
@@ -16,13 +16,32 @@ import Image from "next/image";
 import { sahnelerim } from "@/utils";
 import { FaTicketSimple } from "react-icons/fa6";
 import api from "@/services/client/config";
+import { useRouter, useSearchParams } from "next/navigation";
+
+type TabType = "PUBLISHED" | "DRAFT" | "ARCHIVE";
 
 export default function MyStagesClient() {
   const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<"PUBLISHED" | "DRAFT" | "ARCHIVE">(
-    "PUBLISHED",
-  );
+  // URL'deki "q" parametresini oku (varsayılan: sahnede)
+  const qParam = searchParams?.get("q");
+
+  // URL parametresini state'e çeviren yardımcı fonksiyon
+  const getTabFromParam = (param?: string | null): TabType => {
+    switch (param) {
+      case "taslaklar":
+        return "DRAFT";
+      case "arsiv":
+        return "ARCHIVE";
+      case "sahnede":
+      default:
+        return "PUBLISHED";
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromParam(qParam));
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
   );
@@ -40,12 +59,25 @@ export default function MyStagesClient() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // URL değiştiğinde (tarayıcı ileri/geri tuşları vs.) activeTab'i güncelle
+  useEffect(() => {
+    const tabFromUrl = getTabFromParam(searchParams?.get("q"));
+    setActiveTab(tabFromUrl);
+  }, [searchParams]);
+
+  // Sekme değiştirildiğinde URL'i güncelleyen fonksiyon
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    let queryVal = "sahnede";
+    if (tab === "DRAFT") queryVal = "taslaklar";
+    if (tab === "ARCHIVE") queryVal = "arsiv";
+
+    // Sayfayı yenilemeden URL'i değiştir
+    router.push(`/sahnelerim?q=${queryVal}`, { scroll: false });
+  };
+
   const fetchMyPosts = useCallback(
-    async (
-      selectedTab: "PUBLISHED" | "DRAFT" | "ARCHIVE",
-      pageNum: number,
-      postType?: string,
-    ) => {
+    async (selectedTab: TabType, pageNum: number, postType?: string) => {
       setLoading(true);
       try {
         let isPublished: boolean | undefined = undefined;
@@ -116,8 +148,6 @@ export default function MyStagesClient() {
     }
   };
 
-  console.log("posts", posts);
-
   if (authLoading) return <LoadingScreen />;
   if (!user) return <Home />;
 
@@ -171,10 +201,10 @@ export default function MyStagesClient() {
           className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
           style={{ height: "48px" }}
         >
-          {/* Sol taraf: Sekmeler */}
+          {/* Sol taraf: Sekmeler (URL Query Entegreli) */}
           <div className="flex space-x-6">
             <button
-              onClick={() => setActiveTab("PUBLISHED")}
+              onClick={() => handleTabChange("PUBLISHED")}
               className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "PUBLISHED"
                   ? "text-black border-b-2 border-black"
@@ -184,7 +214,7 @@ export default function MyStagesClient() {
               Sahnede
             </button>
             <button
-              onClick={() => setActiveTab("DRAFT")}
+              onClick={() => handleTabChange("DRAFT")}
               className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "DRAFT"
                   ? "text-black border-b-2 border-black"
@@ -194,7 +224,7 @@ export default function MyStagesClient() {
               Taslaklar
             </button>
             <button
-              onClick={() => setActiveTab("ARCHIVE")}
+              onClick={() => handleTabChange("ARCHIVE")}
               className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "ARCHIVE"
                   ? "text-black border-b-2 border-black"

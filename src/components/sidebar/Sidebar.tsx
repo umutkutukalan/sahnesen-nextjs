@@ -103,16 +103,17 @@ const Sidebar = () => {
             )}
           </div>
           <ul className="flex flex-col gap-5">
-            <li
+            <Link
+              href={`/sahnemdekiler`}
               className={`flex items-center gap-4 cursor-pointer transition-colors ${
-                isActive("/topluluk")
+                isActive("/sahnemdekiler")
                   ? "text-black font-medium"
                   : "text-gray-500 hover:text-black"
               }`}
             >
               <LiaTheaterMasksSolid className="text-[22px]" />
               <span className="text-[15px]">Sahnemdekiler</span>
-            </li>
+            </Link>
             {user && <CommunityFollows username={user.username} />}
           </ul>
         </div>
