@@ -1,3 +1,4 @@
+import { BookmarkCollection } from "../collection/collection.service";
 import api from "../config";
 
 export type ReactionType =
@@ -6,13 +7,6 @@ export type ReactionType =
   | "SHINE_MONOLOG"
   | "SHINE_YANYANA"
   | "SHINE_TERSYUZ";
-
-export interface BookmarkCollection {
-  id: number;
-  name: string;
-  description?: string;
-  isDefault: boolean;
-}
 
 export interface PostInteractionStatus {
   isLiked: boolean;

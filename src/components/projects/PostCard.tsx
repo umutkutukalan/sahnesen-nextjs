@@ -130,7 +130,7 @@ const PostCard = ({
 
   return (
     <div
-      className={`w-full lg:h-[220px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex select-none transition-all duration-300 ease-in-out gap-10 ${
+      className={`w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex select-none transition-all duration-300 ease-in-out gap-10 ${
         isOwner ? "overflow-visible" : "overflow-hidden"
       }`}
     >

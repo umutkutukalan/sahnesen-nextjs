@@ -3,7 +3,7 @@ import PostsClient from "@/pages/posts/PostsClient";
 // import { getFollowingPostsServer } from "@/services/server/post.service";
 
 export default async function SahnemdekilerPage() {
-  let data = { content: [], number: 0, totalPages: 0 };
+  const data = { content: [], number: 0, totalPages: 0 };
 
   try {
     // Örnek: data = await getFollowingPostsServer(0, 5);

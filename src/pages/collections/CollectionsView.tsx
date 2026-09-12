@@ -21,12 +21,15 @@ import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useAuth } from "@/context/UserContext";
 import { FiMoreHorizontal, FiUser } from "react-icons/fi";
 import { useToProfile } from "@/utils/useToProfile";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface CollectionsViewProps {
   initialPosts: PostResponse[];
   initialPage: number;
   totalPages: number;
 }
+
+type TabType = "liked" | "bookmarked";
 
 export default function CollectionsView({
   initialPosts,
@@ -35,7 +38,23 @@ export default function CollectionsView({
 }: CollectionsViewProps) {
   const { user } = useAuth();
   const { ToProfile } = useToProfile();
-  const [activeTab, setActiveTab] = useState<"liked" | "bookmarked">("liked");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const qParam = searchParams?.get("q");
+
+  // Varsayılan durum (parametre yoksa) -> bookmarked (Koleksiyonlar)
+  const getTabFromParam = (param: string | null): TabType => {
+    switch (param) {
+      case "begenilenler":
+        return "liked";
+      case "koleksiyonlar":
+      default:
+        return "bookmarked";
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromParam(qParam));
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined,
   );
@@ -48,18 +67,15 @@ export default function CollectionsView({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
 
-  // Kaydedilenler sekmesindeyken seçilen özel koleksiyon
   const [selectedCollection, setSelectedCollection] =
     useState<BookmarkCollection | null>(null);
   const [collectionPosts, setCollectionPosts] = useState<PostResponse[]>([]);
   const [collectionPostsLoading, setCollectionPostsLoading] = useState(false);
 
-  // Koleksiyon içi sayfalama state'leri
   const [collectionPage, setCollectionPage] = useState(0);
   const [hasMoreCollectionPosts, setHasMoreCollectionPosts] = useState(true);
   const [isCollectionLoadingMore, setIsCollectionLoadingMore] = useState(false);
 
-  // Kullanıcının özel koleksiyonları
   const [userCollections, setUserCollections] = useState<BookmarkCollection[]>(
     [],
   );
@@ -71,7 +87,14 @@ export default function CollectionsView({
   const { posts, isLoadingMore, hasMore, loadMorePosts, fetchPostsByType } =
     useGetCollectionsPosts(initialPosts, initialPage, totalPages);
 
-  // Dışarı tıklandığında üç nokta menüsünü kapat
+  useEffect(() => {
+    const tabFromUrl = getTabFromParam(searchParams.get("q"));
+    setActiveTab(tabFromUrl);
+    if (tabFromUrl === "bookmarked" && selectedCollection) {
+      setSelectedCollection(null);
+    }
+  }, [searchParams, selectedCollection]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -88,12 +111,11 @@ export default function CollectionsView({
     };
   }, [activeMenuId]);
 
-  // Kaydedilenler sekmesindeyken ve bir koleksiyona girilmemişse koleksiyonları çek
   useEffect(() => {
-    if (activeTab === "bookmarked" && !selectedCollection) {
+    if (activeTab === "bookmarked" && !selectedCollection && user) {
       fetchUserCollections();
     }
-  }, [activeTab, selectedCollection]);
+  }, [activeTab, selectedCollection, user]);
 
   const fetchUserCollections = async () => {
     setCollectionsLoading(true);
@@ -107,7 +129,6 @@ export default function CollectionsView({
     }
   };
 
-  // Koleksiyon içeriklerini sayfalı ve filtreli çekme
   const fetchCollectionPosts = useCallback(
     async (
       collectionId: number,
@@ -142,7 +163,6 @@ export default function CollectionsView({
     [],
   );
 
-  // Koleksiyon seçildiğinde veya tür filtresi değiştiğinde sıfırdan yükle
   useEffect(() => {
     if (selectedCollection) {
       fetchCollectionPosts(selectedCollection.id, selectedType, 0, false);
@@ -166,13 +186,17 @@ export default function CollectionsView({
     }
   };
 
-  const handleTabChange = (tab: "liked" | "bookmarked") => {
-    if (activeTab === tab && !selectedCollection) return;
+  const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     setSelectedCollection(null);
     setSelectedType(undefined);
+
+    // Beğeniler için ?q=begenilenler, Koleksiyonlar için direkt temiz /koleksiyonlar yolu
     if (tab === "liked") {
+      router.push(`/koleksiyonlar?q=begenilenler`, { scroll: false });
       fetchPostsByType("liked", undefined);
+    } else {
+      router.push(`/koleksiyonlar`, { scroll: false });
     }
   };
 
@@ -185,7 +209,6 @@ export default function CollectionsView({
     }
   };
 
-  // Sonsuz kaydırma hook'u (Hem beğenilenler hem koleksiyon içi detay için)
   const loadMoreRef = useInfiniteScroll(
     () => {
       if (activeTab === "liked") {
@@ -269,7 +292,6 @@ export default function CollectionsView({
           </div>
         </div>
 
-        {/* Yeni Koleksiyon Oluştur Butonu */}
         {activeTab === "bookmarked" && !selectedCollection && (
           <button
             onClick={() => {
@@ -285,12 +307,11 @@ export default function CollectionsView({
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* Üst Sekmeler ve Tür Filtreleri */}
         <div
           className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
           style={{ height: "48px" }}
         >
-          {/* Sol taraf: Sekmeler */}
+          {/* Sol taraf: Sekmeler (Beğenilenler & Koleksiyonlar) */}
           <div className="flex space-x-6">
             <button
               onClick={() => handleTabChange("liked")}
@@ -559,7 +580,6 @@ export default function CollectionsView({
                             </div>
                           </div>
 
-                          {/* Üç Nokta Butonu ve Açılır Menü */}
                           <div className="relative">
                             <button
                               onClick={(e) => {
@@ -618,7 +638,7 @@ export default function CollectionsView({
             ) : (
               <div className="">
                 <p className="text-gray-500 text-xs">
-                  Henüz beğendiğin bir sahne bulunmuyor.
+                  Henüz koleksiyonun bulunmuyor.
                 </p>
               </div>
             )
