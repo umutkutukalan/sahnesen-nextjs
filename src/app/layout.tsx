@@ -5,6 +5,7 @@ import { UserProvider } from "@/context/UserContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import QueryProvider from "@/providers/QueryProvider";
 import ScrollToTop from "@/components/ScrollToTop";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +35,10 @@ export default function RootLayout({
         <QueryProvider>
           <UserProvider>
             <SidebarProvider>
-              <ScrollToTop />
-              {children}
+              <NotificationProvider>
+                <ScrollToTop />
+                {children}
+              </NotificationProvider>
             </SidebarProvider>
           </UserProvider>
         </QueryProvider>

@@ -5,12 +5,11 @@ import { FaRegUser } from "react-icons/fa6";
 import {
   RiComputerFill,
   RiMenu4Line,
-  RiNotification2Fill,
   RiNotification2Line,
 } from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
-import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoSettingsOutline } from "react-icons/io5";
 import { PublicUser, useAuth } from "../../context/UserContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { FiSearch } from "react-icons/fi";
@@ -31,6 +30,7 @@ import { getFullImageUrl } from "@/utils/image";
 import { PostSummaryResponse } from "@/services/server/post.service";
 import { TagResponse } from "@/services/client/tags/tag.service";
 import { LuImages } from "react-icons/lu";
+import { useNotifications } from "@/context/NotificationContext";
 
 const Navbar = ({
   transparent,
@@ -40,6 +40,7 @@ const Navbar = ({
   isProfile?: boolean;
 }) => {
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const { toggleSidebar, toggleProfileSidebar } = useSidebar();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -345,16 +346,25 @@ const Navbar = ({
                 <NavLinks href="/olustur" logo={<ImPencil2 />} />
               </div>
             )}
-            <div className="relative">
-              <div className="absolute -top-3 -right-2 min-w-[20px] min-h-[20px] bg-white rounded-sm flex items-center justify-center">
-                <div className="w-[8px] px-2 min-h-[16px] rounded-sm bg-green-900 flex items-center justify-center">
-                  <p className="text-white text-[10px]">15</p>
+            {user && (
+              <div className="relative">
+                {unreadCount > 0 && (
+                  <div className="absolute -top-3 -right-2 min-w-[20px] min-h-[20px] bg-white rounded-sm flex items-center justify-center z-10">
+                    <div className="w-[8px] px-2 min-h-[16px] rounded-sm bg-green-900 flex items-center justify-center">
+                      <p className="text-white text-[10px] font-medium">
+                        {unreadCount}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="text-[20px]">
+                  <NavLinks
+                    href="/bildirimler"
+                    logo={<RiNotification2Line />}
+                  />
                 </div>
               </div>
-              <div className="text-[20px]">
-                <NavLinks href="/" logo={<RiNotification2Line />} />
-              </div>
-            </div>
+            )}
             {!user && (
               <button
                 className={`transition-all text-sm cursor-pointer ${
