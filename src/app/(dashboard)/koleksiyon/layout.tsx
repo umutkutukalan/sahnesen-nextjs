@@ -77,10 +77,10 @@ export default function KoleksiyonlarLayout({
 
   const types = [
     { name: "Tümü", value: undefined, color: undefined },
-    { name: "Sahne", value: "SAHNE", color: "#c86b5a" },
-    { name: "Monolog", value: "MONOLOG", color: "#66788a" },
-    { name: "Yan Yana", value: "YANYANA", color: "#789680" },
-    { name: "Tersyüz", value: "TERSYUZ", color: "#f4d45f" },
+    { name: "Sahne", value: "SAHNE", color: "#f18fa0" },
+    { name: "Monolog", value: "MONOLOG", color: "#9dce9d" },
+    { name: "Yan Yana", value: "YANYANA", color: "#91c5e5" },
+    { name: "Tersyüz", value: "TERSYUZ", color: "#f5d35e" },
   ];
 
   return (

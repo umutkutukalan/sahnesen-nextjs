@@ -258,13 +258,13 @@ export default function MyStagesClient() {
                     : "text-gray-400 hover:text-gray-700"
                 }`}
                 style={{
-                  borderColor: selectedType === "SAHNE" ? "#c86b5a" : undefined,
+                  borderColor: selectedType === "SAHNE" ? "#f18fa0" : undefined,
                 }}
                 onClick={() => handleSelectType("SAHNE")}
               >
                 <FaTicketSimple
                   className="text-base"
-                  style={{ color: "#c86b5a" }}
+                  style={{ color: "#f18fa0" }}
                 />
                 <span className="text-xs">Sahne</span>
               </button>
@@ -278,13 +278,13 @@ export default function MyStagesClient() {
                 }`}
                 style={{
                   borderColor:
-                    selectedType === "MONOLOG" ? "#66788a" : undefined,
+                    selectedType === "MONOLOG" ? "#9dce9d" : undefined,
                 }}
                 onClick={() => handleSelectType("MONOLOG")}
               >
                 <FaTicketSimple
                   className="text-base"
-                  style={{ color: "#66788a" }}
+                  style={{ color: "#9dce9d" }}
                 />
                 <span className="text-xs">Monolog</span>
               </button>
@@ -298,13 +298,13 @@ export default function MyStagesClient() {
                 }`}
                 style={{
                   borderColor:
-                    selectedType === "YANYANA" ? "#789680" : undefined,
+                    selectedType === "YANYANA" ? "#91c5e5" : undefined,
                 }}
                 onClick={() => handleSelectType("YANYANA")}
               >
                 <FaTicketSimple
                   className="text-base"
-                  style={{ color: "#789680" }}
+                  style={{ color: "#91c5e5" }}
                 />
                 <span className="text-xs">Yan Yana</span>
               </button>
@@ -318,13 +318,13 @@ export default function MyStagesClient() {
                 }`}
                 style={{
                   borderColor:
-                    selectedType === "TERSYUZ" ? "#f4d45f" : undefined,
+                    selectedType === "TERSYUZ" ? "#f5d35e" : undefined,
                 }}
                 onClick={() => handleSelectType("TERSYUZ")}
               >
                 <FaTicketSimple
                   className="text-base"
-                  style={{ color: "#f4d45f" }}
+                  style={{ color: "#f5d35e" }}
                 />
                 <span className="text-xs">Tersyüz</span>
               </button>
