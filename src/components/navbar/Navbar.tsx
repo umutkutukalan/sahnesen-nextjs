@@ -2,7 +2,12 @@
 
 import { IoIosPaper } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa6";
-import { RiComputerFill, RiMenu4Line } from "react-icons/ri";
+import {
+  RiComputerFill,
+  RiMenu4Line,
+  RiNotification2Fill,
+  RiNotification2Line,
+} from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
 import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
@@ -336,12 +341,19 @@ const Navbar = ({
 
           <ul className="navbar-links">
             {user && user.role === "ADMIN" && (
-              <div className="text-xl">
+              <div className="text-[20px]">
                 <NavLinks href="/olustur" logo={<ImPencil2 />} />
               </div>
             )}
-            <div className="text-xl">
-              <NavLinks href="/" logo={<IoNotificationsOutline />} />
+            <div className="relative">
+              <div className="absolute -top-3 -right-2 min-w-[20px] min-h-[20px] bg-white rounded-sm flex items-center justify-center">
+                <div className="w-[8px] px-2 min-h-[16px] rounded-sm bg-green-900 flex items-center justify-center">
+                  <p className="text-white text-[10px]">15</p>
+                </div>
+              </div>
+              <div className="text-[20px]">
+                <NavLinks href="/" logo={<RiNotification2Line />} />
+              </div>
             </div>
             {!user && (
               <button
