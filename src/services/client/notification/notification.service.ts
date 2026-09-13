@@ -1,5 +1,20 @@
 import api from "../config";
 
+export interface PublicUserDTO {
+  id: number;
+  username: string;
+  name: string;
+  surname: string;
+  slug: string;
+  profileImg: string;
+  coverImg?: string;
+  bio?: string;
+  motto?: string;
+  city?: string;
+  district?: string;
+  role?: string;
+}
+
 export interface NotificationItem {
   id: number;
   title: string;
@@ -14,6 +29,7 @@ export interface NotificationItem {
   targetUrl: string;
   isRead: boolean;
   createdAt: string;
+  sender?: PublicUserDTO; // 👈 Bildirimi tetikleyen kullanıcı bilgisi
 }
 
 export const notificationService = {
