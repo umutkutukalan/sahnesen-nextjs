@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import {
   AiFillFacebook,
   AiFillGithub,
@@ -77,7 +76,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     if (usernameSlug) {
       getUser(usernameSlug);
     }
-  }, [usernameSlug]);
+  }, [usernameSlug, getUser]);
 
   useEffect(() => {
     if (targetUsername) {
@@ -140,6 +139,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 <div className="w-full max-w-4xl flex flex-col transition-all duration-300">
                   {/* Filtreleme Başlıkları */}
                   <PageAbout
+                    feedScope="all"
                     selectedType={selectedPostType}
                     onSelectType={(type) => setSelectedPostType(type)}
                   />

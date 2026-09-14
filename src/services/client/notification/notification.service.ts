@@ -7,11 +7,6 @@ export interface PublicUserDTO {
   surname: string;
   slug: string;
   profileImg: string;
-  coverImg?: string;
-  bio?: string;
-  motto?: string;
-  city?: string;
-  district?: string;
   role?: string;
 }
 
