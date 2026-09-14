@@ -49,7 +49,7 @@ export default function TakipBildirimleriPage() {
 
   if (followNotifications.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-400 text-sm">
+      <div className="text-xs md:text-sm text-gray-500">
         Takip bildiriminiz bulunmuyor.
       </div>
     );

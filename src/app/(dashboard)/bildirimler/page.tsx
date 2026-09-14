@@ -49,7 +49,7 @@ export default function TumBildirimlerPage() {
 
   if (notifications.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-400 text-sm">
+      <div className="text-xs md:text-sm text-gray-500">
         Hiç bildiriminiz yok.
       </div>
     );
@@ -115,17 +115,13 @@ export default function TumBildirimlerPage() {
             <button
               onClick={toggleFollow}
               disabled={isLoading}
-              className={`px-2 py-1 mr-2 flex items-center justify-center gap-1 border border-gray-300 rounded-full text-[10px] md:text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${
+              className={`px-3 py-1 mr-2 flex items-center justify-center gap-1 rounded-lg text-[10px] md:text-xs cursor-pointer transition-colors ${
                 isFollowing
-                  ? "bg-white text-green-600"
-                  : "bg-white text-green-700 border-gray-300"
+                  ? "bg-green-800 hover:bg-green-700 text-white"
+                  : "bg-blue-800 hover:bg-blue-700 text-white"
               }`}
             >
-              {isFollowing ? (
-                <span>Takip Ediliyor</span>
-              ) : (
-                <span>Takip Et</span>
-              )}
+              {isFollowing ? <span>Takiptesin</span> : <span>Takip Et</span>}
             </button>
           )}
         </div>
