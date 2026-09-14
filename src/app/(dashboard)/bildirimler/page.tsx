@@ -56,23 +56,23 @@ export default function TumBildirimlerPage() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-3">
       {notifications.map((notification) => (
         <div
           key={notification.id}
           onClick={() => !notification.isRead && markAsRead(notification.id)}
-          className={`py-2 transition-colors duration-300 flex items-center justify-between gap-4 ${
+          className={`transition-colors duration-300 flex items-center justify-between gap-4 ${
             notification.isRead
               ? "bg-white"
               : notification.type === "POST_LIKE"
-                ? "bg-green-50 hover:bg-green-100"
+                ? "border-l-3 border-red-600"
                 : notification.type === "FOLLOW"
-                  ? "bg-blue-50 hover:bg-blue-100"
-                  : "bg-white"
+                  ? "border-l-3 border-green-600"
+                  : ""
           }`}
         >
           <Link href={notification.targetUrl || "#"} className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="px-3 py-1 flex items-center gap-2">
               <div className="relative">
                 {!notification.isRead && notification.type === "POST_LIKE" && (
                   <span className="absolute top-0 w-3.5 h-3.5 left-0 z-10">
