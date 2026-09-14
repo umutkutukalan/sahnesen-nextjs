@@ -39,5 +39,11 @@ export const useGetFollowers = () => {
     [page],
   );
 
-  return { followers, setFollowers, isLoading, getFollowers, hasMore };
+  return {
+    followers,
+    setFollowers,
+    getFollowers,
+    getFollowersLoading: isLoading,
+    hasMore,
+  };
 };

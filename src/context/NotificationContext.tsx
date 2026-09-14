@@ -21,6 +21,7 @@ interface NotificationContextType {
   markAsRead: (id: number) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   refetchNotifications: () => void;
+  notificationLoading: boolean;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -35,10 +36,12 @@ export const NotificationProvider = ({
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   const fetchInitialData = useCallback(async () => {
     if (!user) return;
     try {
+      setLoading(true);
       const [notifsData, countData] = await Promise.all([
         notificationService.getNotifications(),
         notificationService.getUnreadCount(),
@@ -47,6 +50,8 @@ export const NotificationProvider = ({
       setUnreadCount(countData);
     } catch (error) {
       console.error("Bildirimler yüklenemedi:", error);
+    } finally {
+      setLoading(false);
     }
   }, [user]);
 
@@ -130,6 +135,7 @@ export const NotificationProvider = ({
         markAsRead,
         markAllAsRead,
         refetchNotifications: fetchInitialData,
+        notificationLoading: loading,
       }}
     >
       {children}

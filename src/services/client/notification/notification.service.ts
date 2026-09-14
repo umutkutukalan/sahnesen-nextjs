@@ -7,6 +7,7 @@ export interface PublicUserDTO {
   surname: string;
   slug: string;
   profileImg: string;
+  isFollowing?: boolean;
   role?: string;
 }
 

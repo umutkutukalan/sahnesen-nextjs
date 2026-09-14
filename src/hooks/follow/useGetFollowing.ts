@@ -39,5 +39,11 @@ export const useGetFollowing = () => {
     [page],
   );
 
-  return { followings, setFollowing, isLoading, getFollowing, hasMore };
+  return {
+    followings,
+    setFollowing,
+    getFollowing,
+    getFollowingLoading: isLoading,
+    hasMore,
+  };
 };

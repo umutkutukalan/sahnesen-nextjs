@@ -3,49 +3,64 @@
 import { useNotifications } from "@/context/NotificationContext";
 import { useAuth } from "@/context/UserContext";
 import { useFollow } from "@/hooks/follow/useFollow";
-import { useGetFollowers } from "@/hooks/follow/useGetFollowers";
-import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
-import { useGetUser } from "@/hooks/user/useGetUser";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { getFullImageUrl } from "@/utils/image";
 import { useToProfile } from "@/utils/useToProfile";
 import Link from "next/link";
-import { useEffect } from "react";
 import { IoHeartSharp } from "react-icons/io5";
 
-export default function TumBildirimlerPage() {
-  const { user } = useAuth();
-  const { notifications, markAsRead } = useNotifications();
-  const { formatRelativeTime } = useRelativeTime();
+// Satır bazlı takip butonunu yönetmek için küçük bir yardımcı bileşen:
+export function FollowButton({
+  username,
+  initialIsFollowing,
+}: {
+  username: string;
+  initialIsFollowing: boolean;
+}) {
+  const { isFollowing, toggleFollow, followLoading } = useFollow(
+    username,
+    initialIsFollowing, // artık ikinci parametre
+  );
 
+  const followingStatus = isFollowing; // artık initialIsFollowing ile OR'lamaya gerek yok, hook zaten onunla başlıyor
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleFollow();
+      }}
+      disabled={followLoading}
+      className={`px-3 py-1 mr-2 flex items-center justify-center gap-1 rounded-lg text-[10px] md:text-xs cursor-pointer transition-colors ${
+        followingStatus
+          ? "bg-green-800 hover:bg-green-700 text-white"
+          : "bg-blue-800 hover:bg-blue-700 text-white"
+      } ${followLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+    >
+      {followLoading ? (
+        <span>Yükleniyor...</span>
+      ) : followingStatus ? (
+        <span>Takiptesin</span>
+      ) : (
+        <span>Takip Et</span>
+      )}
+    </button>
+  );
+}
+
+export default function TumBildirimlerPage() {
+  const { notifications, markAsRead, notificationLoading } = useNotifications();
+  const { formatRelativeTime } = useRelativeTime();
   const { ToProfile } = useToProfile();
 
-  console.log("notifications", notifications);
-
-  const targetUsername = notifications.find(
-    (notification) => notification.type === "FOLLOW",
-  )?.sender?.username;
-  const usernameSlug = user?.slug;
-
-  const { getFollowing } = useGetFollowing();
-
-  const { getFollowers } = useGetFollowers();
-  const { isFollowing, toggleFollow } = useFollow(targetUsername!, () => {
-    if (targetUsername) {
-      getFollowing(targetUsername, true);
-      getFollowers(targetUsername, true);
-    }
-  });
-
-  const { getUser, isLoading } = useGetUser();
-
-  useEffect(() => {
-    if (usernameSlug) {
-      getUser(usernameSlug);
-    }
-  }, [usernameSlug, getUser]);
-
-  console.log("isFollowing", isFollowing);
+  if (notificationLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white">
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+        <span className="text-sm text-gray-500">Bildirimler yükleniyor...</span>
+      </div>
+    );
+  }
 
   if (notifications.length === 0) {
     return (
@@ -93,6 +108,7 @@ export default function TumBildirimlerPage() {
               <div className="flex flex-col">
                 <p
                   onClick={(e) => {
+                    e.stopPropagation();
                     if (notification.sender?.username) {
                       ToProfile(notification.sender.username);
                     }
@@ -111,18 +127,12 @@ export default function TumBildirimlerPage() {
               </div>
             </div>
           </Link>
-          {notification.type === "FOLLOW" && (
-            <button
-              onClick={toggleFollow}
-              disabled={isLoading}
-              className={`px-3 py-1 mr-2 flex items-center justify-center gap-1 rounded-lg text-[10px] md:text-xs cursor-pointer transition-colors ${
-                isFollowing
-                  ? "bg-green-800 hover:bg-green-700 text-white"
-                  : "bg-blue-800 hover:bg-blue-700 text-white"
-              }`}
-            >
-              {isFollowing ? <span>Takiptesin</span> : <span>Takip Et</span>}
-            </button>
+
+          {notification.type === "FOLLOW" && notification.sender?.username && (
+            <FollowButton
+              username={notification.sender.username}
+              initialIsFollowing={notification.sender.isFollowing!}
+            />
           )}
         </div>
       ))}

@@ -40,45 +40,45 @@ export default function BildirimlerLayout({
         <h1 className="text-4xl text-[#7c7c7c] merriweather-sans font-bold">
           Bildirimler
         </h1>
-        {unreadCount > 0 && (
+      </div>
+
+      <div className="flex items-end justify-between">
+        {/* Sekmeler (Tabs) */}
+        <div className="flex border-b border-gray-200 gap-8">
+          {tabs.map((tab) => {
+            const isActive = pathname === tab.href;
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-2 ${
+                  isActive
+                    ? "text-black border-b-2 border-black -mb-[1px]"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                <span>{tab.name}</span>
+                {tab.count > 0 && (
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                      isActive ? "bg-black text-white" : "bg-black text-white"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+        {/* {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="text-xs text-green-700 hover:text-green-800 font-medium transition-colors cursor-pointer bg-green-50 px-3 py-1.5 rounded-lg border border-green-200"
+            className="text-xs text-white cursor-pointer bg-yellow-600 px-3 py-1.5 rounded-lg"
           >
             Tümünü okundu işaretle
           </button>
-        )}
-      </div>
-
-      {/* Sekmeler (Tabs) */}
-      <div className="flex border-b border-gray-200 gap-8">
-        {tabs.map((tab) => {
-          const isActive = pathname === tab.href;
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-2 ${
-                isActive
-                  ? "text-black border-b-2 border-black -mb-[1px]"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              <span>{tab.name}</span>
-              {tab.count > 0 && (
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                    isActive
-                      ? "bg-black text-white"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+        )} */}
       </div>
 
       {/* Aktif Sekme İçeriği */}

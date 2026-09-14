@@ -4,10 +4,13 @@ import { followService } from "@/services/client/follow/follow.service";
 
 export const useFollow = (
   targetUsername: string,
+  initialIsFollowing?: boolean,
   onFollowChange?: () => void,
 ) => {
   const { user } = useAuth();
-  const [isFollowing, setIsFollowing] = useState(false);
+  // Dışarıdan (ör. bildirim listesinden) zaten biliniyorsa
+  // başlangıç değeri olarak onu kullan, yoksa false ile başla.
+  const [isFollowing, setIsFollowing] = useState(initialIsFollowing ?? false);
   const [followCounts, setFollowCounts] = useState({
     followingCount: 0,
     followerCount: 0,
@@ -21,7 +24,14 @@ export const useFollow = (
         const stats = await followService.getFollowStats(targetUsername);
         setFollowCounts(stats);
 
-        if (user && user.username !== targetUsername) {
+        // initialIsFollowing zaten sağlanmışsa (bildirim/liste
+        // ekranından geliyorsa) checkIsFollowing'i tekrar çağırıp
+        // butonun anlık değişmesine gerek yok.
+        if (
+          user &&
+          user.username !== targetUsername &&
+          initialIsFollowing === undefined
+        ) {
           const following =
             await followService.checkIsFollowing(targetUsername);
           setIsFollowing(following);
@@ -35,6 +45,7 @@ export const useFollow = (
     if (targetUsername) {
       fetchFollowData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetUsername, user]);
 
   const toggleFollow = async () => {
@@ -61,7 +72,6 @@ export const useFollow = (
         }));
       }
 
-      // 💡 İşlem başarılı olunca dışarıdaki fonksiyonu tetikle (listeleri güncellemek için)
       if (onFollowChange) {
         onFollowChange();
       }
@@ -76,7 +86,7 @@ export const useFollow = (
   return {
     isFollowing,
     followCounts,
-    isLoading,
+    followLoading: isLoading,
     error,
     toggleFollow,
     canFollow: user && user.username !== targetUsername,

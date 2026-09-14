@@ -1,20 +1,14 @@
 "use client";
 
 import { useNotifications } from "@/context/NotificationContext";
-import { useAuth } from "@/context/UserContext";
-import { useFollow } from "@/hooks/follow/useFollow";
-import { useGetFollowers } from "@/hooks/follow/useGetFollowers";
-import { useGetFollowing } from "@/hooks/follow/useGetFollowing";
-import { useGetUser } from "@/hooks/user/useGetUser";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { getFullImageUrl } from "@/utils/image";
 import { useToProfile } from "@/utils/useToProfile";
 import Link from "next/link";
-import { useEffect } from "react";
+import { FollowButton } from "../page";
 
 export default function TakipBildirimleriPage() {
-  const { user } = useAuth();
-  const { notifications, markAsRead } = useNotifications();
+  const { notifications, markAsRead, notificationLoading } = useNotifications();
   const { formatRelativeTime } = useRelativeTime();
 
   const { ToProfile } = useToProfile();
@@ -24,28 +18,14 @@ export default function TakipBildirimleriPage() {
     (n) => n.type === "FOLLOW" || n.type === "FOLLOWED_USER_POST",
   );
 
-  const targetUsername = notifications.find(
-    (notification) => notification.type === "FOLLOW",
-  )?.sender?.username;
-  const usernameSlug = user?.slug;
-
-  const { getFollowing } = useGetFollowing();
-
-  const { getFollowers } = useGetFollowers();
-  const { isFollowing, toggleFollow } = useFollow(targetUsername!, () => {
-    if (targetUsername) {
-      getFollowing(targetUsername, true);
-      getFollowers(targetUsername, true);
-    }
-  });
-
-  const { getUser, isLoading } = useGetUser();
-
-  useEffect(() => {
-    if (usernameSlug) {
-      getUser(usernameSlug);
-    }
-  }, [usernameSlug, getUser]);
+  if (notificationLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white">
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+        <span className="text-sm text-gray-500">Bildirimler yükleniyor...</span>
+      </div>
+    );
+  }
 
   if (followNotifications.length === 0) {
     return (
@@ -106,22 +86,11 @@ export default function TakipBildirimleriPage() {
               </div>
             </div>
           </Link>
-          {notification.type === "FOLLOW" && (
-            <button
-              onClick={toggleFollow}
-              disabled={isLoading}
-              className={`px-2 py-1 mr-2 flex items-center justify-center gap-1 border border-gray-300 rounded-full text-[10px] md:text-xs cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${
-                isFollowing
-                  ? "bg-white text-green-600"
-                  : "bg-white text-green-700 border-gray-300"
-              }`}
-            >
-              {isFollowing ? (
-                <span>Takip Ediliyor</span>
-              ) : (
-                <span>Takip Et</span>
-              )}
-            </button>
+          {notification.type === "FOLLOW" && notification.sender?.username && (
+            <FollowButton
+              username={notification.sender.username}
+              initialIsFollowing={notification.sender.isFollowing!}
+            />
           )}
         </div>
       ))}
