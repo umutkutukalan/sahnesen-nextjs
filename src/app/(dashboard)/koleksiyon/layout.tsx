@@ -26,15 +26,15 @@ export default function KoleksiyonlarLayout({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = useParams();
+  const collectionSlug = decodeURIComponent(params?.collectionSlug as string);
 
   const selectedType = searchParams?.get("type") || undefined;
 
-  const collectionId = Number(params?.collectionId);
-
   const isLikedTab = pathname?.includes("/begenilenler");
   const isDetailView =
-    !isNaN(collectionId) &&
-    pathname?.includes(`/koleksiyon/${collectionId}`) &&
+    !!collectionSlug &&
+    collectionSlug !== "undefined" &&
+    pathname?.includes(`/koleksiyon/${collectionSlug}`) &&
     !isLikedTab;
 
   // Modal ve düzenleme state'leri
@@ -87,7 +87,7 @@ export default function KoleksiyonlarLayout({
   }, []);
 
   const currentCollection = userCollections.find(
-    (col) => col.id === collectionId,
+    (col) => col.slug === collectionSlug,
   );
 
   const types = [
@@ -97,6 +97,8 @@ export default function KoleksiyonlarLayout({
     { name: "Yan Yana", value: "YANYANA", color: "#91c5e5" },
     { name: "Tersyüz", value: "TERSYUZ", color: "#f5d35e" },
   ];
+
+  console.log("UserCollections", userCollections);
 
   return (
     <div className="min-h-screen text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">

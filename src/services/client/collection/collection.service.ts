@@ -15,6 +15,7 @@ export interface BookmarkCollection {
   id: number;
   name: string;
   description: string;
+  slug: string;
   isDefault: boolean;
   contents: PostPreviewDTO[];
 }
@@ -44,18 +45,26 @@ export const addPostToCollectionClient = async (
   return response.data;
 };
 
-export const getCollectionPostsClient = async (
-  collectionId: number,
-  page = 0,
-  size = 6,
+export async function getCollectionPostsBySlugClient(
+  slug: string,
+  page: number = 0,
+  size: number = 6,
   postType?: string,
-) => {
-  const typeQuery = postType ? `&postType=${postType}` : "";
-  const response = await api.get(
-    `/api/interaction/bookmark-collections/${collectionId}/posts?page=${page}&size=${size}${typeQuery}`,
+) {
+  const validPostType =
+    !postType || postType === "undefined" ? undefined : postType;
+  const res = await api.get(
+    `/api/interaction/bookmark-collections/${slug}/posts`,
+    {
+      params: {
+        page,
+        size,
+        postType: validPostType,
+      },
+    },
   );
-  return response.data; // Page<PostSummaryResponse> yapısı döner
-};
+  return res.data;
+}
 
 export const updateCollectionClient = async (
   collectionId: number,

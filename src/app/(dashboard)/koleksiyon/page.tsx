@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { collectiondefault, koleksiyonlar, sagperde, solperde } from "@/utils";
-import { FaPlus } from "react-icons/fa6";
+import { collectiondefault, sagperde, solperde } from "@/utils";
 import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
 import {
   getUserCollectionsClient,
@@ -33,6 +32,23 @@ export default function CollectionsPage() {
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Menü açıkken dışarı tıklandığında kapatma işleyicisi
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+
+    if (activeMenuId !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeMenuId]);
+
   useEffect(() => {
     if (user) {
       fetchUserCollections();
@@ -52,7 +68,7 @@ export default function CollectionsPage() {
   };
 
   const handleSelectCollection = (collection: BookmarkCollection) => {
-    router.push(`/koleksiyon/${collection.id}`);
+    router.push(`/koleksiyon/${collection.slug}`);
   };
 
   const handleDeleteCollection = async (collectionId: number) => {
@@ -85,7 +101,7 @@ export default function CollectionsPage() {
                 <div
                   key={col.id}
                   onClick={() => handleSelectCollection(col)}
-                  className="relative flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden"
+                  className="relative flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden bg-white"
                 >
                   <div className="absolute right-0 top-0 z-10">
                     <Image
@@ -214,13 +230,14 @@ export default function CollectionsPage() {
                       {/* Üç Nokta Butonu ve Açılır Menü */}
                       <div className="relative">
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setActiveMenuId(
                               activeMenuId === col.id ? null : col.id,
                             );
                           }}
-                          className="py-1 px-2 text-gray-400 hover:text-black transition-colors cursor-pointer"
+                          className="py-1 px-2 text-gray-400 hover:text-black transition-colors cursor-pointer bg-transparent border-0"
                           title="Seçenekler"
                         >
                           <FiMoreHorizontal className="text-lg" />
@@ -229,28 +246,27 @@ export default function CollectionsPage() {
                         {activeMenuId === col.id && (
                           <div
                             ref={menuRef}
-                            className="absolute right-0 bottom-full w-48 flex flex-col bg-white rounded-sm z-50 px-4 py-3 gap-2"
-                            style={{
-                              boxShadow: "0px 0px 5px 1px rgba(0, 0, 0, 0.1)",
-                            }}
+                            className="absolute right-0 bottom-full w-48 flex flex-col bg-white rounded-sm z-50 px-4 py-3 gap-2 shadow-md border border-gray-100"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <button
+                              type="button"
                               onClick={() => {
                                 setActiveMenuId(null);
                                 setEditingCollection(col);
                                 setIsEditModalOpen(true);
                               }}
-                              className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
+                              className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer bg-transparent border-0"
                             >
                               Koleksiyonu Düzenle
                             </button>
                             <button
+                              type="button"
                               onClick={() => {
                                 setActiveMenuId(null);
                                 handleDeleteCollection(col.id);
                               }}
-                              className="flex items-center text-xs transition text-left cursor-pointer"
+                              className="flex items-center text-xs transition text-left cursor-pointer bg-transparent border-0"
                               style={{
                                 color: "#b94445",
                               }}
@@ -273,10 +289,16 @@ export default function CollectionsPage() {
         )}
       </div>
 
+      {/* DÜZELTME: Modal açılma durumu (isCreateModalOpen VEYA isEditModalOpen) ve editingCollection prop'u bağlandı */}
       <CreateCollectionModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        isOpen={isCreateModalOpen || isEditModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setIsEditModalOpen(false);
+          setEditingCollection(null);
+        }}
         onSuccess={fetchUserCollections}
+        editingCollection={editingCollection}
       />
     </div>
   );

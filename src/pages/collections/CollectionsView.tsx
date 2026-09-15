@@ -12,9 +12,9 @@ import CreateCollectionModal from "@/components/collections/CreateCollectionModa
 import SaveToCollectionModal from "@/components/collections/SaveToCollectionModal";
 import {
   getUserCollectionsClient,
-  getCollectionPostsClient,
   BookmarkCollection,
   deleteCollectionClient,
+  getCollectionPostsBySlugClient,
 } from "@/services/client/collection/collection.service";
 import { getFullImageUrl } from "@/utils/image";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
@@ -43,7 +43,6 @@ export default function CollectionsView({
 
   const qParam = searchParams?.get("q");
 
-  // Varsayılan durum (parametre yoksa) -> bookmarked (Koleksiyonlar)
   const getTabFromParam = (param: string | null): TabType => {
     switch (param) {
       case "begenilenler":
@@ -87,13 +86,11 @@ export default function CollectionsView({
   const { posts, isLoadingMore, hasMore, loadMorePosts, fetchPostsByType } =
     useGetCollectionsPosts(initialPosts, initialPage, totalPages);
 
+  // URL parametreleri değiştiğinde tab durumunu güncelle
   useEffect(() => {
     const tabFromUrl = getTabFromParam(searchParams.get("q"));
     setActiveTab(tabFromUrl);
-    if (tabFromUrl === "bookmarked" && selectedCollection) {
-      setSelectedCollection(null);
-    }
-  }, [searchParams, selectedCollection]);
+  }, [searchParams]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -131,7 +128,7 @@ export default function CollectionsView({
 
   const fetchCollectionPosts = useCallback(
     async (
-      collectionId: number,
+      collectionSlug: string,
       postType?: string,
       page = 0,
       append = false,
@@ -142,16 +139,17 @@ export default function CollectionsView({
         setCollectionPostsLoading(true);
       }
       try {
-        const data = await getCollectionPostsClient(
-          collectionId,
+        const data = await getCollectionPostsBySlugClient(
+          collectionSlug,
           page,
           10,
           postType,
         );
+        const content = Array.isArray(data) ? data : data?.content || [];
         setCollectionPosts((prev) =>
-          append ? [...prev, ...(data.content || [])] : data.content || [],
+          append ? [...prev, ...content] : content,
         );
-        setHasMoreCollectionPosts(!data.last);
+        setHasMoreCollectionPosts(!data.last && content.length > 0);
         setCollectionPage(page);
       } catch (error) {
         console.error("Koleksiyon içerikleri yüklenemedi:", error);
@@ -165,7 +163,7 @@ export default function CollectionsView({
 
   useEffect(() => {
     if (selectedCollection) {
-      fetchCollectionPosts(selectedCollection.id, selectedType, 0, false);
+      fetchCollectionPosts(selectedCollection.slug, selectedType, 0, false);
     }
   }, [selectedCollection, selectedType, fetchCollectionPosts]);
 
@@ -186,20 +184,22 @@ export default function CollectionsView({
     }
   };
 
+  // 👈 DÜZELTME: Sekme değiştirme mantığı optimize edildi
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     setSelectedCollection(null);
     setSelectedType(undefined);
 
-    // Beğeniler için ?q=begenilenler, Koleksiyonlar için direkt temiz /koleksiyonlar yolu
     if (tab === "liked") {
       router.push(`/koleksiyonlar?q=begenilenler`, { scroll: false });
       fetchPostsByType("liked", undefined);
     } else {
       router.push(`/koleksiyonlar`, { scroll: false });
+      fetchPostsByType("bookmarked", undefined); // Eğer kanca destekliyorsa
     }
   };
 
+  // 👈 DÜZELTME: Filtre türü seçimi butonu tetikleyicileri düzeltildi
   const handleSelectType = (type: string | undefined) => {
     const newType = selectedType === type ? undefined : type;
     setSelectedType(newType);
@@ -207,6 +207,7 @@ export default function CollectionsView({
     if (activeTab === "liked") {
       fetchPostsByType("liked", newType);
     }
+    // Eğer bir koleksiyon seçiliyse useEffect zaten `selectedType` değişimini yakalayıp `fetchCollectionPosts` çalıştıracak.
   };
 
   const loadMoreRef = useInfiniteScroll(
@@ -216,7 +217,7 @@ export default function CollectionsView({
       } else if (activeTab === "bookmarked" && selectedCollection) {
         if (!isCollectionLoadingMore && hasMoreCollectionPosts) {
           fetchCollectionPosts(
-            selectedCollection.id,
+            selectedCollection.slug,
             selectedType,
             collectionPage + 1,
             true,
@@ -314,6 +315,7 @@ export default function CollectionsView({
           {/* Sol taraf: Sekmeler (Beğenilenler & Koleksiyonlar) */}
           <div className="flex space-x-6">
             <button
+              type="button"
               onClick={() => handleTabChange("liked")}
               className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "liked"
@@ -324,6 +326,7 @@ export default function CollectionsView({
               Beğenilenler
             </button>
             <button
+              type="button"
               onClick={() => handleTabChange("bookmarked")}
               className={`pb-3 text-xs font-medium transition-colors relative cursor-pointer ${
                 activeTab === "bookmarked"
@@ -338,98 +341,108 @@ export default function CollectionsView({
           {/* Sağ taraf: İçerik Türü Filtreleri */}
           {(activeTab === "liked" || selectedCollection) && (
             <div className="relative h-12 flex items-end justify-end">
-              <ul className="relative z-50 flex items-end justify-end gap-5 overflow-x-auto scrollbar-hide">
-                <button
-                  type="button"
-                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-                    selectedType === undefined
-                      ? "border-b-2 border-black font-medium"
-                      : "text-gray-400 hover:text-gray-700"
-                  }`}
-                  onClick={() => handleSelectType(undefined)}
-                >
-                  <span className="text-xs">Tümü</span>
-                </button>
+              <ul className="relative z-50 flex items-end justify-end gap-5 overflow-x-auto scrollbar-hide list-none m-0 p-0">
+                <li>
+                  <button
+                    type="button"
+                    className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all bg-transparent border-0 ${
+                      selectedType === undefined
+                        ? "border-b-2 border-black font-medium text-black"
+                        : "text-gray-400 hover:text-gray-700"
+                    }`}
+                    onClick={() => handleSelectType(undefined)}
+                  >
+                    <span className="text-xs">Tümü</span>
+                  </button>
+                </li>
 
-                <button
-                  type="button"
-                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-                    selectedType === "SAHNE"
-                      ? "border-b-2 font-medium"
-                      : "text-gray-400 hover:text-gray-700"
-                  }`}
-                  style={{
-                    borderColor:
-                      selectedType === "SAHNE" ? "#c86b5a" : undefined,
-                  }}
-                  onClick={() => handleSelectType("SAHNE")}
-                >
-                  <FaTicketSimple
-                    className="text-base"
-                    style={{ color: "#c86b5a" }}
-                  />
-                  <span className="text-xs">Sahne</span>
-                </button>
+                <li>
+                  <button
+                    type="button"
+                    className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all bg-transparent border-0 ${
+                      selectedType === "SAHNE"
+                        ? "border-b-2 font-medium text-black"
+                        : "text-gray-400 hover:text-gray-700"
+                    }`}
+                    style={{
+                      borderColor:
+                        selectedType === "SAHNE" ? "#c86b5a" : undefined,
+                    }}
+                    onClick={() => handleSelectType("SAHNE")}
+                  >
+                    <FaTicketSimple
+                      className="text-base"
+                      style={{ color: "#c86b5a" }}
+                    />
+                    <span className="text-xs">Sahne</span>
+                  </button>
+                </li>
 
-                <button
-                  type="button"
-                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-                    selectedType === "MONOLOG"
-                      ? "border-b-2 font-medium"
-                      : "text-gray-400 hover:text-gray-700"
-                  }`}
-                  style={{
-                    borderColor:
-                      selectedType === "MONOLOG" ? "#66788a" : undefined,
-                  }}
-                  onClick={() => handleSelectType("MONOLOG")}
-                >
-                  <FaTicketSimple
-                    className="text-base"
-                    style={{ color: "#66788a" }}
-                  />
-                  <span className="text-xs">Monolog</span>
-                </button>
+                <li>
+                  <button
+                    type="button"
+                    className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all bg-transparent border-0 ${
+                      selectedType === "MONOLOG"
+                        ? "border-b-2 font-medium text-black"
+                        : "text-gray-400 hover:text-gray-700"
+                    }`}
+                    style={{
+                      borderColor:
+                        selectedType === "MONOLOG" ? "#66788a" : undefined,
+                    }}
+                    onClick={() => handleSelectType("MONOLOG")}
+                  >
+                    <FaTicketSimple
+                      className="text-base"
+                      style={{ color: "#66788a" }}
+                    />
+                    <span className="text-xs">Monolog</span>
+                  </button>
+                </li>
 
-                <button
-                  type="button"
-                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-                    selectedType === "YANYANA"
-                      ? "border-b-2 font-medium"
-                      : "text-gray-400 hover:text-gray-700"
-                  }`}
-                  style={{
-                    borderColor:
-                      selectedType === "YANYANA" ? "#789680" : undefined,
-                  }}
-                  onClick={() => handleSelectType("YANYANA")}
-                >
-                  <FaTicketSimple
-                    className="text-base"
-                    style={{ color: "#789680" }}
-                  />
-                  <span className="text-xs">Yan Yana</span>
-                </button>
+                <li>
+                  <button
+                    type="button"
+                    className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all bg-transparent border-0 ${
+                      selectedType === "YANYANA"
+                        ? "border-b-2 font-medium text-black"
+                        : "text-gray-400 hover:text-gray-700"
+                    }`}
+                    style={{
+                      borderColor:
+                        selectedType === "YANYANA" ? "#789680" : undefined,
+                    }}
+                    onClick={() => handleSelectType("YANYANA")}
+                  >
+                    <FaTicketSimple
+                      className="text-base"
+                      style={{ color: "#789680" }}
+                    />
+                    <span className="text-xs">Yan Yana</span>
+                  </button>
+                </li>
 
-                <button
-                  type="button"
-                  className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all ${
-                    selectedType === "TERSYUZ"
-                      ? "border-b-2 font-medium"
-                      : "text-gray-400 hover:text-gray-700"
-                  }`}
-                  style={{
-                    borderColor:
-                      selectedType === "TERSYUZ" ? "#f4d45f" : undefined,
-                  }}
-                  onClick={() => handleSelectType("TERSYUZ")}
-                >
-                  <FaTicketSimple
-                    className="text-base"
-                    style={{ color: "#f4d45f" }}
-                  />
-                  <span className="text-xs">Tersyüz</span>
-                </button>
+                <li>
+                  <button
+                    type="button"
+                    className={`pb-3 flex items-center gap-1.5 cursor-pointer transition-all bg-transparent border-0 ${
+                      selectedType === "TERSYUZ"
+                        ? "border-b-2 font-medium text-black"
+                        : "text-gray-400 hover:text-gray-700"
+                    }`}
+                    style={{
+                      borderColor:
+                        selectedType === "TERSYUZ" ? "#f4d45f" : undefined,
+                    }}
+                    onClick={() => handleSelectType("TERSYUZ")}
+                  >
+                    <FaTicketSimple
+                      className="text-base"
+                      style={{ color: "#f4d45f" }}
+                    />
+                    <span className="text-xs">Tersyüz</span>
+                  </button>
+                </li>
               </ul>
             </div>
           )}
@@ -582,6 +595,7 @@ export default function CollectionsView({
 
                           <div className="relative">
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveMenuId(
@@ -605,21 +619,23 @@ export default function CollectionsView({
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <button
+                                  type="button"
                                   onClick={() => {
                                     setActiveMenuId(null);
                                     setEditingCollection(col);
                                     setIsEditModalOpen(true);
                                   }}
-                                  className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
+                                  className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer bg-transparent border-0"
                                 >
                                   Koleksiyonu Düzenle
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => {
                                     setActiveMenuId(null);
                                     handleDeleteCollection(col.id);
                                   }}
-                                  className="flex items-center text-xs transition text-left cursor-pointer"
+                                  className="flex items-center text-xs transition text-left cursor-pointer bg-transparent border-0"
                                   style={{
                                     color: "#b94445",
                                   }}

@@ -2,13 +2,16 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import PostCard from "@/components/projects/PostCard";
-import { getCollectionPostsClient } from "@/services/client/collection/collection.service";
 import { PostResponse } from "@/services/server/post.service";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import { getCollectionPostsBySlugClient } from "@/services/client/collection/collection.service";
 
 export default function CollectionDetailPage() {
   const params = useParams();
-  const collectionId = Number(params?.collectionId);
+  const searchParams = useSearchParams();
+
+  const collectionSlug = params?.collectionSlug as string;
+  const selectedType = searchParams?.get("type") || undefined;
 
   const [collectionPosts, setCollectionPosts] = useState<PostResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,14 +23,20 @@ export default function CollectionDetailPage() {
 
   // İlk yükleme
   const fetchPosts = useCallback(async () => {
-    if (!collectionId || isNaN(collectionId)) {
+    if (!collectionSlug) {
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     try {
-      const data = await getCollectionPostsClient(collectionId, 0, 6);
+      // selectedType parametresi fonksiyona eklendi
+      const data = await getCollectionPostsBySlugClient(
+        collectionSlug,
+        0,
+        6,
+        selectedType,
+      );
       const posts = Array.isArray(data) ? data : data?.content || [];
       setCollectionPosts(posts);
       setHasMore(!data.last && posts.length > 0);
@@ -36,7 +45,7 @@ export default function CollectionDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [collectionId]);
+  }, [collectionSlug, selectedType]);
 
   useEffect(() => {
     fetchPosts();
@@ -44,12 +53,17 @@ export default function CollectionDetailPage() {
 
   // Sonsuz kaydırma ile sonraki sayfaları çekme
   const loadMorePosts = async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || !collectionSlug) return;
 
     setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
-      const data = await getCollectionPostsClient(collectionId, nextPage, 6);
+      const data = await getCollectionPostsBySlugClient(
+        collectionSlug,
+        nextPage,
+        6,
+        selectedType,
+      );
       const newPosts = Array.isArray(data) ? data : data?.content || [];
 
       setCollectionPosts((prev) => [...prev, ...newPosts]);
