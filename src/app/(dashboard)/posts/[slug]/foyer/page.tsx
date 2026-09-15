@@ -422,7 +422,9 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                 {/* SAYAÇ ROZETİ */}
                 <div
                   className={`w-fit flex items-center ${
-                    isFoyerOpen ? "gap-2" : ""
+                    isFoyerOpen && post?.discussionDurationHours !== 0
+                      ? "gap-2"
+                      : ""
                   } border border-gray-300 px-2 py-1 rounded-sm merriweather-sans`}
                 >
                   <span className="text-[12px] text-gray-800">
