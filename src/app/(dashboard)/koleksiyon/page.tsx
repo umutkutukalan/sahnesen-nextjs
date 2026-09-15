@@ -5,7 +5,6 @@ import Image from "next/image";
 import { collectiondefault, sagperde, solperde } from "@/utils";
 import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
 import {
-  getUserCollectionsClient,
   BookmarkCollection,
   deleteCollectionClient,
 } from "@/services/client/collection/collection.service";
@@ -15,16 +14,16 @@ import { useAuth } from "@/context/UserContext";
 import { FiMoreHorizontal, FiUser } from "react-icons/fi";
 import { useToProfile } from "@/utils/useToProfile";
 import { useRouter } from "next/navigation";
+import { useCollections } from "./layout";
 
 export default function CollectionsPage() {
   const { user } = useAuth();
   const { ToProfile } = useToProfile();
   const router = useRouter();
 
-  const [userCollections, setUserCollections] = useState<BookmarkCollection[]>(
-    [],
-  );
-  const [collectionsLoading, setCollectionsLoading] = useState(true);
+  const { userCollections, collectionsLoading, refreshCollections } =
+    useCollections();
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCollection, setEditingCollection] =
@@ -49,24 +48,6 @@ export default function CollectionsPage() {
     };
   }, [activeMenuId]);
 
-  useEffect(() => {
-    if (user) {
-      fetchUserCollections();
-    }
-  }, [user]);
-
-  const fetchUserCollections = async () => {
-    setCollectionsLoading(true);
-    try {
-      const data = await getUserCollectionsClient();
-      setUserCollections(data);
-    } catch (error) {
-      console.error("Koleksiyonlar yüklenemedi:", error);
-    } finally {
-      setCollectionsLoading(false);
-    }
-  };
-
   const handleSelectCollection = (collection: BookmarkCollection) => {
     router.push(`/koleksiyon/${collection.slug}`);
   };
@@ -75,9 +56,7 @@ export default function CollectionsPage() {
     if (!confirm("Bu koleksiyonu silmek istediğinize emin misiniz?")) return;
     try {
       await deleteCollectionClient(collectionId);
-      setUserCollections((prev) =>
-        prev.filter((col) => col.id !== collectionId),
-      );
+      refreshCollections(); // Silme işleminden sonra listeyi güncelle
     } catch (error) {
       console.error("Koleksiyon silinemedi:", error);
     }
@@ -291,13 +270,14 @@ export default function CollectionsPage() {
 
       {/* DÜZELTME: Modal açılma durumu (isCreateModalOpen VEYA isEditModalOpen) ve editingCollection prop'u bağlandı */}
       <CreateCollectionModal
-        isOpen={isCreateModalOpen || isEditModalOpen}
+        isOpen={isEditModalOpen}
         onClose={() => {
-          setIsCreateModalOpen(false);
           setIsEditModalOpen(false);
           setEditingCollection(null);
         }}
-        onSuccess={fetchUserCollections}
+        onSuccess={() => {
+          refreshCollections(); // Düzenleme sonrasında listeyi güncelle
+        }}
         editingCollection={editingCollection}
       />
     </div>

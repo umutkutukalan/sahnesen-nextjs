@@ -12,15 +12,14 @@ import {
 export default function PublishPage() {
   const params = useParams();
   const router = useRouter();
-  const postSlug = params.postSlug as string;
-
-  console.log("Gelen params:", params);
-  console.log("Yakalanan slug/id değeri:", postSlug);
+  const postSlug = params?.postSlug as string;
 
   const [post, setPost] = useState<PostResponse | null>(null);
   const [subtitle, setSubtitle] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [discussionDurationHours, setDiscussionDurationHours] =
+    useState<number>(3);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,6 +31,12 @@ export default function PublishPage() {
         setPost(data);
         setSubtitle(data.subtitle || "");
         setTags(data.tags || []);
+        if (
+          data.discussionDurationHours !== null &&
+          data.discussionDurationHours !== undefined
+        ) {
+          setDiscussionDurationHours(data.discussionDurationHours);
+        }
       } catch (error) {
         console.error("Yazı detayları yüklenirken hata:", error);
       } finally {
@@ -61,7 +66,7 @@ export default function PublishPage() {
 
   // Yayınla Aksiyonu
   const handlePublish = async () => {
-    if (!post?.id) return; // ID garantisi
+    if (!post?.id) return;
 
     try {
       setIsSubmitting(true);
@@ -69,9 +74,10 @@ export default function PublishPage() {
         ...post,
         subtitle,
         tags,
+        discussionDurationHours, // 💡 Gönderilen verilere süre eklendi
         isPublished: true,
       });
-      router.push("/"); // Yayınlandıktan sonra ana sayfaya veya akışa yönlendir
+      router.push("/");
     } catch (error) {
       console.error("Yayınlama başarısız:", error);
     } finally {
@@ -87,6 +93,16 @@ export default function PublishPage() {
     );
   }
 
+  // Seçenekler listesi
+  const durationOptions = [
+    { label: "3 Saat", value: 3 },
+    { label: "6 Saat", value: 6 },
+    { label: "12 Saat", value: 12 },
+    { label: "24 Saat", value: 24 },
+    { label: "48 Saat", value: 48 },
+    { label: "Süresiz", value: 0 },
+  ];
+
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
       {/* Üst Bar / Kapatma Butonu */}
@@ -99,13 +115,12 @@ export default function PublishPage() {
         </button>
       </div>
 
-      {/* Ana İçerik - İki Sütunlu Medium Tarzı Yerleşim */}
+      {/* Ana İçerik */}
       <div className="max-w-5xl w-full mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 py-4">
-        {/* Sol Sütun: Story Preview ve Kapak Görselleri */}
+        {/* Sol Sütun: Story Preview */}
         <div className="flex flex-col gap-6">
           <h2 className="text-xl font-serif font-bold">Story preview</h2>
 
-          {/* Kapak Görseli Alanı */}
           <div className="w-full h-64 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 p-6 text-center overflow-hidden relative">
             {post?.coverImage ? (
               <img
@@ -127,7 +142,7 @@ export default function PublishPage() {
           </div>
         </div>
 
-        {/* Sağ Sütun: Etiketler, Subtitle ve Yayınla Butonları */}
+        {/* Sağ Sütun: Etiketler, Subtitle, Süre ve Yayınla Butonları */}
         <div className="flex flex-col gap-8">
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
@@ -172,10 +187,37 @@ export default function PublishPage() {
             <textarea
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
-              rows={4}
+              rows={3}
               className="w-full p-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-green-800 resize-none"
               placeholder="Yazınızı kısaca özetleyin..."
             />
+          </div>
+
+          {/* 💡 YENİ: Fuaye / Tartışma Süresi Seçimi */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
+              Fuaye / Tartışma Süresi
+            </label>
+            <div className="grid grid-cols-5 gap-2">
+              {durationOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDiscussionDurationHours(opt.value)}
+                  className={`py-2 text-xs font-medium rounded-xl border transition-all cursor-pointer ${
+                    discussionDurationHours === opt.value
+                      ? "bg-green-800 text-white border-green-800 shadow-sm"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1.5">
+              Yazınızın yayınlandıktan sonra aktif tartışma kalacağı süreyi
+              belirler.
+            </p>
           </div>
 
           {/* Aksiyon Butonları */}

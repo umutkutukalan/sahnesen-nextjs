@@ -64,6 +64,9 @@ export default function FoyerPage({ params }: FoyerPageProps) {
   const { formatRelativeTime } = useRelativeTime();
   const { ToProfile } = useToProfile();
 
+  const isPermanent =
+    post?.discussionDurationHours === 0 || !post?.discussionEndsAt;
+
   // Yazıyı ve yorumları çekme
   useEffect(() => {
     const fetchData = async () => {
@@ -126,6 +129,11 @@ export default function FoyerPage({ params }: FoyerPageProps) {
         setTimeLeft(
           `${String(hours).padStart(2, "0")}s ${String(minutes).padStart(2, "0")}d ${String(seconds).padStart(2, "0")}s`,
         );
+      }
+      if (isPermanent) {
+        setIsFoyerOpen(true);
+        setTimeLeft("Süresiz");
+        return;
       }
     };
 
@@ -418,9 +426,13 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                   } border border-gray-300 px-2 py-1 rounded-sm merriweather-sans`}
                 >
                   <span className="text-[12px] text-gray-800">
-                    {isFoyerOpen && "Fuaye Kapanış:"}
+                    {post?.discussionDurationHours === 0
+                      ? ""
+                      : isFoyerOpen && "Fuaye Kapanış:"}
                   </span>
-                  <span className="text-[12px] font-semibold">{timeLeft}</span>
+                  <span className="text-[12px] font-semibold">
+                    {post?.discussionDurationHours === 0 ? "Süresiz" : timeLeft}
+                  </span>
                 </div>
               </div>
             </div>
