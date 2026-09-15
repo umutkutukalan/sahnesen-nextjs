@@ -15,6 +15,7 @@ import {
   BookmarkCollection,
   getUserCollectionsClient,
 } from "@/services/client/collection/collection.service";
+import { interactionService } from "@/services/client/interaction/interaction.service";
 
 export default function KoleksiyonlarLayout({
   children,
@@ -44,6 +45,19 @@ export default function KoleksiyonlarLayout({
   );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [collectionsLoading, setCollectionsLoading] = useState(true);
+  const [userStats, setUserStats] = useState({
+    totalCollections: 0,
+    totalLikedPosts: 0,
+  });
+
+  const fetchUserStats = async () => {
+    try {
+      const stats = await interactionService.getUserStats();
+      setUserStats(stats);
+    } catch (error) {
+      console.error("İstatistikler yüklenemedi:", error);
+    }
+  };
 
   const handleSelectType = (type: string | undefined) => {
     const params = new URLSearchParams(searchParams?.toString());
@@ -69,6 +83,7 @@ export default function KoleksiyonlarLayout({
 
   useEffect(() => {
     fetchUserCollections();
+    fetchUserStats();
   }, []);
 
   const currentCollection = userCollections.find(
@@ -132,7 +147,11 @@ export default function KoleksiyonlarLayout({
               </div>
               <div className="flex items-center gap-2 select-none">
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-800">0</span>
+                  <span className="text-xs text-gray-800">
+                    {isLikedTab
+                      ? userStats.totalLikedPosts
+                      : userStats.totalCollections}
+                  </span>
                   <span className="text-xs text-gray-500">
                     {isLikedTab
                       ? "Sahne listeleniyor"

@@ -16,6 +16,11 @@ export interface PostInteractionStatus {
   shineCount: number;
 }
 
+export interface UserStats {
+  totalCollections: number;
+  totalLikedPosts: number;
+}
+
 export const interactionService = {
   // Beğen veya Mod Bazlı Parlat Toggle
   toggleReaction: async (postId: number, reactionType: ReactionType) => {
@@ -90,6 +95,11 @@ export const interactionService = {
     const res = await api.get(`/api/interaction/posts/liked`, {
       params: { postType: cleanPostType, page, size: actualSize },
     });
+    return res.data;
+  },
+
+  getUserStats: async (): Promise<UserStats> => {
+    const res = await api.get(`/api/interaction/posts/stats`);
     return res.data;
   },
 };
