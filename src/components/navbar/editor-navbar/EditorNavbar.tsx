@@ -19,6 +19,8 @@ interface EditorNavbarProps {
   activePostId: number | null;
   postSlug: string | null;
   isArchived?: boolean;
+  isPublished?: boolean;
+  onUpdatePost?: () => void;
 }
 
 const EditorNavbar = ({
@@ -27,6 +29,8 @@ const EditorNavbar = ({
   activePostId,
   postSlug,
   isArchived = false,
+  isPublished = false,
+  onUpdatePost,
 }: EditorNavbarProps) => {
   const { user, setUser } = useAuth();
   const router = useRouter();
@@ -145,23 +149,43 @@ const EditorNavbar = ({
 
         <div className="flex items-center gap-4">
           {!isArchived && (
-            <button
-              className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
-                !activePostId || !postSlug
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-green-700 cursor-pointer shadow-sm"
-              }`}
-              disabled={
-                !activePostId || !postSlug || contentStatus === "SAVING"
-              }
-              onClick={() => {
-                if (postSlug) {
-                  router.push(`/olustur/publish/${postSlug}`);
-                }
-              }}
-            >
-              Sahnele
-            </button>
+            <>
+              {isPublished ? (
+                /* EĞER YAZI ZATEN YAYINDAYSA: "Sahneyi Güncelle" Butonu */
+                <button
+                  className={`bg-black text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
+                    !activePostId || contentStatus === "SAVING"
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-gray-800 cursor-pointer shadow-sm"
+                  }`}
+                  disabled={!activePostId || contentStatus === "SAVING"}
+                  onClick={onUpdatePost}
+                >
+                  {contentStatus === "SAVING"
+                    ? "Güncelleniyor..."
+                    : "Sahneyi Güncelle"}
+                </button>
+              ) : (
+                /* Taslak ise normal "Sahnele" butonu */
+                <button
+                  className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
+                    !activePostId || !postSlug
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-green-700 cursor-pointer shadow-sm"
+                  }`}
+                  disabled={
+                    !activePostId || !postSlug || contentStatus === "SAVING"
+                  }
+                  onClick={() => {
+                    if (postSlug) {
+                      router.push(`/olustur/publish/${postSlug}`);
+                    }
+                  }}
+                >
+                  Sahnele
+                </button>
+              )}
+            </>
           )}
 
           <ul className="navbar-links flex items-center">

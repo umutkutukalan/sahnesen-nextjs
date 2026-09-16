@@ -245,6 +245,48 @@ const CreateProjectsBlog = ({
     }
   }, []);
 
+  // 🔥 YAYINLANMIŞ YAZILAR İÇİN DOĞRUDAN GÜNCELLEME FONKSİYONU
+  const handleDirectUpdate = async () => {
+    if (!activePostId) return;
+
+    const currentTitle = extractTitle(editorJSONRef.current);
+    if (!currentTitle || currentTitle.trim().length < 3) {
+      alert("Lütfen en az 3 karakterlik bir başlık yazın.");
+      return;
+    }
+
+    setSaveStatus("SAVING");
+
+    const currentSubtitle = extractSubtitleFromJSON(editorJSONRef.current);
+
+    const payload = {
+      postType: postTypeRef.current,
+      title: currentTitle,
+      subtitle: currentSubtitle,
+      content: editorJSONRef.current,
+      isPublished: true, // Yayında kalmaya devam ediyor
+    };
+
+    try {
+      const savedPost = await updatePostClient(activePostId, payload);
+      setSaveStatus("SAVED");
+
+      await queryClient.invalidateQueries({ queryKey: ["userPosts"] });
+      router.refresh();
+
+      // Başarılı güncelleme sonrası detay sayfasına yönlendir
+      const username = savedPost?.authorUsername || user?.username;
+      const slug = savedPost?.slug;
+
+      if (username && slug) {
+        router.push(`/${username}/${slug}`);
+      }
+    } catch (error: any) {
+      console.error("Sahne güncelleme hatası:", error);
+      setSaveStatus("ERROR");
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
@@ -320,6 +362,8 @@ const CreateProjectsBlog = ({
         activePostId={activePostId}
         postSlug={postSlug}
         isArchived={isArchived}
+        isPublished={isPublished}
+        onUpdatePost={handleDirectUpdate}
       />
 
       <div className="w-full lg:w-[760px] mx-auto px-6 pt-6">
