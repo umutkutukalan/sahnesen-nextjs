@@ -204,7 +204,7 @@ const PostCard = ({
           {/* BAŞLIK & SUBTITLE */}
           <div
             onClick={() => {
-              if (isOwner) {
+              if (isOwner && !post.isPublished) {
                 const archivedFlag = post.isArchived ?? post.archived ?? false;
                 router.push(
                   `/olustur?slug=${post?.slug}&isArchived=${archivedFlag}`,

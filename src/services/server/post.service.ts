@@ -33,6 +33,8 @@ export interface PostSummaryResponse {
   createdAt: string;
   viewCount?: number; // Redis'ten beslenen sayaç alanı
   tags?: string[];
+  isPublished?: boolean;
+  isArchived?: boolean;
   authorName: string;
   authorSurname: string;
   authorUsername: string;

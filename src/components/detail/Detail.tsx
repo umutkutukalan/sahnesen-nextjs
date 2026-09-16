@@ -2,7 +2,7 @@
 
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { PostResponse } from "@/services/server/post.service";
-import { JSX, useEffect } from "react";
+import { JSX, useEffect, useState } from "react";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
@@ -31,12 +31,23 @@ import { ReactionType } from "@/services/client/interaction/interaction.service"
 import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
 import Link from "next/link";
 import { LuTheater } from "react-icons/lu";
-import { solperde } from "@/utils";
+import {
+  hali,
+  sahnekoltuklari,
+  sahnekoltuklaridevami,
+  sahnemikrofonu,
+  solperde,
+} from "@/utils";
 import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { CiSettings } from "react-icons/ci";
 import { useFollow } from "@/hooks/follow/useFollow";
 import { useToProfile } from "@/utils/useToProfile";
+import { getFullImageUrl } from "@/utils/image";
+import {
+  CommentResponse,
+  commentService,
+} from "@/services/client/comment/comment.service";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -104,6 +115,7 @@ const Detail = ({ post }: DetailProps) => {
   const usernameSlug = post.authorUsername;
   const router = useRouter();
   const { ToProfile } = useToProfile();
+  const [comments, setComments] = useState<CommentResponse[]>([]);
 
   const isOwnProfile = usernameSlug === user?.username;
 
@@ -235,6 +247,20 @@ const Detail = ({ post }: DetailProps) => {
       return null;
     }
   };
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!post?.id) return;
+      try {
+        const commentsRes = await commentService.getComments(post.id);
+        setComments(commentsRes);
+      } catch (err) {
+        console.error("Yorumlar yüklenirken hata:", err);
+      }
+    };
+
+    fetchComments();
+  }, [post?.id]);
 
   const subtitle = extractSubtitle(post.content);
 
@@ -679,7 +705,7 @@ const Detail = ({ post }: DetailProps) => {
   console.log("post", post);
 
   return (
-    <div className="page pt-5 bg-private text-black min-h-screen">
+    <div className="page pt-5 text-black min-h-screen">
       <style jsx global>{`
         .apple-code-theme .hljs-keyword {
           color: #9b2385;
@@ -716,7 +742,7 @@ const Detail = ({ post }: DetailProps) => {
       `}</style>
 
       <div className={`page-padding flex justify-center gap-5 relative`}>
-        <div className="h-full flex flex-col w-full lg:w-[850px] gap-10 transition-all duration-300 relative px-2">
+        <div className="h-full flex flex-col w-full lg:w-[850px] transition-all duration-300 relative px-2">
           {/* YAZAR ÜST BARI */}
           <div className="h-full flex flex-col w-full">
             <div className="relative w-full flex items-center justify-between overflow-hidden h-20">
@@ -961,30 +987,117 @@ const Detail = ({ post }: DetailProps) => {
           </div>
 
           {/* REAL TIPTAP İÇERİK ALANI */}
-          <div className="prose max-w-none antialiased playfair-display-400">
+          <div className="prose max-w-none antialiased playfair-display-400 bg-white pb-10 z-20">
             {renderTiptapContent(post.content)}
           </div>
 
-          <div className="mt-16 pt-8 border-t border-gray-200 flex flex-col items-center justify-center text-center gap-4 bg-gray-50/50 p-8 rounded-2xl">
-            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
-              <MdCoffee />
-            </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-xl font-bold text-gray-900 font-sans">
-                Sahnenin Arkası: Fuaye
-              </h3>
-              <p className="text-sm text-gray-500 max-w-md">
-                Bu içeriğe özel açılan kulis alanında mektubunu bırakabilir veya
-                erken saatlerde yazılmış anıların altına yanıt verebilirsin.
-              </p>
-            </div>
+          <div className="relative w-full border-t border-gray-400 mx-auto px-6 lg:px-0 lg:w-[800px] bg-private text-black flex flex-col justify-center overflow-hidden">
+            <div className="relative">
+              <div className="relative">
+                <div className="absolute top-16 right-10 pointer-events-none z-10">
+                  <Image src={sahnemikrofonu} alt="" className="w-45" />
 
-            <Link
-              href={`/posts/${post.slug}/foyer`}
-              className="mt-2 px-6 py-3 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors flex items-center gap-2 cursor-pointer"
-            >
-              Fuayeye Gir
-            </Link>
+                  <div className="absolute top-5 right-10 w-7 h-7 rounded-full overflow-hidden">
+                    <img
+                      src={getFullImageUrl(post?.authorProfileImg)!}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute top-7 right-0 pointer-events-none">
+                <Image src={hali} alt="" className="w-80" />
+              </div>
+
+              {/* Ana kapsayıcı */}
+              <div className="relative flex flex-col justify-between">
+                {/* Koltukların bulunduğu üst/görsel alan (Taşmaları gizlemek için overflow-hidden eklendi) */}
+                <div className="relative h-36 overflow-hidden">
+                  <div className="absolute top-0 -left-0 rotate-[-15deg] pointer-events-none">
+                    <Image src={sahnekoltuklari} alt="" className="w-100" />
+                  </div>
+                  <div className="absolute -top-1 -left-8 rotate-[-15deg] pointer-events-none">
+                    <Image
+                      src={sahnekoltuklaridevami}
+                      alt=""
+                      className="w-100"
+                    />
+                  </div>
+                  <div className="absolute -top-4 -left-8 rotate-[-15deg] pointer-events-none">
+                    <Image
+                      src={sahnekoltuklaridevami}
+                      alt=""
+                      className="w-100"
+                    />
+                  </div>
+                  <div className="absolute -top-8 -left-8 rotate-[-15deg] pointer-events-none">
+                    <Image
+                      src={sahnekoltuklaridevami}
+                      alt=""
+                      className="w-100"
+                    />
+                  </div>
+                  <div className="absolute top-22 left-35 -rotate-15 pointer-events-auto z-20">
+                    {(() => {
+                      const uniqueAuthors = Array.from(
+                        new Map(
+                          comments.map((comment) => [
+                            comment.authorUsername,
+                            comment,
+                          ]),
+                        ).values(),
+                      );
+
+                      if (uniqueAuthors.length === 0) return null;
+
+                      return (
+                        <ul className="flex items-center">
+                          {uniqueAuthors.slice(0, 8).map((comment, index) => (
+                            <Link
+                              key={comment.id || index}
+                              href={`/profil/${comment.authorUsername}`}
+                              className="w-7 h-7 rounded-full overflow-hidden -ml-2 first:ml-0 border-2 border-white shadow-sm transition-transform hover:scale-110 hover:z-20 relative"
+                              style={{ zIndex: 8 - index }}
+                            >
+                              <img
+                                src={getFullImageUrl(comment.authorProfileImg)!}
+                                alt={comment.authorUsername}
+                                className="object-cover w-full h-full"
+                              />
+                            </Link>
+                          ))}
+                          {uniqueAuthors.length > 8 && (
+                            <div className="text-stone-700 text-[10px] font-bold flex items-center justify-center ml-1 z-0">
+                              +{uniqueAuthors.length - 8}
+                            </div>
+                          )}
+                        </ul>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* Yazı ve Buton Alanı */}
+                <div className="relative flex flex-col gap-1 pb-8">
+                  <h3 className="text-xl font-bold text-gray-900 font-sans">
+                    Sahnenin Arkası: Fuaye
+                  </h3>
+                  <p className="text-[10px] text-gray-500 max-w-md">
+                    Bu içeriğe özel açılan fuaye alanında notlarını bırakabilir
+                    veya erken saatlerde bırakılan notların altına yanıt
+                    verebilirsin.
+                  </p>
+                  <Link
+                    href={`/posts/${post.slug}/foyer`}
+                    className="w-fit mt-1 px-3 py-1.5 bg-black text-white text-xs rounded-sm hover:bg-gray-800 transition-colors flex items-center gap-2 cursor-pointer"
+                  >
+                    Fuayeye Gir
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

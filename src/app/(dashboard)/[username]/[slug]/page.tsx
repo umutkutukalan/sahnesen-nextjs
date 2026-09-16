@@ -27,5 +27,9 @@ export default async function Page({ params }: PageProps) {
     notFound(); // Next.js 404 sayfasına pürüzsüz geçiş
   }
 
-  return <Detail post={post} />;
+  return (
+    <div className="page">
+      <Detail post={post} />
+    </div>
+  );
 }

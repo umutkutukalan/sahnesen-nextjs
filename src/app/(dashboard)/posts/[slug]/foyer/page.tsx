@@ -6,7 +6,7 @@ import {
   CommentResponse,
 } from "@/services/client/comment/comment.service";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
-import { FiSend, FiMessageSquare, FiUser, FiArrowLeft } from "react-icons/fi";
+import { FiMessageSquare, FiUser } from "react-icons/fi";
 import Link from "next/link";
 import { PostResponse } from "@/services/server/post.service";
 import { getPostBySlugClient } from "@/services/client/post.service";
@@ -19,7 +19,6 @@ import {
   sahnekoltuklaridevami,
   sahnemikrofonu,
 } from "@/utils";
-import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { useToProfile } from "@/utils/useToProfile";
 import { useAuth } from "@/context/UserContext";
 
