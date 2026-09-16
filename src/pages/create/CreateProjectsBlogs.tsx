@@ -274,12 +274,9 @@ const CreateProjectsBlog = ({
       await queryClient.invalidateQueries({ queryKey: ["userPosts"] });
       router.refresh();
 
-      // Başarılı güncelleme sonrası detay sayfasına yönlendir
-      const username = savedPost?.authorUsername || user?.username;
-      const slug = savedPost?.slug;
-
-      if (username && slug) {
-        router.push(`/${username}/${slug}`);
+      const username = user?.username;
+      if (username && postSlug) {
+        router.push(`/${username}/${postSlug}`);
       }
     } catch (error: any) {
       console.error("Sahne güncelleme hatası:", error);
