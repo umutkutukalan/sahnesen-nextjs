@@ -1,18 +1,16 @@
-import { FiUser } from "react-icons/fi";
+import { FiUser, FiTrash2 } from "react-icons/fi";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { RiImageEditLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/UserContext";
 import {
+  removeCoverImg,
+  removeProfileImg,
   updateCoverImg,
   updateProfileImg,
-  updateUser,
+  updateUser, // Profil güncelleme servisi (resimleri null yapmak için gerekli)
 } from "../../services/client/user/user.service";
-import {
-  compressCoverImage,
-  compressProfileBorder,
-  compressProfileImage,
-} from "../../utils/ImageCompression";
+import { compressCoverImage } from "../../utils/ImageCompression";
 import Image from "next/image";
 import EmailField from "../profile_settings_item/EmailField";
 import Account from "../profile_settings_item/Account";
@@ -23,15 +21,20 @@ import { getOptimizedImageUrl } from "@/utils/ImageUtils";
 import CoverCropModal from "../CoverCropModal";
 
 const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
-  const { user, setUser } = useAuth(); // sadece setUser için (kaydetme sonrası güncelleme)
+  const { user, setUser } = useAuth();
   const { getUser, profileUser, isLoading } = useGetUser();
-  const [previewProfileImage, setPreviewProfileImage] = useState(null); // Preview URL
-  const [previewCoverImg, setPreviewCoverImg] = useState(null); // Preview URL for coverImg
+  const [previewProfileImage, setPreviewProfileImage] = useState(null);
+  const [previewCoverImg, setPreviewCoverImg] = useState(null);
   const [compressedProfileImageData, setCompressedProfileImageData] =
-    useState(null); // Sıkıştırılmış veri
-  const [compressedCoverImgData, setCompressedCoverImgData] = useState(null); // Sıkıştırılmış border veri
-  const profileImageRef = useRef(null); // File input referansı
-  const profileBorderRef = useRef(null); // File input referansı for border
+    useState(null);
+  const [compressedCoverImgData, setCompressedCoverImgData] = useState(null);
+
+  // Resimlerin silinip silinmediğini takip etmek için flag'ler
+  const [removeProfileImageFlag, setRemoveProfileImageFlag] = useState(false);
+  const [removeCoverImgFlag, setRemoveCoverImgFlag] = useState(false);
+
+  const profileImageRef = useRef(null);
+  const profileBorderRef = useRef(null);
 
   const [rawCoverImage, setRawCoverImage] = useState<string | null>(null);
   const [showCropModal, setShowCropModal] = useState(false);
@@ -42,7 +45,6 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
     }
   }, [usernameSlug]);
 
-  // Resim seçme fonksiyonu
   const handleProfileImageSelect = () => {
     profileImageRef.current?.click();
   };
@@ -50,63 +52,72 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
     profileBorderRef.current?.click();
   };
 
+  // Resmi kaldırma fonksiyonları
+  const handleRemoveProfileImage = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Kapsayıcının click event'ini tetiklemesin (dosya seçici açılmasın)
+    setPreviewProfileImage(null);
+    setCompressedProfileImageData(null);
+    setRemoveProfileImageFlag(true);
+  };
+
+  const handleRemoveCoverImg = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPreviewCoverImg(null);
+    setCompressedCoverImgData(null);
+    setRemoveCoverImgFlag(true);
+  };
+
   // Resim kaydetme fonksiyonu
   const handleSaveImage = async () => {
     try {
-      let newProfileImgName = user?.profileImg;
-      let newCoverImgName = profileUser?.coverImg;
-
-      // 1. Profil Resmi Güncelleme
+      // 1. Profil Resmi İşlemleri
       if (compressedProfileImageData) {
         const responseName = await updateProfileImg(compressedProfileImageData);
-        // Backend'den düz string (dosya adı) geldiğini varsayıyoruz
-        newProfileImgName = responseName;
-
-        // Context'i ve mevcut profileUser state'ini yerelde anında güncelle
         const updatedUser = { ...user, profileImg: responseName };
         setUser(updatedUser);
-
-        if (profileUser) {
-          profileUser.profileImg = responseName; // Ekranın anında tetiklenmesi için
-        }
+        if (profileUser) profileUser.profileImg = responseName;
+      } else if (removeProfileImageFlag) {
+        await removeProfileImg();
+        const updatedUser = { ...user, profileImg: null };
+        setUser(updatedUser);
+        if (profileUser) profileUser.profileImg = null;
       }
 
-      // 2. Kapak Resmi Güncelleme (Geliştireceğin zaman buraya ekleyebilirsin)
+      // 2. Kapak Resmi İşlemleri
       if (compressedCoverImgData) {
         const responseName = await updateCoverImg(compressedCoverImgData);
-        newCoverImgName = responseName;
         const updatedUser = { ...user, coverImg: responseName };
         setUser(updatedUser);
-        if (profileUser) {
-          profileUser.coverImg = responseName;
-        }
+        if (profileUser) profileUser.coverImg = responseName;
+      } else if (removeCoverImgFlag) {
+        await removeCoverImg();
+        const updatedUser = { ...user, coverImg: null };
+        setUser(updatedUser);
+        if (profileUser) profileUser.coverImg = null;
       }
 
-      // State'leri temizle (Yeşil barın kapanması için)
+      // State'leri temizle
       setPreviewProfileImage(null);
       setCompressedProfileImageData(null);
       setPreviewCoverImg(null);
       setCompressedCoverImgData(null);
+      setRemoveProfileImageFlag(false);
+      setRemoveCoverImgFlag(false);
 
       alert("Güncellemeler başarıyla kaydedildi!");
     } catch (error) {
-      console.error("Resim güncellenirken hata:", error);
-      alert("Resim güncellenirken bir hata oluştu.");
+      console.error("Resim güncellenirken/silinirken hata:", error);
+      alert("İşlem sırasında bir hata oluştu.");
     }
   };
 
-  // File input change handler
   const handleProfileImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      // 1. Tarayıcıda resmi hemen göstermek için geçici bir güvenli URL üretir (Base64 DEĞİLDİR)
       const previewUrl = URL.createObjectURL(file);
       setPreviewProfileImage(previewUrl);
-
-      // 2. Veri olarak DOĞRUDAN dosyanın kendisini sakla!
       setCompressedProfileImageData(file);
-
-      console.log("Seçilen gerçek dosya nesnesi:", file);
+      setRemoveProfileImageFlag(false); // Yeni seçildiyse silme flag'ini sıfırla
     }
   };
 
@@ -117,15 +128,12 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
     if (!file) return;
 
     const previewUrl = URL.createObjectURL(file);
-
-    // Resmin gerçek boyutlarını öğren
     const img = new window.Image();
     img.onload = () => {
       if (img.width < MIN_COVER_WIDTH) {
         alert(
-          `Kapak fotoğrafı için en az ${MIN_COVER_WIDTH}px genişliğinde bir görsel önerilir. Seçtiğiniz görsel ${img.width}px genişliğinde, netlik düşük olabilir.`,
+          `Kapak fotoğrafı için en az ${MIN_COVER_WIDTH}px genişliğinde bir görsel önerilir.`,
         );
-        // yine de devam etmesine izin verebilir ya da engelleyebilirsin
       }
       setRawCoverImage(previewUrl);
       setShowCropModal(true);
@@ -139,12 +147,12 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
       const previewUrl = URL.createObjectURL(compressed);
       setPreviewCoverImg(previewUrl);
       setCompressedCoverImgData(compressed);
+      setRemoveCoverImgFlag(false);
     } catch (error) {
-      console.error("Cover sıkıştırma hatası:", error);
-      // Sıkıştırma başarısız olursa kırpılmış orijinali kullan
       const previewUrl = URL.createObjectURL(croppedFile);
       setPreviewCoverImg(previewUrl);
       setCompressedCoverImgData(croppedFile);
+      setRemoveCoverImgFlag(false);
     }
     setShowCropModal(false);
     setRawCoverImage(null);
@@ -152,8 +160,13 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-  const currentProfileImg = user?.profileImg ?? profileUser?.profileImg;
-  const currentCoverImg = user?.coverImg ?? profileUser?.coverImg;
+  // Eğer silme flag'i aktifse resmi null göster
+  const currentProfileImg = removeProfileImageFlag
+    ? null
+    : (user?.profileImg ?? profileUser?.profileImg);
+  const currentCoverImg = removeCoverImgFlag
+    ? null
+    : (user?.coverImg ?? profileUser?.coverImg);
 
   const profileImgUrl = currentProfileImg
     ? currentProfileImg.startsWith("http")
@@ -167,20 +180,22 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
       : `${baseUrl}/${currentCoverImg.startsWith("/") ? currentCoverImg.slice(1) : currentCoverImg}`
     : null;
 
-  // Hatanın nerede olduğunu görmek için buraya mutlaka log atıp terminalden/konsoldan izle:
-  console.log("Hesaplanan Tam Kapak URL'i: ", coverImgUrl);
+  const hasChanges =
+    previewProfileImage ||
+    previewCoverImg ||
+    removeProfileImageFlag ||
+    removeCoverImgFlag;
 
   return (
     <div className="min-h-screen">
       <div className="w-full">
         <div className="w-full">
-          {/* Profil resmi ve bilgileri */}
+          {/* Kapak Görseli Alanı */}
           <div className="w-full aspect-[5/1] bg-gray-700 relative z-10">
             <div
-              className="relative w-full h-full overflow-hidden group cursor-pointer relative"
+              className="relative w-full h-full overflow-hidden group cursor-pointer"
               onClick={handleProfileBorderSelect}
             >
-              {/* Gizli file input */}
               <input
                 type="file"
                 ref={profileBorderRef}
@@ -191,8 +206,17 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
 
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black hidden group-hover:block"></div>
 
-              <div className="absolute inset-0 flex items-center justify-center transition-all">
-                <RiImageEditLine className="text-4xl text-white transition-colors duration-100 hidden group-hover:block transition-all drop-shadow-lg" />
+              {/* Kapak Resmi Üzerindeki Düzenleme / Kaldırma Butonları */}
+              <div className="absolute left-0 top-0 z-50">
+                {coverImgUrl && (
+                  <button
+                    onClick={handleRemoveCoverImg}
+                    className="p-2 bg-red-800 text-white items-center justify-center cursor-pointer"
+                    title="Kapak Görselini Kaldır"
+                  >
+                    <FiTrash2 className="text-sm" />
+                  </button>
+                )}
               </div>
 
               {previewCoverImg ? (
@@ -217,15 +241,16 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                 </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <RiImageEditLine className="text-4xl text-gray-500" />
+                  <RiImageEditLine className="text-4xl text-gray-400" />
                 </div>
               )}
             </div>
+
+            {/* Profil Resmi Alanı */}
             <div
-              className="absolute h-34 w-34 rounded-full overflow-hidden bg-gray-200 -bottom-10 left-20 z-20 flex items-center justify-center group shadow-lg shadow-black/20 transition-all cursor-pointer"
+              className="absolute h-34 w-34 rounded-full bg-gray-200 -bottom-10 left-20 z-20 flex items-center justify-center group shadow-lg shadow-black/20 transition-all cursor-pointer"
               onClick={handleProfileImageSelect}
             >
-              {/* Gizli file input */}
               <input
                 type="file"
                 ref={profileImageRef}
@@ -234,7 +259,6 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                 className="hidden"
               />
 
-              {/* Resim önizlemesi - eğer yeni resim seçildiyse onu göster, yoksa mevcut resmi göster */}
               <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
                 {previewProfileImage ? (
                   <Image
@@ -242,9 +266,6 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                     alt=""
                     fill
                     className="hover:scale-105 transition-transform duration-200 object-cover"
-                    style={{
-                      imageRendering: "auto",
-                    }}
                   />
                 ) : profileImgUrl ? (
                   <div className="relative w-34 h-34">
@@ -253,23 +274,33 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                       alt=""
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-200"
-                      style={{
-                        imageRendering: "auto",
-                      }}
                     />
                   </div>
                 ) : (
                   <FiUser className="text-7xl text-gray-500 group-hover:text-gray-300 transition-all" />
                 )}
+
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black hidden group-hover:block"></div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black hidden group-hover:block"></div>
-              {/* Edit icon overlay */}
-              <div className="absolute inset-0 flex items-center justify-center transition-all">
-                <RiImageEditLine className="text-4xl text-white transition-colors duration-100 hidden group-hover:block transition-all drop-shadow-lg" />
+
+              {/* Profil Resmi Üzerindeki Düzenleme / Kaldırma Butonları */}
+              <div className="absolute left-2 top-2 items-center justify-center z-30">
+                {profileImgUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveProfileImage}
+                    className="p-2 bg-red-800 text-white rounded-full items-center justify-center cursor-pointer"
+                    title="Profil Resmini Kaldır"
+                  >
+                    <FiTrash2 className="text-sm" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
+
           <div className="mt-15 px-20 flex flex-col gap-5">
+            {/* Kullanıcı Bilgileri vb. aynı kalıyor */}
             <div className="w-full flex gap-10 border-b border-gray-200 pb-4">
               <div className="flex flex-col">
                 <h3 className="text-gray-500 text-xs">
@@ -297,10 +328,13 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
             </div>
           </div>
         </div>
-        {(previewProfileImage || previewCoverImg) && (
-          <div className="fixed bottom-0 left-0 right-0 bg-green-100 h-20 flex items-center justify-between px-5 z-50">
+
+        {/* Kaydet / İptal Barı */}
+        {hasChanges && (
+          <div className="fixed bottom-0 left-0 right-0 bg-green-100 h-20 flex items-center justify-between px-5 z-50 shadow-inner">
             <p className="text-gray-700">
-              Yeni profil resminiz hazır. Kaydetmek için butona tıklayın.
+              Profil görsellerinizde değişiklik yaptınız. Kaydetmek için butona
+              tıklayın.
             </p>
             <div className="flex gap-3">
               <button
@@ -309,6 +343,8 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                   setCompressedProfileImageData(null);
                   setPreviewCoverImg(null);
                   setCompressedCoverImgData(null);
+                  setRemoveProfileImageFlag(false);
+                  setRemoveCoverImgFlag(false);
                 }}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors cursor-pointer"
               >
@@ -323,6 +359,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
             </div>
           </div>
         )}
+
         {showCropModal && rawCoverImage && (
           <CoverCropModal
             imageSrc={rawCoverImage}

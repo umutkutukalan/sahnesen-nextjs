@@ -143,6 +143,44 @@ export const searchUsersClient = async (query: string) => {
   return response.data;
 };
 
+export const removeProfileImg = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/profile-image`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Profil fotoğrafı silinirken hata oluştu:", error);
+    throw error;
+  }
+};
+
+export const removeCoverImg = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/cover-image`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Kapak fotoğrafı silinirken hata oluştu:", error);
+    throw error;
+  }
+};
+
 export const userService = {
   getUserProfile,
   updateUser,

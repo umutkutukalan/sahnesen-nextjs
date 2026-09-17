@@ -8,7 +8,7 @@ import SocialAccounts from "@/components/profile_settings/SocialAccounts";
 
 const ProfileSettings = () => {
   const { user } = useAuth();
-  const [settingsTitle, setSettingsTitle] = useState("Hesap Bilgileri");
+  const [settingsTitle, setSettingsTitle] = useState<string>("Hesap Bilgileri");
   return (
     <div className="page">
       <div className="w-full h-full flex">
@@ -28,7 +28,7 @@ const ProfileSettings = () => {
         </div>
         <div className="w-4/5 h-full flex flex-col gap-5">
           {settingsTitle === "Hesap Bilgileri" && (
-            <ProfileDetails usernameSlug={user?.username} />
+            <ProfileDetails usernameSlug={user?.username || ""} />
           )}
           {settingsTitle === "Bağlantılar" && <SocialAccounts user={user} />}
         </div>
