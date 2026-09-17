@@ -47,7 +47,7 @@ const Posts = ({
             {/* SOL ANA AKIŞ */}
             <div className="w-full lg:w-full flex flex-col border-gray-200 lg:border-r pb-5">
               <div className="w-full flex flex-col items-center">
-                <div className="w-full h-12 flex items-center justify-center bg-yellow-500 text-xs">
+                <div className="w-full h-12 flex items-center justify-center bg-green-600 text-xs">
                   {/* <span>Lorem ipsum dolor sit amet.</span> */}
                 </div>
 

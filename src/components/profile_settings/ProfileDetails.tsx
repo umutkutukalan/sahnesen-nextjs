@@ -29,6 +29,9 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
     useState(null);
   const [compressedCoverImgData, setCompressedCoverImgData] = useState(null);
 
+  console.log("user", user);
+  console.log("profileUser", profileUser);
+
   // Resimlerin silinip silinmediğini takip etmek için flag'ler
   const [removeProfileImageFlag, setRemoveProfileImageFlag] = useState(false);
   const [removeCoverImgFlag, setRemoveCoverImgFlag] = useState(false);
@@ -157,6 +160,16 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
     setShowCropModal(false);
     setRawCoverImage(null);
   };
+
+  // Eğer kendi profil detay sayfasındaysak ve global user değişirse profileUser'ı da güncelle
+  useEffect(() => {
+    if (user && profileUser && user.username === profileUser.username) {
+      // user güncellendiğinde profileUser'ın ad, soyad ve bio'sunu da senkronize et
+      profileUser.name = user.name;
+      profileUser.surname = user.surname;
+      profileUser.bio = user.bio;
+    }
+  }, [user]);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -304,19 +317,19 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
             <div className="w-full flex gap-10 border-b border-gray-200 pb-4">
               <div className="flex flex-col">
                 <h3 className="text-gray-500 text-xs">
-                  @{profileUser?.username || "user"}
+                  @{user?.username || "user"}
                 </h3>
                 <div className="flex items-center gap-1">
                   <h1 className="text-lg">
-                    {profileUser?.name} {profileUser?.surname}
+                    {user?.name} {user?.surname}
                   </h1>
                   <TbRosetteDiscountCheckFilled
                     className="text-blue-500 text-2xl"
                     title="Onaylı Yazar"
                   />
                 </div>
-                <p className="text-gray-500 text-xs">
-                  {profileUser?.bio || "Bu kullanıcı hakkında bilgi yok."}
+                <p className="text-gray-500 text-xs whitespace-pre-line">
+                  {user?.bio || "Bu kullanıcı hakkında bilgi yok."}
                 </p>
               </div>
             </div>

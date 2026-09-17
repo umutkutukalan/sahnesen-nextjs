@@ -30,6 +30,7 @@ export interface User {
   email: string;
   name: string;
   surname: string;
+  bio: string;
   slug: string;
   profileImg: string;
   coverImg: string;

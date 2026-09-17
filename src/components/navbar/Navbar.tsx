@@ -167,6 +167,7 @@ const Navbar = ({
         }`}
       >
         <>
+          <div className="h-1 w-full bg-green-600 absolute top-0 left-0"></div>
           <div className="flex items-center gap-4">
             {/* Tıklama mantığı güncellenen menü ikonu */}
             <RiMenu4Line

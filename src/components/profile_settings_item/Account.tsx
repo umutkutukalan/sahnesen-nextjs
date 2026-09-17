@@ -11,8 +11,7 @@ const Account = () => {
     surname: "",
     bio: "",
   });
-  const { updateUser, isLoading, error } =
-    useUser();
+  const { updateUser, isLoading, error } = useUser();
   const [editProfile, setEditProfile] = useState(false);
   const [hasChanges, setHasChanges] = useState(false); // Değişiklik kontrolü için
 
@@ -34,15 +33,35 @@ const Account = () => {
     setHasChanges(hasChanged);
   };
 
-  // Input değişikliklerini handle et
+  // Textarea input değişiminde veya enter kontrolünde satır sınırı
   const handleInputChange = (field, value) => {
     if (value.length <= limits[field]) {
+      // Eğer alan 'bio' ise ve kullanıcı alt alta çok fazla indiyse engelle (Örn: Max 3 satır)
+      if (field === "bio") {
+        const lineCount = value.split("\n").length;
+        // Mevcut metindeki satır sayısı 3'ten büyükse ve kullanıcı yeni satır eklemeye çalışıyorsa engelle
+        // (Ancak silme işlemlerine yani '\n' azaltılmasına izin vermeliyiz)
+        if (lineCount > 3 && value.length > formData.bio.length) {
+          return; // 3 satırdan fazlasına izin verme
+        }
+      }
+
       const newFormData = {
         ...formData,
         [field]: value,
       };
       setFormData(newFormData);
       checkForChanges(newFormData);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      const currentLines = formData.bio.split("\n").length;
+      // Örneğin maksimum 3 satıra izin verelim
+      if (currentLines >= 3) {
+        e.preventDefault(); // Enter tuşunun alt satıra geçme etkisini engelle
+      }
     }
   };
 
@@ -166,6 +185,7 @@ const Account = () => {
                   <textarea
                     value={formData.bio}
                     onChange={(e) => handleInputChange("bio", e.target.value)}
+                    onKeyDown={handleKeyDown}
                     id="bio"
                     placeholder="Kendiniz hakkında kısa bir açıklama..."
                     className="text-xs w-full h-24 focus:outline-none p-2 border border-gray-200 focus:border-gray-600 rounded-md resize-none overflow-hidden leading-tight placeholder-gray-400 text-gray-800"
@@ -200,10 +220,11 @@ const Account = () => {
               <button
                 onClick={handleSave}
                 disabled={!hasChanges || isLoading}
-                className={`rounded-md px-4 py-2 text-xs transition-colors ${hasChanges && !isLoading
-                  ? "bg-gray-500 hover:bg-gray-600 text-white cursor-pointer"
-                  : "bg-gray-100 text-gray-500 cursor-not-allowed"
-                  }`}
+                className={`rounded-md px-4 py-2 text-xs transition-colors ${
+                  hasChanges && !isLoading
+                    ? "bg-gray-500 hover:bg-gray-600 text-white cursor-pointer"
+                    : "bg-gray-100 text-gray-500 cursor-not-allowed"
+                }`}
               >
                 {isLoading ? "Kaydediliyor..." : "Kaydet"}
               </button>

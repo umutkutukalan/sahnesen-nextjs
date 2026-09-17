@@ -252,7 +252,9 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                   className="mt-5 flex flex-col gap-1 border-l border-gray-400 pl-2 text-gray-600"
                   style={{ fontSize: "0.7rem" }}
                 >
-                  <p>{profileUser?.bio || "Biyografi alanı doldurulmadı."}</p>
+                  <p className="whitespace-pre-line">
+                    {profileUser?.bio || "Biyografi alanı doldurulmadı."}
+                  </p>
                 </div>
 
                 {publicSocialAccounts.length > 0 && (
