@@ -21,6 +21,7 @@ import {
 } from "@/utils";
 import { useToProfile } from "@/utils/useToProfile";
 import { useAuth } from "@/context/UserContext";
+import { AxiosError } from "axios";
 
 interface FoyerPageProps {
   params: Promise<{ slug: string }>;
@@ -159,8 +160,10 @@ export default function FoyerPage({ params }: FoyerPageProps) {
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Mektup gönderilemedi.");
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        alert(err?.response?.data?.message || "Mektup gönderilemedi.");
+      }
     }
   };
 
@@ -276,8 +279,10 @@ export default function FoyerPage({ params }: FoyerPageProps) {
       if (openRepliesCommentId !== parentId) {
         setOpenRepliesCommentId(parentId);
       }
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Yanıt gönderilemedi.");
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        alert(err?.response?.data?.message || "Yanıt gönderilemedi.");
+      }
     }
   };
 

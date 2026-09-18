@@ -2,11 +2,7 @@
 
 import { FiUser, FiMoreHorizontal } from "react-icons/fi";
 import { LuImages, LuPenLine, LuTheater } from "react-icons/lu";
-import {
-  TbBookmark,
-  TbBookmarkFilled,
-  TbRosetteDiscountCheckFilled,
-} from "react-icons/tb";
+import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
 import {
   PiFeather,
   PiFeatherFill,

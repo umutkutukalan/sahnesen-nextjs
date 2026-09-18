@@ -24,6 +24,18 @@ interface UserProviderProps {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+export interface UserMetrics {
+  contentCount: number;
+  totalReadingTime: number;
+  followerCount: number;
+  ticketedShowCount: number;
+  totalLightCount: number;
+  totalSignatureCount: number;
+  profileViews: number;
+  reputationScore: number;
+  badges: string[];
+}
+
 export interface User {
   id: number;
   username: string;
@@ -35,6 +47,7 @@ export interface User {
   profileImg: string;
   coverImg: string;
   role: string;
+  metrics: UserMetrics | null;
 }
 
 export interface PublicUser {
@@ -50,6 +63,7 @@ export interface PublicUser {
   city: string;
   district: string;
   role: string;
+  metrics: UserMetrics | null;
 }
 
 export const UserProvider = ({ children }: UserProviderProps) => {

@@ -52,14 +52,14 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     getFollowing,
     followings,
     hasMore: hasMoreFollowing,
-    isLoading: loadingFollowing,
+    getFollowingLoading: loadingFollowing,
   } = useGetFollowing();
 
   const {
     getFollowers,
     followers,
     hasMore: hasMoreFollowers,
-    isLoading: loadingFollowers,
+    getFollowersLoading: loadingFollowers,
   } = useGetFollowers();
 
   // Callback fonksiyonunu useCallback ile sarmalayarak referans değişikliliğinden kaynaklı döngüyü kesiyoruz
@@ -189,14 +189,18 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                     <h1 className="text-xl font-semibold">
                       {profileUser?.name} {profileUser?.surname}
                     </h1>
-                    <Image
-                      src={kurucusahne}
-                      width={16}
-                      height={16}
-                      alt="Kurucu"
-                      className="object-contain"
-                      title="Kurucu"
-                    />
+
+                    {/* Kurucu Rozeti Kontrolü */}
+                    {profileUser?.metrics?.badges?.includes("FOUNDER") && (
+                      <Image
+                        src={kurucusahne}
+                        width={16}
+                        height={16}
+                        alt="Kurucu"
+                        className="object-contain"
+                        title="Kurucu Sahne"
+                      />
+                    )}
                   </div>
                 </div>
 

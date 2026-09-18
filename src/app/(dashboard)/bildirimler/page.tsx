@@ -1,7 +1,6 @@
 "use client";
 
 import { useNotifications } from "@/context/NotificationContext";
-import { useAuth } from "@/context/UserContext";
 import { useFollow } from "@/hooks/follow/useFollow";
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { getFullImageUrl } from "@/utils/image";

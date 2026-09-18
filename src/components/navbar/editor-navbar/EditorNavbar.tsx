@@ -196,7 +196,6 @@ const EditorNavbar = ({
                     ? "text-white hover:text-gray-100"
                     : "text-black hover:text-gray-600"
                 }`}
-                onClick={() => setShowLoginModal(true)}
               >
                 Giriş Yap
               </button>

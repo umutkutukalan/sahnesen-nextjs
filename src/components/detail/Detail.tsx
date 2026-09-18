@@ -689,7 +689,7 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
-  const { isFollowing, toggleFollow, isLoading } = useFollow(usernameSlug);
+  const { isFollowing, toggleFollow, followLoading } = useFollow(usernameSlug);
 
   const authorFullName =
     `${post.authorName || ""} ${post.authorSurname || ""}`.trim();
@@ -815,7 +815,7 @@ const Detail = ({ post }: DetailProps) => {
                   ) : (
                     <button
                       onClick={toggleFollow}
-                      disabled={isLoading}
+                      disabled={followLoading}
                       className={`px-2 py-0.5 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-[10px] cursor-pointer transition-colors hover:bg-gray-50 disabled:opacity-50 ${
                         isFollowing
                           ? "bg-blue-50 text-blue-700 border-blue-200"
