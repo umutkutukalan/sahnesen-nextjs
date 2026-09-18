@@ -71,12 +71,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await api.get(`${baseUrl}/api/users/me`, {
+        const response = await api.get(`/api/users/me`, {
           withCredentials: true,
         });
         setUser(response.data);
@@ -88,13 +86,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     };
 
     fetchUser();
-  }, [baseUrl]);
+  }, []);
 
   const logout = async () => {
     try {
       setIsLoggingOut(true); // Çıkış sürecini başlat (loading aktif)
       await api.post(
-        `${baseUrl}/auth/logout`, // Navbar'daki endpoint ile uyumlu hale getirildi
+        `/auth/logout`, // Navbar'daki endpoint ile uyumlu hale getirildi
         {},
         { withCredentials: true },
       );

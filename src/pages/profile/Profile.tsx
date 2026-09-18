@@ -108,6 +108,8 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
       : `${baseUrl}/${profileUser.coverImg}`
     : null;
 
+  console.log("profileUser: ", profileUser);
+
   return (
     <div className="min-h-screen">
       <div className="w-full">
