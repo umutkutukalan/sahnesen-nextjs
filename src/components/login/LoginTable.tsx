@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLogin } from "@/hooks/login/useLogin";
 import { ForgotPasswordModal } from "./ForgotPasswordModal"; // yolunu kendine göre ayarlayabilirsin
+import GoogleLogin from "./GoogleLogin";
 
 const LoginTable = ({ onSuccess }: { onSuccess: () => void }) => {
   const { login, setIdentifier, setPassword } = useLogin(onSuccess);
@@ -41,7 +42,7 @@ const LoginTable = ({ onSuccess }: { onSuccess: () => void }) => {
           <span className="text-xs text-gray-500 px-2">veya</span>
           <span className="flex-1 h-px bg-gray-300 block"></span>
         </div>
-        {/* <GoogleLogin /> */}
+        <GoogleLogin />
       </div>
 
       {/* Şifremi Unuttum Modalı */}
