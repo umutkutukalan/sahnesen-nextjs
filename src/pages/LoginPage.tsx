@@ -33,10 +33,9 @@ const LoginPage = ({ setShowLoginModal }: LoginPageProps) => {
         <IoClose className="text-sm" />
       </div>
       <div className="flex-1 w-full h-full py-10 flex flex-col justify-between items-center">
-        <div className="flex items-center gap-1">
-          <FaFireFlameCurved />
-          <h1 className="text-center">sahnesen</h1>
-        </div>
+        <h1 className="text-2xl text-center merriweather-sans font-semibold tracking-tighter select-none">
+          Sahnesen
+        </h1>
         <div className="flex flex-col w-full justify-center items-center gap-2">
           <div className="flex flex-col items-center text-sm gap-2 w-100">
             <p className="text-2xl text-center w-full mb-2">
@@ -51,15 +50,18 @@ const LoginPage = ({ setShowLoginModal }: LoginPageProps) => {
                 Giris Yap
               </button>
               <button
-                className={`flex-1 px-8 py-2 rounded-sm cursor-pointer ${register ? "bg-white" : ""
-                  }`}
+                className={`flex-1 px-8 py-2 rounded-sm cursor-pointer ${
+                  register ? "bg-white" : ""
+                }`}
                 onClick={() => handleRegister()}
               >
                 Kaydol
               </button>
             </div>
             {sign && <LoginTable onSuccess={() => setShowLoginModal(false)} />}
-            {register && <RegisterTable onSuccess={() => setShowLoginModal(false)} />}
+            {register && (
+              <RegisterTable onSuccess={() => setShowLoginModal(false)} />
+            )}
           </div>
         </div>
         <div
@@ -73,8 +75,7 @@ const LoginPage = ({ setShowLoginModal }: LoginPageProps) => {
             <button className="text-blue-500">sahnesen</button> , fikirlerini
             paylaşan, sesini duyuran, çizgilerle düş kuranların dijital durağı.
             Giriş yaparak yazılım projelerini inceleyebilir, blogları
-            okuyabilir, çizerlerin kitaplarında
-            kaybolabilirsin.
+            okuyabilir, çizerlerin kitaplarında kaybolabilirsin.
           </p>
         </div>
       </div>
