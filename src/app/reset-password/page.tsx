@@ -51,7 +51,7 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-md flex flex-col gap-4">
         <h2 className="text-xl font-bold text-black text-center">
           Yeni Şifre Belirleme

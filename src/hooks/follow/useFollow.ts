@@ -8,8 +8,6 @@ export const useFollow = (
   onFollowChange?: () => void,
 ) => {
   const { user } = useAuth();
-  // Dışarıdan (ör. bildirim listesinden) zaten biliniyorsa
-  // başlangıç değeri olarak onu kullan, yoksa false ile başla.
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing ?? false);
   const [followCounts, setFollowCounts] = useState({
     followingCount: 0,
@@ -18,15 +16,20 @@ export const useFollow = (
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // 💡 KRİTİK DÜZELTME: Dışarıdan gelen initialIsFollowing prop'u güncellendiğinde state'i senkronize et
+  useEffect(() => {
+    if (initialIsFollowing !== undefined) {
+      setIsFollowing(initialIsFollowing);
+    }
+  }, [initialIsFollowing]);
+
   useEffect(() => {
     const fetchFollowData = async () => {
       try {
         const stats = await followService.getFollowStats(targetUsername);
         setFollowCounts(stats);
 
-        // initialIsFollowing zaten sağlanmışsa (bildirim/liste
-        // ekranından geliyorsa) checkIsFollowing'i tekrar çağırıp
-        // butonun anlık değişmesine gerek yok.
+        // Eğer dışarıdan initialIsFollowing gelmediyse backend'den kontrol et
         if (
           user &&
           user.username !== targetUsername &&

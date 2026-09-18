@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
 import {
@@ -62,14 +62,18 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     isLoading: loadingFollowers,
   } = useGetFollowers();
 
+  // Callback fonksiyonunu useCallback ile sarmalayarak referans değişikliliğinden kaynaklı döngüyü kesiyoruz
+  const handleFollowChange = useCallback(() => {
+    if (targetUsername) {
+      getFollowing(targetUsername, true);
+      getFollowers(targetUsername, true);
+    }
+  }, [targetUsername, getFollowing, getFollowers]);
+
   const { isFollowing, followCounts, toggleFollow } = useFollow(
     targetUsername,
-    () => {
-      if (targetUsername) {
-        getFollowing(targetUsername, true);
-        getFollowers(targetUsername, true);
-      }
-    },
+    undefined,
+    handleFollowChange,
   );
 
   useEffect(() => {
