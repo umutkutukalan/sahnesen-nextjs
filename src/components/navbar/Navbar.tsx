@@ -348,22 +348,12 @@ const Navbar = ({
               </div>
             )}
             {user && (
-              <div className="relative">
-                {unreadCount > 0 && (
-                  <div className="absolute -top-3 -right-2 min-w-[20px] min-h-[20px] bg-white rounded-sm flex items-center justify-center z-10">
-                    <div className="w-[8px] px-2 min-h-[16px] rounded-sm bg-green-900 flex items-center justify-center">
-                      <p className="text-white text-[10px] font-medium">
-                        {unreadCount}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <div className="text-[20px]">
-                  <NavLinks
-                    href="/bildirimler"
-                    logo={<RiNotification2Line />}
-                  />
-                </div>
+              <div className="text-[20px]">
+                <NavLinks
+                  href="/bildirimler"
+                  logo={<RiNotification2Line />}
+                  badgeCount={unreadCount}
+                />
               </div>
             )}
             {!user && (
