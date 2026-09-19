@@ -4,7 +4,6 @@ import RegisterTable from "@/components/login/RegisterTable";
 import { loginpageimg } from "@/utils";
 import Image from "next/image";
 import { useState } from "react";
-import { FaFireFlameCurved } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 
 export interface LoginPageProps {
