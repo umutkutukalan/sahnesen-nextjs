@@ -124,11 +124,20 @@ export default function TumBildirimlerPage() {
                   }}
                   className="text-[11px] md:text-xs text-gray-800"
                 >
-                  <span className="text-black font-semibold hover:underline">
-                    {notification.sender?.name} {notification.sender?.surname}
-                  </span>
-                  {`, `}
-                  {notification.message}
+                  {notification.type === "BADGE_EARNED" ? (
+                    <span className="text-black font-semibold hover:underline">
+                      {notification.message}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-black font-semibold hover:underline">
+                        {notification.sender?.name}{" "}
+                        {notification.sender?.surname}
+                      </span>
+                      {`, `}
+                      {notification.message}
+                    </>
+                  )}
                 </p>
                 <span className="text-[10px] text-gray-400 whitespace-nowrap">
                   {formatRelativeTime(notification.createdAt)}
