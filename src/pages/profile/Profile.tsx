@@ -143,12 +143,14 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             <div className="flex-1 min-w-0 border-r border-gray-100 pr-4 lg:pr-8">
               <div className="w-full flex justify-center">
                 <div className="w-full max-w-4xl flex flex-col transition-all duration-300">
-                  {/* Filtreleme Başlıkları */}
-                  <PageAbout
-                    feedScope="all"
-                    selectedType={selectedPostType}
-                    onSelectType={(type) => setSelectedPostType(type)}
-                  />
+                  {/* STICKY YAPILAN ALAN: Top değerini projedeki üst navigasyon çubuğunun yüksekliğine göre ayarlayabilirsin (örn: top-0 veya top-12) */}
+                  <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-sm py-3 transition-all">
+                    <PageAbout
+                      feedScope="all"
+                      selectedType={selectedPostType}
+                      onSelectType={(type) => setSelectedPostType(type)}
+                    />
+                  </div>
 
                   {/* Dinamik Gönderi Akışı */}
                   <div className="mt-6 w-full min-w-0">

@@ -746,21 +746,20 @@ const Detail = ({ post }: DetailProps) => {
           {/* YAZAR ÜST BARI */}
           <div className="h-full flex flex-col w-full">
             <div className="relative w-full flex items-center justify-between overflow-hidden h-20">
-              <div className="absolute top-0 left-0">
+              {/* <div className="absolute inset-0 w-400 h-full bg-gradient-to-r from-white via-transparent to-transparent z-10"></div>
+              <div className="absolute inset-0 w-full h-full">
                 <Image
-                  src={solperde}
+                  src={}
                   alt=""
-                  width={100}
-                  height={100}
+                  width={2000}
+                  height={2000}
+                  priority
                   unoptimized
-                  className="w-30 h-30"
+                  className="w-full h-full object-cover"
                 />
-              </div>
-              <div className="w-full h-full flex items-start justify-between">
-                <div
-                  className="flex flex-col gap-1.5"
-                  style={{ paddingLeft: "50px", paddingTop: "6px" }}
-                >
+              </div> */}
+              <div className="relative w-full h-full flex items-start justify-between border-b border-gray-200 z-20">
+                <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-2">
                     <div
                       className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 cursor-pointer flex items-end justify-center"
@@ -797,7 +796,7 @@ const Detail = ({ post }: DetailProps) => {
                         /> */}
                       </div>
                       <span
-                        className="text-[10px] text-gray-400 cursor-pointer"
+                        className="text-[10px] text-gray-500 cursor-pointer"
                         onClick={() => ToProfile(post.authorUsername)}
                       >
                         @{post.authorUsername}
@@ -859,7 +858,7 @@ const Detail = ({ post }: DetailProps) => {
                 )}
               </div>
 
-              <div className="relative flex items-center gap-1">
+              <div className="relative flex items-center justify-between gap-1">
                 <div
                   className="absolute left-0 top-0 w-5 h-5 bg-black"
                   style={{
@@ -898,11 +897,22 @@ const Detail = ({ post }: DetailProps) => {
                     </>
                   )}
                 </div>
+                <div className="flex items-center gap-2">
+                  {post.tags?.map((tag, index) => (
+                    <Link
+                      key={index}
+                      href={`/tag/${tag}`}
+                      className="px-2 py-1 rounded-sm border border-gray-200 flex items-center justify-center text-xs text-gray-500 list-none"
+                    >
+                      <li>{tag}</li>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* GÜNCELLENMİŞ BEĞENİ, PARLATMA VE KAYDETME BARI */}
-            <div className="h-14 w-full flex items-center py-2.5 justify-between border-b border-gray-200 select-none">
+            <div className="h-14 w-full flex  py-2.5 justify-between border-b border-gray-200 select-none">
               <div className="flex items-center gap-3">
                 {/* Beğeni Butonu */}
                 <button
@@ -966,17 +976,6 @@ const Detail = ({ post }: DetailProps) => {
                     <TbBookmark className="text-xl hover:scale-110 transition-transform" />
                   )}
                 </button>
-
-                {/* Post Tipi Etiketi */}
-                {post.tags?.map((tag, index) => (
-                  <Link
-                    key={index}
-                    href={`/tag/${tag}`}
-                    className="px-2 py-1 rounded-sm border border-gray-200 flex items-center justify-center text-xs text-gray-500 list-none"
-                  >
-                    <li>{tag}</li>
-                  </Link>
-                ))}
 
                 {/* Diğer Seçenekler */}
                 <button className="text-2xl text-gray-400 hover:text-gray-700 transition-colors cursor-pointer">
