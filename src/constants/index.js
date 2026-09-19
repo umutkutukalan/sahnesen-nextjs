@@ -34,12 +34,12 @@ export const profileSettingsOptions = [
     id: 3,
     title: "Gizlilik Ayarları",
   },
-  {
-    id: 4,
-    title: "Bildirim Ayarları",
-  },
-  {
-    id: 5,
-    title: "Tema Ayarları",
-  },
+  // {
+  //   id: 4,
+  //   title: "Bildirim Ayarları",
+  // },
+  // {
+  //   id: 5,
+  //   title: "Tema Ayarları",
+  // },
 ];

@@ -209,7 +209,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                 <div className="flex lg:flex-row flex-col lg:items-center gap-4 mt-2">
                   {isOwnProfile ? (
                     <button
-                      onClick={() => router.push("/profil/me/settings")}
+                      onClick={() => router.push("/me/settings")}
                       className="px-3 py-1 bg-gray-100 text-gray-700 flex items-center justify-center gap-1 border border-gray-300 rounded-sm text-xs cursor-pointer transition-colors hover:bg-gray-200"
                     >
                       <CiSettings className="text-sm" />

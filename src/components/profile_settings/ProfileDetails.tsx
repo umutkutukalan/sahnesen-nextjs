@@ -19,10 +19,13 @@ import DeactivateAccount from "../profile_settings_item/DeactivateAccount";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import { getOptimizedImageUrl } from "@/utils/ImageUtils";
 import CoverCropModal from "../CoverCropModal";
+import { profileSettingsOptions } from "@/constants";
+import SocialAccounts from "./SocialAccounts";
 
 const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
   const { user, setUser } = useAuth();
   const { getUser, profileUser, isLoading } = useGetUser();
+  const [activeTab, setActiveTab] = useState("Hesap Bilgileri");
   const [previewProfileImage, setPreviewProfileImage] = useState(null);
   const [previewCoverImg, setPreviewCoverImg] = useState(null);
   const [compressedProfileImageData, setCompressedProfileImageData] =
@@ -313,7 +316,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
           </div>
 
           <div className="mt-15 px-20 flex flex-col gap-5">
-            {/* Kullanıcı Bilgileri vb. aynı kalıyor */}
+            {/* Kullanıcı Adı ve Bio Alanı */}
             <div className="w-full flex gap-10 border-b border-gray-200 pb-4">
               <div className="flex flex-col">
                 <h3 className="text-gray-500 text-xs">
@@ -323,21 +326,50 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                   <h1 className="text-lg">
                     {user?.name} {user?.surname}
                   </h1>
-                  <TbRosetteDiscountCheckFilled
-                    className="text-blue-500 text-2xl"
-                    title="Onaylı Yazar"
-                  />
                 </div>
                 <p className="text-gray-500 text-xs whitespace-pre-line">
                   {user?.bio || "Bu kullanıcı hakkında bilgi yok."}
                 </p>
               </div>
             </div>
-            <div className="w-full flex flex-col">
-              <Account />
-              <EmailField />
-              <DeactivateAccount />
-              <DeleteAccount />
+
+            {/* --- YATAY TAB MENÜ (Resimlerin ve Bio'nun Hemen Altı) --- */}
+            <div className="flex items-center gap-8 border-b border-gray-200">
+              {profileSettingsOptions.map((option) => {
+                const isActive = activeTab === option.title;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setActiveTab(option.title)}
+                    className={`pb-3 text-sm font-medium transition-colors cursor-pointer relative ${
+                      isActive
+                        ? "text-black border-b-2 border-black"
+                        : "text-gray-500 hover:text-black"
+                    }`}
+                  >
+                    {option.title}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* --- SEKMELERE GÖRE DEĞİŞEN İÇERİK ALANI --- */}
+            <div className="w-full flex flex-col py-2">
+              {activeTab === "Hesap Bilgileri" && (
+                <div className="flex flex-col gap-5">
+                  <Account />
+                  <DeactivateAccount />
+                  <DeleteAccount />
+                </div>
+              )}
+
+              {activeTab === "Bağlantılar" && <SocialAccounts user={user} />}
+
+              {activeTab === "Gizlilik Ayarları" && (
+                <div className="text-gray-500 py-4">
+                  Gizlilik ayarları yakında burada yer alacak.
+                </div>
+              )}
             </div>
           </div>
         </div>
