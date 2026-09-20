@@ -12,6 +12,7 @@ export interface PostInteractionStatus {
   isLiked: boolean;
   isShined: boolean;
   isBookmarked: boolean;
+  isReported: boolean;
   likeCount: number;
   shineCount: number;
 }

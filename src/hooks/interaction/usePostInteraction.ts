@@ -15,6 +15,7 @@ export const usePostInteraction = (
     isLiked: false,
     isShined: false,
     isBookmarked: false,
+    isReported: false,
     likeCount: 0,
     shineCount: 0,
   });
@@ -82,6 +83,10 @@ export const usePostInteraction = (
     }
   };
 
+  const markReported = () => {
+    setStatus((prev) => ({ ...prev, isReported: true }));
+  };
+
   return {
     status,
     isLoading,
@@ -89,5 +94,6 @@ export const usePostInteraction = (
     toggleShine: () => toggleReaction(shineType),
     toggleBookmark,
     markBookmarked,
+    markReported,
   };
 };

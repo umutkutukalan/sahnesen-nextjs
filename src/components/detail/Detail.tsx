@@ -48,6 +48,7 @@ import {
   CommentResponse,
   commentService,
 } from "@/services/client/comment/comment.service";
+import { reportService } from "@/services/client/report/report.service";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -116,6 +117,10 @@ const Detail = ({ post }: DetailProps) => {
   const router = useRouter();
   const { ToProfile } = useToProfile();
   const [comments, setComments] = useState<CommentResponse[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
 
   const isOwnProfile = usernameSlug === user?.username;
 
@@ -144,7 +149,10 @@ const Detail = ({ post }: DetailProps) => {
     toggleLike,
     toggleShine,
     toggleBookmark,
+    markReported,
   } = usePostInteraction(post.id, currentShineType);
+
+  console.log("status", status);
 
   // Sayı Formatlayıcı Helper (Örn: 1200 -> 1.2K)
   const formatCount = (count: number) => {
@@ -689,6 +697,36 @@ const Detail = ({ post }: DetailProps) => {
     }
   };
 
+  const handleReportSubmit = async () => {
+    if (!reportReason.trim()) return;
+    try {
+      setIsReporting(true);
+      await reportService.createReport({
+        targetId: post.id,
+        reportType: "POST",
+        reason: reportReason,
+      });
+
+      // 1. Hook üzerinden state'i anında güncelle (Refreshi beklemez)
+      markReported();
+
+      alert("İçerik başarıyla raporlandı. İncelemeye alınacaktır.");
+      setShowReportModal(false);
+      setReportReason("");
+    } catch (error: any) {
+      console.error("Rapor gönderilemedi:", error);
+      // Eğer backend'den zaten raporlandı hatası gelirse de UI'ı kilitli duruma getir
+      if (error.response?.data?.message?.includes("zaten")) {
+        markReported();
+      }
+      alert(
+        error.response?.data?.message || "Rapor gönderilirken bir hata oluştu.",
+      );
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
   const { isFollowing, toggleFollow, followLoading } = useFollow(usernameSlug);
 
   const authorFullName =
@@ -977,10 +1015,34 @@ const Detail = ({ post }: DetailProps) => {
                   )}
                 </button>
 
-                {/* Diğer Seçenekler */}
-                <button className="text-2xl text-gray-400 hover:text-gray-700 transition-colors cursor-pointer">
-                  <IoIosMore />
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="text-2xl text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+                  >
+                    <IoIosMore />
+                  </button>
+
+                  {showDropdown && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 py-1">
+                      {status.isReported ? (
+                        <div className="w-full text-left px-4 py-2 text-xs text-gray-400 cursor-not-allowed flex items-center gap-2 select-none">
+                          <span>Bu içeriği raporladınız</span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setShowDropdown(false);
+                            setShowReportModal(true);
+                          }}
+                          className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-2"
+                        >
+                          <span>Rapor Et</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1099,6 +1161,44 @@ const Detail = ({ post }: DetailProps) => {
             </div>
           </div>
         </div>
+        {showReportModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-96 flex flex-col gap-4 shadow-xl">
+              <h3 className="text-sm font-semibold text-gray-800">
+                İçeriği Rapor Et
+              </h3>
+              <p className="text-xs text-gray-500">
+                Bu gönderiyi neden rapor etmek istiyorsunuz? Lütfen kısaca
+                açıklayın.
+              </p>
+              <textarea
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder="Rapor sebebi..."
+                className="w-full h-24 border border-gray-300 rounded p-2 text-xs resize-none focus:outline-none focus:border-black text-black"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setReportReason("");
+                  }}
+                  disabled={isReporting}
+                  className="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={handleReportSubmit}
+                  disabled={isReporting || !reportReason.trim()}
+                  className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer disabled:opacity-50"
+                >
+                  {isReporting ? "Gönderiliyor..." : "Gönder"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
