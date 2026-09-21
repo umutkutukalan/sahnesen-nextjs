@@ -2,7 +2,7 @@
 
 import { useRelativeTime } from "@/hooks/useRelativeTime";
 import { PostResponse } from "@/services/server/post.service";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import LoadingScreen from "../LoadingScreen";
 import { FiUser, FiUserCheck } from "react-icons/fi";
 import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
@@ -116,13 +116,30 @@ const Detail = ({ post }: DetailProps) => {
   const usernameSlug = post.authorUsername;
   const router = useRouter();
   const { ToProfile } = useToProfile();
+  const isOwnProfile = usernameSlug === user?.username;
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [isReporting, setIsReporting] = useState(false);
 
-  const isOwnProfile = usernameSlug === user?.username;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false); // Silme onay modalı için
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Dışarı tıklandığında menüyü kapatma useEffect'i (PostCard'da da vardı)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Post tipine göre dinamik ReactionType belirleme
   const getShineReactionType = (type?: string): ReactionType => {
@@ -1015,30 +1032,81 @@ const Detail = ({ post }: DetailProps) => {
                   )}
                 </button>
 
-                <div className="relative">
+                <div ref={menuRef} className="relative">
                   <button
-                    onClick={() => setShowDropdown(!showDropdown)}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="text-2xl text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
                   >
                     <IoIosMore />
                   </button>
 
-                  {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 py-1">
-                      {status.isReported ? (
-                        <div className="w-full text-left px-4 py-2 text-xs text-gray-400 cursor-not-allowed flex items-center gap-2 select-none">
-                          <span>Bu içeriği raporladınız</span>
-                        </div>
+                  {isMenuOpen && (
+                    <div
+                      className="absolute right-0 top-full mt-2 w-48 bg-white rounded-sm z-50 px-4 py-3 gap-2 flex flex-col"
+                      style={{
+                        boxShadow: "0px 0px 5px 1px rgba(0, 0, 0, 0.1)",
+                        border: "1px solid #f3f4f6",
+                      }}
+                    >
+                      {user?.username !== post?.authorUsername ? (
+                        /* --- BAŞKASININ GÖNDERİSİ: RAPORLAMA SEÇENEĞİ --- */
+                        <>
+                          {status.isReported ? (
+                            <div className="w-full text-left text-xs text-gray-400 cursor-pointer flex items-center gap-2 select-none">
+                              <span>Bu içeriği raporladınız</span>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setIsMenuOpen(false);
+                                setShowReportModal(true);
+                              }}
+                              className="w-full text-left text-xs text-red-600 hover:text-red-800 transition-colors cursor-pointer flex items-center gap-2"
+                            >
+                              <span>Rapor Et</span>
+                            </button>
+                          )}
+                        </>
                       ) : (
-                        <button
-                          onClick={() => {
-                            setShowDropdown(false);
-                            setShowReportModal(true);
-                          }}
-                          className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-2"
-                        >
-                          <span>Rapor Et</span>
-                        </button>
+                        /* --- KENDİ GÖNDERİMİZ: DÜZENLE, ARŞİVLE, SİL MENÜSÜ --- */
+                        <>
+                          <button
+                            onClick={() => {
+                              router.push(`/olustur?slug=${post.slug}`);
+                              setIsMenuOpen(false);
+                            }}
+                            className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
+                          >
+                            <span>Sahneyi Düzenle</span>
+                          </button>
+
+                          <div className="h-[1px] bg-gray-100" />
+
+                          <button
+                            onClick={() => {
+                              // Arşivleme fonksiyonunu buraya bağlayabilirsin
+                              setIsMenuOpen(false);
+                            }}
+                            className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
+                          >
+                            <span>
+                              {post.isArchived ? "Arşivden Çıkar" : "Arşive Al"}
+                            </span>
+                          </button>
+
+                          <div className="h-[1px] bg-gray-100" />
+
+                          <button
+                            onClick={() => {
+                              setShowConfirm(true); // Silme onay modalı state'i
+                              setIsMenuOpen(false);
+                            }}
+                            className="flex items-center text-xs transition text-left cursor-pointer"
+                            style={{ color: "#b94445" }}
+                          >
+                            <span>Sahneyi Sil</span>
+                          </button>
+                        </>
                       )}
                     </div>
                   )}
