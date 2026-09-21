@@ -30,7 +30,7 @@ const PageAbout = ({
 
   return (
     <div
-      className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white"
+      className="w-full relative flex items-end justify-between border-b border-gray-100 bg-white px-4 md:px-8 lg:px-20"
       style={{ height: "64px" }}
     >
       {!isProfilePage && (
@@ -64,9 +64,9 @@ const PageAbout = ({
       )}
 
       {/* İÇERİK TÜRÜ FİLTRELERİ (Tümü, Sahne, Monolog vb.) */}
-      <div className="w-full relative h-14 flex items-end justify-between">
+      <div className="w-full flex items-center gap-6 pt-3 px-4 md:px-8 lg:px-10">
         <ul
-          className={`w-full relative z-50 flex ${isProfilePage ? "justify-start" : "justify-end"} gap-6 overflow-x-auto scrollbar-hide`}
+          className={`w-full flex ${isProfilePage ? "justify-start" : "justify-end"} gap-6 overflow-x-auto scrollbar-hide`}
         >
           <button
             type="button"

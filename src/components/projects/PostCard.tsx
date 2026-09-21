@@ -54,6 +54,32 @@ const PostCard = ({
   const [savingPostId, setSavingPostId] = useState<number | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // coverImages listesini güvenli bir şekilde alalım (Eğer backend tekli gönderdiyse diziye çevir)
+  const rawImages = (post as any)?.coverImages;
+  const coverImagesList: string[] = Array.isArray(rawImages)
+    ? rawImages
+    : rawImages
+      ? [rawImages]
+      : post.coverImages
+        ? [post.coverImages]
+        : [];
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (coverImagesList.length <= 1) return;
+    setActiveImageIndex((prev) => (prev + 1) % coverImagesList.length);
+  };
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (coverImagesList.length <= 1) return;
+    setActiveImageIndex(
+      (prev) => (prev - 1 + coverImagesList.length) % coverImagesList.length,
+    );
+  };
+
   const { deletePost } = useDeletePosts();
 
   useEffect(() => {
@@ -103,13 +129,6 @@ const PostCard = ({
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-  const displayImage = post?.coverImage;
-  const finalImageUrl = displayImage
-    ? displayImage.startsWith("http")
-      ? displayImage
-      : `${baseUrl}${displayImage}`
-    : null;
-
   const authorName =
     `${post?.authorName || ""} ${post?.authorSurname || ""}`.trim();
 
@@ -126,31 +145,70 @@ const PostCard = ({
 
   return (
     <div
-      className={`w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex select-none transition-all duration-300 ease-in-out gap-10 ${
-        isOwner ? "overflow-visible" : "overflow-hidden"
-      }`}
+      className={`w-full lg:h-[240px] sm:h-[220px] h-[180px] border-b border-gray-100 text-black flex select-none transition-all duration-300 ease-in-out gap-10`}
     >
       {/* SOL GÖRSEL */}
       <div className="h-full flex flex-col justify-center">
         <div
-          className="hidden flex-shrink-0 sm:flex relative items-center justify-center"
+          className="hidden flex-shrink-0 sm:flex relative items-center justify-center cursor-pointer select-none"
           style={{ width: "160px", height: "160px" }}
         >
-          <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center border border-gray-100 rounded-xl">
-            {finalImageUrl ? (
-              <Image
-                src={finalImageUrl}
-                alt={post.title}
-                fill
-                unoptimized
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                <LuImages className="text-4xl text-gray-300" />
-              </div>
-            )}
-          </div>
+          {coverImagesList.length > 0 ? (
+            <div className="relative w-full h-full flex items-center justify-center">
+              {coverImagesList.map((imgUrl, idx) => {
+                const fullUrl = imgUrl.startsWith("http")
+                  ? imgUrl
+                  : `${baseUrl}${imgUrl}`;
+
+                const isCurrent = idx === activeImageIndex;
+                const total = coverImagesList.length;
+                const relativeIndex = (idx - activeImageIndex + total) % total;
+
+                // Yelpaze pozisyonları
+                let transformStyle =
+                  "translate-x-0 translate-y-0 rotate-0 opacity-100 z-30";
+
+                if (relativeIndex === 1) {
+                  transformStyle =
+                    "-translate-x-4 -translate-y-1 -rotate-6 opacity-85 z-20";
+                } else if (relativeIndex === 2) {
+                  transformStyle =
+                    "-translate-x-8 -translate-y-2 -rotate-12 opacity-70 z-10";
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isCurrent && coverImagesList.length > 1) {
+                        // Eğer en öndekine tıklandıysa bir sonraki görsele ilerlet
+                        setActiveImageIndex(
+                          (prev) => (prev + 1) % coverImagesList.length,
+                        );
+                      } else {
+                        // Arkadakilere tıklandıysa direkt o görseli öne getir
+                        setActiveImageIndex(idx);
+                      }
+                    }}
+                    className={`absolute w-full h-full bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 ease-out ${idx === activeImageIndex ? "cursor-pointer" : "cursor-default"} ${transformStyle}`}
+                  >
+                    <Image
+                      src={fullUrl}
+                      alt={post.title}
+                      fill
+                      unoptimized
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-50 border border-gray-100 rounded-xl">
+              <LuImages className="text-4xl text-gray-300" />
+            </div>
+          )}
         </div>
       </div>
 

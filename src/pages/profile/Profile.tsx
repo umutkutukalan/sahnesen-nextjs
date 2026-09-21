@@ -137,21 +137,20 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
         </div>
 
         {/* Ana İçerik Konteyneri */}
-        <div className="w-full px-4 md:px-8 lg:px-10">
+        <div className="w-full">
           <div className="w-full flex gap-6 lg:gap-12 items-start">
             {/* SOL ALAN: Esnek Daralan Kısım */}
             <div className="flex-1 min-w-0 border-r border-gray-100 pr-4 lg:pr-8">
-              <div className="w-full flex justify-center">
-                <div className="w-full max-w-4xl flex flex-col transition-all duration-300">
-                  {/* STICKY YAPILAN ALAN: Top değerini projedeki üst navigasyon çubuğunun yüksekliğine göre ayarlayabilirsin (örn: top-0 veya top-12) */}
-                  <div className="sticky top-12 z-30 bg-white/95 backdrop-blur-sm py-3 transition-all">
-                    <PageAbout
-                      feedScope="all"
-                      selectedType={selectedPostType}
-                      onSelectType={(type) => setSelectedPostType(type)}
-                    />
-                  </div>
-
+              {/* STICKY YAPILAN ALAN: Top değerini projedeki üst navigasyon çubuğunun yüksekliğine göre ayarlayabilirsin (örn: top-0 veya top-12) */}
+              <div className="sticky top-12 z-50 bg-white/95 backdrop-blur-sm transition-all">
+                <PageAbout
+                  feedScope="all"
+                  selectedType={selectedPostType}
+                  onSelectType={(type) => setSelectedPostType(type)}
+                />
+              </div>
+              <div className="w-full flex justify-center px-4 md:px-8 lg:px-10">
+                <div className="w-full relative max-w-4xl flex flex-col transition-all duration-300">
                   {/* Dinamik Gönderi Akışı */}
                   <div className="mt-6 w-full min-w-0">
                     {targetUsername && (
@@ -167,7 +166,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
 
             {/* SAĞ ALAN: Genişliği Korunan Sabit Kullanıcı Kartı */}
             <div
-              className="w-64 lg:w-80 flex-shrink-0 sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto"
+              className="w-64 lg:w-80 pr-4 md:pr-8 lg:pr-10 flex-shrink-0 sticky -mt-30 scrollbar-hide z-20 transition-all duration-200 overflow-y-auto"
               style={{ top: "50px", maxHeight: "100vh" }}
             >
               <div className="relative flex flex-col pt-10 pb-5">

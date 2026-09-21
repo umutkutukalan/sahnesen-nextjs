@@ -51,19 +51,19 @@ const Posts = ({
                   {/* <span>Lorem ipsum dolor sit amet.</span> */}
                 </div>
 
-                <div className="max-w-[1000px] px-6 w-full">
-                  {/* Sekme Seçim Başlıkları (PageAbout) */}
-                  <div
-                    className="w-full flex justify-center sticky z-50"
-                    style={{ top: "64px" }}
-                  >
-                    <PageAbout
-                      feedScope={feedScope}
-                      selectedType={selectedPostType}
-                      onSelectType={(postType) => setSelectedPostType(postType)}
-                    />
-                  </div>
+                {/* Sekme Seçim Başlıkları (PageAbout) */}
+                <div
+                  className="w-full flex justify-center sticky z-50"
+                  style={{ top: "64px" }}
+                >
+                  <PageAbout
+                    feedScope={feedScope}
+                    selectedType={selectedPostType}
+                    onSelectType={(postType) => setSelectedPostType(postType)}
+                  />
+                </div>
 
+                <div className="max-w-[1000px] px-6 w-full">
                   {/* PROJE / İÇERİK LİSTESİ */}
                   <div className="pt-5 space-y-4">
                     {posts.length > 0 ? (

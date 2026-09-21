@@ -6,7 +6,7 @@ export interface PostResponse {
   subtitle: string;
   slug: string;
   content: string; // Backend'den Stringified JSON string geliyor
-  coverImage?: string;
+  coverImages?: string[];
   postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
   isPublished: boolean;
   isArchived: boolean;
@@ -26,7 +26,7 @@ export interface PostSummaryResponse {
   title: string;
   subtitle: string;
   slug: string;
-  coverImage?: string;
+  coverImages?: string[];
   postType: "SAHNE" | "MONOLOG" | "YANYANA" | "ETUT" | "TERSYUZ";
   discussionDurationHours?: number;
   discussionEndsAt?: string;

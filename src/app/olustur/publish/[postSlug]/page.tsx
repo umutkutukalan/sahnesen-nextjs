@@ -9,6 +9,21 @@ import {
   updatePostClient,
 } from "@/services/client/post.service";
 
+const extractAllImagesFromJSON = (contentJSON: any): string[] => {
+  const images: string[] = [];
+  const traverse = (node: any) => {
+    if (!node) return;
+    if (node.type === "image" && node.attrs?.src) {
+      images.push(node.attrs.src);
+    }
+    if (node.content && Array.isArray(node.content)) {
+      node.content.forEach(traverse);
+    }
+  };
+  traverse(contentJSON);
+  return Array.from(new Set(images));
+};
+
 export default function PublishPage() {
   const params = useParams();
   const router = useRouter();
@@ -20,8 +35,15 @@ export default function PublishPage() {
   const [tagInput, setTagInput] = useState("");
   const [discussionDurationHours, setDiscussionDurationHours] =
     useState<number>(3);
+
+  // 💡 Çoklu görsel state'leri
+  const [availableImages, setAvailableImages] = useState<string[]>([]);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  console.log("post: ", post);
 
   useEffect(() => {
     const fetchPostDetails = async () => {
@@ -31,11 +53,31 @@ export default function PublishPage() {
         setPost(data);
         setSubtitle(data.subtitle || "");
         setTags(data.tags || []);
+
         if (
           data.discussionDurationHours !== null &&
           data.discussionDurationHours !== undefined
         ) {
           setDiscussionDurationHours(data.discussionDurationHours);
+        }
+
+        // 💡 2. Burada data.content string ise parse edip fonksiyona veriyoruz
+        let parsedContent = data.content;
+        if (typeof parsedContent === "string") {
+          try {
+            parsedContent = JSON.parse(parsedContent);
+          } catch (e) {
+            console.error("Content JSON parse edilemedi:", e);
+          }
+        }
+
+        const allImages = extractAllImagesFromJSON(parsedContent);
+        setAvailableImages(allImages);
+
+        if (data.coverImages && data.coverImages.length > 0) {
+          setSelectedImages(data.coverImages);
+        } else {
+          setSelectedImages(allImages.slice(0, 3));
         }
       } catch (error) {
         console.error("Yazı detayları yüklenirken hata:", error);
@@ -48,6 +90,19 @@ export default function PublishPage() {
       fetchPostDetails();
     }
   }, [postSlug]);
+
+  // Görsel seçim/kaldırma mantığı (Max 3 adet)
+  const toggleImageSelection = (imgUrl: string) => {
+    if (selectedImages.includes(imgUrl)) {
+      setSelectedImages(selectedImages.filter((url) => url !== imgUrl));
+    } else {
+      if (selectedImages.length >= 3) {
+        alert("En fazla 3 kapak görseli seçebilirsiniz.");
+        return;
+      }
+      setSelectedImages([...selectedImages, imgUrl]);
+    }
+  };
 
   // Etiket ekleme
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -74,7 +129,8 @@ export default function PublishPage() {
         ...post,
         subtitle,
         tags,
-        discussionDurationHours, // 💡 Gönderilen verilere süre eklendi
+        coverImages: selectedImages, // 💡 Seçilen çoklu görseller gönderiliyor
+        discussionDurationHours,
         isPublished: true,
       });
       router.push("/");
@@ -93,7 +149,6 @@ export default function PublishPage() {
     );
   }
 
-  // Seçenekler listesi
   const durationOptions = [
     { label: "3 Saat", value: 3 },
     { label: "6 Saat", value: 6 },
@@ -104,8 +159,8 @@ export default function PublishPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col">
-      {/* Üst Bar / Kapatma Butonu */}
+    <div className="min-h-screen bg-white text-black flex flex-col merriweather-sans">
+      {/* Üst Bar */}
       <div className="flex items-center justify-end p-6 max-w-5xl w-full mx-auto">
         <button
           onClick={() => router.back()}
@@ -117,32 +172,59 @@ export default function PublishPage() {
 
       {/* Ana İçerik */}
       <div className="max-w-5xl w-full mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 py-4">
-        {/* Sol Sütun: Story Preview */}
+        {/* Sol Sütun: Çoklu Kapak Görseli Seçimi */}
         <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-serif font-bold">Story preview</h2>
-
-          <div className="w-full h-64 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 p-6 text-center overflow-hidden relative">
-            {post?.coverImage ? (
-              <img
-                src={post.coverImage}
-                alt="Cover"
-                className="w-full h-full object-cover rounded-xl"
-              />
-            ) : (
-              <p className="text-sm">
-                Yazınıza henüz kapak görseli eklenmemiş.
-              </p>
-            )}
+          <div>
+            <h2 className="text-xl font-bold mb-1">Kapak Görselleri (Max 3)</h2>
+            <p className="text-xs text-gray-400">
+              Yazınızın içinde geçen görsellerden en fazla 3 tanesini fuaye ve
+              akış kartları için seçin.
+            </p>
           </div>
 
-          <div className="text-xs text-gray-400 leading-relaxed">
-            {
-              "Note: Changes here will affect how your story appears in public places like homepage and subscriber's inboxes."
-            }
+          {availableImages.length === 0 ? (
+            <div className="w-full h-48 bg-gray-50 border border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 p-6 text-center text-sm">
+              Yazınızın içinde henüz hiç görsel bulunmuyor.
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {availableImages.map((img, index) => {
+                const isSelected = selectedImages.includes(img);
+                const selectionIndex = selectedImages.indexOf(img) + 1;
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => toggleImageSelection(img)}
+                    className={`relative h-28 rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
+                      isSelected
+                        ? "border-green-800 shadow-md scale-[1.02]"
+                        : "border-gray-200 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Content img ${index}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 bg-green-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow">
+                        {selectionIndex}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="text-xs text-gray-400 leading-relaxed mt-2">
+            Seçtiğiniz görseller kart üzerindeki kayan vitrinde bu sırayla
+            görüntülenecektir.
           </div>
         </div>
 
-        {/* Sağ Sütun: Etiketler, Subtitle, Süre ve Yayınla Butonları */}
+        {/* Sağ Sütun: Etiketler, Subtitle, Süre ve Yayınla */}
         <div className="flex flex-col gap-8">
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
@@ -193,7 +275,6 @@ export default function PublishPage() {
             />
           </div>
 
-          {/* 💡 YENİ: Fuaye / Tartışma Süresi Seçimi */}
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
               Fuaye / Tartışma Süresi
@@ -214,10 +295,6 @@ export default function PublishPage() {
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-gray-400 mt-1.5">
-              Yazınızın yayınlandıktan sonra aktif tartışma kalacağı süreyi
-              belirler.
-            </p>
           </div>
 
           {/* Aksiyon Butonları */}
