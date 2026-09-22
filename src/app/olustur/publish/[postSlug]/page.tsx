@@ -39,6 +39,7 @@ export default function PublishPage() {
   // 💡 Çoklu görsel state'leri
   const [availableImages, setAvailableImages] = useState<string[]>([]);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,15 +94,31 @@ export default function PublishPage() {
 
   // Görsel seçim/kaldırma mantığı (Max 3 adet)
   const toggleImageSelection = (imgUrl: string) => {
-    if (selectedImages.includes(imgUrl)) {
-      setSelectedImages(selectedImages.filter((url) => url !== imgUrl));
-    } else {
-      if (selectedImages.length >= 3) {
-        alert("En fazla 3 kapak görseli seçebilirsiniz.");
-        return;
+    setSelectedImages((prevSelected) => {
+      const isAlreadySelected = prevSelected.includes(imgUrl);
+
+      if (isAlreadySelected) {
+        // Eğer son 1 görsel kaldıysa, kaldırılmasına izin verme
+        if (prevSelected.length <= 1) {
+          return prevSelected;
+        }
+
+        // Seçiliyse ve 1'den fazla görsel varsa listeden çıkar
+        const updated = prevSelected.filter((item) => item !== imgUrl);
+        setActiveImageIndex(0);
+        return updated;
+      } else {
+        // 3'ten fazla seçilmesini engelle
+        if (prevSelected.length >= 3) {
+          return prevSelected;
+        }
+
+        // Yeni görsel ekle
+        const updated = [...prevSelected, imgUrl];
+        setActiveImageIndex(0);
+        return updated;
       }
-      setSelectedImages([...selectedImages, imgUrl]);
-    }
+    });
   };
 
   // Etiket ekleme
@@ -159,68 +176,154 @@ export default function PublishPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col merriweather-sans">
+    <div className="min-h-screen text-black flex flex-col justify-center merriweather-sans">
       {/* Üst Bar */}
-      <div className="flex items-center justify-end p-6 max-w-5xl w-full mx-auto">
+      <div className="flex items-center justify-end max-w-5xl w-full mx-auto">
         <button
           onClick={() => router.back()}
-          className="text-gray-400 hover:text-black transition-colors cursor-pointer p-2"
+          className="text-gray-700 hover:text-black transition-colors cursor-pointer p-2"
         >
-          <IoClose size={28} />
+          <IoClose size={24} />
         </button>
       </div>
-
       {/* Ana İçerik */}
-      <div className="max-w-5xl w-full mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 py-4">
+      <div className="max-w-5xl w-full mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 py-4">
         {/* Sol Sütun: Çoklu Kapak Görseli Seçimi */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <h2 className="text-xl font-bold mb-1">Kapak Görselleri (Max 3)</h2>
-            <p className="text-xs text-gray-400">
-              Yazınızın içinde geçen görsellerden en fazla 3 tanesini fuaye ve
-              akış kartları için seçin.
-            </p>
-          </div>
-
-          {availableImages.length === 0 ? (
-            <div className="w-full h-48 bg-gray-50 border border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 p-6 text-center text-sm">
-              Yazınızın içinde henüz hiç görsel bulunmuyor.
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-3">
-              {availableImages.map((img, index) => {
-                const isSelected = selectedImages.includes(img);
-                const selectionIndex = selectedImages.indexOf(img) + 1;
-
-                return (
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            {availableImages.length === 0 ? (
+              <div className="w-full h-48 bg-gray-50 border border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 p-6 text-center text-sm">
+                Yazınızın içinde henüz hiç görsel bulunmuyor.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {/* 1. SEÇİLEN GÖRSELLERİN YELPAZE ÖNİZLEMESİ */}
+                <div className="flex flex-col items-center justify-center">
                   <div
-                    key={index}
-                    onClick={() => toggleImageSelection(img)}
-                    className={`relative h-28 rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
-                      isSelected
-                        ? "border-green-800 shadow-md scale-[1.02]"
-                        : "border-gray-200 opacity-60 hover:opacity-100"
-                    }`}
+                    className="relative flex items-center justify-center cursor-pointer select-none"
+                    style={{ width: "160px", height: "160px" }}
                   >
-                    <img
-                      src={img}
-                      alt={`Content img ${index}`}
-                      className="w-full h-full object-cover"
-                    />
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 bg-green-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow">
-                        {selectionIndex}
+                    {selectedImages.length > 0 ? (
+                      <div className="relative w-full h-full flex items-center justify-center">
+                        {selectedImages.map((imgUrl, idx) => {
+                          const fullUrl = imgUrl.startsWith("http")
+                            ? imgUrl
+                            : `${imgUrl}`;
+
+                          const isCurrent = idx === activeImageIndex;
+                          const total = selectedImages.length;
+                          const relativeIndex =
+                            (idx - activeImageIndex + total) % total;
+
+                          // Yelpaze pozisyonları (PostCard ile birebir aynı mantık)
+                          let transformStyle =
+                            "translate-x-0 translate-y-0 rotate-0 opacity-100 z-30";
+
+                          if (relativeIndex === 1) {
+                            transformStyle =
+                              "-translate-x-4 -translate-y-1 -rotate-6 opacity-85 z-20";
+                          } else if (relativeIndex === 2) {
+                            transformStyle =
+                              "-translate-x-8 -translate-y-2 -rotate-12 opacity-70 z-10";
+                          }
+
+                          return (
+                            <div
+                              key={idx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isCurrent && selectedImages.length > 1) {
+                                  setActiveImageIndex(
+                                    (prev) =>
+                                      (prev + 1) % selectedImages.length,
+                                  );
+                                } else {
+                                  setActiveImageIndex(idx);
+                                }
+                              }}
+                              className={`absolute w-full h-full bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 ease-out ${
+                                idx === activeImageIndex
+                                  ? "cursor-pointer"
+                                  : "cursor-default"
+                              } ${transformStyle}`}
+                            >
+                              <img
+                                src={fullUrl}
+                                alt={`Cover preview ${idx}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-white border border-gray-200 rounded-xl text-gray-400 text-xs text-center p-2">
+                        Görsel seçilmedi
                       </div>
                     )}
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  <span className="text-[10px] text-gray-400 mt-3">
+                    Önizlemedeki karta tıklayarak yelpaze akışını test
+                    edebilirsiniz.
+                  </span>
+                </div>
 
-          <div className="text-xs text-gray-400 leading-relaxed mt-2">
-            Seçtiğiniz görseller kart üzerindeki kayan vitrinde bu sırayla
-            görüntülenecektir.
+                {/* 2. SEÇİLEBİLİR GÖRSELLER GRID LİSTESİ */}
+                <div className="grid grid-cols-5 gap-3">
+                  {availableImages.map((img, index) => {
+                    const isSelected = selectedImages.includes(img);
+                    const selectionIndex = selectedImages.indexOf(img) + 1;
+                    const isLimitReached =
+                      selectedImages.length >= 3 && !isSelected;
+
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          if (isLimitReached) return; // Limit dolduysa tıklamayı engelle
+                          toggleImageSelection(img);
+                        }}
+                        className={`relative h-16 rounded-xl overflow-hidden border-2 transition-all ${
+                          isSelected
+                            ? "border-green-800 shadow-md scale-[1.02] cursor-pointer"
+                            : isLimitReached
+                              ? "border-gray-200 opacity-30 cursor-not-allowed" // Limit dolunca soluk ve tıklanamaz
+                              : "border-gray-200 opacity-60 hover:opacity-100 cursor-pointer"
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`Content img ${index}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 bg-green-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow">
+                            {selectionIndex}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="text-xs text-gray-400 leading-relaxed mt-1">
+              Seçtiğiniz görseller kart üzerindeki kayan vitrinde bu sırayla
+              görüntülenecektir.
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
+              Sahnenin Alt Başlığı
+            </label>
+            <textarea
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              rows={3}
+              className="w-full p-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-green-800 resize-none"
+              placeholder="Yazınızı kısaca özetleyin..."
+            />
           </div>
         </div>
 
@@ -228,19 +331,17 @@ export default function PublishPage() {
         <div className="flex flex-col gap-8">
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
-              Topics (Max 5)
+              Etiketler (Max 5)
             </label>
-            <div className="p-2 border border-gray-200 rounded-xl min-h-[50px] bg-white flex flex-wrap gap-2 items-center">
+            <div className="p-2 border border-gray-200 rounded-md min-h-[50px] bg-white flex flex-wrap gap-2 items-center">
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-lg flex items-center gap-1"
+                  onClick={() => removeTag(tag)}
+                  className="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-sm flex items-center gap-1 cursor-pointer"
                 >
                   #{tag}
-                  <button
-                    onClick={() => removeTag(tag)}
-                    className="text-gray-400 hover:text-black ml-1"
-                  >
+                  <button className="text-gray-400 hover:text-black ml-1 cursor-pointer">
                     ×
                   </button>
                 </span>
@@ -253,8 +354,8 @@ export default function PublishPage() {
                   onKeyDown={handleAddTag}
                   placeholder={
                     tags.length === 0
-                      ? "Add up to five topics..."
-                      : "Add another..."
+                      ? "Sahne etiketlerinizi girin..."
+                      : "Ekleyin..."
                   }
                   className="text-sm outline-none flex-1 min-w-[120px] px-2 py-1 bg-transparent"
                 />
@@ -264,31 +365,18 @@ export default function PublishPage() {
 
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
-              Subtitle (Alt Başlık)
-            </label>
-            <textarea
-              value={subtitle}
-              onChange={(e) => setSubtitle(e.target.value)}
-              rows={3}
-              className="w-full p-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-green-800 resize-none"
-              placeholder="Yazınızı kısaca özetleyin..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
               Fuaye / Tartışma Süresi
             </label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {durationOptions.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => setDiscussionDurationHours(opt.value)}
-                  className={`py-2 text-xs font-medium rounded-xl border transition-all cursor-pointer ${
+                  className={`text-xs font-medium px-3 py-2 rounded-md transition-all cursor-pointer ${
                     discussionDurationHours === opt.value
-                      ? "bg-green-800 text-white border-green-800 shadow-sm"
-                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+                      ? "bg-black text-white border-black shadow-sm"
+                      : "bg-white text-gray-700 border border-gray-200"
                   }`}
                 >
                   {opt.label}
@@ -298,17 +386,17 @@ export default function PublishPage() {
           </div>
 
           {/* Aksiyon Butonları */}
-          <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+          <div className="flex w-full items-center gap-4 pt-4 border-t border-gray-100">
             <button
               onClick={handlePublish}
               disabled={isSubmitting}
-              className="bg-green-800 text-white text-sm px-6 py-2.5 rounded-xl hover:bg-green-700 transition-all font-medium cursor-pointer disabled:opacity-50"
+              className="bg-green-800 w-full text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition-all font-medium cursor-pointer disabled:opacity-50"
             >
-              {isSubmitting ? "Yayınlanıyor..." : "Publish now"}
+              {isSubmitting ? "Sahneleniyor..." : "Sahnele"}
             </button>
-            <button className="text-sm text-green-800 hover:underline cursor-pointer">
+            {/* <button className="text-sm text-green-800 hover:underline cursor-pointer">
               Schedule for later
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
