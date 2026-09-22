@@ -142,7 +142,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
             {/* SOL ALAN: Esnek Daralan Kısım */}
             <div className="flex-1 min-w-0 border-r border-gray-100 pr-4 lg:pr-8">
               {/* STICKY YAPILAN ALAN: Top değerini projedeki üst navigasyon çubuğunun yüksekliğine göre ayarlayabilirsin (örn: top-0 veya top-12) */}
-              <div className="sticky top-12 z-50 bg-white/95 backdrop-blur-sm transition-all">
+              <div className="sticky top-16 z-50 bg-white/95 backdrop-blur-sm transition-all">
                 <PageAbout
                   feedScope="all"
                   selectedType={selectedPostType}
