@@ -34,9 +34,9 @@ const Home = () => {
     <div className="relative">
       <nav className="fixed top-0 left-0 w-full text-black z-10 md:px-20 sm:px-10 px-5 py-5 2xl:py-10">
         <div className="w-full flex items-center justify-between">
-          <div className="flex items-center gap-1 2xl:text-4xl">
-            <span>sahnesen</span>
-          </div>
+          <h1 className="text-2xl text-center merriweather-sans font-semibold tracking-tighter select-none">
+            Sahnesen
+          </h1>
           <div className="flex items-center gap-3 text-xs 2xl:text-2xl text-black">
             <button
               className="px-3 py-1 border rounded-md cursor-pointer"
