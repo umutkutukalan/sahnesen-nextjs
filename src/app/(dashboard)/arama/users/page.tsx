@@ -2,7 +2,7 @@ import { searchUsersClient } from "@/services/client/user/user.service";
 import { PublicUser } from "@/context/UserContext";
 import Link from "next/link";
 import Image from "next/image";
-import { FaRegUser } from "react-icons/fa6";
+import { FiUser } from "react-icons/fi";
 
 interface PageProps {
   searchParams: Promise<{ q?: string }>;
@@ -43,7 +43,7 @@ export default async function SearchUsersPage({ searchParams }: PageProps) {
             href={`/profil/${u.username}`}
             className="p-4 border-b border-gray-100 transition-colors flex items-center gap-5"
           >
-            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-end justify-center shrink-0 border border-gray-200">
               {userProfileImgUrl ? (
                 <Image
                   src={userProfileImgUrl}
@@ -53,7 +53,7 @@ export default async function SearchUsersPage({ searchParams }: PageProps) {
                   unoptimized
                 />
               ) : (
-                <FaRegUser className="text-gray-500 text-lg" />
+                <FiUser className="text-3xl text-gray-500 group-hover:text-gray-300 transition-all" />
               )}
             </div>
             <div className="flex flex-col">
