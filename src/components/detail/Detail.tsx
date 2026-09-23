@@ -49,6 +49,7 @@ import {
   commentService,
 } from "@/services/client/comment/comment.service";
 import { reportService } from "@/services/client/report/report.service";
+import SaveToCollectionModal from "../collections/SaveToCollectionModal";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -125,6 +126,7 @@ const Detail = ({ post }: DetailProps) => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false); // Silme onay modalı için
+  const [savingPostId, setSavingPostId] = useState<number | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Dışarı tıklandığında menüyü kapatma useEffect'i (PostCard'da da vardı)
@@ -167,6 +169,7 @@ const Detail = ({ post }: DetailProps) => {
     toggleShine,
     toggleBookmark,
     markReported,
+    markBookmarked,
   } = usePostInteraction(post.id, currentShineType);
 
   console.log("status", status);
@@ -1020,7 +1023,15 @@ const Detail = ({ post }: DetailProps) => {
               <div className="flex items-center gap-4">
                 {/* Kaydetme (Bookmark) Butonu */}
                 <button
-                  onClick={() => toggleBookmark()}
+                  onClick={() => {
+                    if (status.isBookmarked) {
+                      // Zaten kayıtlıysa direkt genel toggle ile kayıttan çıkar
+                      toggleBookmark();
+                    } else {
+                      // Kayıtlı değilse direkt koleksiyon seçim modalını aç
+                      setSavingPostId(post.id);
+                    }
+                  }}
                   disabled={isInteractionLoading}
                   className="transition-colors cursor-pointer"
                   title={status.isBookmarked ? "Kaydedildi" : "Kaydet"}
@@ -1028,7 +1039,10 @@ const Detail = ({ post }: DetailProps) => {
                   {status.isBookmarked ? (
                     <TbBookmarkFilled className="text-xl text-black scale-110 transition-transform" />
                   ) : (
-                    <TbBookmark className="text-xl hover:scale-110 transition-transform" />
+                    <TbBookmark
+                      onClick={() => setSavingPostId(post.id)}
+                      className="text-xl hover:scale-110 transition-transform"
+                    />
                   )}
                 </button>
 
@@ -1266,6 +1280,14 @@ const Detail = ({ post }: DetailProps) => {
               </div>
             </div>
           </div>
+        )}
+        {savingPostId !== null && (
+          <SaveToCollectionModal
+            postId={savingPostId}
+            isOpen={savingPostId !== null}
+            onClose={() => setSavingPostId(null)}
+            onSaved={() => markBookmarked(true)}
+          />
         )}
       </div>
     </div>
