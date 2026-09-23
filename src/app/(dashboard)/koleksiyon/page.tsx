@@ -175,7 +175,7 @@ export default function CollectionsPage() {
                         </span>
                       )}
                       {col.description && (
-                        <p className="text-[10px] text-gray-500 line-clamp-2 leading-relaxed">
+                        <p className="text-[10px] text-gray-500 max-w-64 line-clamp-2 leading-relaxed">
                           {col.description}
                         </p>
                       )}

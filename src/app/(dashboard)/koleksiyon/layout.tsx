@@ -159,7 +159,7 @@ export default function KoleksiyonlarLayout({
                       {isLikedTab ? "Beğenilenler" : "Koleksiyonlar"}
                     </h1>
                   )}
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 max-w-140">
                     {isDetailView
                       ? currentCollection?.description ||
                         "Bu koleksiyona kaydettiğin sahneler"
