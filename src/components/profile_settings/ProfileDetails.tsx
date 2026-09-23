@@ -275,7 +275,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                 className="hidden"
               />
 
-              <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0">
+              <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 flex items-end justify-center shadow-lg shadow-black/20 flex-shrink-0">
                 {previewProfileImage ? (
                   <Image
                     src={getOptimizedImageUrl(previewProfileImage)}
@@ -293,7 +293,7 @@ const ProfileDetails = ({ usernameSlug }: { usernameSlug: string }) => {
                     />
                   </div>
                 ) : (
-                  <FiUser className="text-7xl text-gray-500 group-hover:text-gray-300 transition-all" />
+                  <FiUser className="text-9xl text-gray-500 group-hover:text-gray-300 transition-all" />
                 )}
 
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black hidden group-hover:block"></div>

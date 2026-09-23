@@ -170,7 +170,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
               style={{ top: "50px", maxHeight: "100vh" }}
             >
               <div className="relative flex flex-col pt-10 pb-5">
-                <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-center justify-center shadow-lg shadow-black/20 flex-shrink-0 border-3 border-white">
+                <div className="relative w-34 h-34 rounded-full overflow-hidden bg-gray-200 mb-4 flex items-end justify-center shadow-lg shadow-black/20 flex-shrink-0 border-3 border-white">
                   {profileImgUrl ? (
                     <Image
                       src={getOptimizedImageUrl(profileImgUrl)}
@@ -180,7 +180,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
                       className="hover:scale-105 transition-transform duration-200 object-cover"
                     />
                   ) : (
-                    <FiUser className="text-5xl text-gray-500" />
+                    <FiUser className="text-8xl text-gray-500 group-hover:text-gray-300 transition-all" />
                   )}
                 </div>
 
