@@ -561,7 +561,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                   </div>
 
                   {/* Mektup İçeriği */}
-                  <p className="text-xs text-gray-800 leading-relaxed font-normal">
+                  <p className="text-xs text-gray-800 leading-relaxed whitespace-pre-line">
                     {comment.content}
                   </p>
 

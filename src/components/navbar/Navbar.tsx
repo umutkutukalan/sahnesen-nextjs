@@ -392,58 +392,73 @@ const Navbar = ({
                     />
                   )}
                 </div>
-                {showProfileMenu && !isProfilePage ? (
-                  <div className="absolute top-8 -right-2 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
-                    {getProfileAccountWithUser(user).map((item) => (
-                      <Link
-                        href={item.href}
-                        key={item.title}
-                        className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
-                        onClick={() => setShowProfileMenu(false)}
-                      >
-                        <span className="text-lg">
-                          {renderIcon(item.icon as keyof typeof iconMap)}
-                        </span>
-                        <p className="">{item.title}</p>
-                      </Link>
-                    ))}
-                    <button
-                      className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                      onClick={logout}
-                    >
-                      <CiLogout />
-                      Çıkış Yap
-                    </button>
-                  </div>
-                ) : (
-                  showProfileMenu &&
-                  isProfilePage && (
-                    <>
-                      <div className="absolute top-12 right-2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
-                      <div className="absolute top-14 -right-5 bg-white text-black rounded-lg shadow-lg p-3 w-55 z-50 profile-menu-container">
-                        {getProfileAccountWithUser(user).map((item) => (
-                          <Link
-                            href={item.href}
-                            key={item.title}
-                            className="w-full p-3 text-left text-sm flex items-center gap-3 cursor-pointer hover:text-gray-600"
-                            onClick={() => setShowProfileMenu(false)}
-                          >
-                            <span className="text-lg">
-                              {renderIcon(item.icon as keyof typeof iconMap)}
-                            </span>
-                            <p className="">{item.title}</p>
-                          </Link>
-                        ))}
-                        <button
-                          className="w-full px-4 py-2 text-left text-sm flex items-center gap-2 cursor-pointer hover:text-gray-600"
-                          onClick={logout}
-                        >
-                          <CiLogout />
-                          Çıkış Yap
-                        </button>
+                {showProfileMenu && (
+                  <div
+                    className={`absolute ${
+                      isProfilePage ? "top-14 -right-5" : "top-10 -right-2"
+                    } bg-white text-black rounded-2xl shadow-xl p-4 w-72 z-50 profile-menu-container border border-gray-100 flex flex-col gap-3`}
+                  >
+                    {/* ÜST KISIM: Aktif Kullanıcı Bilgisi */}
+                    <div className="flex flex-col pb-3 border-b border-gray-100 gap-3">
+                      <span className="text-[11px] font-medium text-gray-400">
+                        Şu anda kullanılan hesap
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-11 h-11 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-gray-200">
+                          {user.profileImg ? (
+                            <Image
+                              src={getFullImageUrl(user.profileImg)!}
+                              alt="profile-img"
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <FaRegUser className="text-xl text-gray-500" />
+                          )}
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {user.name} {user.surname}
+                          </p>
+                          <span className="text-xs text-gray-500 truncate">
+                            @{user.username}
+                          </span>
+                        </div>
                       </div>
-                    </>
-                  )
+                    </div>
+
+                    {/* ORTA KISIM: Profil Menü Linkleri (Constants'tan gelenler) */}
+                    <div className="flex flex-col gap-1">
+                      {getProfileAccountWithUser(user).map((item) => (
+                        <Link
+                          href={item.href}
+                          key={item.title}
+                          className="w-full px-3 py-2 text-left text-xs font-medium text-gray-700 flex items-center gap-3 rounded-xl hover:bg-gray-50 transition cursor-pointer"
+                          onClick={() => setShowProfileMenu(false)}
+                        >
+                          <span className="text-base text-gray-500">
+                            {renderIcon(item.icon as keyof typeof iconMap)}
+                          </span>
+                          <p>{item.title}</p>
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* ALT KISIM: Çıkış Yap */}
+                    <div className="pt-2 border-t border-gray-100">
+                      <button
+                        className="w-full px-3 py-2 text-left text-xs font-medium text-red-600 flex items-center gap-3 rounded-xl hover:bg-red-50 transition cursor-pointer"
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          logout();
+                        }}
+                      >
+                        <CiLogout className="text-base" />
+                        <span>Çıkış Yap</span>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
