@@ -236,7 +236,7 @@ const Navbar = ({
                               Kişiler
                             </h3>
                           </div>
-                          {usersResults.map((u: PublicUser) => {
+                          {usersResults.slice(0, 5).map((u: PublicUser) => {
                             return (
                               <Link
                                 key={u.id}
@@ -278,35 +278,39 @@ const Navbar = ({
                               İçerikler
                             </h3>
                           </div>
-                          {postsResults.map((post: PostSummaryResponse) => (
-                            <Link
-                              key={post.id}
-                              href={`/${post.authorUsername}/${post.slug}`}
-                              onClick={() => setIsSearchOpen(false)}
-                              className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
-                            >
-                              <div className="w-8 h-8 relative rounded-md flex items-center justify-center shrink-0">
-                                {post.coverImages ? (
-                                  <Image
-                                    src={getFullImageUrl(post.coverImages[0])!}
-                                    alt={post.title}
-                                    fill
-                                    className="object-cover"
-                                    unoptimized
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                                    <LuImages className="text-lg text-gray-300" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="overflow-hidden">
-                                <p className="text-xs text-gray-800 line-clamp-2">
-                                  {post.title}
-                                </p>
-                              </div>
-                            </Link>
-                          ))}
+                          {postsResults
+                            .slice(0, 5)
+                            .map((post: PostSummaryResponse) => (
+                              <Link
+                                key={post.id}
+                                href={`/${post.authorUsername}/${post.slug}`}
+                                onClick={() => setIsSearchOpen(false)}
+                                className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                              >
+                                <div className="w-8 h-8 relative rounded-md flex items-center justify-center shrink-0">
+                                  {post.coverImages ? (
+                                    <Image
+                                      src={
+                                        getFullImageUrl(post.coverImages[0])!
+                                      }
+                                      alt={post.title}
+                                      fill
+                                      className="object-cover"
+                                      unoptimized
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                      <LuImages className="text-lg text-gray-300" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="overflow-hidden">
+                                  <p className="text-xs text-gray-800 line-clamp-2">
+                                    {post.title}
+                                  </p>
+                                </div>
+                              </Link>
+                            ))}
                         </div>
                       )}
 
@@ -318,7 +322,7 @@ const Navbar = ({
                               Etiketler
                             </h3>
                           </div>
-                          {tagsResults.map((tag: TagResponse) => (
+                          {tagsResults.slice(0, 5).map((tag: TagResponse) => (
                             <Link
                               key={tag.id}
                               href={`/tag/${tag.name}`}

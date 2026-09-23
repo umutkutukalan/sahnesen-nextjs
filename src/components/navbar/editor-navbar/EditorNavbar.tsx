@@ -69,7 +69,7 @@ const EditorNavbar = ({
 
   return (
     <nav
-      className={`editor-navbar py-12 px-20 lg:px-40 px-6 z-50 w-full fixed top-0 left-0  shadow-none static`}
+      className={`editor-navbar py-12 px-20 lg:px-40 px-6 z-50 w-full fixed top-0 left-0 shadow-none static`}
     >
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3 text-black">
