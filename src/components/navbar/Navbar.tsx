@@ -286,9 +286,9 @@ const Navbar = ({
                               className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                             >
                               <div className="w-8 h-8 relative rounded-md flex items-center justify-center shrink-0">
-                                {post.coverImage ? (
+                                {post.coverImages ? (
                                   <Image
-                                    src={getFullImageUrl(post.coverImage)!}
+                                    src={getFullImageUrl(post.coverImages[0])!}
                                     alt={post.title}
                                     fill
                                     className="object-cover"
