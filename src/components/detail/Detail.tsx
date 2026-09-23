@@ -50,6 +50,7 @@ import {
 } from "@/services/client/comment/comment.service";
 import { reportService } from "@/services/client/report/report.service";
 import SaveToCollectionModal from "../collections/SaveToCollectionModal";
+import { useSidebar } from "@/context/SidebarContext";
 
 const lowlight = createLowlight(common);
 lowlight.register("java", java);
@@ -117,6 +118,7 @@ const Detail = ({ post }: DetailProps) => {
   const usernameSlug = post.authorUsername;
   const router = useRouter();
   const { ToProfile } = useToProfile();
+  const { isSidebarOpen } = useSidebar();
   const isOwnProfile = usernameSlug === user?.username;
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -553,13 +555,16 @@ const Detail = ({ post }: DetailProps) => {
               return (
                 <div
                   key={index}
-                  className={`my-8 flex flex-col items-center ${
+                  className={`my-8 flex flex-col items-center transition-all duration-300 ${
                     isFull
-                      ? "w-screen relative left-1/2 -translate-x-1/2"
+                      ? "relative w-screen left-1/2 -translate-x-1/2"
                       : isMedium
                         ? "relative left-1/2 -translate-x-1/2 w-[120%]"
                         : "w-full"
                   }`}
+                  style={{
+                    width: isFull && isSidebarOpen ? "calc(100vw - 240px)" : "",
+                  }}
                 >
                   <div
                     style={isFull || isMedium ? {} : { width: "100%" }}
