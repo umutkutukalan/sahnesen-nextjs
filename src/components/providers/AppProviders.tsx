@@ -12,17 +12,22 @@ export default function AppProviders({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isLoggingOut } = useAuth();
   const pathname = usePathname();
 
-  if (loading) {
+  // İlk yüklenme veya çıkış yapma sürecindeyse şık bir tam ekran yükleme göster
+  if (loading || isLoggingOut) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-neutral-950 text-white">
-        <p className="animate-pulse text-sm">Yükleniyor...</p>
+      <div className="flex flex-col gap-3 h-screen w-screen items-center justify-center bg-[#F7F4EA] text-black z-[99999] fixed inset-0">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <p className="text-xs font-medium text-gray-600 tracking-wide">
+          {isLoggingOut ? "Çıkış yapılıyor..." : "Yükleniyor..."}
+        </p>
       </div>
     );
   }
 
+  // Kullanıcı yoksa doğrudan alt bileşenleri (Landing / Home sayfası) göster
   if (!user) {
     return <>{children}</>;
   }

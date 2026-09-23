@@ -1,10 +1,12 @@
+import { CiSettings } from "react-icons/ci";
+
 export const profileAccount = [
   {
     title: "Hesap Bilgileri",
-    href: `/profil/@`, // Bu dinamik olacak
-    icon: "FiUser",
+    href: `/me/settings`,
+    icon: CiSettings,
     dynamic: true,
-    state: {}, // state objesi eklendi
+    state: {},
   },
 ];
 
@@ -14,7 +16,7 @@ export const getProfileAccountWithUser = (user) => {
     if (item.dynamic && item.title === "Hesap Bilgileri") {
       return {
         ...item,
-        href: `/profil/${user?.username}`,
+        href: `/me/settings`,
       };
     }
     return item;

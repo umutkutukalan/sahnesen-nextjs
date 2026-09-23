@@ -1,6 +1,7 @@
 "use client";
 
 import api from "@/services/client/config";
+import { usePathname, useRouter } from "next/navigation";
 import {
   createContext,
   Dispatch,
@@ -70,6 +71,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -91,20 +94,18 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const logout = async () => {
     try {
       setIsLoggingOut(true); // Çıkış sürecini başlat (loading aktif)
-      await api.post(
-        `/auth/logout`, // Navbar'daki endpoint ile uyumlu hale getirildi
-        {},
-        { withCredentials: true },
-      );
+      await api.post(`/auth/logout`, {}, { withCredentials: true });
     } catch (error) {
       console.error("Çıkış yapılırken hata oluştu:", error);
     } finally {
       setUser(null);
       localStorage.clear();
-      // Kısa bir gecikme ekleyerek kullanıcının akıcı bir geçiş görmesini sağlıyoruz
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
+      setIsLoggingOut(false);
+      // Sadece "/" dışında bir yerdeysek client-side yönlendir; reload YOK
+
+      if (pathname !== "/") {
+        router.replace("/");
+      }
     }
   };
 
@@ -113,17 +114,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       value={{ user, setUser, loading, logout, isLoggingOut }}
     >
       {children}
-      {/* Çıkış yapılırken gösterilecek şık bir tam ekran yüklenme katmanı */}
-      {isLoggingOut && (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[99999] flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-xs font-medium text-gray-600">
-              Oturum kapatılıyor...
-            </p>
-          </div>
-        </div>
-      )}
     </UserContext.Provider>
   );
 };

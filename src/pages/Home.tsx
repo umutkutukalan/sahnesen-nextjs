@@ -8,8 +8,23 @@ import { ressam, runner, walker } from "../utils/";
 import LoginPage from "./LoginPage";
 
 const Home = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Oturum durumu henüz netleşmediyse (arkada /me isteği atılıyorsa)
+  // anlık bir flash/beyaz ekran olmasın diye boş veya sakin bir loading dönebiliriz.
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full bg-[#F7F4EA] flex items-center justify-center">
+        {/* İsteğe bağlı sade bir yükleme göstergesi veya boş div */}
+      </div>
+    );
+  }
+
+  // Eğer kullanıcı varsa (çıkış anındaki geçişte anlık görünmeyi önlemek için)
+  if (user) {
+    return null;
+  }
 
   const handleClick = () => {
     setShowLoginModal(true);

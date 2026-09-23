@@ -7,7 +7,7 @@ import {
   RiMenu4Line,
   RiNotification2Line,
 } from "react-icons/ri";
-import { CiLogout } from "react-icons/ci";
+import { CiLogout, CiSettings } from "react-icons/ci";
 import { FiUser } from "react-icons/fi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { PublicUser, useAuth } from "../../context/UserContext";
@@ -369,12 +369,15 @@ const Navbar = ({
               </button>
             )}
             {user && (
-              <div className="flex items-center md:gap-4 gap-2 relative">
+              <div className="flex items-center md:gap-4 gap-2 relative profile-menu-container">
                 <div
                   className={`relative w-8 h-8 rounded-full overflow-hidden flex items-end justify-center cursor-pointer border border-black ${
                     !user.profileImg && "border border-gray-300"
                   }`}
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowProfileMenu((prev) => !prev);
+                  }}
                 >
                   {user.profileImg ? (
                     <Image
@@ -392,18 +395,22 @@ const Navbar = ({
                     />
                   )}
                 </div>
+
                 {showProfileMenu && (
                   <div
                     className={`absolute ${
-                      isProfilePage ? "top-14 -right-5" : "top-10 -right-2"
-                    } bg-white text-black rounded-2xl shadow-xl p-4 w-72 z-50 profile-menu-container border border-gray-100 flex flex-col gap-3`}
+                      isProfilePage ? "top-14 -right-5" : "top-12 -right-2"
+                    } bg-white text-black rounded-lg shadow-lg w-64 z-50 border border-gray-100 flex flex-col p-2`}
                   >
                     {/* ÜST KISIM: Aktif Kullanıcı Bilgisi */}
-                    <div className="flex flex-col pb-3 border-b border-gray-100 gap-3">
-                      <span className="text-[11px] font-medium text-gray-400">
-                        Şu anda kullanılan hesap
-                      </span>
-                      <div className="flex items-center gap-3">
+                    <div className="flex flex-col hover:bg-gray-100 rounded-lg gap-3 cursor-pointer">
+                      <div
+                        onClick={() => {
+                          router.push(`/profil/${user.username}`);
+                          setShowProfileMenu(false);
+                        }}
+                        className="flex items-center gap-3 p-3"
+                      >
                         <div className="relative w-11 h-11 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-gray-200">
                           {user.profileImg ? (
                             <Image
@@ -428,17 +435,17 @@ const Navbar = ({
                       </div>
                     </div>
 
-                    {/* ORTA KISIM: Profil Menü Linkleri (Constants'tan gelenler) */}
-                    <div className="flex flex-col gap-1">
+                    {/* ORTA KISIM: Profil Menü Linkleri */}
+                    <div className="flex flex-col py-1 mt-1 border-t border-gray-100">
                       {getProfileAccountWithUser(user).map((item) => (
                         <Link
                           href={item.href}
                           key={item.title}
-                          className="w-full px-3 py-2 text-left text-xs font-medium text-gray-700 flex items-center gap-3 rounded-xl hover:bg-gray-50 transition cursor-pointer"
+                          className="w-full px-3 py-2.5 text-left text-xs font-medium text-gray-700 flex items-center gap-3 rounded-xl hover:bg-gray-100 transition cursor-pointer"
                           onClick={() => setShowProfileMenu(false)}
                         >
                           <span className="text-base text-gray-500">
-                            {renderIcon(item.icon as keyof typeof iconMap)}
+                            <CiSettings className="text-xl" />
                           </span>
                           <p>{item.title}</p>
                         </Link>
@@ -446,15 +453,15 @@ const Navbar = ({
                     </div>
 
                     {/* ALT KISIM: Çıkış Yap */}
-                    <div className="pt-2 border-t border-gray-100">
+                    <div className="pt-1 border-t border-gray-100">
                       <button
-                        className="w-full px-3 py-2 text-left text-xs font-medium text-red-600 flex items-center gap-3 rounded-xl hover:bg-red-50 transition cursor-pointer"
+                        className="w-full px-3 py-2.5 text-left text-xs font-medium text-red-600 flex items-center gap-3 rounded-xl hover:bg-red-50 transition cursor-pointer"
                         onClick={() => {
                           setShowProfileMenu(false);
                           logout();
                         }}
                       >
-                        <CiLogout className="text-base" />
+                        <CiLogout className="text-xl" />
                         <span>Çıkış Yap</span>
                       </button>
                     </div>
