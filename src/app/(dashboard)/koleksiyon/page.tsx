@@ -80,7 +80,7 @@ export default function CollectionsPage() {
                 <div
                   key={col.id}
                   onClick={() => handleSelectCollection(col)}
-                  className="relative flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden bg-white"
+                  className="relative flex items-end rounded-lg border border-gray-100 shadow-xs gap-3 group cursor-pointer overflow-hidden bg-white h-36"
                 >
                   <div className="absolute right-0 top-0 z-10">
                     <Image
@@ -112,7 +112,9 @@ export default function CollectionsPage() {
                             }`}
                           >
                             <Image
-                              src={content?.coverImage || "/placeholder.png"}
+                              src={
+                                content?.coverImages[0] || "/placeholder.png"
+                              }
                               alt={content?.title || "Koleksiyon Görseli"}
                               fill
                               className="object-cover"

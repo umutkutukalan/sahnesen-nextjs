@@ -8,7 +8,7 @@ export interface CreateCollectionRequest {
 export interface PostPreviewDTO {
   id: number;
   title: string;
-  coverImage: string;
+  coverImages: string[];
 }
 
 export interface BookmarkCollection {
