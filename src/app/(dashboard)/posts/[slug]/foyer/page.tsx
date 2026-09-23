@@ -624,7 +624,7 @@ export default function FoyerPage({ params }: FoyerPageProps) {
                                 </div>
                               </div>
                             </div>
-                            <p className="text-xs text-gray-800 leading-relaxed font-normal">
+                            <p className="text-xs text-gray-800 leading-relaxed whitespace-pre-line">
                               {reply.content}
                             </p>
                           </div>

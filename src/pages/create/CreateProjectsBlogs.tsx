@@ -358,6 +358,7 @@ const CreateProjectsBlog = ({
         contentStatus={saveStatus}
         activePostId={activePostId}
         postSlug={postSlug}
+        postType={postType}
         isArchived={isArchived}
         isPublished={isPublished}
         onUpdatePost={handleDirectUpdate}

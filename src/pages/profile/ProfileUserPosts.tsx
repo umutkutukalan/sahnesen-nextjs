@@ -8,6 +8,7 @@ import Image from "next/image";
 import { undrawaddfiles } from "@/utils";
 import { useGetUserPosts } from "@/hooks/posts/useGetUserPosts";
 import PostCard from "@/components/projects/PostCard";
+import { useRouter } from "next/navigation";
 
 interface ProfileUserPostsProps {
   targetUsername: string;
@@ -19,6 +20,7 @@ const ProfileUserPosts = ({
   postType,
 }: ProfileUserPostsProps) => {
   const { user } = useAuth();
+  const router = useRouter();
   const currentUsername = user?.username;
 
   const {
@@ -60,7 +62,14 @@ const ProfileUserPosts = ({
           />
         ))
       ) : targetUsername === currentUsername ? (
-        <button className="col-span-full h-30 px-10 text-black border-2 border-gray-100 rounded-2xl flex items-center gap-8 group hover:shadow-md transition-shadow cursor-pointer">
+        <button
+          onClick={() => {
+            postType
+              ? router.push(`/olustur?type=${postType}`)
+              : router.push(`/olustur`);
+          }}
+          className="col-span-full h-30 px-10 text-black bg-white border-2 border-gray-100 rounded-2xl flex items-center gap-8 group hover:shadow-md transition-shadow cursor-pointer"
+        >
           <div className="relative">
             <Image src={undrawaddfiles} alt="" width={100} />
           </div>

@@ -342,11 +342,9 @@ const Navbar = ({
           </div>
 
           <ul className="navbar-links">
-            {user && user.role === "ADMIN" && (
-              <div className="text-[20px]">
-                <NavLinks href="/olustur" logo={<ImPencil2 />} />
-              </div>
-            )}
+            <div className="text-[20px]">
+              <NavLinks href="/olustur" logo={<ImPencil2 />} />
+            </div>
             {user && (
               <div className="text-[20px]">
                 <NavLinks

@@ -14,6 +14,7 @@ interface EditorNavbarProps {
   contentStatus: string;
   activePostId: number | null;
   postSlug: string | null;
+  postType?: string;
   isArchived?: boolean;
   isPublished?: boolean;
   onUpdatePost?: () => void;
@@ -24,6 +25,7 @@ const EditorNavbar = ({
   contentStatus,
   activePostId,
   postSlug,
+  postType,
   isArchived = false,
   isPublished = false,
   onUpdatePost,
@@ -67,13 +69,7 @@ const EditorNavbar = ({
 
   return (
     <nav
-      className={`editor-navbar py-4 lg:px-40 px-6 z-50 ${
-        transparent && isHome
-          ? "bg-transparent text-black shadow-none static py-12 px-20"
-          : transparent && !isHome
-            ? "bg-transparent text-white shadow-none static py-12 px-20"
-            : "text-black bg-white fixed top-0 left-0 w-full z-50"
-      }`}
+      className={`editor-navbar py-12 px-20 lg:px-40 px-6 z-50 w-full fixed top-0 left-0  shadow-none static`}
     >
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3 text-black">
@@ -136,10 +132,20 @@ const EditorNavbar = ({
               ) : (
                 /* Taslak ise normal "Sahnele" butonu */
                 <button
-                  className={`bg-green-800 text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
+                  className={`${
+                    postType === "SAHNE"
+                      ? "bg-[#f18fa0] hover:bg-[#D95F6E]"
+                      : postType === "MONOLOG"
+                        ? "bg-[#9dce9d] hover:bg-[#78A578]"
+                        : postType === "YANYANA"
+                          ? "bg-[#91c5e5] hover:bg-[#70A8D1]"
+                          : postType === "TERSYUZ"
+                            ? "bg-[#f5d35e] hover:bg-[#e8b32d]"
+                            : "border border-black"
+                  } text-xs ${postType ? "text-white" : "hidden text-black"} py-2 px-4 rounded-full transition-all ${
                     !activePostId || !postSlug
                       ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-green-700 cursor-pointer shadow-sm"
+                      : "cursor-pointer shadow-sm"
                   }`}
                   disabled={
                     !activePostId || !postSlug || contentStatus === "SAVING"

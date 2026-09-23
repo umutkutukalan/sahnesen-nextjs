@@ -4,8 +4,6 @@ import EditorNavbar from "@/components/navbar/editor-navbar/EditorNavbar";
 import {
   arkaplan,
   bird,
-  camasir,
-  fineday,
   monolog,
   sahne,
   tersyuz,
@@ -124,7 +122,7 @@ const CreateIntroTwo = () => {
   };
 
   return (
-    <>
+    <main className="min-h-screen bg-white text-black">
       <EditorNavbar
         transparent={true}
         contentStatus="IDLE"
@@ -307,7 +305,7 @@ const CreateIntroTwo = () => {
           })}
         </div>
       </div>
-    </>
+    </main>
   );
 };
 
