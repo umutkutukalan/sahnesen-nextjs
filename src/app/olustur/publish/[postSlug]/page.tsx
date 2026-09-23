@@ -8,6 +8,7 @@ import {
   getPostBySlugClient,
   updatePostClient,
 } from "@/services/client/post.service";
+import { formatTag } from "@/utils/tagFormatter";
 
 const extractAllImagesFromJSON = (contentJSON: any): string[] => {
   const images: string[] = [];
@@ -125,8 +126,13 @@ export default function PublishPage() {
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
-      if (tags.length < 5 && !tags.includes(tagInput.trim())) {
-        setTags([...tags, tagInput.trim()]);
+
+      // Süzgeçten geçiriyoruz
+      const cleanedTag = formatTag(tagInput);
+
+      // Eğer temizlendikten sonra boş kalmadıysa ve daha önce eklenmediyse ekle
+      if (cleanedTag && !tags.includes(cleanedTag) && tags.length < 5) {
+        setTags([...tags, cleanedTag]);
         setTagInput("");
       }
     }

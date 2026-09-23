@@ -115,19 +115,23 @@ const EditorNavbar = ({
           {!isArchived && (
             <>
               {isPublished ? (
-                /* EĞER YAZI ZATEN YAYINDAYSA: "Sahneyi Güncelle" Butonu */
+                /* EĞER YAZI ZATEN YAYINDAYSA: "Sahneyi Güncelle" Butonu -> Publish sayfasına yönlendirir */
                 <button
                   className={`bg-black text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
-                    !activePostId || contentStatus === "SAVING"
+                    !activePostId || !postSlug || contentStatus === "SAVING"
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-gray-800 cursor-pointer shadow-sm"
                   }`}
-                  disabled={!activePostId || contentStatus === "SAVING"}
-                  onClick={onUpdatePost}
+                  disabled={
+                    !activePostId || !postSlug || contentStatus === "SAVING"
+                  }
+                  onClick={() => {
+                    if (postSlug) {
+                      router.push(`/olustur/publish/${postSlug}`);
+                    }
+                  }}
                 >
-                  {contentStatus === "SAVING"
-                    ? "Güncelleniyor..."
-                    : "Sahneyi Güncelle"}
+                  Sahneyi Güncelle
                 </button>
               ) : (
                 /* Taslak ise normal "Sahnele" butonu */
