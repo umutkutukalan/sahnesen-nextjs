@@ -84,6 +84,8 @@ const CreateIntroTwo = () => {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false); // <--- KİLİT STATE'İ EKLENDİ
+
   const selectedCardData = cards.find((card) => card.id === selected);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -91,13 +93,19 @@ const CreateIntroTwo = () => {
   const [offsets, setOffsets] = useState<{ x: string; y: string }[]>([]);
 
   const handleClick = (card: (typeof cards)[0]) => {
+    // Animasyon sürerken tıklamaları tamamen engelle
+    if (isAnimating) return;
+
     if (selected === card.id) {
+      setIsAnimating(true); // Animasyon başladığı an kilitle
       setIsExpanded(false);
       setSelected(null);
       setOffsets([]);
       return;
     }
     if (selected !== null) return;
+
+    setIsAnimating(true); // Animasyon başladığı an kilitle
 
     if (containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
@@ -131,8 +139,12 @@ const CreateIntroTwo = () => {
         isArchived={false}
       />
       <div
-        className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden transition-colors duration-500 ease-in-out"
-        style={{ backgroundColor: selected ? selectedCardData?.bg : "#fff" }}
+        className="w-full h-[100vh] relative flex items-center justify-center overflow-hidden transition-all duration-700 ease-out"
+        style={{
+          backgroundColor: selected ? selectedCardData?.bg : "#ffffff",
+          transitionProperty: "background-color",
+          transitionDuration: "600ms",
+        }}
       >
         <div className="absolute right-0 -bottom-20 w-80 h-180 z-0 pointer-events-none user-none">
           <Image src={arkaplan} fill alt="Background" />
@@ -164,7 +176,9 @@ const CreateIntroTwo = () => {
                 ref={(el) => {
                   cardRefs.current[i] = el;
                 }}
-                className={`relative w-44 h-44 sm:w-60 sm:h-60 cursor-pointer group`}
+                className={`relative w-44 h-44 sm:w-60 sm:h-60 ${
+                  isAnimating ? "pointer-events-none" : "cursor-pointer"
+                } group`}
                 onClick={() => handleClick(card)}
                 animate={
                   isSelected
@@ -194,6 +208,8 @@ const CreateIntroTwo = () => {
                   if (isSelected) {
                     setIsExpanded(true);
                   }
+                  // Animasyon tamamen bittiğinde tıklama kilidini aç
+                  setIsAnimating(false);
                 }}
                 style={{ zIndex: isSelected ? 50 : 1 }}
               >
@@ -230,7 +246,7 @@ const CreateIntroTwo = () => {
                   </div>
                 </motion.div>
 
-                {/* 1. Maskelenmiş Gerçek Kutu (İçerik) - overflow-hidden BURADA kalıyor */}
+                {/* 1. Maskelenmiş Gerçek Kutu (İçerik) */}
                 <div
                   className={`relative w-full h-full rounded-md border border-black overflow-hidden pointer-events-auto z-100`}
                 >
@@ -245,10 +261,7 @@ const CreateIntroTwo = () => {
                   </div>
                 </div>
 
-                {/* 2. SİHİRLİ DOKUNUŞ: KARTIN DIŞINDA (ALTINDA) BELİREN SEÇENEKLER 
-                    overflow-hidden olan üstteki div'in dışına çıkarttık. 
-                    absolute top-full vererek kutunun alt hizasından dışarıya taşmasını sağladık.
-                */}
+                {/* 2. Seçenekler ve Açıklamalar */}
                 {isSelected && isExpanded && (
                   <>
                     <div className="flex flex-col w-full items-center justify-center">
