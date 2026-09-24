@@ -1099,7 +1099,7 @@ const Detail = ({ post }: DetailProps) => {
                             <span>Sahneyi Düzenle</span>
                           </button>
 
-                          <div className="h-[1px] bg-gray-100" />
+                          {/* <div className="h-[1px] bg-gray-100" />
 
                           <button
                             onClick={() => {
@@ -1124,7 +1124,7 @@ const Detail = ({ post }: DetailProps) => {
                             style={{ color: "#b94445" }}
                           >
                             <span>Sahneyi Sil</span>
-                          </button>
+                          </button> */}
                         </>
                       )}
                     </div>
