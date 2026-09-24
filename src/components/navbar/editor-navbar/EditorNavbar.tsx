@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/UserContext";
 import NavLinks from "../NavbarLinks";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getProfileAccountWithUser } from "@/constants";
@@ -64,12 +64,15 @@ const EditorNavbar = ({
   }, [showProfileMenu, notification]);
 
   const pathname = usePathname();
-  const isHome = pathname === "/";
   const isProfilePage = pathname?.startsWith("/profil");
+
+  const searchParams = useSearchParams();
+  const typeParam = searchParams?.get("type");
+  const isCreatePostPage = pathname === "/olustur" && !!typeParam;
 
   return (
     <nav
-      className={`editor-navbar py-12 px-20 lg:px-40 px-6 z-50 w-full fixed top-0 left-0 shadow-none static`}
+      className={`editor-navbar py-6 px-20 lg:px-40 px-6 z-50 w-full ${isCreatePostPage ? "bg-red-900" : "bg-transparent"} fixed top-0 left-0 shadow-none static`}
     >
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3 text-black">
