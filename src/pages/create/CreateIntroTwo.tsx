@@ -26,8 +26,8 @@ const cards = [
     route: "/olustur",
     bottomOffset: "top-0 left-0 w-full h-full",
     options: ["Editöre Git"],
-    sentence: "",
-    description: "Projelerin, çalışmaların, süreçlerin. Sahne senin.",
+    sentence: "Herkesin olduğu gibi, bu da benim emeklerimin sahnesi.",
+    description: "Çalışmaların, başarıların, süreçlerin. Sahne senin.",
   },
   {
     id: "monolog",
@@ -37,7 +37,7 @@ const cards = [
     side: "right",
     bottomOffset: "top-0 left-0 w-full h-full",
     options: ["Editöre Git"],
-    sentence: "",
+    sentence: "İnsan kendini değil, kabuğunu kırmalı. Ah bir bilse değerini...",
     description: "İç sesin, fikirlerin, tecrübelerin. Kendinle baş başa.",
   },
   {
@@ -49,7 +49,7 @@ const cards = [
     bottomOffset: "top-0 left-0 w-full h-full",
     options: ["Editöre Git"],
     sentence: "Bak dün ne oldu biliyor musun?",
-    description: "Anıların, rutinlerin, sohbetlerin. Okurla kahve eşliğinde.",
+    description: "Anıların, rutinlerin, sohbetlerin. Kahve eşliğinde.",
   },
   {
     id: "tersyuz",
