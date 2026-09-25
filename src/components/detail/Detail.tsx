@@ -193,27 +193,27 @@ const Detail = ({ post }: DetailProps) => {
     SAHNE: {
       activeIcon: PiHandsClappingFill,
       inactiveIcon: PiHandsClappingDuotone,
-      color: "#c86b5a",
+      color: "#f18fa0",
     },
     MONOLOG: {
       activeIcon: PiFeatherFill,
       inactiveIcon: PiFeather,
-      color: "#66788a",
+      color: "#9dce9d",
     },
     YANYANA: {
       activeIcon: MdCoffee,
       inactiveIcon: MdOutlineCoffee,
-      color: "#789680",
+      color: "#91c5e5",
     },
     TERSYUZ: {
       activeIcon: RiUserSmileFill,
       inactiveIcon: RiUserSmileLine,
-      color: "#eab308", // #fdfd96 çok açık sarı olduğu için arayüzde görünmeyebilir, burayı istediğin bir tona ayarlayabilirsin
+      color: "#f5d35e",
     },
   };
 
   const postType = post.postType as keyof typeof SHINE_CONFIG;
-  const config = SHINE_CONFIG[postType] || SHINE_CONFIG.SAHNE; // Fallback
+  const config = SHINE_CONFIG[postType] || SHINE_CONFIG.SAHNE;
 
   // Aktif veya pasif duruma göre ilgili ikon componentini seçiyoruz
   const IconComponent = status.isShined
