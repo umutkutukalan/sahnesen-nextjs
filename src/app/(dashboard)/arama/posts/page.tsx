@@ -21,7 +21,9 @@ export default async function SearchPostsPage({ searchParams }: PageProps) {
 
   if (!posts || posts.length === 0) {
     return (
-      <p className="text-gray-500 text-sm">Bu kriterde yazı bulunamadı.</p>
+      <p className="text-gray-500 text-xs">
+        Aradığınız kriterde sahne bulunamadı.
+      </p>
     );
   }
 

@@ -7,6 +7,7 @@ import QueryProvider from "@/providers/QueryProvider";
 import ScrollToTop from "@/components/ScrollToTop";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import AppProviders from "@/components/providers/AppProviders";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,7 @@ export default function RootLayout({
               <SidebarProvider>
                 <NotificationProvider>
                   <ScrollToTop />
-                  {children}
+                  <AppProviders>{children}</AppProviders>
                 </NotificationProvider>
               </SidebarProvider>
             </UserProvider>

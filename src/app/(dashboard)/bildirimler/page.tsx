@@ -9,6 +9,7 @@ import Link from "next/link";
 import { SlBadge } from "react-icons/sl";
 import { IoHeartSharp } from "react-icons/io5";
 import { TbArrowBadgeRightFilled } from "react-icons/tb";
+import { FiUser } from "react-icons/fi";
 
 // Satır bazlı takip butonunu yönetmek için küçük bir yardımcı bileşen:
 export function FollowButton({
@@ -100,19 +101,17 @@ export default function TumBildirimlerPage() {
                 {!notification.isRead && notification.type === "FOLLOW" && (
                   <span className="absolute top-0 left-0.5 w-2.5 h-2.5 rounded-full bg-green-600 z-10"></span>
                 )}
-                {notification.sender ? (
-                  <div className="relative w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="relative w-10 h-10 border border-gray-200 rounded-full flex items-end justify-center overflow-hidden">
+                  {notification.sender?.profileImg ? (
                     <img
                       src={getFullImageUrl(notification.sender?.profileImg)!}
                       alt="Profile Img"
                       className="w-full h-full object-cover"
                     />
-                  </div>
-                ) : (
-                  <div className="relative w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
-                    <TbArrowBadgeRightFilled className="text-2xl" />
-                  </div>
-                )}
+                  ) : (
+                    <FiUser className="text-2xl text-gray-500 group-hover:text-gray-300 transition-all" />
+                  )}
+                </div>
               </div>
               <div className="flex flex-col">
                 <p

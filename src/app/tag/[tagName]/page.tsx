@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
-import { IoIosPaper } from "react-icons/io";
-import api from "@/services/client/config"; // veya axios kullanıyorsan import yolunu kendi yapılandırna göre ayarlayabilirsin
+import api from "@/services/client/config";
 import { PostSummaryResponse } from "@/services/server/post.service";
 import PostCard from "@/components/projects/PostCard";
 
@@ -36,17 +34,15 @@ export default function TagDetailPage() {
   }, [tagName]);
 
   return (
-    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-5">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-700 text-xl font-serif">
-          #
-        </div>
+    <div className="min-h-screen bg-white text-black pt-16 pb-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto flex flex-col gap-6">
+      <div className="flex items-center gap-3 border-b border-gray-200 pb-2">
+        <div className="text-[#7c7c7c] text-3xl">#</div>
         <div>
-          <h1 className="text-2xl font-serif font-bold">
+          <h1 className="text-4xl text-[#7c7c7c] merriweather-sans font-bold">
             {decodeURIComponent(tagName)}
           </h1>
           <p className="text-sm text-gray-400">
-            Bu etiketle paylaşılan gönderiler
+            etiketiyle oluşturulan sahneler
           </p>
         </div>
       </div>
@@ -54,8 +50,8 @@ export default function TagDetailPage() {
       {loading ? (
         <p className="text-gray-400 text-sm">Yükleniyor...</p>
       ) : posts.length === 0 ? (
-        <p className="text-gray-500 text-sm">
-          Bu etiket altında henüz bir gönderi bulunmuyor.
+        <p className="text-gray-500 text-xs">
+          Bu etiket altında henüz bir sahne bulunmuyor.
         </p>
       ) : (
         <div className="flex flex-col gap-4">

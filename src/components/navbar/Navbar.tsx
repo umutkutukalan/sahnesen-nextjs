@@ -116,6 +116,7 @@ const Navbar = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {
       setIsSearchOpen(false);
+      e.currentTarget.blur();
       router.push(`/arama/posts?q=${encodeURIComponent(searchQuery)}`);
     }
   };
@@ -255,7 +256,7 @@ const Navbar = ({
                                     />
                                   ) : (
                                     <div className="w-full h-full flex items-end justify-center">
-                                      <FaRegUser className="text-gray-500 text-sm" />
+                                      <FiUser className="text-gray-500 text-sm" />
                                     </div>
                                   )}
                                 </div>
@@ -390,7 +391,7 @@ const Navbar = ({
                       unoptimized
                     />
                   ) : (
-                    <FaRegUser
+                    <FiUser
                       className={`text-xl ${
                         isProfilePage ? "text-white" : "text-gray-500"
                       }`}
@@ -413,7 +414,7 @@ const Navbar = ({
                         }}
                         className="flex items-center gap-3 p-3"
                       >
-                        <div className="relative w-11 h-11 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-gray-200">
+                        <div className="relative w-11 h-11 rounded-full overflow-hidden flex items-end justify-center shrink-0 border border-gray-200">
                           {user.profileImg ? (
                             <Image
                               src={getFullImageUrl(user.profileImg)!}
@@ -423,7 +424,7 @@ const Navbar = ({
                               unoptimized
                             />
                           ) : (
-                            <FaRegUser className="text-xl text-gray-500" />
+                            <FiUser className="text-3xl text-gray-500 group-hover:text-gray-300 transition-all" />
                           )}
                         </div>
                         <div className="flex flex-col overflow-hidden">

@@ -21,7 +21,9 @@ export default async function SearchTagsPage({ searchParams }: PageProps) {
 
   if (!tags || tags.length === 0) {
     return (
-      <p className="text-gray-500 text-sm">Bu kriterde etiket bulunamadı.</p>
+      <p className="text-gray-500 text-xs">
+        Aradığınız kriterde etiket bulunamadı.
+      </p>
     );
   }
 

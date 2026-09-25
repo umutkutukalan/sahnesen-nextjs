@@ -24,7 +24,9 @@ export default async function SearchUsersPage({ searchParams }: PageProps) {
 
   if (!users || users.length === 0) {
     return (
-      <p className="text-gray-500 text-sm">Bu kriterde kişi bulunamadı.</p>
+      <p className="text-gray-500 text-xs">
+        Aradığınız kritere uygun bir kişi bulunamadı.
+      </p>
     );
   }
 

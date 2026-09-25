@@ -220,7 +220,7 @@ const PostCard = ({
             className="flex items-center gap-2 cursor-pointer w-max"
             onClick={() => ToProfile(post.authorUsername)}
           >
-            <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200">
+            <div className="relative w-5 h-5 flex justify-center items-end rounded-full overflow-hidden border border-gray-200">
               {authorProfileImgUrl ? (
                 <Image
                   src={authorProfileImgUrl}
@@ -230,7 +230,7 @@ const PostCard = ({
                   className="object-cover"
                 />
               ) : (
-                <FiUser className="w-full h-full p-1 text-gray-400" />
+                <FiUser className="text-sm text-gray-500 group-hover:text-gray-300 transition-all" />
               )}
             </div>
 
