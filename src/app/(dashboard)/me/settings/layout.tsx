@@ -72,20 +72,37 @@ export default function SettingsLayout({
 
   const handleSaveImage = async () => {
     try {
+      let updatedProfileImg = user?.profileImg;
+      let updatedCoverImg = user?.coverImg;
+
       if (compressedProfileImageData) {
         const responseName = await updateProfileImg(compressedProfileImageData);
-        setUser({ ...user, profileImg: responseName });
+        updatedProfileImg = responseName;
       } else if (removeProfileImageFlag) {
         await removeProfileImg();
-        setUser({ ...user, profileImg: null });
+        updatedProfileImg = null;
       }
 
       if (compressedCoverImgData) {
         const responseName = await updateCoverImg(compressedCoverImgData);
-        setUser({ ...user, coverImg: responseName });
+        updatedCoverImg = responseName;
       } else if (removeCoverImgFlag) {
         await removeCoverImg();
-        setUser({ ...user, coverImg: null });
+        updatedCoverImg = null;
+      }
+
+      // Kullanıcı state'ini anlık olarak güncelle
+      if (user) {
+        setUser({
+          ...user,
+          profileImg: updatedProfileImg,
+          coverImg: updatedCoverImg,
+        });
+      }
+
+      // Sunucudaki en güncel profili de tekrar çekerek senkronize et
+      if (user?.username) {
+        getUser(user.username);
       }
 
       setPreviewProfileImage(null);
