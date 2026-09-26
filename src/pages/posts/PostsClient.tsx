@@ -27,7 +27,7 @@ export default function PostsClient({
 
   return (
     <>
-      <div className="min-h-screen flex">
+      <div className="h-full flex">
         <Posts
           initialPosts={initialPosts}
           initialPage={initialPage}

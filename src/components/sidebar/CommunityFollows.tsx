@@ -101,7 +101,7 @@ export default function CommunityFollows({ username }: CommunityFollowsProps) {
             className="flex items-center gap-5"
             title={`${user.name} ${user.surname} (@${user.username})`}
           >
-            <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gray-200 hover:border-black transition-all shrink-0">
+            <div className="relative w-5 h-5 rounded-full overflow-hidden flex items-end justify-center border border-gray-200 hover:border-black transition-all shrink-0">
               {user.profileImg ? (
                 <img
                   src={getFullImageUrl(user.profileImg)!}
@@ -109,9 +109,7 @@ export default function CommunityFollows({ username }: CommunityFollowsProps) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                  <FiUser className="text-gray-400 text-xs" />
-                </div>
+                <FiUser className="text-xs text-gray-500 group-hover:text-gray-300 transition-all" />
               )}
             </div>
             <span className="text-xs text-gray-600 hover:text-black truncate">

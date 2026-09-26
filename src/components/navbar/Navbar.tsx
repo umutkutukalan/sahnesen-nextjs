@@ -170,11 +170,12 @@ const Navbar = ({
         <>
           <div className="h-1 w-full bg-green-600 absolute top-0 left-0"></div>
           <div className="flex items-center gap-4">
-            {/* Tıklama mantığı güncellenen menü ikonu */}
-            <RiMenu4Line
-              className="text-2xl cursor-pointer"
-              onClick={handleMenuClick}
-            />
+            {user && (
+              <RiMenu4Line
+                className="text-2xl cursor-pointer"
+                onClick={handleMenuClick}
+              />
+            )}
             <ul className="flex items-center gap-6">
               <li className={`list-none`}>
                 <Link
@@ -189,7 +190,7 @@ const Navbar = ({
 
               <li
                 ref={searchRef}
-                className="relative flex items-center gap-2 border-gray-200 border rounded-lg overflow-visible lg:block hidden"
+                className="relative flex items-center gap-2 bg-gray-100 rounded-full overflow-visible lg:block hidden"
               >
                 <div className="relative rounded-2xl">
                   <div className="absolute top-1/2 left-6 -translate-y-1/2 -translate-x-1/2 transform z-20">
@@ -215,7 +216,7 @@ const Navbar = ({
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder="Ara..."
-                    className="focus:outline-none pl-12 pr-5 py-1.5 text-sm relative z-10 text-lg select-none bg-transparent"
+                    className="focus:outline-none pl-12 pr-5 py-2 text-sm relative z-10 text-lg select-none bg-transparent"
                     style={{ width: 300 }}
                   />
                 </div>
@@ -347,8 +348,14 @@ const Navbar = ({
           </div>
 
           <ul className="navbar-links">
-            <div className="text-[20px]">
-              <NavLinks href="/olustur" logo={<ImPencil2 />} />
+            <div
+              className={`text-[20px] ${!user && "border-r border-gray-100 md:pr-4 pr-2"}`}
+            >
+              <NavLinks
+                href={user ? "/olustur" : ""}
+                logo={<ImPencil2 />}
+                onClick={() => !user && setShowLoginModal(true)}
+              />
             </div>
             {user && (
               <div className="text-[20px]">
@@ -360,16 +367,22 @@ const Navbar = ({
               </div>
             )}
             {!user && (
-              <button
-                className={`transition-all text-sm cursor-pointer ${
-                  isProfilePage
-                    ? "text-white hover:text-gray-100"
-                    : "text-black hover:text-gray-600"
-                }`}
-                onClick={() => setShowLoginModal(true)}
-              >
-                Giris Yap
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  className={`transition-all text-xs cursor-pointer text-black hover:text-gray-600`}
+                  onClick={() => setShowLoginModal(true)}
+                >
+                  Giris Yap
+                </button>
+                <button
+                  className={`transition-all py-1 px-2 text-xs cursor-pointer text-white hover:text-gray-600 rounded-md bg-black`}
+                  onClick={() => {
+                    setShowLoginModal(true);
+                  }}
+                >
+                  Kaydol
+                </button>
+              </div>
             )}
             {user && (
               <div className="flex items-center md:gap-4 gap-2 relative profile-menu-container">

@@ -6,11 +6,13 @@ import {
   ReactionType,
   PostInteractionStatus,
 } from "@/services/client/interaction/interaction.service";
+import { useAuth } from "@/context/UserContext";
 
 export const usePostInteraction = (
   postId: number,
   shineType: ReactionType = "SHINE_SAHNE",
 ) => {
+  const { user } = useAuth();
   const [status, setStatus] = useState<PostInteractionStatus>({
     isLiked: false,
     isShined: false,
@@ -23,6 +25,7 @@ export const usePostInteraction = (
   const [isLoading, setIsLoading] = useState<boolean>(!!postId);
 
   useEffect(() => {
+    if (!user) return;
     if (!postId) return;
 
     let isMounted = true;

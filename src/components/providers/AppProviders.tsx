@@ -5,7 +5,9 @@ import { useAuth } from "@/context/UserContext";
 import Sidebar from "@/components/sidebar/Sidebar";
 import ProfileSidebar from "@/components/sidebar/ProfileSidebar";
 import Navbar from "@/components/navbar/Navbar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import LoginPage from "@/pages/LoginPage";
+import { useSidebar } from "@/context/SidebarContext";
 
 export default function AppProviders({
   children,
@@ -14,6 +16,31 @@ export default function AppProviders({
 }) {
   const { user, loading, isLoggingOut } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+  const { isSidebarOpen, isProfileSidebarOpen } = useSidebar();
+
+  // açık/misafirlerin de gezebileceği sayfaların kontrolü:
+  // 1. Ana sayfa ("/")
+  // 2. Arama sayfaları ("/arama...")
+  // 3. Etiket sayfaları ("/tag...")
+  // 4. Kullanıcı profilleri veya yazı detayları (Genellikle 2 segmentli yollar: /username/slug veya /profil/...)
+  const segments = pathname?.split("/").filter(Boolean) || [];
+
+  const isHome = pathname === "/";
+  const isSearchPage = pathname?.startsWith("/arama");
+  const isTagPage = pathname?.startsWith("/tag");
+  const isProfileRoute = pathname?.startsWith("/profil");
+
+  // Eğer URL'de 2 parça varsa (örn: /kutukalanumut/sirket-maili-...) bu bir yazı detay veya yazar sayfasıdır
+  const isDetailOrAuthorPage = segments.length === 2 && !isProfileRoute;
+
+  // Misafir kullanıcılar için serbest olan sayfalar
+  const isPublicAllowedPage =
+    isHome ||
+    isSearchPage ||
+    isTagPage ||
+    isProfileRoute ||
+    isDetailOrAuthorPage;
 
   // İlk yüklenme veya çıkış yapma sürecindeyse şık bir tam ekran yükleme göster
   if (loading || isLoggingOut) {
@@ -27,9 +54,37 @@ export default function AppProviders({
     );
   }
 
-  // Kullanıcı yoksa doğrudan alt bileşenleri (Landing / Home sayfası) göster
   if (!user) {
-    return <>{children}</>;
+    // Eğer ana sayfadaysak Navbar olmadan veya isteğe göre sadece children göster
+    if (isHome) {
+      return <>{children}</>;
+    }
+
+    // Ana sayfa dışındaki serbest/açık sayfalarda Navbar göstererek içeriği ver
+    return (
+      <>
+        {!isPublicAllowedPage ? (
+          <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f4ea]">
+            <div className="w-full h-full flex items-center justify-center">
+              <LoginPage setShowLoginModal={() => router.push("/")} />
+            </div>
+          </div>
+        ) : (
+          <>
+            <Navbar transparent={false} />
+            <div className="min-h-screen flex flex-col bg-white">
+              <div className="flex flex-1 min-h-[calc(100vh-64px)]">
+                <main
+                  className={`flex-1 min-w-0 bg-white relative top-[64px] transition-all duration-500 ease-in-out`}
+                >
+                  {children}
+                </main>
+              </div>
+            </div>
+          </>
+        )}
+      </>
+    );
   }
 
   const isEditorPage = pathname?.startsWith("/olustur");
@@ -40,25 +95,38 @@ export default function AppProviders({
   const isProfilePage = pathname?.startsWith("/profil");
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <>
       {/* Sabit Navbar */}
       <Navbar transparent={false} isProfile={isProfilePage} />
+      <div className="min-h-screen flex flex-col bg-white">
+        {/* Alt Alan (Sidebar + Sayfa İçeriği) */}
+        <div className="flex flex-1 min-h-[calc(100vh-64px)]">
+          {/* Masaüstü Sabit Sidebar */}
+          <div className="hidden lg:block">
+            {isProfilePage ? <ProfileSidebar /> : <Sidebar />}
+          </div>
 
-      {/* Alt Alan (Sidebar + Sayfa İçeriği) */}
-      <div className="flex flex-1 min-h-[calc(100vh-64px)]">
-        {/* Masaüstü Sabit Sidebar */}
-        <div className="hidden lg:block">
-          {isProfilePage ? <ProfileSidebar /> : <Sidebar />}
+          {/* Mobil Drawer Sidebar */}
+          <div className="block lg:hidden">
+            <ProfileSidebar />
+          </div>
+
+          {/* Sayfa Değiştikçe Sadece Burası Yenilenir, Navbar ve Sidebar Sabit Kalır */}
+          <main
+            className={`flex-1 min-w-0 bg-white relative top-[64px] transition-all duration-500 ease-in-out ${
+              isProfilePage
+                ? isProfileSidebarOpen
+                  ? ""
+                  : ""
+                : isSidebarOpen
+                  ? "lg:ml-60"
+                  : ""
+            }`}
+          >
+            {children}
+          </main>
         </div>
-
-        {/* Mobil Drawer Sidebar */}
-        <div className="block lg:hidden">
-          <ProfileSidebar />
-        </div>
-
-        {/* Sayfa Değiştikçe Sadece Burası Yenilenir, Navbar ve Sidebar Sabit Kalır */}
-        <main className="flex-1 min-w-0 bg-white">{children}</main>
       </div>
-    </div>
+    </>
   );
 }

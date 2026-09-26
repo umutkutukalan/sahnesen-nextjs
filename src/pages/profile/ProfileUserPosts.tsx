@@ -88,8 +88,8 @@ const ProfileUserPosts = ({
       ) : (
         <p className="text-gray-500 text-xs">
           {postType
-            ? `Kullanıcının bu kategoride (${postType}) henüz bir gönderisi yok.`
-            : "Kullanıcı henüz bir gönderi paylaşmadı."}
+            ? `Kullanıcının bu kategoride (${postType.toLowerCase()}) henüz bir sahnesi yok.`
+            : "Kullanıcı henüz bir sahne paylaşmadı."}
         </p>
       )}
 
@@ -110,7 +110,7 @@ const ProfileUserPosts = ({
       {/* Veri Bittiğinde Gösterilecek Mesaj */}
       {!hasNextPage && userPosts && userPosts.length > 0 && (
         <div className="flex justify-center items-center py-8">
-          <p className="text-gray-500 text-xs">Tüm içerikler yüklendi.</p>
+          <p className="text-gray-500 text-xs">Tüm sahneler gösterildi.</p>
         </div>
       )}
     </div>

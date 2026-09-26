@@ -90,7 +90,7 @@ const Profile = ({ usernameSlug }: { usernameSlug: string }) => {
     }
   }, [targetUsername]);
 
-  if (isLoading || !user) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 

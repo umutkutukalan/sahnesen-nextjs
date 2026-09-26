@@ -280,6 +280,7 @@ const Detail = ({ post }: DetailProps) => {
 
   useEffect(() => {
     const fetchComments = async () => {
+      if (!user) return;
       if (!post?.id) return;
       try {
         const commentsRes = await commentService.getComments(post.id);

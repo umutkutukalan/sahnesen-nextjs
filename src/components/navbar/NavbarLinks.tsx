@@ -6,6 +6,7 @@ interface NavLinksProps {
   logo: React.ReactNode;
   isLogin?: boolean; // String kıyaslaması yerine opsiyonel prop eklemek daha güvenlidir
   badgeCount?: number;
+  onClick?: () => void;
 }
 
 const NavLinks = ({
@@ -13,11 +14,13 @@ const NavLinks = ({
   logo,
   isLogin = false,
   badgeCount,
+  onClick,
 }: NavLinksProps) => {
   return (
     <li className="list-none relative flex items-center justify-center">
       <Link
         href={href}
+        onClick={onClick}
         className={`relative inline-block ${
           isLogin
             ? "text-xs border-l pl-2 hover:text-gray-800 transition-all duration-100"
