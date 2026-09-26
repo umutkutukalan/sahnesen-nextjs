@@ -150,7 +150,7 @@ export const createPostClient = async (payload: any) => {
 };
 
 // 5. AUTH: Gönderi / Taslak Güncelleme
-export const updatePostClient = async (postId: number, payload: any) => {
+export const updatePostClient = async (publicId: string, payload: any) => {
   const formattedPayload = {
     postType: payload.postType || "SAHNE",
     title:
@@ -165,7 +165,12 @@ export const updatePostClient = async (postId: number, payload: any) => {
     isPublished: Boolean(payload.isPublished),
   };
 
-  const response = await api.put(`/api/posts/me/${postId}`, formattedPayload);
+  const response = await api.put(`/api/posts/me/${publicId}`, formattedPayload);
+  return response.data;
+};
+
+export const getPostByPublicIdClient = async (publicId: string) => {
+  const response = await api.get(`/api/posts/me/${publicId}`);
   return response.data;
 };
 

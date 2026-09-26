@@ -8,7 +8,7 @@ import PublishModal from "@/components/editor/PublishModal";
 import {
   createPostClient,
   updatePostClient,
-  getPostBySlugClient,
+  getPostByPublicIdClient,
 } from "@/services/client/post.service";
 import { useAuth } from "@/context/UserContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -75,8 +75,16 @@ const CreateProjectsBlog = ({
     isPublishedRef.current = isPublished;
   }, [isPublished]);
 
+  // 🔑 İki ayrı tanımlayıcı:
+  // - activePostId: gerçek DB id'si (numeric). TiptapEditor'e (görsel
+  //   yükleme/klasör işlemleri gibi backend-içi kullanımlar için) geçiyoruz.
+  // - activePublicId: dışa açık, hiç değişmeyen tanımlayıcı (string).
+  //   URL'de, fetch/update çağrılarında bunu kullanıyoruz.
   const [activePostId, setActivePostId] = useState<number | null>(null);
   const activePostIdRef = useRef<number | null>(null);
+
+  const [activePublicId, setActivePublicId] = useState<string | null>(null);
+  const activePublicIdRef = useRef<string | null>(null);
 
   const [initialContent, setInitialContent] = useState<any>(null);
   const [isLoadingPost, setIsLoadingPost] = useState<boolean>(false);
@@ -88,54 +96,105 @@ const CreateProjectsBlog = ({
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("IDLE");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 🔑 publicId'ye göre içerik çekme mantığı; hem ilk mount'ta hem de
+  // popstate/pageshow ile geri dönüşte yeniden tetiklenebilmesi için
+  // ayrı bir ref'e taşındı, searchParams her değiştiğinde güncelleniyor
+  // (stale closure oluşmasın diye).
+  const fetchPostRef = useRef<() => Promise<void>>(async () => {});
+
   useEffect(() => {
-    const slugParam = searchParams?.get("slug");
-    const typeParam = searchParams?.get("type");
+    fetchPostRef.current = async () => {
+      const publicIdParam = searchParams?.get("postId");
+      const typeParam = searchParams?.get("type");
 
-    if (typeParam) {
-      setPostType(typeParam.toUpperCase());
-    }
+      if (typeParam) {
+        setPostType(typeParam.toUpperCase());
+      }
 
-    if (slugParam && !activePostIdRef.current) {
-      setPostSlug(slugParam);
+      if (!publicIdParam || activePublicIdRef.current) return;
+
       setIsLoadingPost(true);
 
-      getPostBySlugClient(slugParam)
-        .then((postData) => {
-          if (postData) {
-            setActivePostId(postData.id);
-            activePostIdRef.current = postData.id;
+      try {
+        const postData = await getPostByPublicIdClient(publicIdParam);
 
-            if (postData.postType) {
-              setPostType(postData.postType);
-            }
+        if (postData) {
+          setActivePostId(postData.id);
+          activePostIdRef.current = postData.id;
 
-            if (typeof postData.isPublished === "boolean") {
-              setIsPublished(postData.isPublished);
-              isPublishedRef.current = postData.isPublished;
-            }
+          setActivePublicId(postData.publicId);
+          activePublicIdRef.current = postData.publicId;
 
-            let parsedContent = postData.content;
-            if (typeof postData.content === "string") {
-              try {
-                parsedContent = JSON.parse(postData.content);
-              } catch (e) {
-                console.error("Content JSON Parse Hatası:", e);
-              }
-            }
+          setPostSlug(postData.slug);
 
-            setInitialContent(parsedContent);
-            setEditorJSON(parsedContent);
+          if (postData.postType) {
+            setPostType(postData.postType);
           }
-        })
-        .catch((err) => {
-          console.error("Slug ile içerik çekilirken hata oluştu:", err);
-        })
-        .finally(() => {
-          setIsLoadingPost(false);
-        });
-    }
+
+          if (typeof postData.isPublished === "boolean") {
+            setIsPublished(postData.isPublished);
+            isPublishedRef.current = postData.isPublished;
+          }
+
+          let parsedContent = postData.content;
+          if (typeof postData.content === "string") {
+            try {
+              parsedContent = JSON.parse(postData.content);
+            } catch (e) {
+              console.error("Content JSON Parse Hatası:", e);
+            }
+          }
+
+          setInitialContent(parsedContent);
+          setEditorJSON(parsedContent);
+        }
+      } catch (err) {
+        console.error("publicId ile içerik çekilirken hata oluştu:", err);
+      } finally {
+        setIsLoadingPost(false);
+      }
+    };
+
+    // searchParams değiştiğinde (URL güncellemesi) normal fetch tetiklenir
+    fetchPostRef.current();
   }, [searchParams]);
+
+  // 🔑 Next.js App Router geri/ileri tuşunda component'i unmount etmeden
+  // Router Cache'teki eski render'ı geri getiriyor (pageshow/bfcache
+  // native olarak tetiklenmiyor). Bunun yerine tarayıcının native
+  // `popstate` event'ini dinleyip stale ref'leri sıfırlayarak fetch'i
+  // zorla yeniden tetikliyoruz. publicId hiç değişmediği için, yayınlanmış
+  // bir yazıya geri dönüldüğünde de aynı editör ekranında (Medium'daki
+  // /p/{id}/edit mantığıyla) kalmaya devam ediyoruz.
+  useEffect(() => {
+    const handlePopState = () => {
+      activePostIdRef.current = null;
+      activePublicIdRef.current = null;
+      isPublishedRef.current = false;
+      setActivePostId(null);
+      setActivePublicId(null);
+      setIsPublished(false);
+      setInitialContent(null);
+      setEditorJSON(null);
+      fetchPostRef.current();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    // pageshow'u da bıraktık: gerçek bfcache restore (tam sayfa
+    // navigasyonu) senaryosu için ek güvence sağlıyor.
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        handlePopState();
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("pageshow", handlePageShow);
+    };
+  }, []);
 
   useEffect(() => {
     postTypeRef.current = postType;
@@ -157,7 +216,7 @@ const CreateProjectsBlog = ({
   // İlk Taslak Oluşturma
   const ensureDraftExistsRef = useRef(async (currentJson?: any) => {
     if (
-      activePostIdRef.current ||
+      activePublicIdRef.current ||
       isCreatingRef.current ||
       isPublishedRef.current
     )
@@ -178,15 +237,20 @@ const CreateProjectsBlog = ({
         isPublished: false,
       });
 
-      if (data?.id) {
+      if (data?.publicId) {
         activePostIdRef.current = data.id;
         setActivePostId(data.id);
+
+        activePublicIdRef.current = data.publicId;
+        setActivePublicId(data.publicId);
+
         setSaveStatus("SAVED");
 
         if (data.slug) {
           setPostSlug(data.slug);
-          router.replace(`/olustur?slug=${data.slug}`, { scroll: false });
         }
+
+        router.replace(`/olustur?postId=${data.publicId}`, { scroll: false });
       }
     } catch (err) {
       console.error("Taslak oluşturma hatası:", err);
@@ -198,7 +262,7 @@ const CreateProjectsBlog = ({
 
   // Otomatik Kaydetme
   const autoSaveContentRef = useRef(async (currentJson: any) => {
-    if (!activePostIdRef.current || isPublishedRef.current) return;
+    if (!activePublicIdRef.current || isPublishedRef.current) return;
 
     const extracted = extractTitle(currentJson);
     const finalTitle =
@@ -207,7 +271,7 @@ const CreateProjectsBlog = ({
         : "Başlıksız Taslak";
 
     try {
-      await updatePostClient(activePostIdRef.current, {
+      await updatePostClient(activePublicIdRef.current, {
         postType: postTypeRef.current,
         title: finalTitle,
         content: currentJson,
@@ -233,7 +297,7 @@ const CreateProjectsBlog = ({
       return;
     }
 
-    if (!activePostIdRef.current) {
+    if (!activePublicIdRef.current) {
       ensureDraftExistsRef.current(json);
     } else {
       setSaveStatus("SAVING");
@@ -247,7 +311,7 @@ const CreateProjectsBlog = ({
 
   // 🔥 YAYINLANMIŞ YAZILAR İÇİN DOĞRUDAN GÜNCELLEME FONKSİYONU
   const handleDirectUpdate = async () => {
-    if (!activePostId) return;
+    if (!activePublicId) return;
 
     const currentTitle = extractTitle(editorJSONRef.current);
     if (!currentTitle || currentTitle.trim().length < 3) {
@@ -268,16 +332,13 @@ const CreateProjectsBlog = ({
     };
 
     try {
-      const savedPost = await updatePostClient(activePostId, payload);
+      await updatePostClient(activePublicId, payload);
       setSaveStatus("SAVED");
 
-      await queryClient.invalidateQueries({ queryKey: ["userPosts"] });
-      router.refresh();
-
-      const username = user?.username;
-      if (username && postSlug) {
-        router.push(`/${username}/${postSlug}`);
-      }
+      // İçerik başarıyla kaydedildi, şimdi publish sayfasına git —
+      // orada güncel içerik gösterilecek, kullanıcı meta bilgileri
+      // ayarlayıp "Sahnele"ye basınca işlem kesinleşecek.
+      router.push(`/olustur/publish/${activePublicId}`);
     } catch (error: any) {
       console.error("Sahne güncelleme hatası:", error);
       setSaveStatus("ERROR");
@@ -323,10 +384,10 @@ const CreateProjectsBlog = ({
 
     try {
       let savedPost;
-      const currentId = activePostIdRef.current || activePostId;
+      const currentPublicId = activePublicIdRef.current || activePublicId;
 
-      if (currentId) {
-        savedPost = await updatePostClient(currentId, payload);
+      if (currentPublicId) {
+        savedPost = await updatePostClient(currentPublicId, payload);
       } else {
         savedPost = await createPostClient(payload);
       }
@@ -341,9 +402,9 @@ const CreateProjectsBlog = ({
       const slug = savedPost?.slug;
 
       if (username && slug) {
-        router.push(`/${username}/${slug}`);
+        window.location.href = `/${username}/${slug}`;
       } else {
-        router.push("/akis");
+        window.location.href = "/";
       }
     } catch (error: any) {
       console.error("Yayınlama hatası:", error);
@@ -357,6 +418,7 @@ const CreateProjectsBlog = ({
         transparent={false}
         contentStatus={saveStatus}
         activePostId={activePostId}
+        activePublicId={activePublicId}
         postSlug={postSlug}
         postType={postType}
         isArchived={isArchived}

@@ -261,7 +261,7 @@ const PostCard = ({
               if (isOwner && !post.isPublished) {
                 const archivedFlag = post.isArchived ?? post.archived ?? false;
                 router.push(
-                  `/olustur?slug=${post?.slug}&isArchived=${archivedFlag}`,
+                  `/olustur?postId=${post?.publicId}&isArchived=${archivedFlag}`,
                 );
               } else {
                 router.push(`/${post?.authorUsername}/${post?.slug}`);
@@ -339,7 +339,7 @@ const PostCard = ({
                     const archivedFlag =
                       post.isArchived ?? post.archived ?? false;
                     router.push(
-                      `/olustur?slug=${post.slug}&isArchived=${archivedFlag}`,
+                      `/olustur?postId=${post.publicId}&isArchived=${archivedFlag}`,
                     );
                   }}
                 >
@@ -381,7 +381,7 @@ const PostCard = ({
                   >
                     <button
                       onClick={() => {
-                        router.push(`/olustur?slug=${post.slug}`);
+                        router.push(`/olustur?postId=${post.publicId}`);
                         setIsMenuOpen(false);
                       }}
                       className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"

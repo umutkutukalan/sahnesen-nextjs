@@ -13,6 +13,7 @@ interface EditorNavbarProps {
   transparent: boolean;
   contentStatus: string;
   activePostId: number | null;
+  activePublicId: string | null;
   postSlug: string | null;
   postType?: string;
   isArchived?: boolean;
@@ -24,6 +25,7 @@ const EditorNavbar = ({
   transparent,
   contentStatus,
   activePostId,
+  activePublicId,
   postSlug,
   postType,
   isArchived = false,
@@ -34,18 +36,6 @@ const EditorNavbar = ({
   const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notification, setNotification] = useState(false);
-
-  // const iconMap = {
-  //   FiUser: FiUser,
-  //   RiComputerFill: RiComputerFill,
-  //   IoIosPaper: IoIosPaper,
-  //   IoSettingsOutline: IoSettingsOutline,
-  // };
-
-  // const renderIcon = (iconName: keyof typeof iconMap) => {
-  //   const IconComponent = iconMap[iconName];
-  //   return IconComponent ? <IconComponent /> : <FiUser />;
-  // };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -121,17 +111,19 @@ const EditorNavbar = ({
                 /* EĞER YAZI ZATEN YAYINDAYSA: "Sahneyi Güncelle" Butonu -> Publish sayfasına yönlendirir */
                 <button
                   className={`bg-black text-xs text-white py-1.5 px-4 rounded-xl transition-all ${
-                    !activePostId || !postSlug || contentStatus === "SAVING"
+                    !activePostId ||
+                    !activePublicId ||
+                    contentStatus === "SAVING"
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-gray-800 cursor-pointer shadow-sm"
                   }`}
                   disabled={
-                    !activePostId || !postSlug || contentStatus === "SAVING"
+                    !activePostId ||
+                    !activePublicId ||
+                    contentStatus === "SAVING"
                   }
                   onClick={() => {
-                    if (postSlug) {
-                      router.push(`/olustur/publish/${postSlug}`);
-                    }
+                    onUpdatePost?.();
                   }}
                 >
                   Sahneyi Güncelle
@@ -150,16 +142,18 @@ const EditorNavbar = ({
                             ? "bg-[#f5d35e] hover:bg-[#e8b32d]"
                             : "border border-black"
                   } text-xs ${postType ? "text-white" : "hidden text-black"} py-2 px-4 rounded-full transition-all ${
-                    !activePostId || !postSlug
+                    !activePostId || !activePublicId
                       ? "opacity-50 cursor-not-allowed"
                       : "cursor-pointer shadow-sm"
                   }`}
                   disabled={
-                    !activePostId || !postSlug || contentStatus === "SAVING"
+                    !activePostId ||
+                    !activePublicId ||
+                    contentStatus === "SAVING"
                   }
                   onClick={() => {
-                    if (postSlug) {
-                      router.push(`/olustur/publish/${postSlug}`);
+                    if (activePublicId) {
+                      router.push(`/olustur/publish/${activePublicId}`);
                     }
                   }}
                 >

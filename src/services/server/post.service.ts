@@ -2,6 +2,7 @@
 
 export interface PostResponse {
   id: number;
+  publicId: string;
   title: string;
   subtitle: string;
   slug: string;
@@ -23,6 +24,7 @@ export interface PostResponse {
 
 export interface PostSummaryResponse {
   id: number;
+  publicId: string;
   title: string;
   subtitle: string;
   slug: string;

@@ -8,12 +8,12 @@ import CreateProjectsBlogs from "@/pages/create/CreateProjectsBlogs";
 function CreateContent() {
   const searchParams = useSearchParams();
   const type = searchParams?.get("type");
-  const slug = searchParams?.get("slug");
+  const postId = searchParams?.get("postId");
 
   const isArchivedParam = searchParams?.get("isArchived") === "true";
 
-  // Eğer URL'de bir type veya slug varsa, doğrudan editör bileşenini göster
-  if (type || slug) {
+  // Eğer URL'de bir type veya postId varsa, doğrudan editör bileşenini göster
+  if (type || postId) {
     return <CreateProjectsBlogs isArchived={isArchivedParam} />;
   }
 

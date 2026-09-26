@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { IoClose } from "react-icons/io5";
 import { PostResponse } from "@/services/server/post.service";
 import {
-  getPostBySlugClient,
+  getPostByPublicIdClient,
   updatePostClient,
 } from "@/services/client/post.service";
 import { formatTag } from "@/utils/tagFormatter";
@@ -28,7 +28,7 @@ const extractAllImagesFromJSON = (contentJSON: any): string[] => {
 export default function PublishPage() {
   const params = useParams();
   const router = useRouter();
-  const postSlug = params?.postSlug as string;
+  const publicId = params?.publicId as string;
 
   const [post, setPost] = useState<PostResponse | null>(null);
   const [subtitle, setSubtitle] = useState("");
@@ -45,13 +45,11 @@ export default function PublishPage() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  console.log("post: ", post);
-
   useEffect(() => {
     const fetchPostDetails = async () => {
       try {
         setLoading(true);
-        const data = await getPostBySlugClient(postSlug);
+        const data = await getPostByPublicIdClient(publicId);
         setPost(data);
         setSubtitle(data.subtitle || "");
         setTags(data.tags || []);
@@ -88,10 +86,10 @@ export default function PublishPage() {
       }
     };
 
-    if (postSlug) {
+    if (publicId) {
       fetchPostDetails();
     }
-  }, [postSlug]);
+  }, [publicId]);
 
   // Görsel seçim/kaldırma mantığı (Max 3 adet)
   const toggleImageSelection = (imgUrl: string) => {
@@ -144,11 +142,11 @@ export default function PublishPage() {
 
   // Yayınla Aksiyonu
   const handlePublish = async () => {
-    if (!post?.id) return;
+    if (!post?.publicId) return;
 
     try {
       setIsSubmitting(true);
-      await updatePostClient(post.id, {
+      await updatePostClient(post.publicId, {
         ...post,
         subtitle,
         tags,
@@ -156,7 +154,8 @@ export default function PublishPage() {
         discussionDurationHours,
         isPublished: true,
       });
-      router.push("/");
+      router.refresh(); // cache temizle
+      router.replace(`/profil/${post.authorUsername}`);
     } catch (error) {
       console.error("Yayınlama başarısız:", error);
     } finally {
