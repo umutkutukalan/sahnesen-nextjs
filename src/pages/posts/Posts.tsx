@@ -73,10 +73,10 @@ const Posts = ({
                     ) : (
                       <div className="py-12 text-center text-xs text-gray-500 border border-dashed border-gray-200 rounded-xl">
                         {feedScope === "following"
-                          ? "Takip ettiğiniz kişilerin henüz yayınlanmış bir içeriği bulunmuyor."
+                          ? "Takip ettiğiniz kişilerin henüz yayınlanmış bir sahnesi bulunmuyor."
                           : selectedPostType
-                            ? `${selectedPostType} türünde henüz bir içerik bulunmuyor.`
-                            : "Henüz yayınlanmış bir içerik bulunmuyor."}
+                            ? `${selectedPostType} türünde henüz bir sahne bulunmuyor.`
+                            : "Henüz yayınlanmış bir sahne bulunmuyor."}
                       </div>
                     )}
                   </div>
@@ -91,7 +91,7 @@ const Posts = ({
                 <div className="flex items-center justify-center py-8">
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
                   <span className="ml-3 text-gray-600 text-xs">
-                    Daha fazla içerik yükleniyor...
+                    Daha fazla sahne yükleniyor...
                   </span>
                 </div>
               )}
@@ -99,16 +99,16 @@ const Posts = ({
               {/* TÜM İÇERİKLER YÜKLENDİ MESAJI */}
               {!hasMore && posts.length > 0 && (
                 <div className="py-8 text-center text-xs text-gray-500">
-                  Tüm içerikler yüklendi.
+                  Tüm sahneler gösterildi.
                 </div>
               )}
 
               {/* SAYFA BİLGİSİ */}
-              {totalPages > 1 && (
+              {/* {totalPages > 1 && (
                 <div className="py-4 text-center text-sm text-gray-400">
                   Sayfa {currentPage + 1} / {totalPages} • {posts.length} içerik
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>

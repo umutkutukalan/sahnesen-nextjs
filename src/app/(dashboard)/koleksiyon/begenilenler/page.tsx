@@ -87,7 +87,7 @@ export default function BegenilenlerPage() {
       <div className="flex flex-col gap-6">
         {isLoading ? (
           <div className="py-12 text-center text-xs text-gray-400">
-            Beğenilenler yükleniyor...
+            Beğenilen sahneler yükleniyor...
           </div>
         ) : posts.length > 0 ? (
           <div className="grid grid-cols-1">
@@ -100,7 +100,7 @@ export default function BegenilenlerPage() {
 
             {isLoadingMore && (
               <div className="py-4 text-center text-xs text-gray-400">
-                Daha fazla yükleniyor...
+                Daha fazla sahne yükleniyor...
               </div>
             )}
           </div>

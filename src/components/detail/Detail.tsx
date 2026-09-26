@@ -1091,7 +1091,7 @@ const Detail = ({ post }: DetailProps) => {
                         <>
                           <button
                             onClick={() => {
-                              router.push(`/olustur?slug=${post.slug}`);
+                              router.push(`/olustur?postId=${post.publicId}`);
                               setIsMenuOpen(false);
                             }}
                             className="flex items-center text-xs text-gray-600 hover:text-black transition text-left cursor-pointer"
