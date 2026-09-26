@@ -16,6 +16,7 @@ import {
   getUserCollectionsClient,
 } from "@/services/client/collection/collection.service";
 import { interactionService } from "@/services/client/interaction/interaction.service";
+import { useAuth } from "@/context/UserContext";
 
 // 1. Koleksiyon verilerini alt bileşenlerin rahatça kullanabilmesi için bir Context oluşturalım
 interface CollectionsContextType {
@@ -37,6 +38,7 @@ export default function KoleksiyonlarLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -85,9 +87,10 @@ export default function KoleksiyonlarLayout({
   };
 
   useEffect(() => {
+    if (!user) return;
     fetchUserCollections();
     fetchUserStats();
-  }, []);
+  }, [user]);
 
   const handleSelectType = (type: string | undefined) => {
     const params = new URLSearchParams(searchParams?.toString());

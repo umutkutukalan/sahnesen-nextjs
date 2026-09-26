@@ -5,8 +5,10 @@ import PostCard from "@/components/projects/PostCard";
 import { interactionService } from "@/services/client/interaction/interaction.service";
 import { PostResponse } from "@/services/server/post.service";
 import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/UserContext";
 
 export default function BegenilenlerPage() {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
 
   // URL'deki ?type= parametresini alıyoruz (Layout ile uyumlu çalışması için)
@@ -45,8 +47,9 @@ export default function BegenilenlerPage() {
 
   // Tür (type) değiştiğinde veya ilk açılışta tetikle
   useEffect(() => {
+    if (!user) return;
     fetchLikedPosts(selectedType, 0, false);
-  }, [selectedType, fetchLikedPosts]);
+  }, [selectedType, fetchLikedPosts, user]);
 
   // Sonsuz kaydırma (Load More) tetikleyicisi
   const loadMorePosts = useCallback(() => {

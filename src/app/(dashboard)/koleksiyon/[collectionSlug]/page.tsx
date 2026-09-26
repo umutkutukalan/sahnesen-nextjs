@@ -5,8 +5,10 @@ import PostCard from "@/components/projects/PostCard";
 import { PostResponse } from "@/services/server/post.service";
 import { useParams, useSearchParams } from "next/navigation";
 import { getCollectionPostsBySlugClient } from "@/services/client/collection/collection.service";
+import { useAuth } from "@/context/UserContext";
 
 export default function CollectionDetailPage() {
+  const { user } = useAuth();
   const params = useParams();
   const searchParams = useSearchParams();
 
@@ -48,8 +50,9 @@ export default function CollectionDetailPage() {
   }, [collectionSlug, selectedType]);
 
   useEffect(() => {
+    if (!user) return;
     fetchPosts();
-  }, [fetchPosts]);
+  }, [fetchPosts, user]);
 
   // Sonsuz kaydırma ile sonraki sayfaları çekme
   const loadMorePosts = async () => {
